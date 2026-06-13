@@ -9,6 +9,7 @@
 //   exit codes: 0 = ok / 2 = usage error · 파일 읽기 실패.
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { writeStdoutSync } from '../../_shared/write-stdout-sync.js';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
@@ -223,7 +224,7 @@ function main() {
 			}
 		}
 	} else {
-		console.log(JSON.stringify(cache, null, 2));
+		writeStdoutSync(JSON.stringify(cache, null, 2));
 	}
 	process.exit(0);
 }

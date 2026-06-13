@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { validateSpecTestLink, validateMockSoundness, loadJson } from './validator.js';
 
+import { writeStdoutSync } from '../../_shared/write-stdout-sync.js';
 function parseArgs(argv) {
   const out = { dryRun: false, json: false, threshold: 0.85 };
   for (let i = 2; i < argv.length; i++) {
@@ -50,7 +51,7 @@ if (unitSpec) {
 }
 
 if (args.json) {
-  console.log(JSON.stringify(result, null, 2));
+  writeStdoutSync(JSON.stringify(result, null, 2));
 } else {
   console.log(`[spec-test-link-validator] ${result.summary.total_findings} findings (critical: ${result.summary.critical}, high: ${result.summary.high}, medium: ${result.summary.medium})`);
   console.log(`coverage AC→TC: ${(result.coverage.ac_to_tc * 100).toFixed(1)}% (threshold ${args.threshold})`);

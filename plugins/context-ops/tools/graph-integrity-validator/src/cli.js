@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { readFileSync } from "node:fs";
+import { writeStdoutSync } from '../../_shared/write-stdout-sync.js';
 import { resolve } from "node:path";
 import { validateGraph } from "./validator.js";
 
@@ -35,7 +36,7 @@ try {
 const result = validateGraph(graph);
 
 if (format === "json") {
-  console.log(JSON.stringify(result, null, 2));
+  writeStdoutSync(JSON.stringify(result, null, 2));
 } else {
   printText(result);
 }

@@ -9,6 +9,7 @@
 //   2 = usage error / 파일 읽기 실패
 
 import { readFileSync, writeFileSync } from 'node:fs';
+import { writeStdoutSync } from '../../_shared/write-stdout-sync.js';
 import { resolve } from 'node:path';
 import {
 	validateCodePointers,
@@ -117,7 +118,7 @@ if (args.applyDrift) {
 const fail = computeGateFail(result.findings, { strict: args.strict });
 
 if (args.format === 'json') {
-	console.log(JSON.stringify({ ...result, freshness }, null, 2));
+	writeStdoutSync(JSON.stringify({ ...result, freshness }, null, 2));
 } else {
 	const cv = result.coverage;
 	const sum = result.summary;

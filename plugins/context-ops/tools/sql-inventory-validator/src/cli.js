@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { validateSqlInventory } from './validator.js';
 
+import { writeStdoutSync } from '../../_shared/write-stdout-sync.js';
 function parseArgs(argv) {
 	const out = {
 		dryRun: false,
@@ -104,7 +105,7 @@ const result = validateSqlInventory(args.target, args.thresholdAutoRatio, {
 });
 
 if (args.json) {
-	console.log(JSON.stringify(result, null, 2));
+	writeStdoutSync(JSON.stringify(result, null, 2));
 } else {
 	console.log(
 		`[sql-inventory-validator] ${result.summary.total_findings} findings (critical: ${result.summary.critical}, high: ${result.summary.high}, medium: ${result.summary.medium})`,

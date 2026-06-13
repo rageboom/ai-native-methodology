@@ -3,6 +3,7 @@
 // usage: discovery-extraction-validator --discovery <path> [--rules <path>] [--domain <path>] [--dry-run] [--json]
 
 import { validateDiscoveryExtraction, loadJson } from './validator.js';
+import { writeStdoutSync } from '../../_shared/write-stdout-sync.js';
 import { loadBusinessRules } from '../../_shared/load-business-rules.js';
 
 function parseArgs(argv) {
@@ -45,7 +46,7 @@ const analysis = {
 const result = validateDiscoveryExtraction(discovery, analysis);
 
 if (args.json) {
-  console.log(JSON.stringify(result, null, 2));
+  writeStdoutSync(JSON.stringify(result, null, 2));
 } else {
   console.log(`[discovery-extraction-validator] ${result.summary.total_findings} findings (critical: ${result.summary.critical}, high: ${result.summary.high})`);
   console.log(`UC coverage: ${(result.coverage.use_case * 100).toFixed(1)}%`);

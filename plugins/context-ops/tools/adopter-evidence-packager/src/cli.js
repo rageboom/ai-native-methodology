@@ -4,6 +4,7 @@
 // exit: 0 = packaged+valid / 1 = schema invalid 또는 post-redaction PII 잔존(필드 경로) / 2 = usage·read error.
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import { writeStdoutSync } from '../../_shared/write-stdout-sync.js';
 import { resolve, join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
@@ -135,7 +136,7 @@ function main() {
   if (leak_hits.length > 0) {
     const detail = leak_hits.map((h) => `${h.field} (${h.labels.join(',')})`).join('; ');
     if (args.format === 'json') {
-      console.log(JSON.stringify({ ok: false, reason: 'pii_leak', leak_hits, redaction_count }, null, 2));
+      writeStdoutSync(JSON.stringify({ ok: false, reason: 'pii_leak', leak_hits, redaction_count }, null, 2));
     } else {
       console.error(`[adopter-packager] LEAK GUARD — post-redaction PII 잔존 ${leak_hits.length}건: ${detail}`);
       console.error('  → 해당 필드 입력에서 PII 제거 후 재실행 (best-effort regex 가 놓친 케이스 / no-redact 사용 시 redaction 우회됨).');
@@ -146,7 +147,7 @@ function main() {
   if (!valid) {
     const detail = (validate.errors || []).map((e) => `${e.instancePath || '/'} ${e.message}`).join('; ');
     if (args.format === 'json') {
-      console.log(JSON.stringify({ ok: false, reason: 'schema_invalid', errors: validate.errors }, null, 2));
+      writeStdoutSync(JSON.stringify({ ok: false, reason: 'schema_invalid', errors: validate.errors }, null, 2));
     } else {
       console.error(`[adopter-packager] SCHEMA INVALID — ${detail}`);
     }
@@ -159,8 +160,8 @@ function main() {
     : resolve(dirname(resolve(args.state)), 'output', 'adopter-corroboration.json');
 
   if (args.dryRun) {
-    if (args.format === 'json') console.log(JSON.stringify({ ok: true, dry_run: true, redaction_count, corroboration }, null, 2));
-    else { console.log(`[adopter-packager] DRY-RUN — corroboration valid (redaction ${redaction_count}건 / PII leak 0). 미작성. out=${outPath}`); console.log(JSON.stringify(corroboration, null, 2)); }
+    if (args.format === 'json') writeStdoutSync(JSON.stringify({ ok: true, dry_run: true, redaction_count, corroboration }, null, 2));
+    else { console.log(`[adopter-packager] DRY-RUN — corroboration valid (redaction ${redaction_count}건 / PII leak 0). 미작성. out=${outPath}`); writeStdoutSync(JSON.stringify(corroboration, null, 2)); }
     process.exit(0);
   }
 
@@ -172,7 +173,7 @@ function main() {
     process.exit(2);
   }
 
-  if (args.format === 'json') console.log(JSON.stringify({ ok: true, out: outPath, redaction_count }, null, 2));
+  if (args.format === 'json') writeStdoutSync(JSON.stringify({ ok: true, out: outPath, redaction_count }, null, 2));
   else console.log(`[adopter-packager] ✓ corroboration 작성 — ${outPath} (redaction ${redaction_count}건 / PII leak 0 / schema valid)`);
   process.exit(0);
 }

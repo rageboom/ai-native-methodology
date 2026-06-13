@@ -19,6 +19,7 @@
 //   2 — usage error / config parse error / --allow-execute 부재 + --dry-run 부재
 
 import { spawnSync } from 'node:child_process';
+import { writeStdoutSync } from '../../_shared/write-stdout-sync.js';
 import { readFileSync, existsSync, writeFileSync, mkdirSync, statSync, readdirSync } from 'node:fs';
 import { dirname, resolve, join, isAbsolute } from 'node:path';
 import { loadTestCmd } from './load-test-cmd.js';
@@ -370,7 +371,7 @@ function main() {
 
 	if (!resolved) {
 		const msg = `[test-impl-pass-validator] no test-cmd contract (source=${source}) — ${error ?? 'unresolved'}`;
-		if (args.json) console.log(JSON.stringify({ ok: false, error: msg }));
+		if (args.json) writeStdoutSync(JSON.stringify({ ok: false, error: msg }));
 		else console.error(msg);
 		process.exit(2);
 	}
@@ -379,7 +380,7 @@ function main() {
 	if (!args.allowExecute && !args.dryRun) {
 		const msg =
 			'[test-impl-pass-validator] ADR-CHAIN-004 §4 — --allow-execute 의무 (또는 --dry-run). 실제 사용자 코드 실행 동의 명시 필요.';
-		if (args.json) console.log(JSON.stringify({ ok: false, error: msg }));
+		if (args.json) writeStdoutSync(JSON.stringify({ ok: false, error: msg }));
 		else console.error(msg);
 		process.exit(2);
 	}
@@ -414,14 +415,14 @@ function main() {
 	if (runResult.spawn_error) {
 		const msg = `[test-impl-pass-validator] runner spawn error: ${runResult.spawn_error}`;
 		if (args.json)
-			console.log(JSON.stringify({ ok: false, error: msg, runResult }));
+			writeStdoutSync(JSON.stringify({ ok: false, error: msg, runResult }));
 		else console.error(msg);
 		process.exit(1);
 	}
 	if (runResult.timedOut) {
 		const msg = `[test-impl-pass-validator] runner timed out (${resolved.timeout_ms}ms)`;
 		if (args.json)
-			console.log(JSON.stringify({ ok: false, error: msg, runResult }));
+			writeStdoutSync(JSON.stringify({ ok: false, error: msg, runResult }));
 		else console.error(msg);
 		process.exit(1);
 	}
@@ -436,7 +437,7 @@ function main() {
 		);
 	} catch (e) {
 		const msg = `[test-impl-pass-validator] runner output parse error: ${e.message}`;
-		if (args.json) console.log(JSON.stringify({ ok: false, error: msg }));
+		if (args.json) writeStdoutSync(JSON.stringify({ ok: false, error: msg }));
 		else console.error(msg);
 		process.exit(1);
 	}
@@ -518,7 +519,7 @@ function main() {
 	}
 
 	if (args.json) {
-		console.log(JSON.stringify(out, null, 2));
+		writeStdoutSync(JSON.stringify(out, null, 2));
 	} else {
 		console.log(
 			`[test-impl-pass-validator] framework=${resolved.framework} / pass=${parsed.pass_count} / fail=${parsed.fail_count} / skip=${parsed.skip_count} / flaky_retries=${runResult.flaky_retries_count ?? 0}`,

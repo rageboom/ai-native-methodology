@@ -16,6 +16,7 @@
  */
 
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
+import { writeStdoutSync } from '../../_shared/write-stdout-sync.js';
 import { join, basename, extname, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Ajv2020 from 'ajv/dist/2020.js';
@@ -224,7 +225,7 @@ function main() {
 	};
 
 	if (jsonOutput) {
-		console.log(JSON.stringify({ stats, results }, null, 2));
+		writeStdoutSync(JSON.stringify({ stats, results }, null, 2));
 	} else {
 		console.log(`schema-validator — ${stats.total} file(s)`);
 		console.log(

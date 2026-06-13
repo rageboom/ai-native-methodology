@@ -8,6 +8,7 @@
 // 출력: JSON sanity 결과. exit code: 0 / 1 (breaking found).
 
 import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { writeStdoutSync } from '../../_shared/write-stdout-sync.js';
 import { join, basename, extname, relative } from 'node:path';
 import { checkJsonSanity } from './json-sanity.js';
 import {
@@ -159,7 +160,7 @@ function main() {
 	}
 
 	if (jsonOut) {
-		console.log(JSON.stringify({ totals, results, baselineReport }, null, 2));
+		writeStdoutSync(JSON.stringify({ totals, results, baselineReport }, null, 2));
 	} else {
 		console.log(
 			`decision-table-validator — ${results.length} decision-table json file(s)`,

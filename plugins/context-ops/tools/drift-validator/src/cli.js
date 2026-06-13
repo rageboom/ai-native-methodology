@@ -8,6 +8,7 @@
 //   --check-handoff-consistency      v12 신설 — JSON-only artifact handoff/rename-drift (artifact-registry)
 
 import { existsSync } from 'node:fs';
+import { writeStdoutSync } from '../../_shared/write-stdout-sync.js';
 import { join, dirname, resolve } from 'node:path';
 import {
 	checkPhaseSkills,
@@ -45,7 +46,7 @@ function runWorkspaceCheck(args, flag, runner, summarizer) {
 	}
 	const result = runner(workspaceRoot);
 	if (args.includes('--json')) {
-		console.log(JSON.stringify(result, null, 2));
+		writeStdoutSync(JSON.stringify(result, null, 2));
 	} else {
 		console.log(summarizer(result));
 		for (const d of result.diffs) {

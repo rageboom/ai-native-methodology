@@ -11,6 +11,7 @@
 
 import { validateAnalysisExtraction, validateEvidenceExistence, loadJson } from './validator.js';
 
+import { writeStdoutSync } from '../../_shared/write-stdout-sync.js';
 function usage() {
   console.log('usage: analysis-extraction-validator --extract <path> [--threshold <0..1>] [--dry-run] [--json]');
   console.log('       analysis-extraction-validator --evidence-scan <analysis-output-dir> --repo-root <dir> [--dry-run] [--json]');
@@ -51,7 +52,7 @@ if (args.evidenceScan) {
   }
   const result = validateEvidenceExistence(args.evidenceScan, args.repoRoot);
   if (args.json) {
-    console.log(JSON.stringify(result, null, 2));
+    writeStdoutSync(JSON.stringify(result, null, 2));
   } else {
     const c = result.coverage;
     console.log(`[analysis-extraction-validator] evidence-scan: ${c.artifacts_scanned} artifact(s) / refs ${c.refs_total} (ok: ${c.refs_ok}, missing: ${c.refs_missing}, line-range: ${c.refs_line_out_of_range}, absolute: ${c.refs_absolute})`);
@@ -83,7 +84,7 @@ if (typeof args.threshold === 'number' && !Number.isNaN(args.threshold)) {
 const result = validateAnalysisExtraction(extract, opts);
 
 if (args.json) {
-  console.log(JSON.stringify(result, null, 2));
+  writeStdoutSync(JSON.stringify(result, null, 2));
 } else {
   const vr = result.coverage.verbatim_ratio;
   console.log(`[analysis-extraction-validator] adapter=${result.adapter} ${result.summary.total_findings} findings (critical: ${result.summary.critical}, high: ${result.summary.high}, medium: ${result.summary.medium})`);

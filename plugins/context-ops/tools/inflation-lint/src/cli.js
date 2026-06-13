@@ -18,6 +18,7 @@
  */
 
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
+import { writeStdoutSync } from '../../_shared/write-stdout-sync.js';
 import { join, extname, dirname, basename } from 'node:path';
 
 const DEFAULT_STAR_PER_FILE = 5;     // single file 안 ★ ≥ 5 → warning
@@ -283,7 +284,7 @@ function main() {
 
   const files = collectMdFiles(args.target);
   if (files.length === 0) {
-    if (args.json) console.log(JSON.stringify({ files_scanned: 0, total_findings: 0, findings: [] }));
+    if (args.json) writeStdoutSync(JSON.stringify({ files_scanned: 0, total_findings: 0, findings: [] }));
     else console.log('inflation-lint: no .md files');
     process.exit(0);
   }
@@ -299,7 +300,7 @@ function main() {
   }
 
   if (args.json) {
-    console.log(JSON.stringify({
+    writeStdoutSync(JSON.stringify({
       files_scanned: files.length,
       total_findings: allFindings.length,
       by_kind: {

@@ -10,6 +10,15 @@
 
 ---
 
+## [0.43.1] — 2026-06-13 PATCH — validator stdout truncation 수정 (대형 레거시 게이트 침묵 차단 해소 / WLFR 489-rule dogfood)
+
+**SSOT**: `decisions/DEC-2026-06-13-validator-stdout-truncation-fix.md`.
+
+### Fixed
+
+- **16 validator/tool stdout truncation (systemic / 게이트 correctness)** — `console.log(JSON.stringify(result))` 직후 `process.exit(N)` 패턴이 출력 > ~64KB(파이프 커널 버퍼) 시 비동기 flush 전 프로세스 종료로, 파이프 소비자(`findings-aggregator` 의 `execFileSync`)에게 **truncation 된 JSON** 전달 → JSON.parse 실패 → 게이트 status='error' + 허위 critical. ep-be-gea **BC-WLFR(489 BR / br-cross 69KB)** 통합이 노출(reqmng 364 BR/<64KB 는 통과 → 규모 임계). 파일 redirect(`>`)는 동기라 멀쩡 = 파이프 소비자에서만 결정론적 발생.
+- **fix**: 신규 `tools/_shared/write-stdout-sync.js`(fd 1 동기 write + EAGAIN 재시도 = 완전 flush 후 반환) 도입 + 16 tool(analysis 게이트 6 + 타 stage/standalone 10)의 JSON 출력 경로 `console.log(JSON.stringify(…))` → `writeStdoutSync(JSON.stringify(…))` 교체. **exit-code 의미·출력 내용 무변**(flush 타이밍만 결정론화). br-cross 회귀 테스트 2건 추가(대용량·멀티바이트 파이프 완전 캡처). additive / breaking 0.
+
 ## [0.43.0] — 2026-06-13 MINOR — 방법론 본체 격상: sql-inventory-extractor §0 MANDATORY 배선 + bc-accumulator-rollup post-merge rollup 규약 (≥2 도메인 corroboration 충족)
 
 **SSOT**: `decisions/DEC-2026-06-12-sql-inventory-extractor.md` · `decisions/DEC-2026-06-12-parallel-bc-accumulator-rollup.md`.

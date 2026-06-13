@@ -31,6 +31,7 @@ import {
 	OVERALL_THRESHOLD,
 } from './validator.js';
 import { loadBusinessRules } from '../../_shared/load-business-rules.js';
+import { writeStdoutSync } from '../../_shared/write-stdout-sync.js';
 
 function parseArgs(argv) {
 	const out = { target: null, json: false, strict: false, llmResults: null };
@@ -124,7 +125,7 @@ async function main() {
 		: validateRulesDoc(doc, options);
 
 	if (args.json) {
-		console.log(JSON.stringify(result, null, 2));
+		writeStdoutSync(JSON.stringify(result, null, 2));
 	} else {
 		printText(result, targetPath);
 	}

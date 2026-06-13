@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { readFileSync } from "node:fs";
+import { writeStdoutSync } from '../../_shared/write-stdout-sync.js';
 import { resolve } from "node:path";
 import { validateDbAssets } from "./validator.js";
 
@@ -46,7 +47,7 @@ try {
 const result = validateDbAssets(manifest, { stage });
 
 if (format === "json") {
-  console.log(JSON.stringify(result, null, 2));
+  writeStdoutSync(JSON.stringify(result, null, 2));
 } else {
   printText(result);
 }
