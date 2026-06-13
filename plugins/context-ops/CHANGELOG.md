@@ -10,6 +10,21 @@
 
 ---
 
+## [0.46.4] — 2026-06-13 PATCH — sql-inventory-extractor FROM-less T-SQL DELETE dependent_tables 추출 (dogfood-found / candidate 정확성)
+
+**SSOT**: `decisions/DEC-2026-06-13-sql-inventory-cte-exclusion.md` §9. carry ④ req 패밀리 **visitprkng(방문주차) 부분추가 analysis dogfood** + 적대 검증 패널 `wf_cd973abc-9f9` (analysis-agent 저작 → 3 verifier: BR grounding·sql/openapi accuracy·schema 정합).
+
+### Fixed (sql-inventory-extractor — FROM-less DELETE)
+- `extractTables` 정규식 키워드(`FROM|JOIN|INTO|UPDATE`)에 **DELETE 부재** → T-SQL FROM-less `DELETE <table> WHERE …`(MSSQL 은 FROM 선택적)의 dependent_tables 미추출(빈 후보). `DELETE FROM t` 는 FROM 규칙이 잡지만 FROM 없는 형은 누락.
+- **별도 패스 + negative lookahead** `\bDELETE\s+(?!FROM\b|TOP\b)(<table>)` — DELETE 를 공용 alternation 에 넣으면 `DELETE FROM t` 를 한 매치로 소비해 t 를 놓치는 regex 상호작용 회피. 가드: ① `DELETE FROM`·`DELETE TOP (n)` = lookahead 제외 ② aliased delete `DELETE <alias> FROM <table>`(dotless 직후 FROM) = alias skip ③ `TOP` stopword 추가(`UPDATE TOP`/`DELETE TOP` 잠재 오탐 제거). 공통 후보 정제는 `consider` 헬퍼로 양 패스 공유.
+
+### Notes
+- **실테이블 누락 0 (rigorous before/after / 전 core 2629 stmt)**: union **416→416**(GAINED 0 / LOST 0 = 오탐·실테이블 손실 0). 가치는 per-record — 398 DELETE record 빈 dependent_tables **141→3**(138 해소 + `<update>`-wrap FROM-less DELETE 1 실테이블 획득 / 잔여 3 = TRUNCATE·reset 비-DELETE 형 정직 carry). non-DELETE 1건 변화=실테이블 GAINED·LOST 0.
+- 검증: sql-inventory-extractor **24 test**(4 신규: FROM-less dotted / bare+`DELETE FROM` regression / aliased delete / `DELETE TOP`) / RR **42/42** / backward-compat·schema·exit-code 무변경. visitprkng leaf regen(6 DELETE 결정론 해소 → carry_flags `extractor-table-undetected` 소멸).
+- **§8.1**: FROM-less DELETE = 표준 T-SQL 구문 paradigm-grounded / 실 drift=ep-be-gea 단일 repo이나 138 record(다수 BC) 내부 corroboration = deterministic 정확성 fix(HARD-gate 아님 / CTE·TVF·4-fix 선례 동형).
+
+---
+
 ## [0.46.3] — 2026-06-13 PATCH — sql-inventory 잔여 noise 4-fix + char-spec description 명료화 + 잔여 findings triage (dogfood)
 
 **SSOT**: `decisions/DEC-2026-06-13-sql-inventory-cte-exclusion.md` §8 (sql-inventory) + `decisions/DEC-2026-06-13-residual-findings-triage.md` (F2b~F5). 병렬 검증 패널 `wf_ef3688c0-926` (7-agent diagnose-before-design).

@@ -73,3 +73,15 @@ agent 자기보고를 액면 수용 ❌ → 실측:
 - **§8.1**: bracket-quoted `[x].[y]`·SQL `/* */`·T-SQL UPDATE…FROM = paradigm-grounded(표준 T-SQL/ANSI 구문) / 단, 실 drift sample 은 ep-be-gea 단일 repo = deterministic 정확성 fix(HARD-gate flip 아님 / CTE 선례 동형).
 
 > **보안**: 본 DEC = 본체 tool 기술만 / 사내 식별자 0(BC-ISSUE-ACM·base_range·OPENJSON 등 = 마스킹 codename·SQL 일반어). 노출 컨텍스트 산출물 = ep-be-gea GHE only.
+
+## 9. v0.46.4 — FROM-less T-SQL DELETE dependent_tables 추출 (PATCH / 2026-06-13)
+
+carry ④ req 패밀리 **visitprkng(방문주차) 부분추가 analysis dogfood** 노출: `extractTables` 정규식 키워드(`FROM|JOIN|INTO|UPDATE`)에 **DELETE 부재** → T-SQL FROM-less `DELETE <table> WHERE …`(MSSQL 은 FROM 선택적)의 dependent_tables 미추출(빈 후보). `DELETE FROM t` 는 FROM 규칙이 잡지만 FROM 없는 형은 누락.
+
+- **diagnose-before-design**: analysis-agent 가 enum 밖 carry_flags(`extractor-table-undetected`)로 표현하려 한 것이 신호. 적대 검증 패널(`wf_cd973abc-9f9` / 3 verifier)이 schema 위반으로 적발 + 갭 실재 확인(BR grounding pass·무날조 0 / sql·openapi accuracy pass). CTE/TVF/UPDATE-alias §1·7·8 선례 동형 = 결정론 parsing 정확성 갭.
+- **결정 (구현 / 결정론 / LLM 판단 0)**: DELETE 를 공용 alternation 에 넣으면 `DELETE FROM t` 를 한 매치로 소비해 t 를 놓치는 regex 상호작용 → **별도 패스 + negative lookahead** `\bDELETE\s+(?!FROM\b|TOP\b)(<table>)`. 가드: ① `DELETE FROM t`(FROM 규칙이 t)·`DELETE TOP (n)`(행수제한) = lookahead 제외 ② aliased delete `DELETE <alias> FROM <table>`(dotless 토큰 직후 FROM) = alias skip(FROM 규칙이 실테이블) ③ `TOP` stopword 추가(`UPDATE TOP`/`DELETE TOP` 잠재 오탐 제거). 공통 후보 정제(bracket strip·동적·stopword·CTE)는 `consider` 헬퍼로 양 패스 공유.
+- **실테이블 누락 0 (rigorous before/after / self-recorded-fact-validation / 전 core 2629 stmt)**: union **416→416**(GAINED 0 / LOST 0 = 오탐 0·실테이블 손실 0). 가치는 per-record — 398 DELETE record 중 빈 dependent_tables **141→3**(138 해소 + `<update>`-wrap FROM-less DELETE 1건 실테이블 획득 / 잔여 3 = TRUNCATE·reset 비-DELETE 형 정직 carry). non-DELETE record 1건만 변화(=실테이블 GAINED·LOST 0).
+- **검증**: sql-inventory-extractor **24 test**(4 신규: FROM-less dotted / bare + `DELETE FROM` regression / aliased delete / `DELETE TOP`) / RR 42/42 / backward-compat. visitprkng leaf regen(6 DELETE dependent_tables 결정론 해소 → carry_flags `extractor-table-undetected` 소멸).
+- **§8.1**: FROM-less DELETE·`DELETE TOP`·aliased delete = 표준 T-SQL 구문 = paradigm-grounded / 실 drift sample ep-be-gea 단일 repo이나 138 record(다수 BC) 내부 corroboration = deterministic 정확성 fix(HARD-gate flip 아님 / CTE·TVF·4-fix 선례 동형).
+
+> **보안**: 본 §9 = 본체 tool 기술만 / 사내 식별자 0(visitprkng·deleteX = 마스킹 codename / 실 테이블명·file:line 미전사 / 테스트 fixture 합성명). 노출 컨텍스트 산출물 = ep-be-gea GHE only.

@@ -59,8 +59,9 @@ const DYNAMIC_TAGS = Object.keys(TAG_TYPE_MAP);
 
 // SQL 예약어/잡음 — dependent_tables 후보에서 제외(FROM/JOIN 뒤 식별자 휴리스틱).
 //   SET = `UPDATE SET`(MERGE WHEN MATCHED THEN UPDATE SET) 캡처 / FROM = `JOIN FROM`(서브쿼리 경계 등) 캡처 = 키워드 (DEC-2026-06-13-sql-inventory-cte-exclusion §7 / ep-be-gea dogfood)
+//   TOP = `DELETE TOP (n) …`·`UPDATE TOP (n) …`(T-SQL) 의 TOP 토큰 = 행수제한 키워드(실테이블 아님 / DEC §9)
 const TABLE_STOPWORDS = new Set([
-	'SELECT', 'DUAL', '(', 'LATERAL', 'TABLE', 'VALUES', 'ONLY', 'SET', 'FROM',
+	'SELECT', 'DUAL', '(', 'LATERAL', 'TABLE', 'VALUES', 'ONLY', 'SET', 'FROM', 'TOP',
 ]);
 
 function sha256(s) {
@@ -145,26 +146,47 @@ function collectTrailingAliases(body) {
 function extractTables(body, cteNames = new Set()) {
 	const tables = new Set();
 	const aliasSet = collectTrailingAliases(body); // UPDATE-alias 식별
+
+	// 공통 후보 정제 — bracket strip + 동적/stopword/CTE 가드. 실테이블이면 Set 추가.
+	const consider = (raw, afterChar) => {
+		const t = raw.replace(/[[\]]/g, ''); // `[db].[dbo].[T]` → `db.dbo.T`
+		// 동적 테이블명(${…}/#{…}) — full(`FROM ${t}`) 및 mid-token(`FROM db.dbo.${t}` = 캡처 끝 직후 `{`) 모두 skip.
+		if (t.startsWith('${') || t.startsWith('#{') || afterChar === '{') return;
+		const up = t.toUpperCase();
+		if (TABLE_STOPWORDS.has(up)) return; // FROM/TOP/SET 등 키워드 제외
+		if (cteNames.has(t.toLowerCase())) return; // CTE(WITH…AS) → 실테이블 아님
+		tables.add(t);
+	};
+
 	// charclass 에 `[ ]` 포함 → bracket-quoted qualified name `[db].[dbo].[T]` 전체 캡처(이후 bracket strip / DEC §8 under-capture 복원).
 	const re = /\b(FROM|JOIN|INTO|UPDATE)\s+(\[?[A-Za-z_#$][A-Za-z0-9_#$.[\]]*)/gi;
 	let m;
 	while ((m = re.exec(body)) !== null) {
 		const kw = m[1].toUpperCase();
 		const after = body.charAt(m.index + m[0].length);
-		let t = m[2].replace(/[[\]]/g, ''); // `[db].[dbo].[T]` → `db.dbo.T`
-		// 동적 테이블명(${…}/#{…}) — full(`FROM ${t}`) 및 mid-token(`FROM db.dbo.${t}` = 캡처 끝 직후 `{`) 모두 skip.
-		if (t.startsWith('${') || t.startsWith('#{') || after === '{') continue;
+		const t = m[2].replace(/[[\]]/g, '');
 		// table-valued function(OPENJSON/STRING_SPLIT 등): FROM|JOIN 뒤 식별자 바로 뒤(공백 없이) '(' = 함수 호출.
 		//   ⚠ FROM|JOIN 한정 — `INSERT INTO t(col,col)` 컬럼리스트는 실테이블 / hint `FROM t (NOLOCK)`=공백 미해당 → 실테이블 누락 0. (DEC §7)
 		if ((kw === 'FROM' || kw === 'JOIN') && after === '(') continue;
-		const up = t.toUpperCase();
-		if (TABLE_STOPWORDS.has(up)) continue;
-		if (cteNames.has(t.toLowerCase())) continue; // CTE(WITH…AS) → 실테이블 아님
 		// SQL Server `UPDATE <alias> SET … FROM <table> <alias>`: UPDATE 뒤 dotless 토큰이 trailing-alias 면 별칭(실테이블은 FROM 으로 독립 캡처).
 		//   점 포함 실테이블(schema.dbo.X)·alias 아닌 bare 테이블은 무관 → 실테이블 누락 0. (DEC §8)
-		if (kw === 'UPDATE' && !t.includes('.') && aliasSet.has(up)) continue;
-		tables.add(t);
+		if (kw === 'UPDATE' && !t.includes('.') && aliasSet.has(t.toUpperCase())) continue;
+		consider(m[2], after);
 	}
+
+	// T-SQL FROM-less DELETE `DELETE <table> WHERE …`(MSSQL 은 FROM 선택적) — FROM 규칙이 못 잡는 실테이블 포착.
+	//   별도 패스 + negative lookahead: `DELETE FROM t`(FROM 규칙이 t 캡처)·`DELETE TOP (n) …`(행수제한 키워드) 제외.
+	//     → DELETE 를 공용 alternation 에 넣으면 `DELETE FROM t` 를 한 매치로 소비해 t 를 놓치는 regex 상호작용 회피.
+	//   aliased delete `DELETE <alias> FROM <table> <alias> …`: dotless 토큰 직후 FROM → 별칭이므로 skip(FROM 규칙이 실테이블 캡처).
+	//   (DEC §9 / ep-be-gea visitprkng 6 deleteX dogfood — extractor 가 FROM-less DELETE 의 dependent_tables 미추출하던 갭)
+	const delRe = /\bDELETE\s+(?!FROM\b|TOP\b)(\[?[A-Za-z_#$][A-Za-z0-9_#$.[\]]*)/gi;
+	while ((m = delRe.exec(body)) !== null) {
+		const after = body.charAt(m.index + m[0].length);
+		const t = m[1].replace(/[[\]]/g, '');
+		if (!t.includes('.') && /^\s+FROM\b/i.test(body.slice(m.index + m[0].length))) continue; // aliased delete
+		consider(m[1], after);
+	}
+
 	return [...tables].sort();
 }
 

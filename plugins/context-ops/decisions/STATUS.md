@@ -9,6 +9,15 @@
 
 > 다음 세션 진입 = 아래 frontier 중 **사용자 선택** (방법론 원칙: 다음 의제 = 사용자 결단 / 하드코딩 ❌).
 
+### ★ 다음 세션 인계 (2026-06-13 / **carry ④ — ep-be-gea req/visitprkng(방문주차) 부분추가 analysis + sql-inventory FROM-less DELETE fix shipped v0.46.4** / ep-be-gea GHE pending / methodology rageboom 게시)
+
+- **req 패밀리 부분추가 (S2 dogfood / 외부격리)**: 신청류 6 sub-domain(stdpkng 239j/iteqmt 193j/bookreq 90j/bizcard 88j/empcard 74j/visitprkng 74j = 758 java) 중 **visitprkng(방문주차 / 2 RestService·2 mapper·45 SQL)** 1 BC 부분추가. analysis-agent 저작 → 13 BR·8 UC·18 endpoint·8 char snapshot·7 finding·6 MC·7 table. 적대 검증 패널 `wf_cd973abc-9f9`(analysis-agent → 3 verifier): **BR grounding 무날조 0**(13 BR+7 finding 전 source_evidence 실소스 전수 대조 / 29 spot-check)·sql/openapi 정확·schema. **orphan business-rules/ 서브디렉토리 미생성**(F2a 교훈 forward).
+- **leaf 적대검증 적발 → 인라인 수정**: v3(schema) 4 HIGH(behavior_likely_bug string→array 4·matrix snapshot ⚠️→❌ 2·carry_flags enum 위반·detection_method tool_output→tool_run) + v2 medium(openapi regitReq/operate "swagger 미선언" 거짓 prose 정정=실 Swagger:767 선언) + 2 low(summary 카운트·ratio). 수정 후 schema-validator **5/5**·sql-inventory-validator **0 critical/high/medium**·br-cross **pass 0.942**.
+- **rollup (2-zone append-only / idempotent)**: BR-index 19→20 BC·509→522 rule / shared/domain.json 19→20 BC·UL 171→176 / migration-cautions 31→32 group. load-business-rules 재조립 522 BR(visitprkng 13 reachable). findings/schema/antipatterns skip(캠페인 컨벤션·by-design).
+- **★ 본체 PATCH v0.46.4 (DEC-2026-06-13-sql-inventory-cte-exclusion §9)**: dogfood 노출 — `extractTables` 키워드(FROM/JOIN/INTO/UPDATE)에 **DELETE 부재** → FROM-less T-SQL `DELETE <table> WHERE`(MSSQL FROM 선택적) dependent_tables 미추출. **별도 패스+negative lookahead**(`DELETE FROM`·`DELETE TOP` lookahead 제외·aliased delete alias skip·TOP stopword / consider 헬퍼 양 패스 공유). **실테이블 누락 0**(rigorous before/after union 416→416 GAINED0/LOST0 / per-record 398 DELETE 빈 dependent_tables **141→3** 해소·잔여 3=TRUNCATE/reset carry). 24 test / RR 42/42 / backward-compat. visitprkng leaf regen(carry_flags extractor-table-undetected 소멸).
+- exit-gate#0 = analysis-only 부분추가엔 discovery-proceed N/A(wlfr·reqmng analysis-integration 선례 동일) / 실질 게이트 3종(schema·sql·br-cross) 통과로 갈음.
+- **다음 갈래(사용자 결단)**: (a) carry ④ 계속 — req 나머지 5 sub-domain(stdpkng 239j 최대·최풍부 / iteqmt/bookreq/bizcard/empcard) (b) 다른 미분석 BC (c) sql-inventory 2nd 외부 repo dogfood. **methodology v0.44.0~v0.46.4 = rageboom 게시 / GHE(origin-smilegate) pending(망)** · ep-be-gea visitprkng leaf(+롤업) GHE pending.
+
 ### ★ 다음 세션 인계 (2026-06-13 / **carry ④ — ep-be-gea BC-ISSUE-ACM(출입통제) analysis + F1(CTE 오탐) fix shipped v0.46.1** / ep-be-gea `ad92994189`(GHE pending) / methodology rageboom 게시)
 
 - **BC-ISSUE-ACM analysis (S2 dogfood / 외부격리)**: 출입통제 7 RestService → 20 BR·30 endpoint·113 SQL·8 char snapshot·8 finding·4 AP. 2-zone append-only(19 BC / 516 tbl / sibling 보존·rollup idempotent). 검증 schema-validator 5/5·sql-inventory 0·br-cross 0.97 pass. PMD 미실행(no-JRE honest carry). `analysis-agent` dispatch. issue 패밀리=1 BC 완주.

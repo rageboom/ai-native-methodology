@@ -277,3 +277,42 @@ SELECT a.id, CAST(a.amt AS INT) AS amt2, (SELECT 1) AS one FROM EP.dbo.ACCOUNT a
 	const { records } = extractFromXml(xml, 'Y.xml');
 	assert.deepEqual(records[0].dependent_tables, ['EP.dbo.ACCOUNT', 'EP.dbo.LEDGER']);
 });
+
+// T-SQL FROM-less DELETE (`DELETE <table> WHERE …`) — dependent_tables 포착 (DEC §9 / FROM-less DELETE dogfood).
+test('FROM-less DELETE (T-SQL `DELETE <schema.table> WHERE`)는 실테이블 포착', () => {
+	const xml = `<mapper namespace="D"><delete id="deleteItem" parameterType="P">
+/* deleteItem comment */
+DELETE EP_DB.dbo.SAMPLE_REQ_BASE
+WHERE REQ_NO = #{reqNo}</delete></mapper>`;
+	const { records } = extractFromXml(xml, 'D.xml');
+	assert.equal(records[0].operation, 'delete');
+	assert.deepEqual(records[0].dependent_tables, ['EP_DB.dbo.SAMPLE_REQ_BASE']);
+});
+
+test('FROM-less DELETE bare 테이블도 포착 / `DELETE FROM t`는 중복·FROM 누출 0 (regression)', () => {
+	const xml = `<mapper namespace="D2">
+<delete id="bare">DELETE MY_TABLE WHERE id = #{id}</delete>
+<delete id="withFrom">DELETE FROM users WHERE id = #{id}</delete></mapper>`;
+	const { records } = extractFromXml(xml, 'D2.xml');
+	const byId = Object.fromEntries(records.map((r) => [r.sql_id, r]));
+	assert.deepEqual(byId['D2.bare'].dependent_tables, ['MY_TABLE']);
+	assert.deepEqual(byId['D2.withFrom'].dependent_tables, ['users']); // FROM 규칙 단독 / 'FROM' 누출·중복 0
+});
+
+test('SQL Server aliased DELETE (`DELETE d FROM <table> d`)는 별칭 제외·실테이블(FROM) 유지', () => {
+	const xml = `<mapper namespace="D3"><delete id="aliased">
+DELETE d FROM EP.dbo.TARGET d INNER JOIN EP.dbo.OTHER o ON d.id = o.id WHERE o.x = #{x}</delete></mapper>`;
+	const { records } = extractFromXml(xml, 'D3.xml');
+	const t = records[0].dependent_tables;
+	assert.ok(!t.includes('d') && !t.includes('D')); // alias 제외
+	assert.deepEqual(t, ['EP.dbo.OTHER', 'EP.dbo.TARGET']); // 실테이블만
+});
+
+test('T-SQL `DELETE TOP (n) FROM <table>`: TOP 토큰 제외, 실테이블 유지', () => {
+	const xml = `<mapper namespace="D4"><delete id="topDel">
+DELETE TOP (100) FROM EP.dbo.BATCH_QUEUE WHERE created &lt; #{cutoff}</delete></mapper>`;
+	const { records } = extractFromXml(xml, 'D4.xml');
+	const t = records[0].dependent_tables;
+	assert.ok(!t.includes('TOP')); // 행수제한 키워드 제외
+	assert.deepEqual(t, ['EP.dbo.BATCH_QUEUE']);
+});
