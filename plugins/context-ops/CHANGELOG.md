@@ -10,6 +10,21 @@
 
 ---
 
+## [0.45.0] — 2026-06-13 MINOR — label-lint JS/TS extractor (jest/vitest describe·it) — carry TS/React 해소
+
+**SSOT**: `decisions/DEC-2026-06-13-displayname-label-lint-soft.md` §7 (v0.44.0 SOFT lint 의 per-framework extractor 확장).
+
+### Added
+- **`validateCodeLabelConsistency` JS/TS extractor** (`extractJsDisplayNames` + `extractorFor(path)` dispatch): jest/vitest `describe`·`it`·`test` 문자열 라벨의 BR/AC/TC 토큰 검사. Senior 권고 "generic core + per-framework 어댑터" 실현 — 메커니즘(check A 날조 id / C intra-label / tokensIn 정규화) Java 와 100% 공유, parser 만 언어별. `.java`→Java / `.ts·tsx·js·jsx·mjs·cjs`→JS(React .tsx 포함) / 그 외 `unsupported_extractor_carry` 정직 skip(pytest 등).
+- **JS 정직 한계 명시**: JS `describe` = 독립 식별자명 부재(Java nested class 와 상이) → **check B(join) skip / A·C 만 유효**.
+
+### Notes
+- **실 dogfood 2 (committed)**: poc-05(vitest / describe TC+UC/AC/BHV·it BR / checked 4·0 finding) + poc-20(js / describe AC / checked 3·0 finding) = no-false-positive 2 datapoint(clean PoC → drift-catching 은 synthetic unit-test). 둘 다 join_anchor_absent skip(JS 구조 정직).
+- 검증: spec-test-link **23 test**(JS 4 추가: extract/clean/날조BR critical/intra-label mismatch high / 기존 carry 테스트는 pytest `.py` `unsupported_extractor_carry` 로 갱신) / release-readiness **42/42**.
+- **§8.1 불변 / SOFT 유지**: multi-language 커버(Java+JS/TS)는 HARD flip 전제(≥2 distinct **도메인 실 drift**) 충족 아님(poc-05/20=clean·동류). HARD flip 별도 결정. carry: pytest 등 extractor · HARD flip · codegen.
+
+---
+
 ## [0.44.0] — 2026-06-13 MINOR — code @DisplayName ↔ test-spec 라벨 정합 lint (SOFT / opt-in) + canonical 라벨 grammar
 
 **SSOT**: `decisions/DEC-2026-06-13-displayname-label-lint-soft.md`. 연구 패널 `wf_40ab04b1-fda` (4원칙 §2).

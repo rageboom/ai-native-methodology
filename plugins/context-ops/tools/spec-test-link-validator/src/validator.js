@@ -262,7 +262,7 @@ export function validateMockSoundness(testSpec, unitSpec) {
 //     C. intra-label: 한 @DisplayName 이 AC+TC 동시 보유 시 라벨 AC == 라벨-TC 의 spec ac_ref (high).
 //   ※ "실재 id·오의미"(event 식 drift)는 의미 판단 필요 = 본 결정론 lint 비대상(semantic 영역 / 정직 표기). SOFT=cli 가 별도 키로만 attach.
 //   §8.1: 1 datapoint(단일 마스킹 Java 프로젝트) = SOFT only. HARD flip 은 ≥2 distinct 도메인 후.
-//   다언어: @DisplayName=Java/JUnit5 전용 extractor(아래). TS/React = carry.
+//   다언어: per-framework extractor — Java/JUnit5 @DisplayName + JS/TS jest·vitest describe·it/test(v0.45.0). React(.tsx jest/vitest)=동일 extractor 커버. JS 는 describe 독립 식별자명 부재 → check B(join) skip / A·C 만(정직 한계).
 // ──────────────────────────────────────────────────────────────────────
 const LABEL_TOKEN_RE = /\b(BR|AC|BHV|UC|TC)-[A-Z0-9-]*\d{3}\b/g;
 const DISPLAYNAME_RE = /@DisplayName\(\s*"((?:[^"\\]|\\.)*)"\s*\)/g;
@@ -313,6 +313,31 @@ export function extractJavaDisplayNames(content) {
 	return labels;
 }
 
+// JS/TS extractor (jest/vitest describe·it·test) — v0.45.0 (DEC-2026-06-13-displayname-label-lint-soft 확장 / poc-05 vitest·poc-20 js dogfood).
+//   라벨 = describe('...')·it/test('...') 문자열 1st arg. describe→suite(class-equivalent / name 없음)·it/test→case.
+//   JS describe 는 (Java nested class 와 달리) 독립 식별자명이 없어 **join(check B)=skip** → check A(날조 id)+C(intra-label AC↔TC)만 유효(정직 한계). 메커니즘은 Java 와 동일(tokensIn 공유).
+export function extractJsDisplayNames(content) {
+	const RE = /\b(describe|it|test)\s*\(\s*(['"`])((?:\\.|(?!\2)[\s\S])*?)\2/g;
+	const labels = [];
+	let m;
+	while ((m = RE.exec(content)) !== null) {
+		labels.push({
+			label: m[3],
+			kind: m[1] === 'describe' ? 'describe' : 'it',
+			name: null,
+			tokens: tokensIn(m[3]),
+		});
+	}
+	return labels;
+}
+
+// 확장자 → extractor dispatch (v0.45.0 — Java + JS/TS / 그 외 carry).
+function extractorFor(path) {
+	if (/\.java$/.test(path)) return extractJavaDisplayNames;
+	if (/\.(ts|tsx|js|jsx|mjs|cjs)$/.test(path)) return extractJsDisplayNames;
+	return null;
+}
+
 // source_evidence / code_pointers / class_ref 에서 안정 식별자(nested class · method 명) 추출 (라벨 아님).
 function joinIdentifiers(tc) {
 	const ids = { classes: [], methods: [] };
@@ -348,8 +373,9 @@ export function validateCodeLabelConsistency(testSpec, sourceFiles, brIds, acIds
 	const byFileLabels = new Map();
 	for (const f of sourceFiles ?? []) {
 		if (!f || !f.content) { skipped.push({ path: f?.path, reason: 'unreadable' }); continue; }
-		if (!/\.java$/.test(f.path || '')) { skipped.push({ path: f.path, reason: 'non_java_extractor_carry' }); continue; }
-		byFileLabels.set(f.path, extractJavaDisplayNames(f.content));
+		const extract = extractorFor(f.path || '');
+		if (!extract) { skipped.push({ path: f.path, reason: 'unsupported_extractor_carry' }); continue; }
+		byFileLabels.set(f.path, extract(f.content));
 	}
 
 	// A. 모든 라벨의 토큰 날조/미존재 검사

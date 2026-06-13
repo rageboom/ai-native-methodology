@@ -5,6 +5,7 @@ import {
 	validateCodeLabelConsistency,
 	normalizeLabelId,
 	extractJavaDisplayNames,
+	extractJsDisplayNames,
 } from '../src/validator.js';
 
 const validBehavior = { behaviors: [{ id: 'BHV-USER-001' }] };
@@ -270,11 +271,11 @@ describe('validateCodeLabelConsistency (code @DisplayName ↔ test-spec)', () =>
 		assert.ok(r.skipped.some((s) => s.reason === 'join_anchor_absent'));
 	});
 
-	it('non-Java source carried (not flagged)', () => {
-		const ts = { test_cases: [{ id: 'TC-USER-001', ac_ref: 'AC-USER-001', source_file: 'a.spec.ts' }] };
-		const r = validateCodeLabelConsistency(ts, [{ path: 'a.spec.ts', content: 'describe("x (TC-FAKE-999)", () => {});' }], brIds, acIds);
+	it('unsupported-language source carried (pytest .py = carry / not flagged)', () => {
+		const ts = { test_cases: [{ id: 'TC-USER-001', ac_ref: 'AC-USER-001', source_file: 'test_x.py' }] };
+		const r = validateCodeLabelConsistency(ts, [{ path: 'test_x.py', content: 'def test_x_TC_FAKE_999(): pass  # (TC-FAKE-999)' }], brIds, acIds);
 		assert.equal(r.summary.total_findings, 0);
-		assert.ok(r.skipped.some((s) => s.reason === 'non_java_extractor_carry'));
+		assert.ok(r.skipped.some((s) => s.reason === 'unsupported_extractor_carry'));
 	});
 
 	it('normalizeLabelId expands short to full within scope', () => {
@@ -288,5 +289,40 @@ describe('validateCodeLabelConsistency (code @DisplayName ↔ test-spec)', () =>
 		assert.equal(labels[0].kind, 'class');
 		assert.equal(labels[0].name, 'Foo');
 		assert.deepEqual(labels[0].tokens.TC, ['TC-001']);
+	});
+});
+
+// v0.45.0 — JS/TS extractor (jest/vitest describe·it/test) — poc-05 vitest·poc-20 js dogfood
+describe('validateCodeLabelConsistency — JS/TS extractor (describe·it)', () => {
+	const ts = {
+		test_cases: [{ id: 'TC-USER-001', ac_ref: 'AC-USER-001', source_file: 'user.service.test.ts' }],
+	};
+	const brIds = new Set(['BR-USER-DATA-001']);
+	const acIds = new Set(['AC-USER-001']);
+	const jsSrc = (body) => [{ path: 'user.service.test.ts', content: body }];
+
+	it('extractJsDisplayNames parses describe/it with tokens', () => {
+		const labels = extractJsDisplayNames(`describe('TC-USER-001 — register (AC-USER-001)', () => {\n  it('dup (BR-USER-DATA-001)', () => {});\n});`);
+		assert.equal(labels.length, 2);
+		assert.equal(labels[0].kind, 'describe');
+		assert.deepEqual(labels[0].tokens.TC, ['TC-USER-001']);
+		assert.equal(labels[1].kind, 'it');
+		assert.deepEqual(labels[1].tokens.BR, ['BR-USER-DATA-001']);
+	});
+
+	it('JS passes clean (describe TC+AC consistent / it BR real)', () => {
+		const r = validateCodeLabelConsistency(ts, jsSrc(`describe('TC-USER-001 — register (AC-USER-001)', () => {\n  it('dup throws (BR-USER-DATA-001)', () => {});\n});`), brIds, acIds);
+		assert.equal(r.summary.total_findings, 0);
+		assert.ok(r.checked >= 2);
+	});
+
+	it('JS flags fabricated BR in it() label (critical)', () => {
+		const r = validateCodeLabelConsistency(ts, jsSrc(`describe('TC-USER-001 (AC-USER-001)', () => {\n  it('x (BR-USER-FAKE-099)', () => {});\n});`), brIds, acIds);
+		assert.ok(r.findings.some((f) => f.kind === 'code_label.br_fabricated' && f.severity === 'critical'));
+	});
+
+	it('JS flags intra-label AC↔TC mismatch in describe (high)', () => {
+		const r = validateCodeLabelConsistency(ts, jsSrc(`describe('TC-USER-001 — register (AC-USER-099)', () => {\n  it('x', () => {});\n});`), brIds, acIds);
+		assert.ok(r.findings.some((f) => f.kind === 'code_label.ac_tc_mismatch' && f.severity === 'high'));
 	});
 });
