@@ -132,3 +132,67 @@ test('빈 입력 — 0건 정직 산출(throw ❌)', () => {
 	assert.deepEqual(r.inventory, []);
 	assert.equal(r.evidence.files_scanned, 0);
 });
+
+// F1 — CTE(WITH…AS) 별칭이 dependent_tables 로 새는 회귀 차단 (ep-be-gea 출입통제 dogfood / DEC-2026-06-13)
+test('CTE — WITH 별칭(base_range/di_agg/USERS)은 dependent_tables 제외, 실테이블만 유지', () => {
+	const CTE = `<mapper namespace="com.example.acm.AcmRepository">
+  <select id="searchSummary" resultType="map">
+    WITH base_range AS (
+      SELECT id, dt FROM EP_BE_GEA_ADMIN.dbo.ADM_ENTRC_BASE
+    ),
+    di_agg (k, c) AS (
+      SELECT k, COUNT(*) FROM EP_BE_GEA_ADMIN.dbo.ADM_VISITOR GROUP BY k
+    ),
+    USERS AS (
+      SELECT * FROM base_range
+    )
+    SELECT * FROM base_range b JOIN di_agg d ON b.id = d.k JOIN USERS u ON u.id = b.id
+  </select>
+</mapper>`;
+	const { records } = extractFromXml(CTE, 'Acm.xml');
+	const r = records.find((x) => x.sql_id === 'AcmRepository.searchSummary');
+	assert.ok(r);
+	assert.deepEqual(r.dependent_tables, ['EP_BE_GEA_ADMIN.dbo.ADM_ENTRC_BASE', 'EP_BE_GEA_ADMIN.dbo.ADM_VISITOR']);
+	for (const cte of ['base_range', 'di_agg', 'USERS', 'users']) {
+		assert.ok(!r.dependent_tables.includes(cte), `CTE ${cte} 누출`);
+	}
+});
+
+test('CTE — RECURSIVE + col-list + 자기참조 JOIN 도 실테이블만 유지', () => {
+	const xml = `<mapper namespace="X"><select id="q" resultType="map">
+WITH RECURSIVE node_cte (id, pid) AS (
+  SELECT id, pid FROM EP.dbo.TREE_TABLE WHERE pid IS NULL
+  UNION ALL SELECT t.id, t.pid FROM EP.dbo.TREE_TABLE t JOIN node_cte n ON t.pid = n.id
+)
+SELECT * FROM node_cte</select></mapper>`;
+	const { records } = extractFromXml(xml, 'X.xml');
+	assert.deepEqual(records[0].dependent_tables, ['EP.dbo.TREE_TABLE']);
+	assert.ok(!records[0].dependent_tables.includes('node_cte'));
+});
+
+test('CTE — <sql> fragment 정의 + <include> 참조 CTE 도 제외 (fragment-defined / 출입통제 실사례)', () => {
+	const xml = `<mapper namespace="Z">
+  <sql id="cteBlock">
+    WITH base_range AS ( SELECT id FROM EP.dbo.ENTRC_BASE ),
+    di_agg (k, c) AS ( SELECT k, COUNT(*) FROM EP.dbo.VISITOR GROUP BY k )
+  </sql>
+  <select id="search" resultType="map">
+    <include refid="cteBlock"/>
+    SELECT * FROM base_range b JOIN di_agg d ON b.id = d.k
+  </select>
+</mapper>`;
+	const { records } = extractFromXml(xml, 'Z.xml');
+	const r = records.find((x) => x.sql_id === 'Z.search');
+	assert.ok(r);
+	// fragment 에 정의된 CTE(base_range/di_agg)도 include 해소로 포착 → 제외(body 엔 WITH 없음)
+	assert.ok(!r.dependent_tables.includes('base_range'), 'fragment CTE base_range 누출');
+	assert.ok(!r.dependent_tables.includes('di_agg'), 'fragment CTE di_agg 누출');
+	assert.deepEqual(r.dependent_tables, []); // CTE 참조뿐 — fragment 내 실테이블은 미해석(include carry)
+});
+
+test('CTE — 비-CTE SQL(컬럼 alias·CAST AS)은 오제외 0 (false-positive 가드)', () => {
+	const xml = `<mapper namespace="Y"><select id="q" resultType="map">
+SELECT a.id, CAST(a.amt AS INT) AS amt2, (SELECT 1) AS one FROM EP.dbo.ACCOUNT a JOIN EP.dbo.LEDGER l ON a.id = l.aid</select></mapper>`;
+	const { records } = extractFromXml(xml, 'Y.xml');
+	assert.deepEqual(records[0].dependent_tables, ['EP.dbo.ACCOUNT', 'EP.dbo.LEDGER']);
+});

@@ -103,9 +103,24 @@ function namespacePrefix(xml, relPath) {
 	return base.replace(/\.xml$/i, '');
 }
 
+// CTE(공통 테이블 식) 이름 수집 — `WITH [RECURSIVE] name [(cols)] AS (` 및 체인 `, name [(cols)] AS (`.
+//   `<식별자> AS (` 는 **CTE 전용 구문**(실테이블은 `TABLE AS (` 형태가 존재하지 않음) → 수집된 이름을 candidate 에서
+//   제외해도 실테이블 누락 위험 0. per-statement scope(같은 body 에서 수집·제외) — CTE 참조 `FROM cte` 는 query-local.
+//   (F-ISSUE-ACM-CTE-CANDIDATE-NOISE / DEC-2026-06-13 — ep-be-gea 출입통제 dogfood 노출: WITH 별칭이 dependent_tables 오포착)
+function collectCteNames(body) {
+	const names = new Set();
+	const re = /(?:\bWITH\s+(?:RECURSIVE\s+)?|,\s*)([A-Za-z_#$][A-Za-z0-9_#$]*)\s*(?:\([^)]*\))?\s+AS\s*\(/gi;
+	let m;
+	while ((m = re.exec(body)) !== null) names.add(m[1].toLowerCase());
+	return names;
+}
+
 // dependent_tables 후보 추출(SKILL §4 FROM/JOIN regex). exhaustive ❌ = 후보 마킹.
-// subquery·동적 테이블명(${...})·CTE 는 regex 한계 → 누락 가능.
-function extractTables(body) {
+// subquery·동적 테이블명(${...}) 은 regex 한계 → 누락 가능. CTE 별칭은 cteNames(파일 단위 사전수집)로 제외(오탐 제거).
+//   cteNames = 파일 전체에서 collectCteNames 로 수집한 CTE 이름 Set. MyBatis 는 <sql> fragment 의 WITH 절을
+//   직접 <include> 하지 않는 statement 도 런타임 조합으로 참조(ep-be-gea 출입통제 searchBoEntranceAuthorityRequestChipsCount 실사례)
+//   → per-statement/include 해소로 불충분 → 파일 단위 CTE 이름 제외(실테이블은 schema-qualified=점 포함이라 bare CTE 명과 충돌 무시 가능).
+function extractTables(body, cteNames = new Set()) {
 	const tables = new Set();
 	const re = /\b(?:FROM|JOIN|INTO|UPDATE)\s+(\[?[A-Za-z_#$][A-Za-z0-9_#$.]*\]?)/gi;
 	let m;
@@ -114,6 +129,7 @@ function extractTables(body) {
 		if (t.startsWith('${') || t.startsWith('#{')) continue; // 동적 테이블명 → skip
 		const up = t.toUpperCase();
 		if (TABLE_STOPWORDS.has(up)) continue;
+		if (cteNames.has(t.toLowerCase())) continue; // CTE 참조(WITH…AS 로 정의된 별칭) → 실테이블 아님 → 제외
 		tables.add(t);
 	}
 	return [...tables].sort();
@@ -165,6 +181,9 @@ export function extractFromXml(rawXml, relPath) {
 	let fm;
 	while ((fm = fragRe.exec(xml)) !== null) fragments.push(fm[1]);
 
+	// 파일 전체 CTE 이름 사전수집 — fragment/statement 어디서 정의되든(런타임 조합 포함) bare 참조를 테이블 후보에서 제외.
+	const fileCteNames = collectCteNames(xml);
+
 	for (const el of STMT_ELEMENTS) {
 		// statement 는 중첩 없음(select 안에 select 없음) → non-greedy open→close 안전.
 		const re = new RegExp(`<${el}\\b([^>]*)>([\\s\\S]*?)</${el}>`, 'g');
@@ -178,7 +197,7 @@ export function extractFromXml(rawXml, relPath) {
 			const includes = [...body.matchAll(/<include\b[^>]*\brefid\s*=\s*"([^"]+)"/g)].map(
 				(x) => x[1],
 			);
-			const tables = extractTables(body);
+			const tables = extractTables(body, fileCteNames);
 			const stmtType = statementType(el, openTag, body);
 
 			const record = {

@@ -10,6 +10,21 @@
 
 ---
 
+## [0.46.1] — 2026-06-13 PATCH — sql-inventory-extractor CTE 오탐 제외 (dogfood-found / 결정론 tool 정확성)
+
+**SSOT**: `decisions/DEC-2026-06-13-sql-inventory-cte-exclusion.md`. carry ④ ep-be-gea BC-ISSUE-ACM(출입통제) analysis dogfood 발견 F1.
+
+### Fixed
+- **`sql-inventory-extractor` CTE 별칭 오탐**: `WITH <name> AS (` 로 정의된 공통 테이블 식(CTE) query-local 식별자가 `dependent_tables` 후보로 오포착되던 버그. `collectCteNames`(WITH/체인·RECURSIVE·col-list 인지) + `extractFromXml` 파일 단위 `fileCteNames` 수집 → `extractTables` 가 FROM/JOIN candidate 중 CTE 이름 제외. **파일 단위**인 이유 = MyBatis 는 CTE 를 `<sql>` fragment 정의 + 비-include statement 가 런타임 조합 참조(실사례 입증) → per-statement/include 해소 불충분.
+- **실테이블 누락 0 (증명+실측)**: 실테이블 = schema-qualified(점 포함) → bare CTE 이름과 충돌 불가 → 제외는 provable CTE 한정. §8.1 corroboration: issue-acm CTE 6 제거(실테이블 21 유지) + **WLFR 독립 도메인 실테이블 83=83 누락 0**.
+
+### Notes
+- 검증: sql-inventory-extractor **11 test**(CTE 4 신규: inline 단일·체인·col-list / RECURSIVE+자기참조 / fragment-defined+include / 비-CTE false-positive 가드[CAST AS·컬럼 alias]) / 4 PoC 무회귀 / release-readiness **42/42**(criteria_total 무변).
+- backward-compat / schema·exit-code 무변경 (후보 정확도만 향상).
+- carry: emp_distinct·EP_BE_COMMON(비-CTE candidate noise / 별도) · TVF·alias·키워드 noise(OPENJSON·STRING_SPLIT·SET 등 = 별개 candidate-noise 클래스 / 향후) · fragment 내 실테이블 미해석(기존 include carry 유지).
+
+---
+
 ## [0.46.0] — 2026-06-13 MINOR — label-lint Python/pytest extractor (docstring·주석) — carry pytest 해소 + join capability gain
 
 **SSOT**: `decisions/DEC-2026-06-13-displayname-label-lint-soft.md` §8 (v0.44.0 SOFT lint 의 per-framework extractor 3번째 언어). 적대검증 패널 `wf_f649f1d7-f9a` (false-pos/neg + governance + 독립 재도출 / go·blocker 0).

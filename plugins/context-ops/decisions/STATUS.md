@@ -9,14 +9,14 @@
 
 > 다음 세션 진입 = 아래 frontier 중 **사용자 선택** (방법론 원칙: 다음 의제 = 사용자 결단 / 하드코딩 ❌).
 
-### ★ 다음 세션 인계 (2026-06-13 / **carry ④ — ep-be-gea BC-ISSUE-ACM(출입통제) analysis 완주 + dogfood findings 2건 검증** / ep-be-gea `98307e4d03`(GHE pending) / methodology 미릴리스)
+### ★ 다음 세션 인계 (2026-06-13 / **carry ④ — ep-be-gea BC-ISSUE-ACM(출입통제) analysis + F1(CTE 오탐) fix shipped v0.46.1** / ep-be-gea `ad92994189`(GHE pending) / methodology rageboom 게시)
 
-- **BC-ISSUE-ACM analysis (S2 dogfood / 외부격리)**: 출입통제 7 RestService → 20 BR·30 endpoint·113 SQL·8 char snapshot·8 finding·4 AP. 2-zone append-only(19 BC / 516 tbl / sibling 보존·rollup idempotent). 검증 schema-validator 5/5·sql-inventory 0·br-cross 0.97 pass. PMD 미실행(no-JRE honest carry). `analysis-agent` dispatch.
-- **dogfood findings 5건 (plugin axis = 본질) / 2건 실측 검증(self-recorded-fact-validation)**:
-  - **F1 (검증✅ / 실 버그)**: `sql-inventory-extractor` 가 CTE(`WITH <name> AS`) 별칭·derived-table 명을 `dependent_tables` candidate 로 오포착. issue-acm 실측 8 bare candidate 중 5(Aggre/base_range/GROUPS/USER_LIST/USERS) = mapper 내 `WITH … AS` 실재. **fix 후보**: FROM/JOIN candidate 에서 WITH-절 식별자 제외(결정론·§8.1-safe / 타 도메인 회귀 corroboration 의무).
-  - **F2a (검증✅ / schema 비대칭)**: leaf schema(`business-rules-bc.schema.json`)가 `source_evidence.type` enum 미강제 → full schema(`business-rules.schema.json` 17-enum)와 비대칭. WLFR leaf = calc/state/validation/integration/auth(strict enum 밖) 사용 = **cross-BC 어휘 drift**(leaf 느슨해 미검출). **fix = schema 통일/어휘 reconcile + 기존 leaf 마이그레이션 → DEC 필요(§8.1 고려)**.
-  - F2b/c(검증 미完): migration-cautions affected_scope enum 에 service/data 부재·detection_method tool_output_review 부재 / F2d: shared schema.json per-BC provenance 부재(artifact-zone canonical-global 의도와 대조 필요) / F3: char-spec field trap(when=string·behavior_likely_bug=array·ambiguous_carry=구조체) / F4: bc-accumulator-rollup 가 schema/antipatterns 미커버(hand-upsert) / F5: AP id pattern `^AP-[A-Z]+-\d+$` multi-segment 금지(미문서).
-- **다음 갈래(사용자 결단)**: (a) F1 fix(결정론 tool 정확성 / 타 도메인 회귀 검증 후 release) (b) F2a schema 비대칭 DEC (c) carry ④ 계속 — req 패밀리(신청류 ~821 java / 6 sub-domain) 또는 issue 잔여. **HARD flip 무관**(같은 프로젝트=1 datapoint).
+- **BC-ISSUE-ACM analysis (S2 dogfood / 외부격리)**: 출입통제 7 RestService → 20 BR·30 endpoint·113 SQL·8 char snapshot·8 finding·4 AP. 2-zone append-only(19 BC / 516 tbl / sibling 보존·rollup idempotent). 검증 schema-validator 5/5·sql-inventory 0·br-cross 0.97 pass. PMD 미실행(no-JRE honest carry). `analysis-agent` dispatch. issue 패밀리=1 BC 완주.
+- **F1 (CTE 오탐) = v0.46.1 PATCH 시행·완료**: `sql-inventory-extractor` 가 `WITH <name> AS (` CTE 별칭을 `dependent_tables` 오포착 → file-wide `collectCteNames` 제외(MyBatis 런타임 조합 참조까지 / 실테이블=점 포함이라 충돌 0=provable CTE 한정). §8.1 corroboration issue-acm CTE 6 제거 + WLFR 83=83 누락 0. 11 test / RR 42/42. DEC-2026-06-13-sql-inventory-cte-exclusion. issue-acm 인벤토리 재생성·reconcile(ep-be-gea `ad92994189`).
+- **잔여 dogfood findings (plugin axis = 본질)**:
+  - **F2a (검증✅ / schema 비대칭 / 미fix)**: leaf schema(`business-rules-bc.schema.json`)가 `source_evidence.type` enum 미강제 → full schema(17-enum) 비대칭. WLFR leaf=calc/state/validation/integration/auth(strict 밖) = **cross-BC 어휘 drift**. **fix = schema 통일/어휘 reconcile + 기존 leaf 마이그레이션 → DEC 필요(§8.1)**.
+  - F2b/c(미完): migration-cautions affected_scope service/data 부재·detection_method tool_output_review 부재 / F2d: shared schema.json per-BC provenance 부재 / F3: char-spec field trap / F4: bc-accumulator-rollup schema/antipatterns 미커버 / F5: AP id pattern multi-segment 금지. + **신규**: sql-inventory candidate-noise 별개 클래스(TVF OPENJSON·STRING_SPLIT / alias A1·B1 / MERGE UPDATE SET 키워드 / dbo) = TABLE_STOPWORDS·TVF 인지 확장 후보.
+- **다음 갈래(사용자 결단)**: (a) F2a schema 비대칭 DEC (b) sql-inventory TVF/키워드 noise 확장 (c) carry ④ 계속 — req 패밀리(신청류 ~821 java / 6 sub-domain) 또는 다른 BC. **HARD flip 무관**(같은 프로젝트=1 datapoint).
 
 ### ★ 직전 인계 (2026-06-13 / **label-lint Python/pytest extractor v0.46.0 (SOFT)** — carry pytest 해소 + join capability gain / rageboom 게시 · GHE pending / v0.44.0·v0.45.0 rageboom 게시됨 / ep-be-gea 라벨 fix `cf9e0c20a9`·`9a60e35537`·`2b6d7ab014` GHE pending)
 
