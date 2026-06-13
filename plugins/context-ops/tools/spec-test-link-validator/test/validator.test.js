@@ -413,6 +413,19 @@ describe('validateCodeLabelConsistency — Python/pytest extractor (docstring·c
 		assert.ok(!r.findings.some((f) => f.kind === 'code_label.py_idiom_conflict'));
 	});
 
+	it('unittest-style class method (def test_*(self)) — covered by Python extractor (no separate extractor needed)', () => {
+		const body = `import unittest\nclass TestAmort(unittest.TestCase):\n    def test_pmt(self):\n        """TC-PMT-001 / AC-PMT-001 (BR-PMT-EQUATION-001)."""\n        self.assertTrue(True)\n`;
+		const labels = extractPyDisplayNames(body);
+		assert.equal(labels.length, 1);
+		assert.equal(labels[0].name, 'test_pmt'); // 들여쓰기·self 인자·클래스 중첩 모두 처리
+		assert.deepEqual(labels[0].tokens.TC, ['TC-PMT-001']);
+		// join: source_evidence 'TestAmort.test_pmt' → bare test_pmt anchor → bind, clean
+		const tsU = { test_cases: [{ id: 'TC-PMT-001', ac_ref: 'AC-PMT-001', source_file: 'test_amort.py', source_evidence: 'TestAmort.test_pmt' }] };
+		const r = validateCodeLabelConsistency(tsU, pySrc(body), brIds, acIds);
+		assert.equal(r.summary.total_findings, 0);
+		assert.ok(!r.skipped.some((s) => s.tc_id === 'TC-PMT-001' && s.reason === 'join_anchor_absent'));
+	});
+
 	it('multi-fn source_evidence — drift on the 2nd (non-first) fn is caught (exhaustive join)', () => {
 		const ts3 = {
 			test_cases: [
