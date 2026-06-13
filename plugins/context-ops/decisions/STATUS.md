@@ -9,6 +9,17 @@
 
 > 다음 세션 진입 = 아래 frontier 중 **사용자 선택** (방법론 원칙: 다음 의제 = 사용자 결단 / 하드코딩 ❌).
 
+### ★ 다음 세션 인계 (2026-06-13 / cal(정산) 메뉴그룹 3 BC analysis+풀체인 dogfood + 방법론 findings / **버전 bump 없음** — ep-be-gea-cal·methodology 미커밋)
+
+**이번 세션 성과 (사용자 "cal 새 워크트리로 잡아서 풀체인 진행 + 방법론 파인딩 가장 마지막" / `DEC-2026-06-13-cal-3bc-fullchain-corroboration` / 본체 코드 무변경)**:
+- **cal 미분석 잔여 그룹 → 3 BC(salary/corpt/taxi) analysis(chain0)+chains1~5 fresh 완주**. resve 와 달리 **analysis(코드-고고학) 부터 fresh**(BR leaf+openapi+sql-inventory + shared 카탈로그 append). 새 워크트리 `ep-be-gea-cal`(`feat/cal-domains-analysis`/base=context-ops-test/HEAD 7a60da9f) **GHE only**.
+- **시행**: Phase 0a(WF 3병렬 analysis author+fragment) → 0b(inline append-catalog.js 결정론 머지+exit-gate#0) → A(WF 3병렬 chain author) → B(inline gradle1회 BUILD SUCCESSFUL→실 evidence backfill→matrix/graph→gate 3×5). 산출 = 3 analysis leaf + 4 shared 카탈로그 append + 3 manifest + 18 chain json(6×3) + 3 bo JUnit char 클래스(13 method). 위치 = `ep-be-gea-cal/.ai-context/{output/domains/BC-CAL-*, cal-salary/corpt/taxi}/`.
+- **결과**: 3 BC × 5 stage gate **전부 critical/high/medium=0 GO** + analysis exit-gate#0 GO×3 + **13 real JUnit GREEN(fail 0 / BUILD SUCCESSFUL 46s)** = test-impl-pass gate 레벨 실 gradle(13/13) + graph orphan 0 + matrix fwd·bwd 100%. BR index 126→**176**(+50). (static-runner=evidence_missing/semgrep R19 soft).
+- **방법론 finding**: ①**§8.1 corroboration** — v0.42.x 본체가 cal 3 BC(analysis-stage 포함 fresh)에서 새 본체 결함 0 = 누적 **9 BC datapoint** 과적합 아님. ②**body-candidate 7건 평가 → 본체 코드 수정 0 확정**(액면수용 금지·실측): #5 golf behavior-spec `behavior_spec_path` schema 위반=**현 schema VALID 반증**(resve 와 **동일 hallucination 재발** / 검증기가 에이전트 자기오류 차단) · #1 category `state_transition`/#2 migration-cautions `risk`/#4 sql carry_flags = workflow·other 우회 **일관 작동 규약** → defer(enrichment≠defect) · #3 antipatterns DOMAIN→formal_spec_links 설계대로(AP DB 재분류) · #6/#7 = 수기추출 N/A·기존 v11.x carry corroboration. 부수 **#8 code-pointer-validator strict 진짜 drift 차단(positive)** — SALARY 4 carry TC 미생성 테스트클래스 참조→source_file 정정. ③천장(real-tested AC SALARY 4/16·CORPT 6/15·TAXI 4/19 / taxi=cross-BC **write** 결합 sub-flavor).
+- **본체 무변경(버전 bump·CHANGELOG·schema 없음)** — 검증된 결함 0 → 날조 fix 금지. DEC+INDEX+STATUS+memory 기록만.
+- **carry / 다음**: ① ep-be-gea 잔여 미분석 = **req**(신청류 fo6+bo6=최대) / **issue**(출입·방문) — 사용자 결단(별도 워크트리). ② ep-be-gea-cal push(GHE) 사용자 결단. ③ deferred body-enrichment backlog(state_transition/risk/cross-bc enum + state→workflow 규약 문서화 = 비-defect / §8.1 누적 후 결정).
+
+
 ### ★ 다음 세션 인계 (2026-06-13 / resve 나머지 4 BC 풀체인 dogfood + 방법론 findings / **버전 bump 없음** — ep-be-gea·methodology 미커밋)
 
 **이번 세션 성과 (사용자 "나머지 진행 안했던 체인 다 진행 + 방법론 findings 모아서 마지막" / `DEC-2026-06-13-resve-4bc-fullchain-corroboration` / 본체 코드 무변경)**:
