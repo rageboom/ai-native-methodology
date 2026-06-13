@@ -9,6 +9,15 @@
 
 > 다음 세션 진입 = 아래 frontier 중 **사용자 선택** (방법론 원칙: 다음 의제 = 사용자 결단 / 하드코딩 ❌).
 
+### ★ 다음 세션 인계 (2026-06-13 / **carry ④ — ep-be-gea req/stdpkng(정기주차) 부분추가 analysis** — req 최대 BC / **methodology 무bump**(v0.46.4 가 이미 DELETE 커버) / ep-be-gea `e049c57273` GHE pending)
+
+- **stdpkng = req 최대 BC**(7 RestService ~9,963줄[최대 RestService 단독 4,084줄]·9 mapper·172 SQL / 추첨 draw 알고리즘 + 급여공제 + 기준/대상 + 당첨확인). **병렬 deep-read 4 sub-area(FO신청·당첨 / BO마스터 / BO추첨 / BO급여) → analysis-agent 종합 저작 → 3-verifier 적대검증**(`wf_91e00391-436` / 8 agent). leaf = **59 BR·10 finding·18 MC·11 UC·52 endpoint·16 table**. orphan business-rules/ 미생성.
+- **3-verifier 전부 PASS**: ① BR grounding **무날조 0**(추첨 +1 가산점·Math.random·급여 역적용·상태전이·10 finding 전부 EXACT / 20+ spot-check) ② sql/openapi 정확(enrich 172=172 무드롭·24 candidate 전부 실테이블·CTE/TVF/alias 오탐0·**DELETE 23 v0.46.4 해소**) ③ schema 정합(**visitprkng 4 HIGH 위반 전부 CLEAN** — author 가 ajv 자가검증+enum 준수).
+- **leaf 인라인 수정**: ① stale BR-ref 15건(author renumber[letter-suffix→023-033]가 prose 누락 / self-recorded-fact-validation 적발 — 구조적 ambiguous_carry 002b→030·09c→028·010b→029 **reliable content-remap** + 7 genericize[base 병합·매핑 불가→stale token 안전 제거]) ② openapi BO GET 2건 보강(50→52 / v2 완전성갭) ③ sql warning 케이스중복 prose(≈14→16).
+- **rollup (2-zone idempotent)**: BR-index 20→21 BC·522→**581 rule** / shared/domain 20→21 BC·UL 176→183 / migration-cautions 32→34. load-business-rules 재조립 581 BR(stdpkng 59 reachable). schema-validator 5/5·sql-inventory 0·br-cross 0.947.
+- **dogfood 처분 (본질)**: ① **v0.46.4 FROM-less DELETE 2nd-도메인 corroboration**(stdpkng DELETE 23 전부 해소). ② **case-dup 테이블(.DBO./.dbo. 24후보→고유16)=carry**(데이터 오류 아님·per-record 정확·SQL Server collation-unknown·honest-candidate·§8.1 / semantic dedup=enrichment/DBA 몫). ③ **3 v3 low 전부 template-identical**(business-rules verifier wrong-schema 오검증=실제 business-rules-bc VALID / ambiguous_carry 컨벤션 / auto.json by-design). ④ stale-ref=LLM authoring 아티팩트(tool 버그 아님 / 적대검증이 안전망). → **검증된 본체 결함 0 = 무bump**(cal·resve 선례 동일).
+- **다음 갈래(사용자 결단)**: req 나머지 4 sub-domain(iteqmt 193j / bookreq 90j / bizcard 88j / empcard 74j) / 다른 BC / sql-inventory 2nd 외부 repo dogfood. **methodology rageboom**: v0.46.4 게시됨(`895e82aa`) / 본 stdpkng STATUS = docs 무bump(push 사용자 결단) / GHE pending(망).
+
 ### ★ 다음 세션 인계 (2026-06-13 / **carry ④ — ep-be-gea req/visitprkng(방문주차) 부분추가 analysis + sql-inventory FROM-less DELETE fix shipped v0.46.4** / ep-be-gea GHE pending / methodology rageboom 게시)
 
 - **req 패밀리 부분추가 (S2 dogfood / 외부격리)**: 신청류 6 sub-domain(stdpkng 239j/iteqmt 193j/bookreq 90j/bizcard 88j/empcard 74j/visitprkng 74j = 758 java) 중 **visitprkng(방문주차 / 2 RestService·2 mapper·45 SQL)** 1 BC 부분추가. analysis-agent 저작 → 13 BR·8 UC·18 endpoint·8 char snapshot·7 finding·6 MC·7 table. 적대 검증 패널 `wf_cd973abc-9f9`(analysis-agent → 3 verifier): **BR grounding 무날조 0**(13 BR+7 finding 전 source_evidence 실소스 전수 대조 / 29 spot-check)·sql/openapi 정확·schema. **orphan business-rules/ 서브디렉토리 미생성**(F2a 교훈 forward).
