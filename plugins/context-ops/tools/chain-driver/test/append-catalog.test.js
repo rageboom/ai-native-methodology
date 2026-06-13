@@ -105,6 +105,54 @@ describe('upsertCautionGroup — title 키', () => {
 		upsertCautionGroup(mc, { title: 'G2', cautions: [{ id: 'X' }] });
 		assert.deepEqual(mc.caution_groups.map((g) => g.title), ['G1', 'G2']);
 	});
+	test('title 충돌 → cautions id union 병합 (sibling caution 보존 / group 통째 교체 ❌)', () => {
+		// 회귀: empcard rollup 이 stdpkng 메타 그룹을 통째 교체해 2 cautions drop (DEC-2026-06-14).
+		const mc = {
+			caution_groups: [
+				{
+					title: 'META',
+					category: 'database',
+					cautions: [
+						{ id: 'C-A', title: 'a' },
+						{ id: 'C-B', title: 'b' },
+					],
+				},
+			],
+		};
+		const r = upsertCautionGroup(mc, {
+			title: 'META',
+			cautions: [
+				{ id: 'C-B', title: 'b2' },
+				{ id: 'C-C', title: 'c' },
+			],
+		});
+		assert.equal(r.action, 'merged');
+		assert.equal(mc.caution_groups.length, 1, '그룹 수 유지(통째 교체 금지)');
+		const g = mc.caution_groups[0];
+		assert.deepEqual(
+			g.cautions.map((c) => c.id),
+			['C-A', 'C-B', 'C-C'],
+			'C-A 보존 + C-C 추가',
+		);
+		assert.equal(g.cautions.find((c) => c.id === 'C-B').title, 'b2', '같은 id 는 교체');
+		assert.equal(r.addedCautions, 1);
+		assert.equal(r.replacedCautions, 1);
+		assert.equal(g.category, 'database', '기존 그룹 메타 보존');
+	});
+	test('merge idempotent — 같은 group 재적용 시 중복 0', () => {
+		const mc = { caution_groups: [] };
+		const grp = {
+			title: 'M',
+			cautions: [{ id: 'C-1' }, { id: 'C-2' }],
+		};
+		upsertCautionGroup(mc, grp);
+		upsertCautionGroup(mc, grp);
+		assert.equal(mc.caution_groups.length, 1);
+		assert.deepEqual(
+			mc.caution_groups[0].cautions.map((c) => c.id),
+			['C-1', 'C-2'],
+		);
+	});
 });
 
 describe('path-based — multi-BC no-clobber + indent 보존 (핵심 회귀)', () => {

@@ -98,10 +98,49 @@ export function upsertBcFile(indexObj, entry) {
 	return { ...r, total_rules: indexObj.total_rules };
 }
 
-/** migration-cautions.json 의 caution_groups[] 에 group(title 키) upsert. */
+/**
+ * migration-cautions.json 의 caution_groups[] 에 group(title 키) upsert.
+ *
+ * F-finding(cross-BC caution clobber): 기존 구현은 title 일치 시 group 전체를 교체(upsertById)했다.
+ *   다중 BC 가 같은 cross-cutting 메타 title(예: "분석 메타 — sql-inventory 추출기 한계")에 각자
+ *   cautions 를 누적하면 마지막 BC 의 cautions 만 살아남고 sibling BC 의 cautions 가 silently drop
+ *   되는 데이터 손실이 관측됨(empcard rollup 이 stdpkng 2 cautions 클로버 / DEC-2026-06-14).
+ *   따라서 title 충돌 시 group 을 통째 교체하지 않고 cautions 를 caution.id 기준 union 병합(없으면
+ *   추가 / 같은 id 는 교체 = idempotent)하고, group 메타(category/description)는 기존이 비었을 때만
+ *   incoming 으로 보강한다. caution.id 는 schema required → union 키 안전.
+ * @returns {{action:'appended'|'merged', index:number, addedCautions:number, replacedCautions:number}}
+ */
 export function upsertCautionGroup(mcObj, group) {
 	mcObj.caution_groups ??= [];
-	return upsertById(mcObj.caution_groups, group, 'title');
+	const i = mcObj.caution_groups.findIndex((g) => g && g.title === group.title);
+	if (i < 0) {
+		mcObj.caution_groups.push(group);
+		return {
+			action: 'appended',
+			index: mcObj.caution_groups.length - 1,
+			addedCautions: (group.cautions ?? []).length,
+			replacedCautions: 0,
+		};
+	}
+	const existing = mcObj.caution_groups[i];
+	existing.cautions ??= [];
+	const idx = new Map(existing.cautions.map((c, k) => [c && c.id, k]));
+	let added = 0;
+	let replaced = 0;
+	for (const c of group.cautions ?? []) {
+		const id = c && c.id;
+		if (id != null && idx.has(id)) {
+			existing.cautions[idx.get(id)] = c;
+			replaced++;
+		} else {
+			existing.cautions.push(c);
+			if (id != null) idx.set(id, existing.cautions.length - 1);
+			added++;
+		}
+	}
+	if (group.category && !existing.category) existing.category = group.category;
+	if (group.description && !existing.description) existing.description = group.description;
+	return { action: 'merged', index: i, addedCautions: added, replacedCautions: replaced };
 }
 
 // ── I/O (indent 보존) ──────────────────────────────────────────────

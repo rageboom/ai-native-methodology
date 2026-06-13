@@ -10,6 +10,21 @@
 
 ---
 
+## [0.46.5] — 2026-06-14 PATCH — append-catalog `upsertCautionGroup` cross-BC caution merge (clobber fix / dogfood-found) + req 4-BC 부분추가 analysis
+
+**SSOT**: `decisions/DEC-2026-06-14-append-catalog-caution-merge.md`. carry ④ req 패밀리 **나머지 4 sub-domain(iteqmt 비품·bookreq 도서·bizcard 명함·empcard 사원증) 부분추가 analysis dogfood** — 병렬 workflow `wf_3d614d66-1be`(28-agent: BC당 3 deep-read → analysis-agent leaf 저작 → 3 적대검증) + leaf 정확성 수정 `wf_2d777a1e-6eb`(3-agent: bookreq characterization 보강 / iteqmt openapi concrete 재구성 / bizcard openapi param 정합).
+
+### Fixed (append-catalog — cross-BC caution clobber)
+- `upsertCautionGroup` 이 title 일치 시 caution_group 객체를 **통째 교체**(`upsertById('title')`) → 같은 cross-cutting 메타 title 에 여러 BC 가 caution 을 누적하면 마지막 BC 만 살고 sibling BC 의 `cautions[]` 가 **silently drop**. 단일-BC(golf/event)는 충돌 부재로 미노출 — 다중-BC 팬아웃 잠복 결함. dogfood 증거: empcard rollup 이 stdpkng 2 caution(`MC-REQ-STDPKNG-TABLE-CANDIDATE-CASE-DUP`·`-USESTATUS-DUP-GUARD-MAPPER-ORPHAN`) 클로버.
+- **수정**: title 충돌 시 그룹 교체 대신 `cautions[]` 를 `caution.id` 기준 **union 병합**(없으면 추가 / 같은 id 교체=idempotent / sibling 보존). group 메타(category/description)는 기존 비었을 때만 보강. `caution.id`=schema required → union 키 안전.
+
+### Notes
+- 검증: append-catalog **16/16**(신규 회귀 2: title 충돌 union·sibling 보존 / merge idempotent) / chain-driver **539/539** 무회귀 / 수정 tool 재-rollup **caution LOST 0**(HEAD 161 ⊆ 208 / 병합 그룹=stdpkng 2+empcard 2 union 정확).
+- req 4-BC dogfood 산출(사내 / 외부 격리): **57 BR·34 finding·8 MC group**·openapi 정확성 fix. shared 카탈로그 rollup **25 BC/638 rule**·domain 25/UL 209·MC 41. 결정론 gate 전수 GREEN(leaf schema 20/20·sql-inventory info-only·br-cross 0.896~0.95) + iteqmt openapi 컨트롤러 ↔ spec 양방향 diff **55:55**(템플릿 {div} 0).
+- analysis-agent 저작물의 schema enum drift(category `state_transition`/`data_integrity`/`notification` 미존재값·source_evidence type)·openapi `{div}` 템플릿 날조·characterization 필수필드 누락은 **결정론 gate + 3 적대검증**이 포착 → 수정(검증기 액면 수용 ❌ / self-recorded-fact-validation: empcard category enum 위반은 검증기가 놓쳤으나 결정론 schema-validator 가 포착).
+- **§8.1**: correctness 수정(데이터 손실 방지) / HARD-gate·정량 ceiling 아님 — 단일 결정론 재현 + 회귀 test 충분.
+- RR **42/42**.
+
 ## [0.46.4] — 2026-06-13 PATCH — sql-inventory-extractor FROM-less T-SQL DELETE dependent_tables 추출 (dogfood-found / candidate 정확성)
 
 **SSOT**: `decisions/DEC-2026-06-13-sql-inventory-cte-exclusion.md` §9. carry ④ req 패밀리 **visitprkng(방문주차) 부분추가 analysis dogfood** + 적대 검증 패널 `wf_cd973abc-9f9` (analysis-agent 저작 → 3 verifier: BR grounding·sql/openapi accuracy·schema 정합).
