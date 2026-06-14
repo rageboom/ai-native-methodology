@@ -9,6 +9,15 @@
 
 > 다음 세션 진입 = 아래 frontier 중 **사용자 선택** (방법론 원칙: 다음 의제 = 사용자 결단 / 하드코딩 ❌).
 
+### ★ 다음 세션 인계 (2026-06-14 / **carry ④ — eaprv(전자결재 엔진) 부분 leaf 완성 + shared 재조정** / methodology 무bump / ep-be-gea `9c677553c7` GHE pending)
+
+- **BC-EAPRV = _catalog-fragment 부채 해소**: leaf 가 3/9 파일(business-rules 17 BR·openapi 3·sql 7)만 / shared 엔 side-branch(`feature/context-ops-eaprv` v0.43.0) rollup(domain entry + legacy 5 MC-PRESERVE-EAPRV-*) 잔존. "완성"=재생성 ❌ 누락 6 파일 backfill(기존 3 무수정 보존).
+- **6 파일 grounded 저작**(`wf_6adc7678-0c3` / 2 deep-read→analysis-agent→3 적대검증): bc-scope·domain·characterization(7 snapshot/17 scenario)·migration-cautions·findings(8)·README. eaprv 엔진 scope=core/{epbcommon,fo,bo}/electronicapproval 3 RestService(도메인별 *ElectronicApproval 8종=통합 cross_link / scope 밖).
+- **검증기≠ground-truth 재실증**: 적대 FABRICATION 3 low(preserve_alias dup·controller명·line offset) / SCHEMA 가 **preserve_alias 미허용 키(gate-blocking)** 포착 → 결정론 schema-validator 확정 → migration_guidance 이동 + controller method 명 정정. dangling BR/MC 0.
+- **데이터 손실 방지 reconcile(핵심)**: 새 leaf(11 MC-EAPRV-*)가 legacy 5(MC-PRESERVE-001~005)와 부분 overlap — 001~004 흡수했으나 **003 잔여(engine→biztrip 컴파일 의존·하드코딩 템플릿ID)+005 잔여(validate() 필수값 불일치 @NotBlank requestNo) 미커버** 발견(diagnose-before-design grep). → 2 caution grounded port → leaf 13 superset 화 → root legacy 그룹 제거 + 내 2 그룹 append(**append-catalog merge-fix v0.46.5 활용**). **기타 BC caution 손실 0**(208→216). domain=union merge(shared entities/repos/services/UC + leaf VO5/external_deps → leaf+shared 양쪽).
+- **gate 전수 GREEN**: leaf schema 5/5·br-cross 0.929·sql info-only / root MC 42 group·shared domain 25 BC valid / BR-index BC-EAPRV 17 무변 / 재조립 638 BR. methodology 코드/스펙 무변=**무bump**(v0.46.5 caution-merge fix 실 reconcile corroboration).
+- **다음 갈래(사용자 결단)**: 다른 미분석 BC / sql-inventory 2nd 외부 MSSQL+MyBatis repo(toy RealWorld PoC=방언 불일치로 부적합 확인) / label-lint HARD flip. **methodology rageboom**: c0f2600e 동기화됨 / 본 eaprv STATUS=무bump(push 결단). **ep-be-gea** `9c677553c7` GHE pending(ahead 29).
+
 ### ★ 다음 세션 인계 (2026-06-14 / **carry ④ — req 나머지 4 BC(iteqmt·bookreq·bizcard·empcard) 부분추가 analysis 완주 → req 패밀리 6/6 + append-catalog caution-merge fix shipped v0.46.5** / ep-be-gea GHE pending / methodology rageboom push 대기)
 
 - **req 패밀리 완주(6/6)**: visitprkng·stdpkng 후 나머지 4 BC(iteqmt 비품·bookreq 도서·bizcard 명함·empcard 사원증) 부분추가 → 신청류 6 BC 전부 AX-context. **28-agent 병렬 workflow `wf_3d614d66-1be`**(BC당 3 deep-read[logic/sql/api] → analysis-agent leaf 저작 → 3 적대검증[fabrication/sql-openapi/schema-staleref]). 산출 **57 BR·34 finding·8 MC group·~129 endpoint·40 table**.
