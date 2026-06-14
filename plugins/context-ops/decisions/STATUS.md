@@ -9,6 +9,13 @@
 
 > 다음 세션 진입 = 아래 frontier 중 **사용자 선택** (방법론 원칙: 다음 의제 = 사용자 결단 / 하드코딩 ❌).
 
+### ★ 다음 세션 인계 (2026-06-14 / **carry ④ — BC-NOTIFICATION(알림 cross-cutting 엔진) 분석** / methodology 무bump / ep-be-gea `2660001905` GHE pending)
+
+- **알림(notification) cross-cutting 엔진**(geacommon/notification + backoffice/notification / NotificationRestService·BoNotification / E-xxxx 코드 = 전 BC cross_link) — eaprv 에 이은 cross-cutting 서비스 BC. 7-agent workflow(`wf_e544e508-079`) + **hardened prompt**(이번 세션 전 drift 패턴 선차단).
+- **hardened prompt 효과 입증**: category enum clean·source_evidence.type enum·carry_flags enum(sql 20 critical 0)·characterization intent_vs_bug+coverage 완비·**br-cross 0.938**(NL↔GWT 식별자 공유 선반영) — req/issue 의 주요 drift 전부 선차단됨. **유일 잔여 = sql-inventory top-level `evidence` 키**(extractor 가 real_tool 5종 물증으로 emit / VISITOR 재발) → **diagnose-before-design 로 convention 확정**(기존 9 BC 전부 enriched 는 evidence 생략·auto.json 만 보유 = schema 결함 아님 / 헛 release 차단) → 제거. + meta.summary category count(INTEGRATION 5/VALIDATION 2) 정정.
+- **gate 전수 GREEN**: schema 5/5·br-cross 0.938·sql info-only·dangling 0. 산출 12 BR·9 finding·13 MC·7 UC·36 SQL·7 table. rollup(append-catalog merge-fix): BR-index 27→**28 BC**·652→**664 rule**(+12) / domain 28·UL 233 / migration-cautions 48→50(1 group **merged**=sibling 보존·v0.46.5 fix 실증) / **caution 손실 0**.
+- methodology 코드/스펙 무변=**무bump**. **business 도메인 사실상 소진** — 잔여 = epbcommon/* infra(employee 30·code 25·department 19·company 14·file/excel/lookup 등) + backoffice batch/cmn/auth. employee(조직/사원 service)=최후 高참조 cross-cutting 후보. **ep-be-gea** `2660001905` GHE pending(ahead 31 / VPN).
+
 ### ★ 다음 세션 인계 (2026-06-14 / **carry ④ — issue 패밀리 완성(secomterminal·visitor 2 BC) → 출입통제 도메인 마무리** / methodology 무bump / ep-be-gea `2a82241203` GHE pending)
 
 - **issue 출입통제 패밀리 완성(acm 후)**: BC-ISSUE-SECOM(세콤 단말 기준 / BO CRUD 3 BR) + BC-ISSUE-VISITOR(방문자 출입권한 신청·현황 / FO+BO 11 BR). 14-agent 병렬 workflow(`wf_9b976dc0-b14`) + 2-agent grounded 수정(`wf_a1dde914-df1`).
