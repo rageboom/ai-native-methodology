@@ -9,6 +9,14 @@
 
 > 다음 세션 진입 = 아래 frontier 중 **사용자 선택** (방법론 원칙: 다음 의제 = 사용자 결단 / 하드코딩 ❌).
 
+### ★ 다음 세션 인계 (2026-06-14 / **carry ④ — issue 패밀리 완성(secomterminal·visitor 2 BC) → 출입통제 도메인 마무리** / methodology 무bump / ep-be-gea `2a82241203` GHE pending)
+
+- **issue 출입통제 패밀리 완성(acm 후)**: BC-ISSUE-SECOM(세콤 단말 기준 / BO CRUD 3 BR) + BC-ISSUE-VISITOR(방문자 출입권한 신청·현황 / FO+BO 11 BR). 14-agent 병렬 workflow(`wf_9b976dc0-b14`) + 2-agent grounded 수정(`wf_a1dde914-df1`).
+- **결정론 gate = ground-truth(검증기 액면수용❌ / 이번 세션 핵심 패턴 반복)**: ① VISITOR sql-inventory carry_flags 13 비-enum dialect 태그(mssql-nolock 등)+top-level `evidence` 추가키 = **schema FAIL + sql-validator 20 critical 동일근원** → enum 매핑 + dialect→business_meaning 이동(결정론 node fix) ② VISITOR characterization intent_vs_bug·coverage 누락(bookreq 동형)→grounded 보강 ③ **SECOM br-cross 0.75 FAIL = penalty-based**(5 structure finding×0.15 / overlap 평균 아님 — agent 가 validator 실측 발견)→given/when/then 의미보강+NL↔GWT 식별자 공유→**1.0 PASS** ④ SECOM openapi response schema over/under-declare(실 DTO 14필드 동형)·count(createBulk 22·11 stmt·10 메서드) 실측 정정.
+- **category enum 은 이번 깨끗**(author 가 valid 사용 = req 교훈 선반영 효과) — drift 가 sql carry_flags·br-cross 표현·characterization 누락으로 이동(패턴 진화 관측).
+- **gate 전수 GREEN**: schema 10/10·br-cross SECOM 1.0/VISITOR 0.905·sql info-only·dangling 0. rollup(2-zone idempotent / append-catalog merge-fix): BR-index 25→**27 BC**·638→**652 rule**(+14) / domain 27·UL 226 / migration-cautions 42→48 / **caution 손실 0** / 재조립 652.
+- methodology 코드/스펙 무변=**무bump**. **다음**: BC-NOTIFICATION(알림 cross-cutting 엔진) 분석 병렬 진행 중(`wf_e544e508-079`) / 그 후 잔여 infra(batch/cmn/epbcommon-*). **ep-be-gea** `2a82241203` GHE pending(ahead 30 / VPN).
+
 ### ★ 다음 세션 인계 (2026-06-14 / **carry ④ — eaprv(전자결재 엔진) 부분 leaf 완성 + shared 재조정** / methodology 무bump / ep-be-gea `9c677553c7` GHE pending)
 
 - **BC-EAPRV = _catalog-fragment 부채 해소**: leaf 가 3/9 파일(business-rules 17 BR·openapi 3·sql 7)만 / shared 엔 side-branch(`feature/context-ops-eaprv` v0.43.0) rollup(domain entry + legacy 5 MC-PRESERVE-EAPRV-*) 잔존. "완성"=재생성 ❌ 누락 6 파일 backfill(기존 3 무수정 보존).
