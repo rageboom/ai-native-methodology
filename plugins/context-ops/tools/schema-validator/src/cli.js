@@ -85,9 +85,13 @@ function inferSchemaName(jsonFile, jsonContent) {
 		const m = jsonContent.$schema.match(/([a-z0-9-]+\.schema\.json)/i);
 		if (m) return m[1];
 	}
-	// 2) 파일명 패턴
+	// 2) 파일명 패턴 (+ canonical alias — 산출물 파일명이 schema 명과 다른 경우 / DEC-2026-06-15-matrix-schema-builder-align)
 	const base = basename(jsonFile, '.json');
-	return `${base}.schema.json`;
+	//    traceability-matrix-builder 가 matrix.json 으로 emit (canonical schema 명 = traceability-matrix.schema.json)
+	//    → 별칭 없으면 matrix.schema.json(미존재)로 라우팅돼 silent skip(false-green). $schema_ref 보유 산출물은 위 1)에서 이미 처리.
+	const FILENAME_ALIASES = { matrix: 'traceability-matrix' };
+	const canonical = FILENAME_ALIASES[base] ?? base;
+	return `${canonical}.schema.json`;
 }
 
 function main() {

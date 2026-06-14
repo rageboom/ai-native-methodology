@@ -10,6 +10,23 @@
 
 ---
 
+## [0.46.6] — 2026-06-15 PATCH — traceability-matrix schema ↔ builder contract 정렬 (full-chain pilot dogfood-found)
+
+**SSOT**: `decisions/DEC-2026-06-15-matrix-schema-builder-align.md`. ep-be-gea full-chain 캠페인 pilot(BC-RESV-BASE chain 2~5 / `wf_f8bd124e-c67`)의 gate#5 적대검증이 `matrix.json` 을 canonical schema 로 explicit 검증할 때 폭로(strict 검증 = latent drift 노출).
+
+### Fixed (traceability-matrix schema — builder contract 분기)
+- `traceability-matrix-builder/src/builder.js` 는 top-level S5 provenance header `{derived_from, do_not_edit_manually, matrix, coverage_summary}` 를 emit(DO-178C/IEC 62304 + `_base-build-traceability-matrix` SKILL 명세 / `builder.test.js` 가 `do_not_edit_manually`·`derived_from` 고정)하나, `traceability-matrix.schema.json` 은 `required:["meta",…]` + `additionalProperties:false` → **빌더 산출물이 자기 canonical schema 를 항상 FAIL**. golf 포함 기존 9 full-chain BC + 신규 BC-RESV-BASE = matrix 10/10 전부 동일(이전 run 이 explicit schema 검증 미실행 + 파일명 미스매치 auto-route skip 으로 잠복).
+- **수정 (방향 = schema 를 builder 에 정렬 / 사용자 확정 / builder 무변경)**: schema `required` 에서 `meta` 제거(optional) + properties 에 `derived_from`(array<string>)·`do_not_edit_manually`(boolean)·`$schema_ref`/`$schema_origin`/`$comment`(optional) 추가. `additionalProperties:false` 유지. matrix cell·coverage_summary 정의 무변.
+
+### Fixed (schema-validator — auto-route false-green skip)
+- 산출 파일명 `matrix.json` → `inferSchemaName` 이 `matrix.schema.json`(미존재) 라우팅 → silent skip(false-green). `FILENAME_ALIASES = { matrix: 'traceability-matrix' }` 별칭 추가 → `matrix.json` 이 `traceability-matrix.schema.json` 으로 해소. `$schema_ref` 보유 산출물은 기존 1)단계 우선 처리 → 무영향.
+
+### 검증
+- 기존 9 full-chain BC + BASE = **matrix 10/10 auto-route GREEN**. 도구 무회귀: `traceability-matrix-builder` 179/179 · `schema-validator` 111/111 (0 fail). workspace 1716/1718 pass/0 fail. **release-readiness 42/42** (criteria_total 무변).
+- **§8.1**: correctness 수정 + 10 datapoint corroboration(전 full-chain BC) → HARD-gate/정량 ceiling 아님 → 단일 정렬 + 기존 test 회귀 충분. 신 check 없음(count-coupling 무).
+
+---
+
 ## [0.46.5] — 2026-06-14 PATCH — append-catalog `upsertCautionGroup` cross-BC caution merge (clobber fix / dogfood-found) + req 4-BC 부분추가 analysis
 
 **SSOT**: `decisions/DEC-2026-06-14-append-catalog-caution-merge.md`. carry ④ req 패밀리 **나머지 4 sub-domain(iteqmt 비품·bookreq 도서·bizcard 명함·empcard 사원증) 부분추가 analysis dogfood** — 병렬 workflow `wf_3d614d66-1be`(28-agent: BC당 3 deep-read → analysis-agent leaf 저작 → 3 적대검증) + leaf 정확성 수정 `wf_2d777a1e-6eb`(3-agent: bookreq characterization 보강 / iteqmt openapi concrete 재구성 / bizcard openapi param 정합).

@@ -4,11 +4,31 @@
   "title": "Traceability Matrix (cross-cutting)",
   "description": "v2.0 SDLC 4단계 chain harness 의 cross-cutting 산출물. UC-* → BHV-* → AC-* → TC-* → IMPL-* + commit_hash forward+backward link 매트릭스. DO-178C bidirectional traceability + IEC 62304 차용 (Official research 권고). 매 chain stage gate 종결 시 갱신 의무. DEC-2026-05-06-v2.0-i-strict-채택 정합.",
   "type": "object",
-  "required": ["meta", "matrix", "coverage_summary"],
+  "required": ["matrix", "coverage_summary"],
   "additionalProperties": false,
   "properties": {
     "meta": {
-      "$ref": "./meta-confidence.schema.json"
+      "$ref": "./meta-confidence.schema.json",
+      "description": "선택 (meta-confidence). traceability-matrix-builder 는 meta 대신 derived_from + do_not_edit_manually 의 S5 provenance header 를 emit 하므로 required 아님 (DEC-2026-06-15-matrix-schema-builder-align / builder.js 가 SSOT — builder.test.js 가 derived_from/do_not_edit_manually 고정)."
+    },
+    "$schema_ref": {
+      "type": "string",
+      "description": "선택 — 자기기술 schema 라우팅 키 (다른 산출물 패턴 정합)."
+    },
+    "$schema_origin": {
+      "type": "string"
+    },
+    "$comment": {
+      "type": "string"
+    },
+    "derived_from": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "S5 provenance header — 이 매트릭스가 합성된 chain 산출물 목록 (planning/behavior/acceptance/test/impl-spec + optional business-rules/antipatterns/task-plan/unit-spec). traceability-matrix-builder/src/builder.js 가 emit (DO-178C/IEC 62304 bidirectional traceability provenance)."
+    },
+    "do_not_edit_manually": {
+      "type": "boolean",
+      "description": "S5 header — 결정론 빌더 산출물이므로 수동 편집 금지 신호 (builder 가 항상 true emit)."
     },
     "matrix": {
       "type": "array",
