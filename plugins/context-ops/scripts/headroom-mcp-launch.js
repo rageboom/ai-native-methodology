@@ -2,15 +2,15 @@
 // headroom-mcp-launch.js — wrapper launcher for the headroom MCP server (referenced by .mcp.json).
 //
 // The plugin declares an MCP server whose `command` points HERE instead of directly at `headroom`,
-// so the static server declaration is safe when headroom is opt-out or not-yet-installed:
-//   - CONTEXT_OPS_INSTALL_HEADROOM != 1  → exit 0 (graceful no-op; server simply not active)
-//   - headroom not on PATH               → exit 0 (no-op; activates next session after install /reload)
-//   - both OK                            → exec `headroom mcp serve` (stdio passthrough)
+// so the static server declaration is safe when headroom is opted out or not-yet-installed:
+//   - opted out (CONTEXT_OPS_DISABLE_HEADROOM=1) → exit 0 (graceful no-op; server simply not active)
+//   - headroom not on PATH                       → exit 0 (no-op; activates next session after install /reload)
+//   - otherwise (default)                        → exec `headroom mcp serve` (stdio passthrough)
 //
 // Why a launcher: Claude Code plugin MCP declarations have no conditional syntax and always try to
-// start. Without this guard, default-OFF adopters (and the first session after opt-in, before the
-// SessionStart installer finishes) would see a hard-failing server. The launcher turns those cases
-// into a clean no-op. Mirrors the install scripts' no-simulation / honest-carry posture.
+// start. Without this guard, opted-out adopters (and the first session before the SessionStart
+// installer finishes installing headroom) would see a hard-failing server. The launcher turns those
+// cases into a clean no-op. Mirrors the install scripts' no-simulation / honest-carry posture.
 
 import { spawn, spawnSync } from 'node:child_process';
 
@@ -24,8 +24,12 @@ function commandExists(cmd) {
 	return probe.status === 0;
 }
 
-// Opt-out (default) → MCP server not active.
-if (process.env.CONTEXT_OPS_INSTALL_HEADROOM !== '1') {
+// Opted out → MCP server not active (default is ON).
+const lc = (v) => String(v ?? '').trim().toLowerCase();
+const OPTED_OUT =
+	['1', 'true', 'yes', 'on'].includes(lc(process.env.CONTEXT_OPS_DISABLE_HEADROOM)) ||
+	['0', 'false', 'no', 'off'].includes(lc(process.env.CONTEXT_OPS_INSTALL_HEADROOM));
+if (OPTED_OUT) {
 	process.exit(0);
 }
 

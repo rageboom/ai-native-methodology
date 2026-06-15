@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// install-companion-tools.js — OPT-IN idempotent installer for companion MCP tools (headroom + codegraph).
+// install-companion-tools.js — idempotent installer for companion MCP tools (headroom + codegraph), both DEFAULT ON (opt-out).
 //
 // Invoked by the SessionStart hook (see hooks/hooks.json) as `node ...install-companion-tools.js`.
 // Mirrors install-static-tools.js conventions:
@@ -8,9 +8,10 @@
 //   - Idempotent — no-op when `headroom` already on PATH (marker under .static-tools/).
 //
 // Scope: headroom (https://github.com/chopratejas/headroom) — LLM context-compression CLI + MCP server.
-//   ★ OPT-IN ONLY — runs only when env CONTEXT_OPS_INSTALL_HEADROOM=1 (default OFF).
-//     headroom is a heavy 3rd-party dependency (Python + Rust-built wheels) and is NEVER forced on
-//     adopters; the shipped default is a silent no-op so no one gets a surprise install.
+//   ★ DEFAULT ON (opt-out) — runs unless env CONTEXT_OPS_DISABLE_HEADROOM=1 (or CONTEXT_OPS_INSTALL_HEADROOM=0).
+//     headroom is a heavy 3rd-party dependency (Python + Rust-built wheels), so the install stays
+//     bounded: wheel-only (no Rust compile), always exit 0, honest-carry on failure. Adopters who
+//     do not want it set CONTEXT_OPS_DISABLE_HEADROOM=1 for a silent no-op.
 //   Channel: pipx (isolated, CLI on PATH) → pip3/pip --user fallback. Package = headroom-ai[mcp]
 //     (CLI + MCP server; the [mcp] extra is what headroom-mcp-launch.js needs).
 //   Wheel-preferred (`--only-binary headroom-ai`, per headroom's own docs) so SSL-inspected corporate
@@ -31,11 +32,19 @@ const PLUGIN_ROOT = process.env.CLAUDE_PLUGIN_ROOT || resolve(SCRIPT_DIR, '..');
 const MARKER_DIR = join(PLUGIN_ROOT, '.static-tools'); // reuse static-tools marker dir (gitignored)
 const HEADROOM_MARKER = join(MARKER_DIR, '.headroom-installed');
 
-// Two independent opt-in companion MCP tools, each behind its own flag (default OFF):
-//   CONTEXT_OPS_INSTALL_HEADROOM=1 → headroom (context compression / pip)
-//   CONTEXT_OPS_CODEGRAPH_MCP=1    → codegraph (structural-search MCP / npm) + project index bootstrap
-const OPT_IN_HEADROOM = process.env.CONTEXT_OPS_INSTALL_HEADROOM === '1';
-const OPT_IN_CODEGRAPH = process.env.CONTEXT_OPS_CODEGRAPH_MCP === '1';
+// Two independent companion MCP tools — both DEFAULT ON (opt-out):
+//   headroom (context compression / pip) — opt out with CONTEXT_OPS_DISABLE_HEADROOM=1
+//                                          (CONTEXT_OPS_INSTALL_HEADROOM=0 also honored).
+//   codegraph (structural-search MCP / npm) — opt out with CONTEXT_OPS_DISABLE_CODEGRAPH=1
+//                                             (CONTEXT_OPS_CODEGRAPH_MCP=0 also honored).
+const lc = (v) => String(v ?? '').trim().toLowerCase();
+const isTruthy = (v) => ['1', 'true', 'yes', 'on'].includes(lc(v));
+const isFalsy = (v) => ['0', 'false', 'no', 'off'].includes(lc(v));
+// Both default ON → enabled unless explicitly opted out.
+const ENABLE_HEADROOM = !(isTruthy(process.env.CONTEXT_OPS_DISABLE_HEADROOM)
+	|| isFalsy(process.env.CONTEXT_OPS_INSTALL_HEADROOM));
+const ENABLE_CODEGRAPH = !(isTruthy(process.env.CONTEXT_OPS_DISABLE_CODEGRAPH)
+	|| isFalsy(process.env.CONTEXT_OPS_CODEGRAPH_MCP));
 const PKG = 'headroom-ai[mcp]';
 const CODEGRAPH_PKG = '@colbymchenry/codegraph';
 const CODEGRAPH_MARKER = join(MARKER_DIR, '.codegraph-installed');
@@ -78,7 +87,7 @@ function ensureHeadroom() {
 		return true;
 	}
 
-	log(`headroom not found — attempting opt-in install (${PKG})…`);
+	log(`headroom not found — attempting install (${PKG})…`);
 
 	// Channel order: pipx (isolated, recommended) → pip3 --user → (Windows) pip --user.
 	// `--only-binary headroom-ai` forces a prebuilt wheel for headroom itself (no Rust build);
@@ -127,7 +136,7 @@ function ensureCodegraph() {
 		}
 		return true;
 	}
-	log(`codegraph not found — attempting opt-in install (${CODEGRAPH_PKG})…`);
+	log(`codegraph not found — attempting install (${CODEGRAPH_PKG})…`);
 	if (commandExists('npm') && runInstaller('npm', ['install', '-g', CODEGRAPH_PKG])) {
 		log('codegraph installed via npm -g.');
 		try { mkdirSync(MARKER_DIR, { recursive: true }); writeFileSync(CODEGRAPH_MARKER, ''); } catch {}
@@ -154,16 +163,16 @@ function ensureCodegraphIndex() {
 }
 
 try {
-	if (!OPT_IN_HEADROOM && !OPT_IN_CODEGRAPH) {
-		// Default OFF — silent no-op. Do not nag adopters who never opted in.
+	if (!ENABLE_HEADROOM && !ENABLE_CODEGRAPH) {
+		// both opted out — silent no-op.
 		process.exit(0);
 	}
-	if (OPT_IN_HEADROOM) {
-		log('CONTEXT_OPS_INSTALL_HEADROOM=1 — headroom companion enabled.');
+	if (ENABLE_HEADROOM) {
+		log('headroom companion enabled (default ON; set CONTEXT_OPS_DISABLE_HEADROOM=1 to opt out).');
 		ensureHeadroom();
 	}
-	if (OPT_IN_CODEGRAPH) {
-		log('CONTEXT_OPS_CODEGRAPH_MCP=1 — codegraph search companion enabled.');
+	if (ENABLE_CODEGRAPH) {
+		log('codegraph search companion enabled (default ON; set CONTEXT_OPS_DISABLE_CODEGRAPH=1 to opt out).');
 		if (ensureCodegraph()) ensureCodegraphIndex();
 	}
 } catch (err) {

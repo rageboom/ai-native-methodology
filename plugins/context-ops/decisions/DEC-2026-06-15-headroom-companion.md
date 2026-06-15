@@ -1,6 +1,8 @@
 # DEC-2026-06-15-headroom-companion
 
-**OPT-IN companion 도구(headroom) 설치 + MCP 서버 활성화 배선 (default OFF / 전 adopter / draft — release bump 대기)**
+**companion 도구(headroom) 설치 + MCP 서버 활성화 배선 (DEFAULT ON / opt-out / 전 adopter / draft — release bump 대기)**
+
+> **2026-06-15 갱신 (사용자 결단 반전)**: 최초 채택은 default-OFF opt-in(adopter 보호 명목)이었으나, 사용자(TF Lead)가 **"활성화가 기본이고 원하지 않으면 끄는 방식"** 으로 뒤집을 것을 지시 → **default ON + opt-out**(`CONTEXT_OPS_DISABLE_HEADROOM=1` / `CONTEXT_OPS_INSTALL_HEADROOM=0` 도 허용)으로 변경. adopter 보호는 이제 *기본 강제가 아닌 blast-radius bounded* 로 충족(항상 exit 0 / wheel-only no-Rust-compile / honest-carry / launcher graceful no-op). 본문의 "기본 OFF" 표현은 본 갱신으로 supersede. headroom 만 반전 — codegraph 자매 companion 은 opt-in(`CONTEXT_OPS_CODEGRAPH_MCP=1`) 유지(별도 결단 전).
 
 ## 맥락 (사용자 요청)
 
@@ -16,22 +18,22 @@
 ## 결정 (사용자 확정 2026-06-15)
 
 1. **적용 범위 = 전 adopter** — shipped SessionStart 훅 + `.mcp.json` 에 배선(공유 플러그인).
-2. **트리거 = 기본 OFF + env 토글** — `CONTEXT_OPS_INSTALL_HEADROOM=1` 일 때만 설치·MCP 활성. 무거운 3rd-party 의존이라 default 강제 ❌(adopter 보호).
+2. **트리거 = 기본 ON + opt-out env 토글** (~~기본 OFF + opt-in~~ / 2026-06-15 반전) — 설치·MCP 가 **default 활성**. 끄려면 `CONTEXT_OPS_DISABLE_HEADROOM=1`(또는 `CONTEXT_OPS_INSTALL_HEADROOM=0`). 무거운 3rd-party 의존이나 install 이 bounded(wheel-only·항상 exit 0·honest carry)라 default-on 의 blast radius = 1회 설치 시도(실패 시 stderr 안내 + no-op).
 3. **채널 = `pipx install "headroom-ai[mcp]"`**(pip3/pip --user fallback / wheel-우선).
 4. **MCP 활성 = 플러그인 자체 선언**(`.mcp.json`) + launcher gate(설치 경로 `headroom mcp serve` stdio passthrough).
 
 ## 구현
 
-- **NEW `scripts/install-companion-tools.js`** — install-static-tools.js 계약 복제(항상 exit 0 / stderr 로깅 / `.static-tools/.headroom-installed` marker 멱등). OPT-IN 가드 선두(off=silent no-op). 채널 pipx→pip3 --user→(win)pip --user / `--only-binary headroom-ai`. 실패=honest carry(no-simulation / LLM 대체 ❌).
-- **NEW `scripts/headroom-mcp-launch.js`** — `.mcp.json` `command` 가 직접 `headroom` 대신 본 launcher 지목: 토글 off → exit 0 / headroom 부재 → exit 0(stderr 안내, 다음 세션 활성) / 둘 다 OK → `spawn('headroom',['mcp','serve'],{stdio:'inherit'})` passthrough.
+- **NEW `scripts/install-companion-tools.js`** — install-static-tools.js 계약 복제(항상 exit 0 / stderr 로깅 / `.static-tools/.headroom-installed` marker 멱등). **default-on 가드**(opt-out=`CONTEXT_OPS_DISABLE_HEADROOM=1`/`CONTEXT_OPS_INSTALL_HEADROOM=0` 시에만 silent no-op). 채널 pipx→pip3 --user→(win)pip --user / `--only-binary headroom-ai`. 실패=honest carry(no-simulation / LLM 대체 ❌).
+- **NEW `scripts/headroom-mcp-launch.js`** — `.mcp.json` `command` 가 직접 `headroom` 대신 본 launcher 지목: opt-out → exit 0 / headroom 부재 → exit 0(stderr 안내, 다음 세션 활성) / 그 외(default) → `spawn('headroom',['mcp','serve'],{stdio:'inherit'})` passthrough.
 - **EDIT `.mcp.json`** — `mcpServers.headroom = { command:"node", args:["${CLAUDE_PLUGIN_ROOT}/scripts/headroom-mcp-launch.js"] }`.
 - **EDIT `hooks/hooks.json`** — SessionStart 3번째 command(install-companion-tools.js).
 - **EDIT `package.json files[]`** — `.mcp.json` + 신규 스크립트 2개 출하 포함(source:npm tarball).
 
 ## caveat (정직)
 
-- opt-in **첫 세션**엔 MCP 미활성(같은 세션에 설치 → 다음 세션/`/reload-plugins` 후 활성 / 설치→기동 ordering 불가피).
-- **기본-off adopter**: launcher no-op → `/mcp` 패널에 `headroom` 비활성 표기(에러 ❌ / "켜면 됨" 신호 / 공식 graceful 보장).
+- **첫 세션**엔 MCP 미활성(같은 세션에 설치 → 다음 세션/`/reload-plugins` 후 활성 / 설치→기동 ordering 불가피). default-on 이라 별도 토글 없이 설치 시작부터 자동.
+- **opt-out adopter**(`CONTEXT_OPS_DISABLE_HEADROOM=1`): launcher no-op → `/mcp` 패널에 `headroom` 비활성 표기(에러 ❌ / "끈 상태" 신호 / 공식 graceful 보장).
 - **설치 ≠ 토큰 절감**: 훅은 설치까지 자동화 / 실 절감은 MCP 서버 활용(에이전트가 `headroom_compress`/`retrieve`/`stats` 호출)부터.
 - ⚠️ headroom `learn` 은 CLAUDE.md 를 자동 편집 — 방법론 CLAUDE.md(운영 컨텍스트 SSOT) drift 위험 → `learn` 자동기록은 별도 결단 전 비권장(MCP server scope 와 무관 / 기록만).
 

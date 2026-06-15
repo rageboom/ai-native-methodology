@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 // codegraph-mcp-launch.js — wrapper launcher for the codegraph structural-search MCP (.mcp.json command).
 //
-// Gates `codegraph serve --mcp` on the opt-in flag + binary presence + project-index presence, so the
-// static .mcp.json declaration no-ops cleanly when codegraph is opt-out / not-yet-installed / not-indexed:
-//   - CONTEXT_OPS_CODEGRAPH_MCP != 1            → exit 0 (server not active)
-//   - codegraph not on PATH                     → exit 0 (SessionStart installer adds it; activates next session)
-//   - project not indexed (.codegraph absent)   → exit 0 (installer bootstraps index; activates next session)
-//   - all OK                                    → exec `codegraph serve --mcp` (stdio passthrough, cwd = project)
+// Gates `codegraph serve --mcp` on opt-out + binary presence + project-index presence, so the
+// static .mcp.json declaration no-ops cleanly when codegraph is opted out / not-yet-installed / not-indexed:
+//   - opted out (CONTEXT_OPS_DISABLE_CODEGRAPH=1) → exit 0 (server not active)
+//   - codegraph not on PATH                       → exit 0 (SessionStart installer adds it; activates next session)
+//   - project not indexed (.codegraph absent)     → exit 0 (installer bootstraps index; activates next session)
+//   - otherwise (default)                         → exec `codegraph serve --mcp` (stdio passthrough, cwd = project)
 //
 // Trust (DEC-2026-05-28 §4.2 / plan cheap-falsifiability): this is a SEARCH/navigation MCP — its output is
 // reference-lens, NEVER injected into deterministic chain gates. grep stays the authoritative falsification
@@ -28,7 +28,12 @@ function commandExists(cmd) {
 	return probe.status === 0;
 }
 
-if (process.env.CONTEXT_OPS_CODEGRAPH_MCP !== '1') process.exit(0);
+// Opted out → MCP server not active (default is ON).
+const lc = (v) => String(v ?? '').trim().toLowerCase();
+const OPTED_OUT =
+	['1', 'true', 'yes', 'on'].includes(lc(process.env.CONTEXT_OPS_DISABLE_CODEGRAPH)) ||
+	['0', 'false', 'no', 'off'].includes(lc(process.env.CONTEXT_OPS_CODEGRAPH_MCP));
+if (OPTED_OUT) process.exit(0);
 
 if (!commandExists('codegraph')) {
 	process.stderr.write(

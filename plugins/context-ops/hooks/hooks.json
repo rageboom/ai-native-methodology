@@ -19,8 +19,8 @@
           {
             "type": "command",
             "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/install-companion-tools.js",
-            "statusMessage": "Checking opt-in companion MCP tools (headroom / codegraph)...",
-            "$comment": "OPT-IN companion MCP installs. Default OFF — silent no-op unless a flag is set. CONTEXT_OPS_INSTALL_HEADROOM=1 → headroom-ai[mcp] (pipx/pip, wheel-preferred). CONTEXT_OPS_CODEGRAPH_MCP=1 → codegraph (npm -g @colbymchenry/codegraph) + one-time project index bootstrap (codegraph init+index; native daemon maintains freshness after). Both idempotent (markers), always exit 0 (honest carry / no-simulation). Pair with .mcp.json 'headroom'/'codegraph' servers (launchers gate activation on the same flags). codegraph = reference-lens/SEARCH only, never gate-injected (DEC-2026-05-28 §4.2); grep stays authoritative. DEC-2026-06-15-headroom-companion + plan-codegraph-search-token-saving."
+            "statusMessage": "Checking companion MCP tools (headroom + codegraph, default-on)...",
+            "$comment": "Companion MCP installs — both DEFAULT ON (opt-out). headroom → headroom-ai[mcp] (pipx/pip, wheel-preferred); opt out with CONTEXT_OPS_DISABLE_HEADROOM=1 (CONTEXT_OPS_INSTALL_HEADROOM=0 also honored). codegraph → codegraph (npm -g @colbymchenry/codegraph) + one-time project index bootstrap (codegraph init+index; native daemon maintains freshness after); opt out with CONTEXT_OPS_DISABLE_CODEGRAPH=1 (CONTEXT_OPS_CODEGRAPH_MCP=0 also honored). Both idempotent (markers), always exit 0 (honest carry / no-simulation). Pair with .mcp.json 'headroom'/'codegraph' servers (launchers gate activation on the same flags). codegraph = reference-lens/SEARCH only, never gate-injected (DEC-2026-05-28 §4.2); grep stays authoritative. DEC-2026-06-15-headroom-companion + plan-codegraph-search-token-saving."
           }
         ]
       }
