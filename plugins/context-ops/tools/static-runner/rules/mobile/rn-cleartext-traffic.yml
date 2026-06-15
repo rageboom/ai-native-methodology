@@ -1,0 +1,47 @@
+rules:
+  - id: internal.mobile.security.rn-cleartext-traffic
+    message: |
+      axios baseURL 또는 fetch 에 HTTP 평문 URL 하드코딩 — MITM(중간자) 공격 노출.
+      AP-SECURITY-RN-CLEARTEXT-001 / CWE-319 / OWASP M5:2024 (Insecure Communication).
+      권고: https:// 로 교체. 개발 환경 URL 은 react-native-config 환경변수로 분리.
+    severity: MEDIUM
+    languages: [js, ts]
+    pattern-either:
+      - patterns:
+          - pattern: 'axios.create({..., baseURL: "$URL", ...})'
+          - metavariable-regex:
+              metavariable: $URL
+              regex: '^http://'
+      - patterns:
+          - pattern: fetch("$URL", ...)
+          - metavariable-regex:
+              metavariable: $URL
+              regex: '^http://'
+      - patterns:
+          - pattern: fetch("$URL")
+          - metavariable-regex:
+              metavariable: $URL
+              regex: '^http://'
+      - patterns:
+          - pattern: |
+              const $VAR = "$URL"
+          - metavariable-regex:
+              metavariable: $URL
+              regex: '^http://'
+          - metavariable-regex:
+              metavariable: $VAR
+              regex: '(?i)(base.?url|api.?url|server.?url|endpoint|host)'
+    metadata:
+      cwe: 'CWE-319'
+      owasp: ['M5:2024']
+      references:
+        - https://owasp.org/www-project-mobile-top-10/
+        - https://developer.android.com/training/articles/security-config
+      category: security
+      technology: [react-native, typescript, javascript]
+      license: Internal-Proprietary
+      ai_native_methodology:
+        antipattern: AP-SECURITY-RN-CLEARTEXT-001
+        introduced_in: v0.20.0
+        platform: mobile
+        notes: 'axios(SN15-MOBILE-2 client 사용 확인) baseURL + fetch 패턴 우선 대응. 환경변수 분리가 근본 해결.'

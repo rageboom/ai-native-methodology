@@ -1,0 +1,46 @@
+rules:
+  - id: internal.mobile.security.asyncstorage-sensitive-data
+    message: |
+      AsyncStorage에 인증 토큰/비밀번호 평문 저장 — 암호화 없이 기기 파일시스템에 노출됨.
+      AP-SECURITY-RN-ASYNCSTORAGE-001 / CWE-922 / OWASP M9:2024 (Insecure Data Storage).
+      권고: react-native-keychain(iOS Keychain / Android Keystore) 또는
+            react-native-encrypted-storage 사용. jwt-localstorage(AP-FE-SECURITY-001) 동형.
+    severity: HIGH
+    languages: [js, ts]
+    pattern-either:
+      - patterns:
+          - pattern: AsyncStorage.setItem("$KEY", $VAL)
+          - metavariable-regex:
+              metavariable: $KEY
+              regex: '(?i)(token|jwt|auth|access|bearer|session|password|passwd|secret|credential|apikey|api_key)'
+      - patterns:
+          - pattern: AsyncStorage.setItem($KEY, $VAL)
+          - metavariable-regex:
+              metavariable: $KEY
+              regex: '(?i)(token|jwt|auth|access|bearer|session|password|passwd|secret|credential|apikey|api_key)'
+      - patterns:
+          - pattern: await AsyncStorage.setItem("$KEY", $VAL)
+          - metavariable-regex:
+              metavariable: $KEY
+              regex: '(?i)(token|jwt|auth|access|bearer|session|password|passwd|secret|credential|apikey|api_key)'
+      - patterns:
+          - pattern: await AsyncStorage.setItem($KEY, $VAL)
+          - metavariable-regex:
+              metavariable: $KEY
+              regex: '(?i)(token|jwt|auth|access|bearer|session|password|passwd|secret|credential|apikey|api_key)'
+    metadata:
+      cwe: 'CWE-922'
+      owasp: ['M9:2024']
+      references:
+        - https://owasp.org/www-project-mobile-top-10/
+        - https://github.com/oblador/react-native-keychain
+        - https://github.com/emeraldsanto/react-native-encrypted-storage
+      category: security
+      technology: [react-native, typescript, javascript]
+      license: Internal-Proprietary
+      ai_native_methodology:
+        antipattern: AP-SECURITY-RN-ASYNCSTORAGE-001
+        cross_isomorphic: AP-FE-SECURITY-001
+        introduced_in: v0.20.0
+        platform: mobile
+        notes: 'web localStorage(AP-FE-SECURITY-001) 의 React Native 동형 룰. AsyncStorage = 암호화 없는 기기 파일시스템 저장.'
