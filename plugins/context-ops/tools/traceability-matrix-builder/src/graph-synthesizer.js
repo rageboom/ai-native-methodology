@@ -1021,6 +1021,25 @@ export function synthesizeGraph(input) {
     if (commitHash && !e.commit_hash) e.commit_hash = commitHash;
   }
 
+  // --- ★ F-DOGFOOD-ANALYSIS-ORPHAN (DEC-2026-06-15) — 미참조 analysis-zone 노드 → 'propose' ---
+  //   analysis-{kind} 노드(antipatterns / characterization-spec / sql-inventory 등 reference-lens)는
+  //   chain artifact 가 그것을 참조할 때만(AC.related_aps / characterization snapshots[].use_case 등) edge 를 얻는다.
+  //   참조하지 않는 BC(해당 AP 부재 / characterization use_case 토큰 unmatch)는 정상인데도 in/out=0 active orphan →
+  //   graph-integrity hard-block (본류 UC→IMPL 무결성과 무관한 보조 lens 를 의무 연결로 오인 = false-block).
+  //   pending-TC 강등과 동형: active + incident edge 0 인 analysis-* 노드 → 'propose'(가시 / orphan 검사 제외 /
+  //   silent-false-health 아님). ★ derive/na/commit-stamp 이후 실행 = active 처리(code_pointers·na backstop) 보존 후 강등만.
+  //   ★ chain 본류 노드(UC/BHV/AC/TC/TASK/IMPL)는 미해당 → 진짜 끊김은 계속 active orphan block (버그 미은폐).
+  //   analysis-business-rules(-*) 는 BHV.br_refs 로 연결 시 active 유지(미참조 시에만 강등).
+  {
+    const _inc = new Set();
+    for (const e of edges) { _inc.add(e.source); _inc.add(e.target); }
+    for (const n of nodes) {
+      if (typeof n.id === 'string' && n.id.startsWith('analysis-') && n.state === 'active' && !_inc.has(n.id)) {
+        n.state = 'propose';
+      }
+    }
+  }
+
   // --- 통계 ---
   const stats = {
     node_count: nodes.length,

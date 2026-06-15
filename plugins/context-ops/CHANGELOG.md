@@ -10,6 +10,19 @@
 
 ---
 
+## [0.46.7] — 2026-06-15 PATCH — 미참조 analysis-zone artifact-graph 노드 → 'propose' 강등 (full-chain 병렬 캠페인 dogfood-found)
+
+**SSOT**: `decisions/DEC-2026-06-15-analysis-zone-orphan-propose.md`. ep-be-gea full-chain 캠페인(나머지 22 BC 4-worktree 병렬)에서 모든 lane 의 gate#5 `graph-integrity-validator` 가 orphan 반복 FAIL(req-visitprkng stop / 나머지 매 BC repair 낭비). strict 검증 = latent drift 노출.
+
+### Fixed (graph-synthesizer — 미참조 analysis-zone 노드 false-orphan)
+- `traceability-matrix-builder --graph` 합성 artifact-graph 의 `analysis-antipatterns`·`analysis-characterization-spec` 등 analysis-zone 노드는 chain artifact 참조 시에만(AC.related_aps / characterization snapshots[].use_case→UC) edge 획득. 참조 안 하는 BC(해당 AP 부재 / use_case 토큰 unmatch)는 정상인데도 in/out edge 0 + state=active → graph-integrity Tier-1 orphan(state∈{active,drift}+degree 0) hard-block. 본류(UC→IMPL) 무결성과 무관한 보조 reference-lens 를 의무 연결로 오인 = false-block (22 BC 재발 systemic).
+- **수정**: `graph-synthesizer.js` `synthesizeGraph` 의 commit_hash 스탬프 직후(derive/na/스탬프 active 처리 **이후**)에 `id.startsWith('analysis-') && state==='active' && incident edge 0` 노드를 `state='propose'` 강등(기존 pending-TC propose 패턴 동형 / orphan 검사 제외 · 가시적 · silent-false-health 아님). derive **이전** 배치 시 code_pointers 누락 34 test fail → 위치 이동 확정. chain 본류 노드(UC/BHV/AC/TC/TASK/IMPL) 미해당 → 진짜 끊김은 계속 block. builder·schema·validator 무변경.
+
+### 검증
+- `traceability-matrix-builder` 179/179 test (회귀 0). req-visitprkng 재생성 → 2 노드 propose → **orphans=0 passed=True**. 라이브 WT1 캠페인 3 BC 전부 orphan=0(wlfr propose=1=fix 실작동) / matrix auto-route ✅.
+- **§8.1**: correctness 수정 + 4-worktree 22 BC 다수 datapoint → 단일 강등 + 기존 test 회귀 충분(신 check 무).
+- carry: companion-mcp draft(`2999ab23`)가 analysis exit-gate 에 verdict-consistency-validator 추가하며 findings-aggregator·chain-driver test 4건 미갱신 = 본 PATCH 범위 외(별도 작업 / 사용자 지시 미접촉 / 캠페인 gate 영향 없음 — findings-aggregator 미사용).
+
 ## [0.46.6] — 2026-06-15 PATCH — traceability-matrix schema ↔ builder contract 정렬 (full-chain pilot dogfood-found)
 
 **SSOT**: `decisions/DEC-2026-06-15-matrix-schema-builder-align.md`. ep-be-gea full-chain 캠페인 pilot(BC-RESV-BASE chain 2~5 / `wf_f8bd124e-c67`)의 gate#5 적대검증이 `matrix.json` 을 canonical schema 로 explicit 검증할 때 폭로(strict 검증 = latent drift 노출).
