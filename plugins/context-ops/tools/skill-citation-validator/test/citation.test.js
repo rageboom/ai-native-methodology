@@ -71,6 +71,11 @@ describe('skill-citation-validator (repo-wide v8.1.1)', () => {
 					'| `agents/old/README.md` | skills-axis §4 |', // 흡수 표 row → skip (historical)
 				].join('\n'),
 			);
+			// _template/ = 템플릿 예시 경로 → FP skip (skills/ 패턴이 _template/ 하위 경로에 매치되는 오탐 방지)
+			w(
+				'extensions/README.md',
+				'`_template/skills/my-skill-name/SKILL.md` ← 이 파일을 복사해서 작성',
+			);
 			// CHANGELOG = history-class → 전체 skip
 			w('CHANGELOG.md', '`schemas/ghost.schema.json` (구 이름 보존)');
 			// docs/adr/ = history-class → 전체 skip
@@ -108,6 +113,11 @@ describe('skill-citation-validator (repo-wide v8.1.1)', () => {
 				byFile('decisions/INSPECTION-2026-05-31-x.md').length,
 				0,
 				'F-X02 — INSPECTION-* history-exclude',
+			);
+			assert.equal(
+				byFile('extensions/README.md').length,
+				0,
+				'_template/ 경로 예시 = FP skip (skills/ 패턴 오탐 방지)',
 			);
 		} finally {
 			rmSync(tmp, { recursive: true, force: true });
