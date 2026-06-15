@@ -1,0 +1,44 @@
+rules:
+  - id: internal.mobile.security.android-insecure-shared-prefs
+    message: |
+      SharedPreferences MODE_WORLD_READABLE / MODE_WORLD_WRITEABLE — 다른 앱이 데이터를 읽거나 쓸 수 있음.
+      AP-SECURITY-ANDROID-PREFS-001 / CWE-732 / OWASP M9:2024 (Insecure Data Storage).
+      권고: Context.MODE_PRIVATE 사용. 민감 데이터는 EncryptedSharedPreferences(Jetpack Security) 사용.
+    severity: HIGH
+    languages: [java]
+    pattern-either:
+      - patterns:
+          - pattern: $OBJ.getSharedPreferences($NAME, $MODE)
+          - metavariable-regex:
+              metavariable: $MODE
+              regex: '(Context\.)?MODE_WORLD_(READABLE|WRITEABLE)'
+      - patterns:
+          - pattern: getSharedPreferences($NAME, $MODE)
+          - metavariable-regex:
+              metavariable: $MODE
+              regex: '(Context\.)?MODE_WORLD_(READABLE|WRITEABLE)'
+      - patterns:
+          - pattern: $OBJ.getPreferences($MODE)
+          - metavariable-regex:
+              metavariable: $MODE
+              regex: '(Context\.)?MODE_WORLD_(READABLE|WRITEABLE)'
+      - patterns:
+          - pattern: getPreferences($MODE)
+          - metavariable-regex:
+              metavariable: $MODE
+              regex: '(Context\.)?MODE_WORLD_(READABLE|WRITEABLE)'
+    metadata:
+      cwe: 'CWE-732'
+      owasp: ['M9:2024']
+      references:
+        - https://owasp.org/www-project-mobile-top-10/
+        - https://developer.android.com/reference/android/content/Context#MODE_WORLD_READABLE
+        - https://developer.android.com/topic/security/data
+      category: security
+      technology: [android, java]
+      license: Internal-Proprietary
+      ai_native_methodology:
+        antipattern: AP-SECURITY-ANDROID-PREFS-001
+        introduced_in: v0.20.0
+        platform: mobile
+        notes: 'API 17(Android 4.2)부터 deprecated. 그러나 레거시 코드에서 여전히 발견됨. MODE_PRIVATE 또는 EncryptedSharedPreferences 로 교체 의무.'

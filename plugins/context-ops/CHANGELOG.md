@@ -10,6 +10,18 @@
 
 ---
 
+## [merge] — 2026-06-16 — origin-smilegate(GHE) 분기 라인 통합
+
+분기해 있던 origin(rageboom)·origin-smilegate(GHE) 두 원격을 merge 로 통합 (force-push 없이 양쪽 작업 보존). GHE 분기 라인 기능을 본 canonical 라인으로 folding — 코드는 트리에 반영됨 / plugin.json·package.json 현재 **0.46.7** 유지:
+
+- **ticket-sync config-bootstrap**: `ticket-sync` skill pre-flight 에 `.ai-context/ticket-sync-config.yaml` 부재 시 자동 생성(config-bootstrap) + `env-config-reference.md` 에 SG-MIS 표준 config(공통/프로젝트별) SSOT 분리. Finding `F-TICKETSYNC-019 config_bootstrap`(info).
+- **static-runner mobile semgrep rules**: `tools/static-runner/rules/mobile/` — android-insecure-shared-prefs / asyncstorage-sensitive-data / rn-cleartext-traffic (yml + 샘플).
+- **extensions/_template**: 외부 확장 skill scaffold (`SUBMIT.md` + `skills/my-skill-name/SKILL.md`).
+
+**버전 번호 충돌 주의**: GHE 분기는 위 기능을 독립적으로 `0.42.0` 으로 번호 매김 — 본 canonical 라인의 `0.42.0`(golf BC-RESV-GOLF 5-chain dogfood)과 충돌. 따라서 GHE 기능은 새 버전 부여 없이 본 merge 항목으로만 기록 (향후 정식 승격 시 별도 번호 부여).
+
+---
+
 ## [0.46.7] — 2026-06-15 PATCH — 미참조 analysis-zone artifact-graph 노드 → 'propose' 강등 (full-chain 병렬 캠페인 dogfood-found)
 
 **SSOT**: `decisions/DEC-2026-06-15-analysis-zone-orphan-propose.md`. ep-be-gea full-chain 캠페인(나머지 22 BC 4-worktree 병렬)에서 모든 lane 의 gate#5 `graph-integrity-validator` 가 orphan 반복 FAIL(req-visitprkng stop / 나머지 매 BC repair 낭비). strict 검증 = latent drift 노출.
@@ -234,6 +246,8 @@ ep-be-gea campaign(예약 메뉴그룹) golf(BC-RESV-GOLF) 를 analysis→discov
 **carry**: BC-2(drift-validator = workspace-internal 검증기 / user-project evidence_missing 사실상 N/A / REQUIRED 제외=설계결정 deferred) · BC-4(static-runner --plugin 부재 = R19 Tier-2 정직 carry / no-fix).
 
 **golf dogfood 결과**(외부 격리 / ep-be-gea repo commit): 5 chain 전부 critical 0/high 0. discovery 7 UC·24 BR-intent / spec 7 BHV·25 AC(chain-coverage 100%) / plan 13 TASK(plan-coverage 0) / test 실 JUnit **8 method GREEN**(6 AC characterization + 19 operability 천장 carry / god-method+SQL-embedded) / implement matrix 25 green·artifact-graph 153 node 0 orphan·real_integration 0(Mockito honest). 검증: discovery-ext 43 / aggregator 67(+1) / traceability 179 / chain-driver 523 무회귀 + **release-readiness 42/42**.
+
+---
 
 ## [0.41.0] — 2026-06-12 MINOR — canonical 산출물 2-zone 재구조화 (shared/ + domains/<BC>/)
 

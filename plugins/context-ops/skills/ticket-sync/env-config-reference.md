@@ -44,8 +44,17 @@ structure_auto_add_on_exit: true
 
 (jira.smilegate.net / 사내 공통 — SmileApp Intune 실측 확정) <!-- allow-identity: SG-MIS 환경 config reference (사내 공통 / 개인 신원 아님) -->
 
+### 공통 필드 (config-bootstrap 자동 적용 / 사용자 입력 불필요)
+
+> `ticket-sync` skill §단계 1 config-bootstrap 이 `.ai-context/ticket-sync-config.yaml` 부재 시 아래 공통값을 자동 삽입. **SSOT — 이 값을 변경 시 SKILL.md config-bootstrap 템플릿도 동기화할 것.**
+
 ```yaml
-# .ai-context/ticket-sync-config.yaml (SG-MIS 환경 — 사내 표준)
+# ── SG-MIS 공통 고정값 (config-bootstrap 자동 적용) ──
+parent_strategy: epic_link_customfield
+epic_link_customfield_id: customfield_10006    # Story → Epic 링크 (사내 공통)
+parent_link_customfield_id: customfield_11902  # Epic → Initiative "Parent Link" (사내 공통)
+structure_id: 684              # SG-MIS Structure board (jira.smilegate.net) — allow-identity: 사내 공통 env config
+structure_auto_add_on_exit: true
 issuetype_map:
   epic:       epic
   story:      이야기
@@ -53,6 +62,22 @@ issuetype_map:
   initiative: Initiative
   task:       작업
   bug:        버그
+```
+
+### 프로젝트별 필드 (config-bootstrap 시 사용자 입력 필요)
+
+```yaml
+# ── 프로젝트마다 다른 값 (config-bootstrap 질문 항목) ──
+project_key: MIS              # Jira 프로젝트 키 (기본값: MIS)
+parent_initiative: MIS-???    # 본인 프로젝트 Initiative 키 (예: MIS-108) — ticket-sync 생성 ❌ (참조 전용)
+```
+
+### 전체 config 예시 (SG-MIS 표준)
+
+```yaml
+# .ai-context/ticket-sync-config.yaml (SG-MIS 환경 — 사내 표준)
+project_key: MIS
+parent_initiative: MIS-108    # 프로젝트별 기재
 parent_strategy: epic_link_customfield
 epic_link_customfield_id: customfield_10006    # Story → Epic 링크 (사내 공통)
 parent_link_customfield_id: customfield_11902  # Epic → Initiative "Parent Link" (사내 공통)
@@ -63,7 +88,13 @@ parent_link_customfield_id: customfield_11902  # Epic → Initiative "Parent Lin
 # B15 — Structure 보드 자동 등록 (SG-MIS board)
 structure_id: 684              # SG-MIS Structure board (jira.smilegate.net) — allow-identity: 사내 공통 env config
 structure_auto_add_on_exit: true
-# parent_initiative: <앱/제품 Initiative 키>  # 프로젝트별 기재 (예: MIS-108)
+issuetype_map:
+  epic:       epic
+  story:      이야기
+  subtask:    하위 작업
+  initiative: Initiative
+  task:       작업
+  bug:        버그
 ```
 
 ### B16 — SG-MIS Epic 생성 시 customfield_10007 필수
