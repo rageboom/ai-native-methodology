@@ -812,6 +812,7 @@
 > | 014       | **critical** | **resolved (본 cycle)** | evidence-scan 신설 + gate #0 REQUIRED 배선 — 날조 증거 = validator_critical hard-block (go 거부 실증)  |
 > | 015       | **high**     | **resolved (본 cycle)** | static-runner exit 의미론 (semgrep [0,1] / pmd [0,4,5]) + scan FAILED = exit 5 / real_tool=false       |
 > | 016       | **high**     | **resolved (본 cycle)** | probe ETIMEDOUT ≠ ENOENT 분리 (PROBE_TIMEOUT / exit 6) + semgrep 오프라인 env default                  |
+> | 017       | low–medium   | **promoted (백로그)**   | char-test 생성기 per-BC FQN 네임스페이싱 부재 — BC 스코프 중첩 시 동일 test-class FQN 충돌 (ep-be-gea full-chain 캠페인 / 통합서 rename 공존 우회로 해소·커버리지 손실 0 / 엔진 개선 = v 후보) |
 
 ### F-DOGFOOD-013: codegraph-coverage 모듈 rollup — 모노레포 동명 심볼 오연결 거짓 엣지 + provenance 무구분 + 채택자 분석 플로우 미배선
 
@@ -870,3 +871,18 @@
 - **Severity:** **high** — 사내 표준 배포 타깃에서 Tier 1 도구 체계적 오작동 + 정직 신호 신뢰 훼손.
 - **Proposed fix:** (✅ 본 cycle) 위 시행. carry — 기본 ruleset 이 여전히 레지스트리(`p/owasp-top-ten`): 벤더링된 `tools/semgrep-rules/` 로컬 기본화는 룰 커버리지 정책 결정 필요 (별도 DEC 후보 / scan 실패는 이제 exit 5 로 정직).
 - **Status:** **resolved** (본 cycle / DEC-2026-06-11-epfemis-dogfood-p0-fixes)
+
+### F-DOGFOOD-017: char-test 생성기 per-BC FQN 네임스페이싱 부재 — BC 스코프 중첩 시 동일 test-class FQN 충돌
+
+> ※ 출처 = ep-be-gea **full-chain 캠페인**(analysis-only BC × 5-stage chain dogfood / 2026-06-16) — ep-fe-mis 라인과 별개 dogfood. F-DOGFOOD 네임스페이스(외부 사내 프로젝트 dogfood)에 귀속.
+
+- **Phase:** test (chain 4 / characterization RED→GREEN). 통합(Phase 2)서 표면화.
+- **Confidence:** verified (실 충돌 재현 — 격리 worktree 두 곳이 같은 FQN `.java` 산출 / 한 브랜치 통합 시 같은 경로 중복).
+- **Type:** gap (char-test 생성 규칙의 BC-scope 충돌 미고려).
+- **Description:** 캠페인이 BC별 격리 worktree 에서 char-test 를 병렬 생성. 두 BC 가 같은 프로덕션 서비스를 건드리면(BC-ISSUE-VISITOR·BC-ISSUE-ACM 모두 `FoEntranceAuthorityVisitorRequestRestService`), 둘 다 클래스명을 `<Service>CharacterizationTest` 규칙으로만 지어 **동일 FQN**(같은 패키지·동일 클래스명)을 산출 → 격리 안에선 무해하나 단일 브랜치 통합 순간 같은 경로에 내용 다른 `.java` 둘 = 컴파일 충돌. 두 테스트는 상호보완(11 TC lifecycle vs 3 TC PII 마스킹)이라 한쪽 덮어쓰기 = 커버리지 손실.
+- **Evidence:** `ep-be-gea-core/src/test/java/.../frontoffice/issue/acm/visitor/application/service/FoEntranceAuthorityVisitorRequestRestServiceCharacterizationTest.java` 가 wt1(issue-visitor 382L/11TC)·wt4(issue-acm 137L/3TC) 양쪽에서 동일 FQN 으로 생성. 통합 commit `e7bd90a2a9`(feature/context-ops-test) + 결정 기록 `$GEA/.ai-context/issue-acm/INTEGRATION-NOTE.md`.
+- **Spec gap:** char-test 클래스명 규칙(`templates/test/test-spec.template.json` 기반 `<ServiceClassName>CharacterizationTest`)이 **BC 식별자를 미반영** → BC 스코프가 코드상 겹치면(공유 서비스) 동일 FQN 보장 안 됨. 캠페인 엔진(`.claude/workflows/fullchain-batch.mjs`)도 per-BC test-class 충돌 감지/네임스페이싱 미수행.
+- **Decision made:** 통합 시점 **클래스 rename 공존**(사용자 결정) — issue-acm 본을 `FoEntranceAuthorityVisitorRequestRestServicePiiMaskingCharacterizationTest` 로 rename → 두 FQN distinct·14 TC 전부 보존. 생성 산출물/evidence 는 원본(충돌)명 보존(no-fabrication/R19). **엔진 자체 개선은 본 finding 으로 백로그 등재**.
+- **Severity:** low–medium — 격리 worktree 안에선 무해(컴파일·실행 정상) / 통합 시점에만 표면화 / 통합자 수동 rename 으로 완전 해소(커버리지 손실 0). 단 BC 스코프 중첩이 흔한 대형 레포 캠페인에선 통합 마찰 누적.
+- **Proposed fix:** char-test 생성 경로(chain-4 test stage + 캠페인 엔진)에 **BC-scope-aware test-class 네임스페이싱** 도입 — 공유 서비스 충돌 위험 감지 시 클래스명에 BC suffix(또는 관심사 한정자) 자동 부여, 또는 생성 후 cross-BC FQN 충돌 검사 게이트로 통합 전 선차단. `templates/test/test-spec.template.json` 명명 규칙 보강 + `analysis-characterization-test`/test-stage SKILL 에 충돌 회피 규칙 명시.
+- **Status:** **promoted** (백로그 등재 / 미수정 — 통합 rename 우회로 현 캠페인은 해소 / 엔진 개선 = v 후보)
