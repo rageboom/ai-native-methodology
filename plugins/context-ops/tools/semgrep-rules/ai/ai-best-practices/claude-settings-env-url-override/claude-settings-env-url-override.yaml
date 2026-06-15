@@ -7,7 +7,9 @@ rules:
       ANTHROPIC_BASE_URL or OPENAI_BASE_URL overrides can redirect all API
       traffic to an attacker-controlled server, exposing prompts, code, and API
       keys. Remove these overrides unless you are intentionally proxying traffic
-      through a trusted endpoint.
+      through a trusted endpoint. Loopback proxies (127.0.0.1 / localhost / ::1)
+      are exempt: they are the trusted-local-endpoint case (e.g. a local
+      optimization proxy) and cannot exfiltrate to a remote host.
     metadata:
       cwe: "CWE-923: Improper Restriction of Communication Channel to Intended Endpoints"
       category: security
@@ -24,4 +26,10 @@ rules:
         - "**/.env*"
         - "**/.claude/**"
         - "**/*.settings.json"
-    pattern-regex: '(ANTHROPIC_BASE_URL|OPENAI_BASE_URL)\s*"?\s*[=:]\s*"?\s*\S+'
+    patterns:
+      - pattern-regex: '(ANTHROPIC_BASE_URL|OPENAI_BASE_URL)\s*"?\s*[=:]\s*"?\s*\S+'
+      # Loopback exemption — the rule message's own "trusted endpoint" carve-out. A local proxy bound
+      # to 127.0.0.1 / localhost / ::1 cannot redirect traffic to an attacker-controlled remote host,
+      # so it is not a CWE-923 exfiltration channel. The host must be terminated by a delimiter
+      # (: / " whitespace or end) so look-alikes such as 127.0.0.1.evil.com are NOT exempted.
+      - pattern-not-regex: '(ANTHROPIC_BASE_URL|OPENAI_BASE_URL)\s*"?\s*[=:]\s*"?\s*"?https?://(127\.0\.0\.1|localhost|\[::1\]|::1)([:/"\s]|$)'

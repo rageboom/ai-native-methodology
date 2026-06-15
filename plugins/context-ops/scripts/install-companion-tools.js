@@ -18,9 +18,15 @@
 //     envs do NOT trigger a Rust toolchain build at session start. No sdist/build fallback on purpose:
 //     a multi-minute Rust compile at SessionStart is unacceptable — when no wheel exists we honest-carry
 //     to a manual-install message (no-simulation; never LLM-substituted).
+//   ★ DURABLE GLOBAL ROUTING (DEC-2026-06-15-headroom-global-routing / default ON / same opt-out):
+//     after the binary lands, runs `headroom init claude --global` once (marker-guarded). That writes
+//     ANTHROPIC_BASE_URL=http://127.0.0.1:8787 into ~/.claude/settings.json + installs headroom's own
+//     SessionStart ensure-hook (best-effort proxy start). Effect = EVERY Claude Code session routes
+//     through the local proxy (effective NEXT session — env is read at boot). Machine-wide blast radius;
+//     see ensureGlobalRouting() for caveats. Opt-out is bidirectional here (un-routes — see removeGlobalRouting()).
 
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -31,6 +37,7 @@ const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const PLUGIN_ROOT = process.env.CLAUDE_PLUGIN_ROOT || resolve(SCRIPT_DIR, '..');
 const MARKER_DIR = join(PLUGIN_ROOT, '.static-tools'); // reuse static-tools marker dir (gitignored)
 const HEADROOM_MARKER = join(MARKER_DIR, '.headroom-installed');
+const HEADROOM_ROUTING_MARKER = join(MARKER_DIR, '.headroom-routing-installed');
 
 // Two independent companion MCP tools — both DEFAULT ON (opt-out):
 //   headroom (context compression / pip) — opt out with CONTEXT_OPS_DISABLE_HEADROOM=1
@@ -126,6 +133,46 @@ function ensureHeadroom() {
 	return false;
 }
 
+// ── global durable proxy routing (headroom init claude --global) ─────────────
+// DEC-2026-06-15-headroom-global-routing — default ON / opt-out. `headroom init claude --global`
+// writes ANTHROPIC_BASE_URL=http://127.0.0.1:8787 into ~/.claude/settings.json (env block) and
+// installs headroom's own SessionStart + PreToolUse ensure-hook (best-effort proxy start).
+// Idempotent-once via marker (init itself is idempotent, but re-writing the user's global settings
+// every session is intrusive — so we apply once and let `headroom unwrap claude` undo it).
+// Caveats (honest):
+//   (1) Effective NEXT session — ANTHROPIC_BASE_URL is read at process boot, so the session that
+//       applies it is NOT routed; the next `claude` launch is.
+//   (2) Machine-wide blast radius — ALL Claude Code traffic (every project) routes through the local
+//       proxy. The ensure-hook restarts a dead proxy at session start, but there is NO mid-session
+//       self-heal — if the proxy dies mid-run, in-flight calls fail until the next session start.
+//   (3) Install ≠ token savings — proxy compression only fires on large tool-results (measured 0 on
+//       short sessions). This wires routing, not guaranteed savings.
+function ensureGlobalRouting() {
+	if (existsSync(HEADROOM_ROUTING_MARKER)) return true; // applied once already
+	if (!commandExists('headroom')) return false; // applies next session, once the binary install lands
+	log('applying global proxy routing (headroom init claude --global)…');
+	if (runInstaller('headroom', ['init', 'claude', '--global'])) {
+		try { mkdirSync(MARKER_DIR, { recursive: true }); writeFileSync(HEADROOM_ROUTING_MARKER, ''); } catch {}
+		log('global routing applied → ANTHROPIC_BASE_URL=http://127.0.0.1:8787 in ~/.claude/settings.json (effective NEXT session).');
+		log('  all Claude Code sessions now route through the local proxy; the ensure-hook restarts it at session start. Remove: headroom unwrap claude');
+		return true;
+	}
+	log('ERROR: could not apply global routing (honest carry — never LLM-substituted). Manual: headroom init claude --global');
+	return false;
+}
+
+// Opt-out cleanup — undo durable routing when headroom is opted out AFTER it was applied.
+// Routing has machine-wide blast radius, so opting out must genuinely un-route (asymmetric with the
+// binary/MCP opt-out, which stays a passive no-op). No-op when routing was never applied.
+function removeGlobalRouting() {
+	if (!existsSync(HEADROOM_ROUTING_MARKER)) return; // nothing applied — silent no-op
+	if (commandExists('headroom')) {
+		log('headroom opted out — removing global proxy routing (headroom unwrap claude)…');
+		runInstaller('headroom', ['unwrap', 'claude']);
+	}
+	try { rmSync(HEADROOM_ROUTING_MARKER, { force: true }); } catch {}
+}
+
 // ── codegraph (structural-search MCP companion) ──────────────────────────────
 // Trust: codegraph output = reference-lens / SEARCH only, never injected into deterministic
 // chain gates (DEC-2026-05-28 §4.2). grep stays the authoritative falsification valve.
@@ -163,13 +210,14 @@ function ensureCodegraphIndex() {
 }
 
 try {
-	if (!ENABLE_HEADROOM && !ENABLE_CODEGRAPH) {
-		// both opted out — silent no-op.
-		process.exit(0);
-	}
 	if (ENABLE_HEADROOM) {
 		log('headroom companion enabled (default ON; set CONTEXT_OPS_DISABLE_HEADROOM=1 to opt out).');
-		ensureHeadroom();
+		if (ensureHeadroom()) ensureGlobalRouting();
+	} else {
+		// Opt-out is bidirectional for routing (machine-wide blast radius → a flipped opt-out must
+		// actually un-route, not merely stop applying). removeGlobalRouting() is a silent no-op when
+		// routing was never applied, so the all-opted-out path stays quiet as before.
+		removeGlobalRouting();
 	}
 	if (ENABLE_CODEGRAPH) {
 		log('codegraph search companion enabled (default ON; set CONTEXT_OPS_DISABLE_CODEGRAPH=1 to opt out).');
