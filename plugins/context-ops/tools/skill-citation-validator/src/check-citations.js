@@ -39,8 +39,9 @@ const SKIP_DIR = new Set([
 //  - templates/adoption/ = downstream-project scaffold (placeholder 예시 content 설계 / methodology SSOT ❌)
 const HISTORY_FILE =
 	/(^|\/)CHANGELOG|HISTORY|(^|\/)decisions\/STATUS|(^|\/)decisions\/DEC-|(^|\/)decisions\/INDEX|(^|\/)decisions\/INSPECTION-|(^|\/)decisions\/finding-ledger|(^|\/)docs\/adr\/|(^|\/)templates\/adoption\//;
-// 명백 FP (외부 URL fragment / placeholder).
-const FP_LINE = /docs\/en\/|poc-NN|poc-\{|\bNN-layer|<[a-z-]+>/;
+// 명백 FP (외부 URL fragment / placeholder / _template 예시 경로).
+// _template/ = skill 작성 템플릿 디렉토리 안 경로 예시 — 실 파일 인용 아님 → skip.
+const FP_LINE = /docs\/en\/|poc-NN|poc-\{|\bNN-layer|<[a-z-]+>|_template\//;
 // 의도적 부재 / supersession / future-carry — 현재-dead-link 주장 아님 → skip.
 // 의도적 부재 / supersession / future-carry / 흡수(제거된 구 자산 historical mapping LL-i-52) — 현재-dead-link 주장 아님 → skip.
 const ABSENCE_CTX =
