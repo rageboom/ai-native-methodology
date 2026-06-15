@@ -1,5 +1,13 @@
 {
   "mcpServers": {
-    "_comment": "MCP servers for AI-Native methodology tools. Stage = analysis (v1.4.x). Tools 6종: drift-validator / decision-table-validator / formal-spec-link-validator / schema-validator / spectral-runner / static-runner. cli.mjs MCP wrapper 작성은 Phase A.1 후반부 별도 task — 현재는 SKILL 안에서 Bash 로 standalone CLI (src/cli.js) 직접 호출 fallback. MCP wrapper 작성 완료 시 아래 mcpServers 채움."
+    "_comment": "MCP servers. (1) AI-Native methodology tools (drift / decision-table / formal-spec-link / schema / spectral / static) = SKILL Bash fallback (src/cli.js) until MCP wrappers written. (2) headroom = OPT-IN companion (LLM context compression / chopratejas/headroom) — ACTIVE only when CONTEXT_OPS_INSTALL_HEADROOM=1 AND headroom on PATH; launcher no-ops otherwise. (3) codegraph = OPT-IN structural-search companion (token-saving navigation / colbymchenry/codegraph) — ACTIVE only when CONTEXT_OPS_CODEGRAPH_MCP=1 AND codegraph on PATH AND project indexed; launcher no-ops otherwise. Both default OFF; SessionStart hook installs + bootstraps. codegraph = reference-lens/SEARCH only, NEVER gate-injected (DEC-2026-05-28 §4.2); grep stays authoritative valve. DEC-2026-06-15-headroom-companion + plan-codegraph-search-token-saving.",
+    "headroom": {
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/headroom-mcp-launch.js"]
+    },
+    "codegraph": {
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/codegraph-mcp-launch.js"]
+    }
   }
 }

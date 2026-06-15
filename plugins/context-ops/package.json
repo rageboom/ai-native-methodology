@@ -17,6 +17,7 @@
   },
   "files": [
     ".claude-plugin",
+    ".mcp.json",
     "agents",
     "skills",
     "hooks",
@@ -28,6 +29,9 @@
     "guides",
     "scripts/install-static-tools.js",
     "scripts/install-static-tools.sh",
+    "scripts/install-companion-tools.js",
+    "scripts/headroom-mcp-launch.js",
+    "scripts/codegraph-mcp-launch.js",
     "CHANGELOG.md",
     "CHANGELOG-HISTORY.md",
     "README.md",
