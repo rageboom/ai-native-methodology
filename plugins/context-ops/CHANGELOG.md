@@ -10,6 +10,16 @@
 
 ---
 
+## [0.42.0] — 2026-06-15 MINOR — ticket-sync config-bootstrap 자동 생성
+
+`ticket-sync` skill pre-flight(§단계 1)에 `.ai-context/ticket-sync-config.yaml` 부재 시 자동 생성 흐름(config-bootstrap) 추가. Initiative 키만 입력하면 SG-MIS 표준 config(`customfield_10006`·`customfield_11902`·`structure_id=684`)를 즉시 생성하고 계속 진행. `.gitignore` 자동 append 포함. Finding `F-TICKETSYNC-019 config_bootstrap`(severity=info) 신설.
+
+### 변경
+
+- `skills/ticket-sync/SKILL.md` §단계 1 Pre-flight: step 4 config-bootstrap 삽입 (기존 step 4→5, 5→6 renumber).
+
+---
+
 ## [0.41.0] — 2026-06-12 MINOR — canonical 산출물 2-zone 재구조화 (shared/ + domains/<BC>/)
 
 **SSOT**: `decisions/DEC-2026-06-12-artifact-zone.md` / plan `~/.claude/plans/plan-artifact-zone-restructure.md`.
