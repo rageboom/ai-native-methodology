@@ -612,14 +612,8 @@ function check11_workspaceTestPass(args) {
 	//    (본 env 잔존 시 workspace 안 모든 test 자동 skip → 0/0 pass false positive).
 	const childEnv = { ...process.env };
 	delete childEnv.NODE_TEST_CONTEXT;
-	// node 22+ 는 test 파일별 process-isolation 이 기본 → pnpm recursive 러너의 child spawn 과 충돌해
-	//   "node:test run() recursively … skipping running files" 로 파일이 통째로 skip(undercount) 됨.
-	//   isolation=none 으로 단일 프로세스 실행 시 해소. 플래그는 node 22+ 에만 존재(18~21 은 격리 자체가 없어 불필요).
-	const nodeMajor = parseInt(process.versions.node.split('.')[0], 10);
-	if (nodeMajor >= 22) {
-		childEnv.NODE_OPTIONS =
-			`${childEnv.NODE_OPTIONS || ''} --test-isolation=none`.trim();
-	}
+	// --test-isolation=none 은 NODE_OPTIONS 허용 목록 외 플래그 → pnpm 자체가 exit=9 종료.
+	// 각 workspace 패키지의 test 스크립트에 직접 포함시켜야 함. NODE_OPTIONS 경로 사용 금지.
 	// pnpm 워크스페이스 — 멤버 정의는 pnpm-workspace.yaml (repo-root). -r = 모든 멤버, test script 있는 패키지만 실행.
 	//   --workspace-concurrency=1 = 순차(npm 동형) — 병렬 시 cross-package temp-file race(skill-citation ↔ inflation-lint) 회피.
 	const result = spawnSync(
