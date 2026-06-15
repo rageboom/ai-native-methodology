@@ -31,8 +31,12 @@ codegraph callers ↔ 실 grep 호출 site 대조:
 - `.mcp.json` `codegraph` 서버 + hooks SessionStart(기존 companion 훅이 처리) + `package.json files[]` 출하.
 - **검증**: JSON valid·node --check·기본off no-op·launcher 미인덱스 graceful·**실 부트스트랩 작동**(임시 프로젝트 3 nodes/76ms→.codegraph→marker)·**launcher 가 실제 serve 기동 확인**("Attached to daemon v0.9.6")·tarball 출하·**release gate 신 실패 0**(잔존 1 = 별개 verdict 작업의 gate-eval).
 
-## 보류 (P3 hard-block = §8.1-차단)
-clean PASS 타깃 1개(poc-18)뿐 → 출하 전 최소: ① **독립 PASS ≥2**(다른 shape/언어) ② hard-block = `verdict=PASS ∧ index_fresh` 둘 다 ③ 밸브 = deny 가 정확한 grep 제공 ④ **Read/Glob 한정 / Grep 영구 비차단**. P0 calibration 도구(`tools/codegraph-calibrate`)가 verdict 산출(reference-lens) — 후속.
+## P0 calibration 도구 (시행 / `tools/codegraph-calibrate` / 미커밋)
+- 신규 tool: 실 `codegraph callers` ↔ 독립 identifier-call grep proxy 일치도 측정 + fabrication-risk 구조 스캔 → reference-lens verdict {PASS=navigation-authority 적격 / WARN=reference-lens 유지}. 순수 코어(calibrate.js / 18 test) + I/O(cli.js / 실 codegraph·index 부재 exit3 / test 파일 scope 제외).
+- **자동 측정 = 수동 calibration 자가교정**([[feedback_self_recorded_fact_validation]]): 수동은 깨끗한 유틸 심볼 cherry-pick → 100% 주장이었으나, **넓은 자동 샘플 실측 = poc-18 WARN(precision 0.941 / recall 0.889 / fab_risk 0) · tools/ WARN(0.667 / fab_risk 1)**. 불일치는 namespace 멤버호출 경계(static frontier)에 군집 — grep proxy ≠ ground truth(agreement smell-test). PASS 는 의도적 고-bar(bidirectional ≥0.9 ∧ fab 0).
+
+## 보류 (P3 hard-block = §8.1-차단 / 강화됨)
+**자동 calibration 결과 PASS 타깃 = 0개**(poc-18 도 WARN / 수동 "100%"는 cherry-pick 과대 — 정정). → 출하 전 최소: ① **독립 PASS ≥2**(다른 shape/언어 / 현재 0) ② hard-block = `verdict=PASS ∧ index_fresh` 둘 다 ③ 밸브 = deny 가 정확한 grep 제공 ④ **Read/Glob 한정 / Grep 영구 비차단**. P3 는 PASS 나오는 near-perfect 타깃 발견 전까지 영구 보류 가능 — reference-lens 기본이 정합(품질1). codegraph-calibrate 의 값 = PASS/WARN bit 뿐 아니라 **투명 agreement 지표 + 불일치 파일 목록 + fab 스캔**(reference-lens with confidence vs caution 판단 보조).
 
 ## trust (cheap-falsifiability 경계)
 **navigation-authority ≠ gate-authority**: code-graph 는 navigation 을 *제안*할 권위 OK / *유일한* ground-truth 경로면 ❌. grep(반증 밸브)을 영구 비차단 = 싼 반증 항상 가능. DEC-2026-05-28 §4.2 reference-lens(결정적 chain gate inject ❌) **불변** — 검색층이지 gate 아님. codegraph ⚠️ 배너 = 내장 verify.

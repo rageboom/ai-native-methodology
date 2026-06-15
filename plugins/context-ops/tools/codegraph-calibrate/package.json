@@ -1,0 +1,15 @@
+{
+  "name": "@mis-plugins/codegraph-calibrate",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "codegraph-calibrate": "src/cli.js"
+  },
+  "main": "src/cli.js",
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "license": "UNLICENSED",
+  "description": "P0 calibration tool (DEC-2026-06-15-codegraph-search-token-saving). Measures codegraph caller-resolution accuracy on a target: real `codegraph callers <symbol>` ↔ independent identifier-call grep proxy → precision/recall + fabrication-risk scan (collision symbol called without local def = cross-folder impossible-edge precondition) → reference-lens verdict {PASS = navigation-authority eligible (P3) / WARN = keep reference-lens}. NEVER gate-injected (DEC-2026-05-28 §4.2); grep stays the falsification valve. no-simulation (real codegraph CLI + real source read / index absent → exit 3). Pure core (calibrate.js) tested without codegraph; CLI does I/O."
+}
