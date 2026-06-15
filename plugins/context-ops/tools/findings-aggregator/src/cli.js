@@ -167,6 +167,9 @@ function resolveDomain(projectDir, scopeCtx) {
 export function buildValidatorArgs(validatorName, projectDir, stage, scopeCtx = null) {
 	const O = (f) => resolveChainArtifact(projectDir, f, scopeCtx);
 	switch (validatorName) {
+		case 'verdict-consistency-validator':
+			// analysis gate#0 — BC verdict 정합 (analysis output 루트 검사 / DEC-2026-06-15)
+			return ['--root', join(projectDir, '.ai-context', 'output'), '--json'];
 		case 'discovery-extraction-validator':
 			return [
 				'--discovery',
@@ -353,6 +356,11 @@ function buildAnalysisArgs(validatorName, projectDir, artifacts) {
 			const f = abs(artifacts['sql-inventory']);
 			const dir = ok(f) ? dirname(f) : abs(artifacts['sql-inventory-dir']);
 			return ok(dir) ? ['--target', dir, '--json'] : null;
+		}
+		case 'verdict-consistency-validator': {
+			// DEC-2026-06-15 — BC verdict 정합. 입력 = analysis output 루트(전 BC sql-inventory + shared/domain.json).
+			const dir = abs(artifacts['analysis-output-dir']);
+			return ok(dir) ? ['--root', dir, '--json'] : null;
 		}
 		default:
 			return null;

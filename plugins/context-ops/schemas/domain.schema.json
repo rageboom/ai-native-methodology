@@ -296,6 +296,22 @@
               }
             }
           },
+          "verdict": {
+            "type": "string",
+            "enum": ["core", "supporting", "cross_cutting", "read_model", "operational"],
+            "description": "BC 분류 판정 (DEC-2026-06-15-bc-verdict-classification). core/supporting=소유 쓰기 aggregate 보유(per-BC, domains/<BC>/) / cross_cutting=소유 없는 횡단기능(shared/cross-cutting/, 미등록) / read_model=타 BC aggregate 읽기 투영 / operational=배치. 판별 칼 = sql-inventory by_type write_ops(insert+update+delete)."
+          },
+          "verdict_basis": {
+            "type": "object",
+            "description": "verdict 재현 근거 — verdict-consistency-validator 가 실제 sql-inventory by_type 과 대조 (basis≠실제 = HARD).",
+            "properties": {
+              "write_ops": {"type": "integer"},
+              "read_ops": {"type": "integer"},
+              "owned_aggregates": {"type": "integer"},
+              "fan_in": {"type": "integer"},
+              "decided_by": {"type": "string", "enum": ["rule", "human-override"]}
+            }
+          },
           "use_cases": {
             "type": "array",
             "description": "유스케이스 목록 (시스템이 수행하는 행동 단위)",

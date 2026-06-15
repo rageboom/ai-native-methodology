@@ -50,6 +50,8 @@ importers:
 
   plugins/context-ops/tools/code-pointer-validator: {}
 
+  plugins/context-ops/tools/codegraph-calibrate: {}
+
   plugins/context-ops/tools/codegraph-coverage: {}
 
   plugins/context-ops/tools/codegraph-runner: {}
@@ -118,6 +120,8 @@ importers:
         version: 4.2.0
 
   plugins/context-ops/tools/traceability-matrix-builder: {}
+
+  plugins/context-ops/tools/verdict-consistency-validator: {}
 
 packages:
 

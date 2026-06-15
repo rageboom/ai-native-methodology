@@ -107,13 +107,14 @@ describe('gate-eval', () => {
 	});
 
 	// DEC-2026-06-06-analysis-exit-gate — analysis exit gate #0 (옵션 A fail-closed + soft)
-	it('analysis: requiredValidators(analysis) = base 5 (drift-validator 제외 / F-DOGFOOD-014 evidence-scan 포함)', () => {
+	it('analysis: requiredValidators(analysis) = base 6 (drift-validator 제외 / F-DOGFOOD-014 evidence-scan + DEC-2026-06-15 verdict 포함)', () => {
 		assert.deepEqual(requiredValidators('analysis'), [
 			'schema-validator',
 			'br-cross-consistency-validator',
 			'formal-spec-link-validator',
 			'decision-table-validator',
 			'analysis-extraction-validator',
+			'verdict-consistency-validator',
 		]);
 	});
 

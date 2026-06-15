@@ -502,13 +502,14 @@ describe('aggregateForStage', () => {
 
 // DEC-2026-06-06-analysis-exit-gate — analysis gate #0 러너 (validator 실행 + transform + fail-closed)
 describe('DEC-2026-06-06-analysis-exit-gate', () => {
-	it('REQUIRED_VALIDATORS_PER_STAGE.analysis = base 5 (gate-eval sync / F-DOGFOOD-014 evidence-scan)', () => {
+	it('REQUIRED_VALIDATORS_PER_STAGE.analysis = base 6 (gate-eval sync / F-DOGFOOD-014 evidence-scan + DEC-2026-06-15 verdict)', () => {
 		assert.deepEqual(REQUIRED_VALIDATORS_PER_STAGE.analysis, [
 			'schema-validator',
 			'br-cross-consistency-validator',
 			'formal-spec-link-validator',
 			'decision-table-validator',
 			'analysis-extraction-validator',
+			'verdict-consistency-validator',
 		]);
 	});
 
@@ -569,6 +570,8 @@ describe('DEC-2026-06-06-analysis-exit-gate', () => {
 				return JSON.stringify({ summary: { critical: 0, high: 1, medium: 0 } });
 			if (name === 'sql-inventory-validator')
 				return JSON.stringify({ summary: { critical: 0, high: 0, medium: 0 } });
+			if (name === 'verdict-consistency-validator')
+				return JSON.stringify({ findings: [], summary: { critical: 0, high: 0, medium: 0, low: 0, info: 0 }, mode: 'advisory' });
 			return null;
 		};
 		const findings = aggregateForStage('analysis', '/tmp/poc', mockRun, {
@@ -578,7 +581,7 @@ describe('DEC-2026-06-06-analysis-exit-gate', () => {
 			],
 		});
 		assert.equal(findings.high, 1); // characterization 1 high
-		assert.equal(Object.keys(findings.sources).length, 7); // base 5 + 조건부 2
+		assert.equal(Object.keys(findings.sources).length, 8); // base 6 (+verdict) + 조건부 2
 		assert.equal(
 			findings.sources['characterization-coverage-validator'].status,
 			'ok',
@@ -596,7 +599,7 @@ describe('DEC-2026-06-06-analysis-exit-gate', () => {
 			findings.evidence_missing.includes('br-cross-consistency-validator'),
 			'미해석 validator = evidence_missing',
 		);
-		assert.equal(findings.evidence_missing.length, 4); // br-cross + formal-spec-link + decision-table + analysis-extraction(evidence-scan)
+		assert.equal(findings.evidence_missing.length, 5); // br-cross + formal-spec-link + decision-table + analysis-extraction(evidence-scan) + verdict-consistency
 		assert.equal(
 			findings.sources['decision-table-validator'].status,
 			'evidence_missing',

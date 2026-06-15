@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "findings-analysis.schema.json",
+  "title": "Findings — analysis stage 통합/집계",
+  "description": "domains/<BC>/findings-analysis.json (per-BC) 및 output/findings-analysis.json (루트 집계) 동형 — severity 카운트 + sources[] + findings[]. DEC-2026-06-15-bc-verdict-classification (이전 schema-less 해소). additive·permissive(additionalProperties 허용).",
+  "type": "object",
+  "required": ["critical", "high", "medium", "low", "info"],
+  "properties": {
+    "$comment": { "type": "string" },
+    "bounded_context": { "type": "string", "description": "per-BC leaf 일 때. 루트 집계는 부재 가능." },
+    "phase": { "type": "string" },
+    "generated_at": { "type": "string" },
+    "source_branch": { "type": "string" },
+    "source_commit_sha": { "type": "string" },
+    "critical": { "type": "integer", "minimum": 0 },
+    "high": { "type": "integer", "minimum": 0 },
+    "medium": { "type": "integer", "minimum": 0 },
+    "low": { "type": "integer", "minimum": 0 },
+    "info": { "type": "integer", "minimum": 0 },
+    "total": { "type": "integer", "minimum": 0 },
+    "evidence_missing": { "type": "array" },
+    "scenario": { "type": "string" },
+    "sources": { "type": ["array", "object"], "description": "기여한 validator/단계 소스 — per-BC=array / 루트 집계=validator별 object 맵 (둘 다 허용)" },
+    "findings": { "type": "array" }
+  },
+  "additionalProperties": true
+}

@@ -9,7 +9,7 @@ import { resolve } from 'node:path';
 
 // chain-driver/src/gate-eval.js REQUIRED_VALIDATORS_PER_STAGE 와 정합 (v2.4.0 br-cross-consistency-validator 추가 / v11.0.0 discovery rename)
 export const REQUIRED_VALIDATORS_PER_STAGE = {
-	// analysis exit gate #0 (DEC-2026-06-06-analysis-exit-gate) — base 4 (gate-eval REQUIRED.analysis 와 sync 의무).
+	// analysis exit gate #0 (DEC-2026-06-06-analysis-exit-gate) — base 6 (gate-eval REQUIRED.analysis 와 sync 의무).
 	//   조건부(characterization-coverage[S2/S3] · sql-inventory[RDB])는 cli 가 opts.extraValidators 로 추가 (sdlc gates[#0].conditional_validators allowlist 정합).
 	analysis: [
 		'schema-validator',
@@ -18,6 +18,8 @@ export const REQUIRED_VALIDATORS_PER_STAGE = {
 		'decision-table-validator',
 		// F-DOGFOOD-014 — evidence-scan: LLM 산출물 {file,line} 증거 실재성 (날조 source_evidence 차단 / analysis-only 는 code-pointer-validator 불가)
 		'analysis-extraction-validator',
+		// DEC-2026-06-15 — BC 분류 verdict 정합 (gate-eval REQUIRED.analysis 와 sync)
+		'verdict-consistency-validator',
 	],
 	discovery: [
 		'discovery-extraction-validator',
@@ -333,6 +335,9 @@ export function dispatchValidator(validatorName, output) {
 			return transformGeneric(JSON.parse(output));
 		case 'traceability-matrix-builder':
 			return transformTraceabilityMatrix(JSON.parse(output));
+		case 'verdict-consistency-validator':
+			// { findings, summary:{critical,high,medium,low,info} } — generic summary 정합 (DEC-2026-06-15 / 이중분류·모순 = high → HARD)
+			return transformGeneric(JSON.parse(output));
 		default:
 			// generic JSON fallback (drift / spec-test-link / static-runner)
 			try {

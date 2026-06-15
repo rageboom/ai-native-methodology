@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "bc-scope.schema.json",
+  "title": "BC Scope (per-BC analysis 진입 스코프 노트)",
+  "description": "domains/<BC>/bc-scope.json — per-BC 분석 스코프·API 표면·SQL·AS-IS quirk preliminary·cross-link. DEC-2026-06-15-bc-verdict-classification (이전 schema-less 해소). additive·permissive(additionalProperties 허용 = 기존 인스턴스 무효화 ❌).",
+  "type": "object",
+  "required": ["bounded_context"],
+  "properties": {
+    "bounded_context": { "type": "string", "pattern": "^BC-[A-Z0-9-]+$", "description": "BC id (architecture/domain 정합)" },
+    "display_name": { "type": "string" },
+    "meta": { "type": "object" },
+    "source_scope": { "type": "object", "description": "패키지/모듈 등 코드 스코프 경계" },
+    "api_surface": { "type": "object" },
+    "as_is_quirks_preliminary": { "type": "array", "description": "AS-IS 특이동작 1차 관찰(특성화 후보)" },
+    "sql_xml": { "type": "array" },
+    "sql_inventory_auto": { "type": "object" },
+    "cross_links": { "type": "array", "description": "타 BC/cross-cutting 의존 링크" },
+    "findings": { "type": ["object", "array"] },
+    "verdict": { "type": "string", "enum": ["core", "supporting", "cross_cutting", "read_model", "operational"], "description": "BC 분류 판정 (domain.json#bounded_contexts[].verdict 와 정합)" },
+    "verdict_basis": { "type": "object" }
+  },
+  "additionalProperties": true
+}

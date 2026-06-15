@@ -1,0 +1,12 @@
+{
+  "name": "@mis-plugins/verdict-consistency-validator",
+  "version": "0.1.0",
+  "description": "analysis gate#0 validator — BC 분류(verdict: core/supporting/cross_cutting/read_model/operational) 정합 검사. 판별 칼 = 소유 쓰기 aggregate(sql-inventory by_type). 이중분류·verdict↔write_ops 모순·basis 불일치 = HARD(high). DEC-2026-06-15-bc-verdict-classification.",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": {
+    "verdict-consistency-validator": "./src/cli.js"
+  },
+  "scripts": { "test": "node --test test/validator.test.js" },
+  "license": "UNLICENSED"
+}
