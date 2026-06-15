@@ -17,6 +17,7 @@
 ### 변경
 
 - `skills/ticket-sync/SKILL.md` §단계 1 Pre-flight: step 4 config-bootstrap 삽입 (기존 step 4→5, 5→6 renumber).
+- `skills/ticket-sync/env-config-reference.md` §SG-MIS 환경 표준 config: 공통 필드(자동 적용) / 프로젝트별 필드(사용자 입력) 분리 — **SSOT 명시**. config-bootstrap 템플릿이 이 파일을 참조하도록 SKILL.md 업데이트.
 
 ---
 
