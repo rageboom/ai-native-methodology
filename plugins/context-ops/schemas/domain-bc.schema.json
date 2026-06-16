@@ -1,0 +1,517 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/domain-bc.schema.json",
+  "title": "도메인 모델 (per-BC 샤드) — domain.schema.json 파생",
+  "description": "per-BC domain.json 샤드(base/domains/<BC>/domain.json·base/shared/cross-cutting/<x>/domain.json) 전용. domain.schema.json 에서 결정론 파생 — delta 2곳뿐: (a) top-level $schema_ref/$schema_origin/$comment 허용, (b) bounded_contexts.items.required 에서 verdict 제거. verdict 는 카탈로그(base/shared/domain.json)가 SSOT 소유 (DEC-2026-06-15-bc-verdict-classification / bc-verdict-policy) → 샤드는 미보유가 정상. 라우팅: basename fallback 은 domain.schema.json(verdict required)로 가므로 샤드 인스턴스는 top-level $schema_ref 로 본 schema 를 명시 (business-rules-bc.schema.json 선례 동격). domain.schema.json 구조 변경 시 본 파생본 재생성 필요.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "meta",
+    "bounded_contexts"
+  ],
+  "properties": {
+    "$schema_ref": {
+      "type": "string"
+    },
+    "$schema_origin": {
+      "type": "string"
+    },
+    "$comment": {
+      "type": "string"
+    },
+    "meta": {
+      "$ref": "./meta-confidence.schema.json"
+    },
+    "stakeholders": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "v11.16.0 (C-domain-schema-stakeholders) — 도메인 모델 actor / 이해관계자 목록 (예: 차량관리자, 회계담당자). optional / additive — discovery-spec business_intent.stakeholders 와 동형(string array) / domain 은 도메인 actor 초점 (전체 비즈니스 이해관계자는 discovery-spec SSOT). analysis-domain-model skill 본문이 신규 산출 시 작성 의무."
+    },
+    "business_intent_summary": {
+      "type": "string",
+      "description": "v11.16.0 (C-domain-schema-stakeholders) — 도메인 비즈니스 의도 한 줄 요약. optional / additive — discovery-spec business_intent.domain_purpose 의 도메인 측 요약(summary / full 의도는 discovery-spec SSOT). analysis-domain-model skill 본문이 신규 산출 시 작성 의무."
+    },
+    "ubiquitous_language": {
+      "type": "array",
+      "description": "보편 언어 (도메인 용어집). 비즈니스 측과 코드 측이 같은 단어 사용",
+      "items": {
+        "type": "object",
+        "required": [
+          "term",
+          "definition"
+        ],
+        "properties": {
+          "term": {
+            "type": "string",
+            "description": "도메인 용어 (예: 주문, Order)"
+          },
+          "term_en": {
+            "type": "string",
+            "description": "영문 표기"
+          },
+          "definition": {
+            "type": "string",
+            "description": "한 줄 정의"
+          },
+          "synonyms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "동의어/오용되는 용어"
+          },
+          "anti_definition": {
+            "type": "string",
+            "description": "이 용어가 아닌 것 (혼동 방지)"
+          }
+        }
+      }
+    },
+    "bounded_contexts": {
+      "type": "array",
+      "description": "도메인 경계 (Bounded Context) 목록. 모듈 그룹과 매칭",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^BC-[A-Z0-9_-]+$",
+            "description": "도메인 경계 ID (예: BC-ORDER)"
+          },
+          "name": {
+            "type": "string",
+            "description": "도메인 경계 이름 (예: 주문)"
+          },
+          "description": {
+            "type": "string",
+            "description": "이 경계가 다루는 책임"
+          },
+          "related_modules": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "연관된 아키텍처 모듈 ID (architecture.json의 MOD-XXX)"
+          },
+          "aggregates": {
+            "type": "array",
+            "description": "이 도메인 경계의 Aggregate 목록",
+            "items": {
+              "type": "object",
+              "required": [
+                "root_entity_id"
+              ],
+              "properties": {
+                "root_entity_id": {
+                  "type": "string",
+                  "description": "Aggregate Root 엔티티 ID (예: E-ORDER-Order)"
+                },
+                "members": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Aggregate 내부 엔티티/VO ID 목록"
+                },
+                "invariants": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "description"
+                    ],
+                    "properties": {
+                      "description": {
+                        "type": "string",
+                        "description": "불변식 자연어 설명 (예: 'OrderItem은 Order 없이 존재 불가')"
+                      },
+                      "enforced_by": {
+                        "type": "string",
+                        "enum": [
+                          "entity_method",
+                          "orm_constraint",
+                          "db_constraint",
+                          "service_check",
+                          "unknown"
+                        ]
+                      },
+                      "evidence": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "file": {
+                              "type": "string"
+                            },
+                            "line": {
+                              "type": "integer"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "transaction_boundary": {
+                  "type": "boolean",
+                  "description": "이 Aggregate가 트랜잭션 경계인가? (true면 한 트랜잭션에서 함께 저장/수정)"
+                },
+                "consistency": {
+                  "type": "string",
+                  "enum": [
+                    "strong",
+                    "eventual",
+                    "unknown"
+                  ],
+                  "description": "일관성 수준"
+                }
+              }
+            }
+          },
+          "entities": {
+            "type": "array",
+            "description": "엔티티 목록 (Aggregate에 속하지 않는 단독 엔티티 포함)",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "name"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^E-[A-Z0-9_-]+-[A-Za-z0-9_]+$",
+                  "description": "엔티티 ID (예: E-ORDER-Order)"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "엔티티 이름"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "is_aggregate_root": {
+                  "type": "boolean"
+                },
+                "attributes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "name",
+                      "type"
+                    ],
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string"
+                      },
+                      "is_id": {
+                        "type": "boolean"
+                      },
+                      "nullable": {
+                        "type": "boolean"
+                      },
+                      "default": {},
+                      "value_object_ref": {
+                        "type": "string",
+                        "description": "이 속성이 VO인 경우 VO ID 참조 (예: VO-ORDER-Money)"
+                      }
+                    }
+                  }
+                },
+                "behaviors": {
+                  "type": "array",
+                  "description": "엔티티의 비즈니스 메서드 (단순 getter/setter 제외)",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "method_name"
+                    ],
+                    "properties": {
+                      "method_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "related_use_cases": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "관련 유스케이스 ID (v2.0 통일 / 예: UC-ORDER-001)"
+                      },
+                      "related_rules": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "description": "관련 비즈니스 규칙 ID (4토막 strict / 예: BR-ORDER-CANCEL-001)"
+                      }
+                    }
+                  }
+                },
+                "persisted_to": {
+                  "type": "string",
+                  "description": "영속화되는 DB 테이블 이름 (db.schema의 table)"
+                }
+              }
+            }
+          },
+          "value_objects": {
+            "type": "array",
+            "description": "Value Object 목록 (불변 객체, ID 없음)",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "name"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^VO-[A-Z0-9_-]+-[A-Za-z0-9_]+$",
+                  "description": "VO ID (예: VO-ORDER-Money)"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "attributes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "name",
+                      "type"
+                    ],
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "evidence": {
+                  "type": "array",
+                  "description": "추출 근거 (예: @Embeddable 클래스 위치)",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "file": {
+                        "type": "string"
+                      },
+                      "line": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "repositories": {
+            "type": "array",
+            "description": "Repository 목록 (Aggregate별 1개 권장)",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "manages_aggregate"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^R-[A-Z0-9_-]+-[A-Za-z0-9_]+$",
+                  "description": "Repository ID (예: R-ORDER-OrderRepository)"
+                },
+                "manages_aggregate": {
+                  "type": "string",
+                  "description": "관리하는 Aggregate Root ID"
+                },
+                "implementation_class": {
+                  "type": "string",
+                  "description": "구현 클래스 경로"
+                },
+                "interface": {
+                  "type": "string",
+                  "description": "인터페이스 (있으면)"
+                }
+              }
+            }
+          },
+          "domain_services": {
+            "type": "array",
+            "description": "도메인 서비스 (엔티티에 속하기 어려운 도메인 로직)",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "name"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^DS-[A-Z0-9_-]+-[A-Za-z0-9_]+$"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "operations": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "method_name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "related_rules": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "tier": {
+            "type": "string",
+            "enum": [
+              "baseline",
+              "characterized",
+              "full-leaf"
+            ],
+            "description": "BC 분석 깊이 명시 선언 (추론 ❌). baseline=business-rules+openapi+sql-inventory / characterized=+characterization / full-leaf=+bc-scope·domain·findings-analysis·migration-cautions·README. verdict-consistency-validator 가 선언 tier 의 mandatory 산출물 보유를 advisory(low) 검사 — 파일 유무로 tier 를 추론하지 않으므로 use_cases-backfill leaf 가 full-leaf 로 오판되지 않음."
+          },
+          "verdict": {
+            "type": "string",
+            "enum": [
+              "core",
+              "supporting",
+              "cross_cutting",
+              "read_model",
+              "operational"
+            ],
+            "description": "BC 분류 판정 (DEC-2026-06-15-bc-verdict-classification). core/supporting=소유 쓰기 aggregate 보유(per-BC, domains/<BC>/) / cross_cutting=소유 없는 횡단기능(shared/cross-cutting/, 미등록) / read_model=타 BC aggregate 읽기 투영 / operational=배치. 판별 칼 = sql-inventory by_type write_ops(insert+update+delete)."
+          },
+          "verdict_basis": {
+            "type": "object",
+            "description": "verdict 재현 근거 — verdict-consistency-validator 가 실제 sql-inventory by_type 과 대조 (basis≠실제 = HARD).",
+            "properties": {
+              "write_ops": {
+                "type": "integer"
+              },
+              "read_ops": {
+                "type": "integer"
+              },
+              "owned_aggregates": {
+                "type": "integer"
+              },
+              "fan_in": {
+                "type": "integer"
+              },
+              "decided_by": {
+                "type": "string",
+                "enum": [
+                  "rule",
+                  "human-override"
+                ]
+              }
+            }
+          },
+          "use_cases": {
+            "type": "array",
+            "description": "유스케이스 목록 (시스템이 수행하는 행동 단위)",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "name"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^UC-[A-Z0-9_-]+-[0-9]{3}$",
+                  "description": "유스케이스 ID (v2.0 통일 / id-conventions canonical / 예: UC-ORDER-001 / 기존 이름 형식 (UC-ORDER-CREATE) = sub-plan-6 migration carry)"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "actor": {
+                  "type": "string",
+                  "description": "수행 주체 (사용자, 관리자, 시스템 등)"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "preconditions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "postconditions": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "related_aggregate": {
+                  "type": "string",
+                  "description": "주로 다루는 Aggregate Root ID"
+                },
+                "related_api_operation_id": {
+                  "type": "string",
+                  "description": "OpenAPI operationId 매칭"
+                },
+                "related_rules": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "v12_reserved": {
+      "type": "object",
+      "description": "v1.2에서 추가될 영역 (현재는 비워둠) — Strategic Design (Context Map)",
+      "properties": {
+        "context_map_relationships": {
+          "const": null
+        },
+        "subdomain_classification": {
+          "const": null
+        }
+      }
+    }
+  },
+  "$comment": "GENERATED from domain.schema.json (gen-domain-bc-schema.cjs). 단일 delta = verdict optional + 포인터 키 허용."
+}
