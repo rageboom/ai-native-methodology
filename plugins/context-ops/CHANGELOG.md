@@ -10,6 +10,15 @@
 
 ---
 
+## [0.49.0] — 2026-06-16 — MINOR — `domain-bc.schema.json` 신설 (per-BC domain 샤드 verdict-optional 라우팅)
+
+per-BC `domain.json` 샤드(`domains/<BC>/`·`shared/cross-cutting/<x>/`)가 카탈로그용 `domain.schema.json`(bounded_contexts 항목 verdict REQUIRED)에 basename 라우팅돼 schema RED 이던 문제를, per-BC 전용 schema 신설로 해소. verdict 는 카탈로그(`shared/domain.json`)가 SSOT 소유이고 샤드는 의도적 미보유(DEC-2026-06-15-bc-verdict-classification).
+
+- **`schemas/domain-bc.schema.json` 신설**: `domain.schema.json` 결정론 파생 — delta 2곳뿐. (a) top-level `$schema_ref`/`$schema_origin`/`$comment` 허용(top-level `additionalProperties:false` 대응), (b) `bounded_contexts.items.required` 에서 verdict 제거(optional, 있어도 됨). 샤드 인스턴스는 top-level `"$schema_ref": "schemas/domain-bc.schema.json"` 로 본 schema 명시(basename fallback 은 카탈로그 schema 로 가므로) — `business-rules-bc.schema.json` 선례와 동형.
+- **카탈로그 불변**: `shared/domain.json` 은 top-level $schema_ref 없이 basename → `domain.schema.json`(verdict REQUIRED) 유지. verdict-required 보증 비손상.
+- **`analysis-domain-model` 스킬**: per-BC 샤드 emit 시 `$schema_ref` + verdict-미보유 규약 문서화(회귀방지 / business-rules index↔bc 분리와 동형).
+- 검증: `ajv2020-regression` + `schema-ref-routing` GREEN(전 schema Ajv2020 로드 / `$id` 충돌 0). 채택처(ep-be-gea)에서 per-BC domain 26 샤드 schema invalid 26→0 / 카탈로그 strict 유지 / verdict-consistency 무회귀.
+
 ## [0.48.2] — 2026-06-16 — PATCH — chain-driver scope별 진행 상태 독립 분리 (#19 GHE 통합 출하)
 
 GHE(origin-smilegate) PR #19 를 canonical 라인에 머지(`525c5ecc`)하고 출하. v0.48.1 packaging fix 와 동일 라인.

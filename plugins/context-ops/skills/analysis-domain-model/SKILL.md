@@ -57,7 +57,7 @@ DDD 원칙 기반. Entity / Aggregate / Value Object / Bounded Context 식별.
 
 **multi-BC append (F-1)**: domain.json 은 repo-wide BC 카탈로그(shared/). 여러 BC 가 누적될 때 domain.json 을 **통째 재생성 ❌**(BC#2 가 BC#1·event·golf 덮음). `tools/_shared/append-catalog.js` 의 `appendBoundedContext(domainPath, bcEntry, ulAdditions)` 사용 = `bounded_contexts[]` upsert-by-`id`(sibling BC 보존) + `ubiquitous_language` term dedup 병합 + 기존 indent 보존.
 
-**per-BC 샤드 (`domains/<BC>/domain.json`) — 카탈로그와 schema 구분**: 위 `shared/domain.json` 은 verdict 보유 카탈로그(SSOT). 별개로 per-BC `domains/<BC>/domain.json` 샤드(use_cases-backfill leaf)를 emit 할 때는 **`schemas/domain-bc.schema.json`** 로 라우팅한다 — 인스턴스에 top-level `"$schema_ref": "schemas/domain-bc.schema.json"` **명시 필수**(basename `domain.json` fallback 은 verdict-required 카탈로그 schema(`domain.schema.json`)로 오라우팅돼 RED). 샤드는 `verdict`/`verdict_basis` 를 **싣지 않는다**(verdict 는 카탈로그 SSOT 소유 / rollup 시 산출 — DEC-2026-06-15-bc-verdict-classification). business-rules index↔bc 분리(`analysis-business-rules`)와 동형.
+**per-BC 샤드 (`domains/<BC>/domain.json`) — 카탈로그와 schema 구분**: 위 `shared/domain.json` 은 verdict 보유 카탈로그(SSOT). 별개로 per-BC `domains/<BC>/domain.json` 샤드(use_cases-backfill leaf)를 emit 할 때는 **`schemas/domain-bc.schema.json`** 로 라우팅한다 — 인스턴스에 top-level `"$schema_ref": "schemas/domain-bc.schema.json"` **명시 필수**(basename `domain.json` fallback 은 verdict-required 카탈로그 schema(`domain.schema.json`)로 오라우팅돼 RED). 샤드는 `verdict`/`verdict_basis` 를 **싣지 않는다**(verdict 는 카탈로그 SSOT 소유 / rollup 시 산출). business-rules index↔bc 분리(`analysis-business-rules`)와 동형.
 
 ## greenfield (code-optional) mode
 
