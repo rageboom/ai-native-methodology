@@ -19,7 +19,7 @@
 ## 2. 형식
 
 ```
-.ai-context/output/
+.ai-context/base/
 ├── business-rules.json            # 분할 index — bc_files[] + total_rules (well-known 진입점 / business-rules-index.schema.json)
 ├── business-rules/                # per-BC leaf 디렉토리 (BR-split STEP 3 / v0.24.0)
 │   ├── <BC-slug>.json             # 해당 BC 의 business_rules[] (business-rules-bc.schema.json)

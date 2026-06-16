@@ -31,13 +31,13 @@ REST API 표면 → OpenAPI 3.x spec.
 
 ## 산출물
 
-`<user-project>/.ai-context/output/domains/<BC>/openapi.yaml`
+`<user-project>/.ai-context/base/domains/<BC>/openapi.yaml`
 
 ## greenfield (code-optional) mode
 
 `work-unit-manifest.scenario == "greenfield"` (legacy 코드 없음) 일 때 — 코드 endpoint 스캔 대신 **입력어댑터 extract** 에서 산출:
 
-- **결정적 경로 (swagger 채널)** — `tools/greenfield-bootstrap --swagger-extract .ai-context/<scope>/planning/swagger-extract.json --output .ai-context/output`. swagger-extract 는 이미 파싱·정규화된 OpenAPI → `domains/<BC>/openapi.yaml` 로 **결정적 승격** (AI 추론 0 / endpoints × schemas 재조립만). 본 skill 의 AI 추출 불필요.
+- **결정적 경로 (swagger 채널)** — `tools/greenfield-bootstrap --swagger-extract .ai-context/scopes/<scope>/planning/swagger-extract.json --output .ai-context/base`. swagger-extract 는 이미 파싱·정규화된 OpenAPI → `domains/<BC>/openapi.yaml` 로 **결정적 승격** (AI 추론 0 / endpoints × schemas 재조립만). 본 skill 의 AI 추출 불필요.
 - swagger 채널 부재 (figma / PRD only) 시 — endpoint = PRD/figma flow 에서 AI 도출, `source_grounded_evidence` = 입력 출처 인용 (`doc:§N` / `figma:node_id`), `code_pointers` = N/A (가리킬 코드 부재 / `meta.code_pointers_na`).
 - spectral-runner 검증은 동일 (no-simulation).
 - 무회귀: scenario ≠ greenfield 시 본 절 무시 (legacy 코드 endpoint 추출 경로 그대로).

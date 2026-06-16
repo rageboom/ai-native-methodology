@@ -8,9 +8,9 @@
     "$comment": "task-plan template placeholder (chain 3 / macro HOW: task 분해·의존성·ADR·NFR·risk·rollback / 4-level Epic+Story+OP+TASK cascade). confidence=bare number (schema:number). layer 분기: be→openapi_endpoint_ref / fe→component_ref. 근거: AC→TASK 분해 + ADR alternatives≥3 + NFR allocation + risk 3중 망."
   },
   "derivation_source": {
-    "behavior_spec_path": ".ai-context/output/behavior-spec.json",
-    "acceptance_criteria_path": ".ai-context/output/acceptance-criteria.json",
-    "discovery_spec_path": ".ai-context/output/discovery-spec.json"
+    "behavior_spec_path": ".ai-context/base/behavior-spec.json",
+    "acceptance_criteria_path": ".ai-context/base/acceptance-criteria.json",
+    "discovery_spec_path": ".ai-context/base/discovery-spec.json"
   },
   "tasks": [
     {
@@ -144,8 +144,8 @@
     "verification": "rollback 후 회귀 test GREEN + data 무결성 확인 (실제 rollback 가능성 검증)"
   },
   "cross_links": {
-    "to_behavior_spec": [".ai-context/output/behavior-spec.json"],
-    "to_acceptance_criteria": [".ai-context/output/acceptance-criteria.json"],
-    "to_discovery_spec": [".ai-context/output/discovery-spec.json"]
+    "to_behavior_spec": [".ai-context/base/behavior-spec.json"],
+    "to_acceptance_criteria": [".ai-context/base/acceptance-criteria.json"],
+    "to_discovery_spec": [".ai-context/base/discovery-spec.json"]
   }
 }

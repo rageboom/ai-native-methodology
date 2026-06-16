@@ -16,9 +16,9 @@ chain 4 의 sub-skill. **coverage-auditor persona** 책임. 3 metric 분리 측�
 
 ## 입력
 
-- `<project>/.ai-context/output/acceptance-criteria.json` (AC-\* / verifiable)
-- `<project>/.ai-context/output/test-spec.json` (TC-\* / framework)
-- `<project>/.ai-context/output/impl-spec.json` — 있으면 (line/branch coverage path)
+- `<project>/.ai-context/base/acceptance-criteria.json` (AC-\* / verifiable)
+- `<project>/.ai-context/base/test-spec.json` (TC-\* / framework)
+- `<project>/.ai-context/base/impl-spec.json` — 있으면 (line/branch coverage path)
 - `<project>/<coverage>/lcov.info` 또는 `coverage.xml` 등 (framework 별)
 
 ## 3 metric 분리
@@ -50,10 +50,10 @@ chain 4 의 sub-skill. **coverage-auditor persona** 책임. 3 metric 분리 측�
 
 ```bash
 node ${CLAUDE_PLUGIN_ROOT}/tools/spec-test-link-validator/src/cli.js \
-  --behavior   .ai-context/output/behavior-spec.json \
-  --acceptance .ai-context/output/acceptance-criteria.json \
-  --test-spec  .ai-context/output/test-spec.json \
-  --inventory  .ai-context/output/shared/inventory.json \
+  --behavior   .ai-context/base/behavior-spec.json \
+  --acceptance .ai-context/base/acceptance-criteria.json \
+  --test-spec  .ai-context/base/test-spec.json \
+  --inventory  .ai-context/base/shared/inventory.json \
   --threshold 0.85 \
   --json
 ```
@@ -65,7 +65,7 @@ node ${CLAUDE_PLUGIN_ROOT}/tools/spec-test-link-validator/src/cli.js \
 ```bash
 node ${CLAUDE_PLUGIN_ROOT}/tools/test-impl-pass-validator/src/cli.js \
   --project <project> \
-  --inventory .ai-context/output/shared/inventory.json \
+  --inventory .ai-context/base/shared/inventory.json \
   --allow-execute --json
 ```
 

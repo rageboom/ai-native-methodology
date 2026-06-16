@@ -81,7 +81,7 @@ flowchart LR
 
 scope 는 사용자가 작업 시작 시 자유 명명 (chain-driver init --scope <slug>). 자동 추출 ❌ (사용자 의도 분명).
 한국어 / 공백 / path traversal (`../`, `/`) 비허용 — 파일시스템 호환 + state-store `validateScopeSlug` 강제.
-한 사용자 프로젝트가 운영 누적 시 scope N 개 — 각 scope 가 chain 사이클 1회 또는 revisit 시 N회. `.ai-context/<scope>/` 단위 격리.
+한 사용자 프로젝트가 운영 누적 시 scope N 개 — 각 scope 가 chain 사이클 1회 또는 revisit 시 N회. `.ai-context/scopes/<scope>/` 단위 격리 (DEC-2026-06-16 / scopes/ 컨테이너).
 
 discovery-spec 의 use_cases 는 기존 UC-_ 차용 (analysis stage UC-_ 와 동일 namespace / backward link).
 BR-INTENT-_ prefix ❌ — rules.schema 의 BR-_ 에 `intent` sub-object 확장 (Senior 권고 / B1 정합).
@@ -168,7 +168,7 @@ BR-INTENT-_ prefix ❌ — rules.schema 의 BR-_ 에 `intent` sub-object 확장 
   source_files: [src/main/java/order/OrderCancelService.java]
   test_pass_evidence: # no-simulation 5종 물증 7 필드
     test_runner_version: 'junit-jupiter-5.10.0'
-    test_runner_stdout_path: '.ai-context/output/runs/2026-05-06T12-00/stdout.log'
+    test_runner_stdout_path: '.ai-context/runtime/runs/2026-05-06T12-00/stdout.log'
     invocation_timestamp: '2026-05-06T12:00:00Z'
     duration_ms: 4523
     pass_count: 12
@@ -177,6 +177,21 @@ BR-INTENT-_ prefix ❌ — rules.schema 의 BR-_ 에 `intent` sub-object 확장 
     reproduction_command: ['./gradlew test --tests OrderCancelTest']
     result_hash: 'sha256:...' # 정규화 (timestamp+duration 제외 / sorted test names)
 ```
+
+---
+
+## $schema 포인터
+
+산출물 JSON 이 자기 schema 를 가리키는 **정규 키 = `$schema_ref`** (단일 source-of-truth). schema-validator 가 라우팅 시 `$schema_ref` 를 먼저 보고 값에서 basename(`<name>.schema.json`)을 추출해 schema 를 해소한다.
+
+- **값 형식** = 둘 중 하나 (둘 다 basename 해석 가능):
+  - 프로젝트-상대: `schemas/<name>.schema.json` (예: `schemas/state.schema.json`)
+  - scheme-token: `context-ops:schemas/<name>.schema.json` (이식성 강조 / 플러그인 경계 명시 / verify C1 은 scheme-token 을 skip)
+- **이유**:
+  - **basename 라우팅** — validator 는 경로 전체가 아닌 끝의 `<name>.schema.json` 만 보고 schema 를 찾으므로, 깊은 디렉토리 위치에 무관하게 안정적으로 해소된다.
+  - **이식성** — 프로젝트-상대/scheme-token 형식은 repo 를 어디에 두든, 어느 worktree 에서 열든 동일하게 해석된다.
+  - **프로젝트밖 `../` 금지** — `../../../../Study/...` 같은 프로젝트 경계를 벗어나는 상대경로는 다른 머신/클론에서 미해결(파일 부재)이 되므로 금지.
+- **레거시 `$schema_origin` = deprecated**. 깊은 상대경로(예: `../../../schemas/state.schema.json`)로 방출돼 프로젝트 밖을 가리키면 미해결된다. validator 는 하위호환을 위해 여전히 `$schema_origin` 을 읽지만(fallback), **신규 산출물에는 절대 방출하지 말 것**. 기존 인스턴스는 `$schema_ref` 로 교체 권장.
 
 ---
 
@@ -241,7 +256,7 @@ Tier 2.5 활성 시 ticket 상태 전이 timeline 자동 기록:
         from_status: 'To Do'
         to_status: 'In Progress'
         mcp_tool: 'mcp__wiki-jira-assistant__jira_transition'
-        evidence_ref: '.ai-context/output/evidence/ticket-sync-spec-20260518T150000.json'
+        evidence_ref: '.ai-context/runtime/evidence/ticket-sync-spec-20260518T150000.json'
       - transitioned_at: '2026-05-18T16:30:00+09:00'
         from_status: 'In Progress'
         to_status: 'Done'
@@ -260,9 +275,11 @@ MCP tool = `mcp__wiki-jira-assistant__*` only (Tier 2.5).
 - Ticket Binding (Tier 1 정책) 근거: DEC-2026-05-18-ticket-binding-policy
 - R20 (Tier 2.5 MCP ticket sync) 근거: DEC-2026-05-18-r20-mcp-ticket-sync-channel
 - R20-prime (ticket = plan stage 단일 cascade / subtask_ids{chain*} → subtask_refs·op_task_refs 폐기·재편 / breaking) 근거: DEC-2026-05-26-ticket-plan-단일
+- `$schema_ref` 정규 키 채택 / schema-validator 인식 (vs 레거시 `$schema_origin` deprecated) 근거: DEC-2026-06-06-non-analysis-gate-fail-closed (F4 schema-validator `$schema_ref` 미인식 fix)
 
 ### Cross-link
 
+- $schema 포인터 라우팅 구현: `tools/schema-validator/src/cli.js` (`inferSchemaName` — `$schema_ref` → `$schema_origin` → `$schema` → 파일명 순)
 - 정책 본문: `methodology-spec/ticket-policy.md`
 - Skill: `skills/ticket-sync/SKILL.md` (5 stage matrix + confirmation gate)
 - Schema field: `schemas/traceability-matrix.schema.json` matrix.items.ticket_ref (+ status_history)

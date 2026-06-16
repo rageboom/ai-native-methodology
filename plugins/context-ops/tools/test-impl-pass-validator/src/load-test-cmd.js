@@ -3,6 +3,7 @@
 
 import { existsSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
+import { configFileForRead } from '../../_shared/ai-context-layout.js';
 
 // ADR-CHAIN-004 §2 — inventory.stack_signals → inferred test_cmd.
 // T16 (no-simulation honesty) — adapter 보유 framework(jest/vitest/junit5/pytest)만 직접 추론.
@@ -123,7 +124,7 @@ export function loadTestCmd({ sourceProjectDir, inventory, cliOverride }) {
 		resolved = { ...cliOverride };
 		source = 'cli-override';
 	} else {
-		const cfgPath = join(sourceProjectDir, '.ai-context', 'config', 'test-cmd.json');
+		const cfgPath = configFileForRead(sourceProjectDir, 'test-cmd.json'); // runtime/config NEW ↔ config/ OLD
 		if (existsSync(cfgPath)) {
 			try {
 				resolved = JSON.parse(readFileSync(cfgPath, 'utf-8'));

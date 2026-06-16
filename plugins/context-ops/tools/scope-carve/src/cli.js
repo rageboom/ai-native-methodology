@@ -20,6 +20,7 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { makeMiningGitRunner } from './co-change.js';
 import { buildCarve, DEFAULT_PARAMS, TOOL_VERSION } from './carve.js';
+import { baseDirForRead } from '../../_shared/ai-context-layout.js';
 
 export class ScopeCarveEnvironmentMissing extends Error {}
 
@@ -143,7 +144,7 @@ function main() {
 
 	const outDir = opts.output
 		? resolve(opts.output)
-		: join(repoPath || process.cwd(), '.ai-context', 'output');
+		: baseDirForRead(repoPath || process.cwd());
 	mkdirSync(outDir, { recursive: true });
 	const outPath = join(outDir, 'scope-carve.json');
 	writeFileSync(outPath, JSON.stringify(result, null, 2) + '\n');

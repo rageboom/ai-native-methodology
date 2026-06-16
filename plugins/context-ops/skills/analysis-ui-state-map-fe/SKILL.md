@@ -26,7 +26,7 @@ FE 의 client state + server state cache shape 추출.
 
 ## 산출물
 
-`<user-project>/.ai-context/output/domains/<BC>/state-map.json`
+`<user-project>/.ai-context/base/domains/<BC>/state-map.json`
 
 ## 인용
 

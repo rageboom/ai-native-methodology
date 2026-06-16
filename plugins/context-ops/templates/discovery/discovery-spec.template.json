@@ -11,10 +11,10 @@
   "derivation_source": {
     "type": "legacy-extraction",
     "source_artifacts": [
-      ".ai-context/output/business-rules.json",
-      ".ai-context/output/domain.json",
-      ".ai-context/output/openapi.yaml",
-      ".ai-context/output/antipatterns.json"
+      ".ai-context/base/business-rules.json",
+      ".ai-context/base/domain.json",
+      ".ai-context/base/openapi.yaml",
+      ".ai-context/base/antipatterns.json"
     ],
     "source_handling": "in-place read (사본 ❌)",
     "source_root_absolute": "<프로젝트 root absolute path>"
@@ -68,10 +68,10 @@
   "pending_decisions": [],
   "cross_links": {
     "to_analysis_artifacts": [
-      ".ai-context/output/business-rules.json",
-      ".ai-context/output/domain.json",
-      ".ai-context/output/openapi.yaml",
-      ".ai-context/output/antipatterns.json"
+      ".ai-context/base/business-rules.json",
+      ".ai-context/base/domain.json",
+      ".ai-context/base/openapi.yaml",
+      ".ai-context/base/antipatterns.json"
     ]
   }
 }

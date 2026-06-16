@@ -1,6 +1,6 @@
 # DEC-2026-06-15-bc-verdict-classification
 
-**BC 분류(core/supporting/cross_cutting/read_model/operational)를 결정론 `verdict` 필드로 명시 + analysis gate#0 강제 (draft — release bump 대기)**
+**BC 분류(core/supporting/cross_cutting/read_model/operational)를 결정론 `verdict` 필드로 명시 + analysis gate#0 강제 (accepted)**
 
 ## 맥락 (사용자 요청 / ep-be-gea dogfood)
 
@@ -41,10 +41,12 @@ ep-be-gea `.ai-context` 점검에서 "공통(global-common) / cross-cutting / pe
 - **SSOT 정합 (flows/sdlc-4stage-flow.json)** — `gates[#0].validators` 가 base 4 만 나열(직전 `analysis-extraction-validator` 추가 시 미반영된 기존 drift) → `analysis-extraction-validator` + `verdict-consistency-validator` 추가해 6 로 정합($comment "gate-eval REQUIRED.analysis ⊆ 본 validators" 진위 회복). `conditional_validators` 무변경(verdict=base).
 - **검증**: verdict 14/14 · aggregator 67/67 · chain-driver 539/539 · schema-validator 111/111 · drift-validator 49/49 GREEN. 신규 schema 2종 ajv compile OK. CLI smoke(비-샤딩 → exit 0 비차단).
 
-## 미배선(후속)
-- `analysis-domain-model` 스킬에 verdict+basis **자동 emit** 규칙 본문화(현재는 검증만 / 백필은 수동·serial).
-- `verdict` schema `required` 승격(현 권장 / 점진). release-readiness 체크 + version bump + skill-citation.
-- ep-be-gea verdict 백필(domain.json 쓰기)은 **병렬 머지 후 serial 창**(shared 자원).
+## 후속 (격상 완료 — ADR-CHAIN-017 채택)
+- **[해소] `verdict` required 승격** — `schemas/domain.schema.json` `bounded_contexts[].items.required = ["id","name","verdict"]` 반영 완료(현 권장 → 의무). verdict 부재 산출물은 schema-validator 단계에서 차단.
+- **[해소] gate#0 enforce 배선** — `tools/findings-aggregator/src/cli.js` 의 `buildValidatorArgs` 양 경로(L173 + L365)에서 `verdict-consistency-validator` 에 `--enforce` 전달 완료 → gate#0 가 fail-closed(high 유지 → HARD STOP). no-domains 는 `info` N/A 로 비차단(비-샤딩 PoC 무영향).
+- **[해소] `analysis-domain-model` auto-emit 본문화** — SKILL.md §7-1 에 `bounded_contexts[]` 의 `verdict`+`verdict_basis` 를 sql-inventory `summary.by_type` 에서 **자동 산출(의무 / required 필드)** 규칙 + 예시 명문화 완료(현재는 검증만 → emit 규칙 codify).
+- **[해소] `analysis.phase-flow` validator 목록 reconcile** — gate-eval `REQUIRED.analysis`(6) · aggregator `REQUIRED.analysis`(6) · `flows/analysis.phase-flow.json` gate#0 validators 가 모두 `verdict-consistency-validator` 를 동반(sync) → "gate-eval REQUIRED.analysis ⊆ 본 validators" 불변식 진위 회복.
+- **(잔여)** ep-be-gea verdict 백필(domain.json 쓰기)은 **병렬 머지 후 serial 창**(shared 자원) — 방법론 배선 외 데이터 작업.
 
 ## 결과
 - 분류가 "흩어진 판단"에서 **domain-model 산출물 + write_ops 결정론 근거 + gate 강제**로 승격 → athrt/base 류 이중분류·read-only 누수를 분석 전이에서 자동 차단(STOP).

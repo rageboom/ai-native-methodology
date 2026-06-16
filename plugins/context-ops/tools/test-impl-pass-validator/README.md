@@ -16,9 +16,9 @@ DEC-2026-05-06-sub-plan-3b-종결 / ADR-CHAIN-004 (test runner invocation contra
 
 ## Inputs
 
-- `<project-dir>/.ai-context/config/test-cmd.json` — test runner 명세 (schemas/test-cmd.schema.json 정합)
-- `<project-dir>/.ai-context/output/test/` + `<project-dir>/.ai-context/output/impl/` — 실 test code + 실 impl code
-- `<project-dir>/.ai-context/output/test-spec.json` (chain 4) + `impl-spec.json` (chain 5) 산출물
+- `<project-dir>/.ai-context/runtime/config/test-cmd.json` — test runner 명세 (schemas/test-cmd.schema.json 정합)
+- `<project-dir>/.ai-context/base/test/` + `<project-dir>/.ai-context/base/impl/` — 실 test code + 실 impl code
+- `<project-dir>/.ai-context/base/test-spec.json` (chain 4) + `impl-spec.json` (chain 5) 산출물
 
 ## Outputs
 
@@ -95,7 +95,7 @@ npm test --workspace=tools/test-impl-pass-validator   # unit test pass (result-h
 
 ## 참조
 
-- ADR-CHAIN-004 — test-runner-invocation-contract (Aider 패턴 + `.ai-context/config/test-cmd.json` 우선 + `--allow-execute` 의무 + result_hash 정규화)
+- ADR-CHAIN-004 — test-runner-invocation-contract (Aider 패턴 + `.ai-context/runtime/config/test-cmd.json` 우선 + `--allow-execute` 의무 + result_hash 정규화)
 - DEC-2026-05-06-sub-plan-3b-종결 — workspace 11번째 신설 + 5 adapter + Senior Blocker 1 해결
 - [`../../schemas/test-cmd.schema.json`](../../schemas/test-cmd.schema.json) — test runner 명세 schema
 - [`../../schemas/impl-spec.schema.json`](../../schemas/impl-spec.schema.json) — chain 5 (implement) 산출물 schema

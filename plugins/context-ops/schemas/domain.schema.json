@@ -56,7 +56,7 @@
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["id", "name"],
+        "required": ["id", "name", "verdict"],
         "properties": {
           "id": {
             "type": "string",
@@ -295,6 +295,11 @@
                 }
               }
             }
+          },
+          "tier": {
+            "type": "string",
+            "enum": ["baseline", "characterized", "full-leaf"],
+            "description": "BC 분석 깊이 명시 선언 (추론 ❌). baseline=business-rules+openapi+sql-inventory / characterized=+characterization / full-leaf=+bc-scope·domain·findings-analysis·migration-cautions·README. verdict-consistency-validator 가 선언 tier 의 mandatory 산출물 보유를 advisory(low) 검사 — 파일 유무로 tier 를 추론하지 않으므로 use_cases-backfill leaf 가 full-leaf 로 오판되지 않음."
           },
           "verdict": {
             "type": "string",

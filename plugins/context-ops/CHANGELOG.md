@@ -10,6 +10,19 @@
 
 ---
 
+## [0.48.0] — 2026-06-16 — MINOR — `.ai-context/` 레이아웃 재구조화 (base/scopes/runtime + read-alias)
+
+사용자 프로젝트의 `.ai-context/` 온-디스크 레이아웃을 평면 → **3-버킷 + 루트 싱글톤**으로 재구조화. **read-alias 비파괴**(배포된 구 `output/`·최상위 scope 디스크 무손상) / DEC-2026-06-16-ai-context-layout-restructure.
+
+- **3-버킷**: `base/`(was `output/` — analysis 정본 shared/·domains/BC-*/·index) · `scopes/<scope>/`(was 최상위 평면 — work-unit + stage dirs) · `runtime/`(신규 — config/·findings·intervention-log·tool-runs/·evidence/·layer-2-results/·baseline-evidence/·cascade-plan). 루트 싱글톤 = state.json·input.json·HANDOFF.md·baseline-*.json.
+- **경로 SSOT 신설** `tools/_shared/ai-context-layout.js` — `*Path`(쓰기=NEW) / `*ForRead`(읽기=NEW→OLD alias). 코드 ~18파일 라우팅. `_shared/project-root.js` 는 이미 layout-agnostic(무변경).
+- **listScopes deny→allow** — `scopes/` 직접 readdir → config/evidence/findings **오분류 결함 제거**(잠복 버그 수정).
+- **hooks-bridge 차단 확대** — state.blocked 시 `.ai-context/` 전체 쓰기 차단(구 output/ 한정 우회 방지).
+- **`chain-driver migrate-layout <project> [--dry-run]`** 신설 — 구 디스크 인플레이스 컷오버(멱등·충돌거부 / 기존 `migrate`=state schema 와 직교 / auto-run ❌).
+- 문서 sweep 110파일(skills 54·methodology-spec·templates·guides·agents·hooks·tool READMEs) — `output/` → base/runtime 분기 결정론 치환. decisions·examples·CHANGELOG 역사 보존.
+- 검증: 전체 1867 + _shared 34 테스트 GREEN / `.ai-context/output` 잔여 0 / anti-false-green 음성 단언 페어링.
+- **ep-be-gea 실이주 = 후속**(별도 승인 — `migrate-layout` 실행 + char-test-aggregate 스크래치 청소).
+
 ## [merge] — 2026-06-16 — origin-smilegate(GHE) 분기 라인 통합
 
 분기해 있던 origin(rageboom)·origin-smilegate(GHE) 두 원격을 merge 로 통합 (force-push 없이 양쪽 작업 보존). GHE 분기 라인 기능을 본 canonical 라인으로 folding — 코드는 트리에 반영됨 / plugin.json·package.json 현재 **0.46.7** 유지:
@@ -21,6 +34,24 @@
 **버전 번호 충돌 주의**: GHE 분기는 위 기능을 독립적으로 `0.42.0` 으로 번호 매김 — 본 canonical 라인의 `0.42.0`(golf BC-RESV-GOLF 5-chain dogfood)과 충돌. 따라서 GHE 기능은 새 버전 부여 없이 본 merge 항목으로만 기록 (향후 정식 승격 시 별도 번호 부여).
 
 ---
+
+## [0.47.0] — 2026-06-16 — MINOR — BC verdict 분류 결정론화 + analysis gate#0 fail-closed enforce
+
+**SSOT**: `decisions/DEC-2026-06-15-bc-verdict-classification.md`. ep-be-gea `.ai-context` 점검에서 "공통(global-common) / cross-cutting / per-BC" 분류가 결정론·강제된 단계 없이 scope-carve(reference-lens) + soft gate#0 사람 확정에 흩어져 있어 ① athrt/base 이중분류(per-BC 승격 후 옛 cross-cutting 쌍둥이 잔존) ② read-only BC 누수(소유 쓰기 aggregate 0인데 per-BC 등재)가 발생. draft DEC 를 본 릴리스에서 본체 격상.
+
+### Added (verdict 결정론 분류 + gate#0 강제)
+- **`verdict` REQUIRED 승격**: `schemas/domain.schema.json` `bounded_contexts[].items.required` 에 `verdict`(enum: core/supporting/cross_cutting/read_model/operational) 추가 — 판별 칼 = `sql-inventory` `by_type` write_ops(insert+update+delete). `verdict_basis`(write_ops/read_ops/owned_aggregates/fan_in/decided_by) additive 동반.
+- **gate#0 fail-closed enforce 배선**: `verdict-consistency-validator`(VC1 미등록·VC2 verdict↔write_ops 모순·VC3 이중분류·VC4 stale concern)는 이미 `gate-eval`·`findings-aggregator`·`sdlc-4stage-flow gates[#0]` 에 등록돼 있었으나 advisory 로만 호출돼 `high→medium` 강등으로 무차단이었음. 본 릴리스: `findings-aggregator/src/cli.js` 의 두 validator-arg builder 에 `--enforce` 배선(`--enforce`/`CONTEXT_OPS_VERDICT_ENFORCE=1` 시 high 유지 → analysis gate HARD block) + `analysis.phase-flow.json` validator 목록 reconcile(누락돼 있던 `verdict-consistency`·`analysis-extraction` 추가 → sdlc gates[#0] ≡ phase-flow ≡ gate-eval SSOT 정합).
+- **verdict-consistency cross-cutting glob 일반화**: validator 의 cross-cutting concern 스캔을 고정 두 파일명(`biztrip-/reservation-cross-cutting.json`) 대신 `shared/*-cross-cutting.json` glob 으로 일반화(프로젝트 무관).
+- **`$schema_ref` 컨벤션**: 정규 스키마 포인터 키 = `$schema_ref`(값 = `schemas/<name>.schema.json` 또는 scheme-token `context-ops:…`). 레거시 `$schema_origin`(프로젝트밖 `../` 상대경로) deprecated. `methodology-spec/id-conventions.md` 문서화 + `state-store.js` 방출 교정.
+- **`cross-cutting.schema` 신설**: `schemas/cross-cutting.schema.json` 신설로 `shared/cross-cutting/<module>/`·`shared/*-cross-cutting.json` 산출물에 schema 라우팅 타겟 제공(`cross_cutting_concerns[]` + `retired_concerns[]`, verdict const `cross_cutting`). (`bc-scope.schema.json`·`findings-analysis.schema.json` 은 기존 보유 — 본 릴리스 신설 아님.)
+- **명시-tier(`tier`) 필드 + C4 완전성 lane**: `domain.schema.json` `bounded_contexts[].tier`(enum `baseline|characterized|full-leaf`, optional) 추가. `verdict-consistency-validator` 에 **C4(선언 tier 기반 mandatory 완전성, advisory low)** lane 추가 — **파일 유무로 tier 를 추론하지 않고 선언만 신뢰**(미선언 BC 는 skip). use_cases-backfill leaf(`domain.json` 1개)가 full-leaf 로 오판되던 결함을 구조적으로 차단. `analysis-domain-model/SKILL.md §7-2` 에 tier 자동 선언 규칙. (이전엔 프로젝트-로컬 `tools/context-ops-audit/verify.mjs` 가 tier 를 *추론*해 biztrip 류를 오탐했음 — 명시-tier 로 상류 격상.)
+- **C5 중복산출물 lane**: `verdict-consistency-validator` 에 `business-rules.json`(canonical) + `business-rules/` dir 공존(stale 중복 표현) 검사(high, enforce 차단) 추가.
+- **C1 폐기(컨벤션 흡수)**: 깨진 `$schema_origin` 상대경로 resolve 검사는 별도 validator 로 만들지 않음 — `$schema_ref` basename/scheme-token 컨벤션 하에선 resolve 할 경로 자체가 무의미(schema-validator 가 basename 라우팅)하므로 **문서 컨벤션(`id-conventions.md`)이 회귀 가드**. 런타임 warn 미도입(템플릿/예시 노이즈 회피).
+
+### 검증
+- backward-compat: `verdict` 부재 산출물은 advisory(medium/low)로만 surface — 무효화 ❌. enforce 미설정(기본) 시 무회귀.
+- athrt/base 류 이중분류 · read-only BC 누수를 분석 전이에서 자동 차단(STOP).
 
 ## [0.46.7] — 2026-06-15 PATCH — 미참조 analysis-zone artifact-graph 노드 → 'propose' 강등 (full-chain 병렬 캠페인 dogfood-found)
 

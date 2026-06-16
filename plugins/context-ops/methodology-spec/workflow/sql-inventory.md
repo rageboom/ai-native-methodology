@@ -114,11 +114,11 @@ patterns_extension_v3 (cache / discriminator / typeHandler) = 본 phase scope �
 
 ```bash
 # Schema validate
-node tools/schema-validator/src/cli.js .ai-context/output/sql-inventory/
+node tools/schema-validator/src/cli.js .ai-context/base/sql-inventory/
 
 # 11 컬럼 + statement_type + carry_flags + confidence if/then
 node tools/sql-inventory-validator/src/cli.js \
-  --target .ai-context/output/sql-inventory/ \
+  --target .ai-context/base/sql-inventory/ \
   --threshold-auto-ratio 0.50
 # 옛 명칭 'sql-inventory-extractor' bin alias 양쪽 보존 (옛 호출자 break ❌)
 ```

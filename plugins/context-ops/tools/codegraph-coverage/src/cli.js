@@ -28,6 +28,7 @@ import { buildCoverage } from './coverage.js';
 import { MODULE_EDGE_KINDS } from './module-graph.js';
 import { annotateImportVerification } from './import-verify.js';
 import { renderMarkdown, toFindings, SEVERITY_CEILING } from './render.js';
+import { baseDirForRead } from '../../_shared/ai-context-layout.js';
 import {
 	toPromoteReadyFindings,
 	buildHandlerSet,
@@ -146,7 +147,7 @@ function main() {
 	// 산출물 디렉토리 해소 (default = <target>/.ai-context/output).
 	let delivDir = args.deliverables ? resolve(args.deliverables) : null;
 	if (!delivDir && args.target)
-		delivDir = join(resolve(args.target), '.ai-context', 'output');
+		delivDir = baseDirForRead(resolve(args.target));
 	if (!delivDir || !existsSync(delivDir)) usage(3);
 
 	// inventory (stack 감지) — zone-aware (shared/inventory.json 우선 흡수).

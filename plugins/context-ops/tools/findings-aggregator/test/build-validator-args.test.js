@@ -3,6 +3,9 @@
 //   validator 가 --task-plan/--acceptance 요구 → errored → silent skip = plan gate primary validator 미실행(fail-OPEN).
 import { describe, it } from 'node:test';
 import { strict as assert } from 'node:assert';
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { buildValidatorArgs } from '../src/cli.js';
 
 describe('buildValidatorArgs (F2 fix — plan-coverage wiring)', () => {
@@ -12,8 +15,8 @@ describe('buildValidatorArgs (F2 fix — plan-coverage wiring)', () => {
 		assert.ok(args.includes('--acceptance'), 'has --acceptance');
 		assert.ok(!args.includes('--target'), 'no generic --target (이전 default = errored skip)');
 		assert.ok(
-			args.some((a) => a.endsWith('.ai-context/output/task-plan.json')),
-			'task-plan.json 경로 포함',
+			args.some((a) => a.endsWith('.ai-context/base/task-plan.json')),
+			'task-plan.json 경로 포함 (NEW base/ 기본값 / DEC-2026-06-16)',
 		);
 	});
 
@@ -119,18 +122,34 @@ describe('buildValidatorArgs — test-impl-pass-validator (F-R2-40)', () => {
 // F-R2-35 — 비-analysis stage scope-aware overlay (scopeCtx 주입 시 per-scope / null 시 평면 무회귀)
 describe('buildValidatorArgs — scope-aware overlay (F-R2-35)', () => {
 	const tail2 = (args) => args.map((a) => a.split('/').slice(-2).join('/'));
-	it('scopeCtx=null → 평면 .ai-context/output 경로 (backward-compat byte-identical)', () => {
+	it('scopeCtx=null → 평면 base/ 경로 (NEW 기본값 / DEC-2026-06-16)', () => {
 		const args = buildValidatorArgs('chain-coverage-validator', '/p', 'spec', null);
-		assert.ok(args.some((a) => a.endsWith('.ai-context/output/discovery-spec.json')), 'flat 경로 유지');
-		assert.ok(args.some((a) => a.endsWith('.ai-context/output/behavior-spec.json')));
+		assert.ok(args.some((a) => a.endsWith('.ai-context/base/discovery-spec.json')), 'base/ 기본 경로');
+		assert.ok(args.some((a) => a.endsWith('.ai-context/base/behavior-spec.json')));
 	});
-	it('scopeCtx 주입 + per-scope 파일 부재 → flat fallback (graceful)', () => {
-		// /p 에 .ai-context/event/spec/behavior-spec.json 실재 ❌ → existsSync false → flat fallback.
+	it('scopeCtx 주입 + per-scope 파일 부재 → flat base/ fallback (graceful)', () => {
+		// /p 에 scopes/event/spec/behavior-spec.json 실재 ❌ → existsSync false → flat base/ fallback.
 		const args = buildValidatorArgs('chain-coverage-validator', '/p', 'spec', { scope: 'event' });
 		assert.ok(
-			args.some((a) => a.endsWith('.ai-context/output/behavior-spec.json')),
-			'per-scope 파일 부재 시 flat output/ 으로 graceful fallback (fail-closed 아닌 정직 해석)',
+			args.some((a) => a.endsWith('.ai-context/base/behavior-spec.json')),
+			'per-scope 파일 부재 시 flat base/ 으로 graceful fallback (fail-closed 아닌 정직 해석)',
 		);
+	});
+	// backward-compat (anti-false-green): 실제 구 output/ 파일 존재 → 그쪽으로 해소 (배포 디스크 무손상).
+	it('legacy output/ 파일 실재 시 alias 가 output/ 으로 해소 (배포 호환)', () => {
+		const tmp = mkdtempSync(join(tmpdir(), 'fa-alias-'));
+		try {
+			const oldFile = join(tmp, '.ai-context', 'output', 'behavior-spec.json');
+			mkdirSync(join(oldFile, '..'), { recursive: true });
+			writeFileSync(oldFile, '{}');
+			const args = buildValidatorArgs('chain-coverage-validator', tmp, 'spec', null);
+			assert.ok(
+				args.some((a) => a.endsWith('.ai-context/output/behavior-spec.json')),
+				'구 output/ 실재 시 그 경로로 해소 (alias fallback)',
+			);
+		} finally {
+			rmSync(tmp, { recursive: true, force: true });
+		}
 	});
 	it('br-cross scopeCtx=null → legacy input/business-rules.json (무회귀)', () => {
 		const args = buildValidatorArgs('br-cross-consistency-validator', '/p', 'discovery', null);

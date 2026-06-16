@@ -139,5 +139,5 @@ cross_links:
 - 결정: DEC-2026-06-10-reverse-eng-delta-2a-3-promotion (draft→official 격상 / ≥2 paradigm corroborated)
 - 정책: `methodology-spec/policies/no-simulation.md` (source-grounded / 누락 정직 / value 미저장) · `methodology-spec/use-scenario-taxonomy.md` (P0 RUN 축)
 - 선례 schema: `schemas/migration-cautions.schema.json` (negative 반대편) · `schemas/db-schema.schema.json` (sensitivity enum) · `schemas/inventory.schema.json` (stack) · `schemas/test-cmd.schema.json` (cmd+args shell-safe 필드)
-- dogfood: `examples/poc-18-express-prisma-modern-ts/target/.ai-context/output/run-manifest.json` · `examples/poc-10-realworld-jpa-querydsl/.ai-context/output/run-manifest.json`
+- dogfood: `examples/poc-18-express-prisma-modern-ts/target/.ai-context/base/run-manifest.json` · `examples/poc-10-realworld-jpa-querydsl/.ai-context/base/run-manifest.json`
 - sibling 산출물 번호: `methodology-spec/deliverables/24-sql-inventory.md` (#24) / #25 = recovered-adr 예약 / #16 = `16-error-mapping-spec.md` (무변경)

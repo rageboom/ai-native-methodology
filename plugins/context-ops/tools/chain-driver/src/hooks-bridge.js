@@ -11,6 +11,7 @@
 
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { runtimeFileForRead } from '../../_shared/ai-context-layout.js';
 import {
 	formatHookBlockContext,
 	formatSkillSuggestion,
@@ -24,7 +25,8 @@ const CONFORMANCE_EXEMPT_PREFIXES = ['[Chain ', '[Plugin Verify]'];
 
 export function checkCascadeConformance({ toolName, toolInput, root, cascadePlanPath }) {
 	if (typeof toolName !== 'string' || !toolName.endsWith('jira_create')) return null;
-	const planPath = cascadePlanPath || join(root || '.', '.ai-context', 'output', 'cascade-plan.json');
+	const planPath =
+		cascadePlanPath || runtimeFileForRead(root || '.', 'cascade-plan.json');
 	if (!existsSync(planPath)) return null; // cascade-plan 없음 = 비-cascade 흐름 (미적용)
 	let plan;
 	try {
@@ -293,7 +295,8 @@ export function shouldBlockToolUse({ toolName, toolInput, state }) {
 	if (!['Write', 'Edit', 'NotebookEdit'].includes(toolName)) return null;
 	const path = toolInput?.file_path || toolInput?.path || '';
 	if (!path) return null;
-	if (!path.includes('/.ai-context/output/') && !path.includes('\\.ai-context\\output\\'))
+	// DEC-2026-06-16: state.blocked 시 .ai-context/ 전체 산출물 쓰기 차단 (base/scopes/runtime — 구 output/ 한정 우회 방지).
+	if (!path.includes('/.ai-context/') && !path.includes('\\.ai-context\\'))
 		return null;
 	return state.block_reason || 'state.blocked=true';
 }

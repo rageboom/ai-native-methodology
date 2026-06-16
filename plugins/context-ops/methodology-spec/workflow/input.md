@@ -73,7 +73,7 @@
 - 자연어 발화 1회 (메타데이터 + 의도 섞임) → `analysis-input-orchestrate` 자동 호출
 - 휴리스틱 (URL/path 패턴 + 키워드) + 인라인 마커 (`@swagger:`, `@figma:`, `@plan-doc:`) 으로 1단계 파싱
 - BCDE 4 skill 자동 dispatch + merge + cross-ref + conflict 검출 (정량 산식)
-- 산출 = `.ai-context/<scope>/planning/input-summary.json` (json 단독 SSOT)
+- 산출 = `.ai-context/scopes/<scope>/planning/input-summary.json` (json 단독 SSOT)
 - Hybrid rule: 총 입력 ≤ 50K token = 직접 chain / > 50K = Task tool sub-agent
 
 ### 3.3 환경 제약 케이스

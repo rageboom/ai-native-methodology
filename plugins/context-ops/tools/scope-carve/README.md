@@ -28,7 +28,7 @@ scope-carve --architecture <architecture.json> [--repo <dir>] [--output <dir>]
 
 ## Outputs
 
-- `<output|repo|cwd>/.ai-context/output/scope-carve.json` (`schemas/scope-carve.schema.json` / reference-lens / NOT gate-injected). `evidence.evidence_trust=real_tool` / `result_hash` = timestamp 제외 결정론 payload sha256(재현 witness).
+- `<output|repo|cwd>/.ai-context/base/scope-carve.json` (`schemas/scope-carve.schema.json` / reference-lens / NOT gate-injected). `evidence.evidence_trust=real_tool` / `result_hash` = timestamp 제외 결정론 payload sha256(재현 witness).
 
 ## Exit codes
 

@@ -31,7 +31,7 @@ RDB 가 **MyBatis 3 / iBATIS 2 XML mapper** 면 §1–4 의 5 auto 컬럼(`sql_i
 ```bash
 node ${CLAUDE_PLUGIN_ROOT}/tools/sql-inventory-extractor/src/cli.js \
   --src <src> [--glob "**/*.xml"] [--rel-root <repo-root>] \
-  --output .ai-context/output/domains/<BC>/sql-inventory/
+  --output .ai-context/base/domains/<BC>/sql-inventory/
 # 산출: sql-inventory.auto.json (5 auto 컬럼 / 판단 6 컬럼 null = PARTIAL) + raw-grep.txt
 # 이후 LLM 은 판단 6 컬럼(§6·§7)만 보강 → sql-inventory.json 승격 → §10·§11 검증
 ```
@@ -159,7 +159,7 @@ iBATIS 2 전용 `<dynamic>` / `<iterate>` / `<isPropertyAvailable>` sub-classifi
 `schemas/sql-inventory.schema.json` 정합. 4 sub-section (meta_confidence + summary + extraction_automation + inventory + (optional) patterns_extension_v2).
 
 ```bash
-node ../../tools/schema-validator/src/cli.js .ai-context/output/domains/<BC>/sql-inventory/
+node ../../tools/schema-validator/src/cli.js .ai-context/base/domains/<BC>/sql-inventory/
 # Expect: sql-inventory.json valid + carry_flags enum 통과 + external_call_out_of_scope confidence if/then 통과
 ```
 
@@ -167,15 +167,15 @@ node ../../tools/schema-validator/src/cli.js .ai-context/output/domains/<BC>/sql
 
 ```bash
 node ../../tools/sql-inventory-validator/src/cli.js \
-  --target .ai-context/output/domains/<BC>/sql-inventory/ \
+  --target .ai-context/base/domains/<BC>/sql-inventory/ \
   [--threshold-auto-ratio 0.50]
 # Expect: 11 컬럼 의무 / statement_type enum / carry_flags enum / extraction_automation 형식 검증 통과
 ```
 
 ## 산출물
 
-- `<user-project>/.ai-context/output/domains/<BC>/sql-inventory/sql-inventory.json` (산출물 24 / 통합 entry / json 단독 SSOT)
-- `<user-project>/.ai-context/output/domains/<BC>/sql-inventory/raw-grep.txt` (1차 산출)
+- `<user-project>/.ai-context/base/domains/<BC>/sql-inventory/sql-inventory.json` (산출물 24 / 통합 entry / json 단독 SSOT)
+- `<user-project>/.ai-context/base/domains/<BC>/sql-inventory/raw-grep.txt` (1차 산출)
 
 ## chain 1 입력 보강
 

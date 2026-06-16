@@ -18,8 +18,8 @@ F-162 (analysis-from-figma verbatim 검증 부재) + F-163 (input-adapter 비대
 ## 사용
 
 ```bash
-analysis-extraction-validator --extract .ai-context/<scope>/planning/figma-extract.json
-analysis-extraction-validator --extract .ai-context/<scope>/planning/plan-doc-extract.json --threshold 0.3 --json
+analysis-extraction-validator --extract .ai-context/scopes/<scope>/planning/figma-extract.json
+analysis-extraction-validator --extract .ai-context/scopes/<scope>/planning/plan-doc-extract.json --threshold 0.3 --json
 analysis-extraction-validator --extract <path> --dry-run   # finding 출력만 / exit 0
 ```
 

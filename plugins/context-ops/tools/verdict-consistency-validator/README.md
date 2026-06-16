@@ -18,7 +18,7 @@ analysis stage(gate#0) 등록 validator. BC 분류 **verdict**(`domain.json#boun
 
 ## 사용
 ```bash
-node tools/verdict-consistency-validator/src/cli.js --root <project>/.ai-context/output --json            # advisory(기본)
+node tools/verdict-consistency-validator/src/cli.js --root <project>/.ai-context/base --json            # advisory(기본)
 CONTEXT_OPS_VERDICT_ENFORCE=1 node tools/verdict-consistency-validator/src/cli.js --root <…> --json        # enforce(HARD)
 ```
 exit 0(clean / advisory 는 항상 0) / 1(enforce + critical|high) / 2(usage).

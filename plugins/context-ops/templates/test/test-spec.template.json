@@ -8,8 +8,8 @@
     "$comment": "v11.0.0 test-spec.json template placeholder (chain 4 / test 산출물). confidence=bare number (schema:number / meta-confidence.schema.json). 근거: AC-* 마다 실 test 코드 생성 (RED 의무 / impl 부재 / 모든 test fail) + 5종 물증 7 필드 실 runner. framework 별 분기 (vitest/junit5/pytest/playwright/schemathesis/axe-core 등). BE contract framework → openapi_contract_ref 의무 / FE visual framework → visual_regression_ref 의무. test_cases Example 1=BE unit(junit5 / contract ❌ → openapi_contract_ref 불필요) / Example 2=BE contract(schemathesis → openapi_contract_ref required) / Example 3=FE visual(playwright-visual → visual_regression_ref required) / Example 4=S2(AX전환) characterization(test_intent=characterization / expected_outcome=pass / 기존 legacy GREEN) / Example 5=S2 augmentation(test_intent=augmentation / expected_outcome=fail / 신규 RED) — gate-eval per_tc_outcome 분기 scaffold (DEC-2026-05-30-s2-gate-slice / v11.11.0). _base-apply-template instantiate."
   },
   "derivation_source": {
-    "acceptance_criteria_path": ".ai-context/output/acceptance-criteria.json",
-    "behavior_spec_path": ".ai-context/output/behavior-spec.json"
+    "acceptance_criteria_path": ".ai-context/base/acceptance-criteria.json",
+    "behavior_spec_path": ".ai-context/base/behavior-spec.json"
   },
   "test_cases": [
     {
@@ -25,7 +25,7 @@
       "fail_mode": "compile_import_fail",
       "test_run_evidence": {
         "test_runner_version": "junit-jupiter 5.10.0",
-        "test_runner_stdout_path": ".ai-context/output/test-evidence/TC-DOMAIN-001.stdout.log",
+        "test_runner_stdout_path": ".ai-context/base/test-evidence/TC-DOMAIN-001.stdout.log",
         "invocation_timestamp": "2026-01-01T00:00:00+09:00",
         "duration_ms": 1234,
         "pass_count": 0,
@@ -52,13 +52,13 @@
       },
       "test_run_evidence": {
         "test_runner_version": "schemathesis 3.27.0",
-        "test_runner_stdout_path": ".ai-context/output/test-evidence/TC-DOMAIN-002.stdout.log",
+        "test_runner_stdout_path": ".ai-context/base/test-evidence/TC-DOMAIN-002.stdout.log",
         "invocation_timestamp": "2026-01-01T00:00:00+09:00",
         "duration_ms": 5678,
         "pass_count": 0,
         "fail_count": 1,
         "skip_count": 0,
-        "reproduction_command": "schemathesis run --base-url http://localhost:8080 .ai-context/output/openapi.yaml",
+        "reproduction_command": "schemathesis run --base-url http://localhost:8080 .ai-context/base/openapi.yaml",
         "result_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
         "report_format": "junit_xml"
       }
@@ -81,7 +81,7 @@
       },
       "test_run_evidence": {
         "test_runner_version": "playwright 1.43.0",
-        "test_runner_stdout_path": ".ai-context/output/test-evidence/TC-DOMAIN-003.stdout.log",
+        "test_runner_stdout_path": ".ai-context/base/test-evidence/TC-DOMAIN-003.stdout.log",
         "invocation_timestamp": "2026-01-01T00:00:00+09:00",
         "duration_ms": 8901,
         "pass_count": 0,
@@ -104,7 +104,7 @@
       "test_intent": "characterization",
       "test_run_evidence": {
         "test_runner_version": "junit-jupiter 5.10.0",
-        "test_runner_stdout_path": ".ai-context/output/test-evidence/TC-DOMAIN-004.stdout.log",
+        "test_runner_stdout_path": ".ai-context/base/test-evidence/TC-DOMAIN-004.stdout.log",
         "invocation_timestamp": "2026-01-01T00:00:00+09:00",
         "duration_ms": 980,
         "pass_count": 1,
@@ -128,7 +128,7 @@
       "fail_mode": "assertion_fail",
       "test_run_evidence": {
         "test_runner_version": "junit-jupiter 5.10.0",
-        "test_runner_stdout_path": ".ai-context/output/test-evidence/TC-DOMAIN-005.stdout.log",
+        "test_runner_stdout_path": ".ai-context/base/test-evidence/TC-DOMAIN-005.stdout.log",
         "invocation_timestamp": "2026-01-01T00:00:00+09:00",
         "duration_ms": 1010,
         "pass_count": 0,

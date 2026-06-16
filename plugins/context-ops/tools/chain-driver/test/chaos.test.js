@@ -123,7 +123,7 @@ describe('chaos — intervention-log JSONL concurrency', () => {
 	it('Senior F5#2 — small lines (< 4KB) preserve newline boundary under append', () => {
 		const root = join(tmp, 'jsonl1');
 		initState(root, 'jsonl1');
-		const logPath = join(root, '.ai-context/output/intervention-log.jsonl');
+		const logPath = join(root, '.ai-context/runtime/intervention-log.jsonl');
 
 		// 3 short lines appended sequentially.
 		const lines = [
@@ -161,7 +161,7 @@ describe('chaos — intervention-log JSONL concurrency', () => {
 		// 다중 writer 시나리오는 sp6-c6 carry (다중 사용자 driver state 동시성) 로 위임.
 		const root = join(tmp, 'jsonl2');
 		initState(root, 'jsonl2');
-		const logPath = join(root, '.ai-context/output/intervention-log.jsonl');
+		const logPath = join(root, '.ai-context/runtime/intervention-log.jsonl');
 
 		const longMessage = 'x'.repeat(8192);
 		const line = JSON.stringify({

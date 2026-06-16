@@ -49,7 +49,7 @@ chain 0~2 / 4~5 skill ❌ — 각 stage agent 권한.
 
 ## 호출 절차 (사용자 또는 main agent 가 dispatch 시)
 
-1. **input 확인** — `.ai-context/output/behavior-spec.json` + `acceptance-criteria.json` (chain 2 산출 / gate #2 go 결단 후) 모두 존재? 부재 시 → spec-agent 권한 위임 + blocker 등재
+1. **input 확인** — `.ai-context/base/behavior-spec.json` + `acceptance-criteria.json` (chain 2 산출 / gate #2 go 결단 후) 모두 존재? 부재 시 → spec-agent 권한 위임 + blocker 등재
 
 2. **plan-decompose-and-sequence skill 호출** — task-plan.tasks[] 본격 작성:
    - BHV 별 task 묶음 (1~3 AC 강제 / 같은 layer + 같은 module)
@@ -80,14 +80,14 @@ chain 0~2 / 4~5 skill ❌ — 각 stage agent 권한.
    ```bash
    # plan stage coverage (Senior BLOCKER-2 exit code contract 본격 작동)
    node ${CLAUDE_PLUGIN_ROOT}/tools/plan-coverage-validator/src/cli.js \
-     --task-plan  .ai-context/output/task-plan.json \
-     --acceptance .ai-context/output/acceptance-criteria.json
+     --task-plan  .ai-context/base/task-plan.json \
+     --acceptance .ai-context/base/acceptance-criteria.json
 
    # schema validation (additionalProperties:false strict)
-   node ${CLAUDE_PLUGIN_ROOT}/tools/schema-validator/src/cli.js .ai-context/output/task-plan.json
+   node ${CLAUDE_PLUGIN_ROOT}/tools/schema-validator/src/cli.js .ai-context/base/task-plan.json
 
    # SP 4분류 hard-gate — DB 자산(stored procedure) 보유 시 (sp_unclassified_at_plan critical / db-assets-always-on + sp-conversion-policy 2026-05-28 mandate / P9)
-   node ${CLAUDE_PLUGIN_ROOT}/tools/db-assets-validator/src/cli.js .ai-context/output/task-plan.json
+   node ${CLAUDE_PLUGIN_ROOT}/tools/db-assets-validator/src/cli.js .ai-context/base/task-plan.json
    ```
 
    exit 0 = ok / exit 1 = blocking findings (plan-coverage + schema + db-assets 합산 → gate#3 block).
@@ -106,22 +106,22 @@ chain 0~2 / 4~5 skill ❌ — 각 stage agent 권한.
 ## paradigm 정합
 
 - **본 agent = chain 3 (plan) gate #3 hard gate**
-- **본체 산출 경로** = `.ai-context/output/task-plan.json` (discovery-spec.json (discovery 산출) 과 명확히 분리)
+- **본체 산출 경로** = `.ai-context/base/task-plan.json` (discovery-spec.json (discovery 산출) 과 명확히 분리)
 - **lifecycle-contract §Agent column plan row** = 본 agent (plan stage = ticket cascade 단일 생성 지점 / `ticket-sync` skill R20-prime 연동)
 
 ## 산출 자산 (chain 3)
 
-- `.ai-context/output/task-plan.json` (schemas/task-plan.schema.json 의무 / json 단독 SSOT)
-- `.ai-context/output/findings.md` (누적)
-- `.ai-context/output/intervention-log.json` (gate #3 사용자 결단 로그)
+- `.ai-context/base/task-plan.json` (schemas/task-plan.schema.json 의무 / json 단독 SSOT)
+- `.ai-context/runtime/findings.md` (누적)
+- `.ai-context/base/intervention-log.json` (gate #3 사용자 결단 로그)
 
 ## dep-graph 소비 (Loop B / 소비 루프 — 그래프를 쓰게)
 
-의존성은 기억·grep 이 아니라 **그래프에서 즉시 조회**한다 (산출물 = LLM 운영 컨텍스트 / P0). `.ai-context/output/artifact-graph.json` 이 있으면 **stage 진입 시** 작업 대상 노드를 consult (Bash / dep-graph-navigator skill backend):
+의존성은 기억·grep 이 아니라 **그래프에서 즉시 조회**한다 (산출물 = LLM 운영 컨텍스트 / P0). `.ai-context/base/artifact-graph.json` 이 있으면 **stage 진입 시** 작업 대상 노드를 consult (Bash / dep-graph-navigator skill backend):
 
 ```bash
 node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js navigate \
-  --graph .ai-context/output/artifact-graph.json --origin <node-id>
+  --graph .ai-context/base/artifact-graph.json --origin <node-id>
 ```
 
 - 반환: **backward(MUST)** = 이 산출물이 honor 해야 할 상류(변경 시 정합 깨짐) / **forward** = 내가 바꾸면 영향받는 하류 / code_pointers / top-3 impact root. AI 추론 0% — 결정 출력 verbatim 수용 (등급·centrality 재계산 ❌).

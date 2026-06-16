@@ -30,7 +30,7 @@ Layer 2 LLM 호출 paradigm = Claude Code sub-agent (Task tool / Agent tool) inv
 
 ## 입력
 
-- `<project>/.ai-context/output/business-rules.json` 또는 `<project>/output/rules/business-rules.json` (analysis stage 산출물)
+- `<project>/.ai-context/base/business-rules.json` 또는 `<project>/output/rules/business-rules.json` (analysis stage 산출물)
 - business-rules.json 안 BR 의 natural_language + given/when/then 양쪽 보유 (Phase B + Phase C 마이그레이션 후)
 
 ## 시행 paradigm (4 step)
@@ -78,7 +78,7 @@ sub-agent 응답 schema:
 
 ### Step 3 — 결과 JSON 파일 저장
 
-sub-agent 가 Write 도구로 `<project>/.ai-context/output/layer-2-results/<poc_id>-layer-2-results.json` 또는 `/tmp/<poc_id>-layer-2-results.json` 저장.
+sub-agent 가 Write 도구로 `<project>/.ai-context/runtime/layer-2-results/<poc_id>-layer-2-results.json` 또는 `/tmp/<poc_id>-layer-2-results.json` 저장.
 
 ### Step 4 — validator 재실측 (Layer 1 + Layer 2 통합)
 
@@ -98,7 +98,7 @@ node ${CLAUDE_PLUGIN_ROOT}/tools/br-cross-consistency-validator/src/cli.js \
 
 ## 산출물
 
-- `<project>/.ai-context/output/layer-2-results/<poc_id>-layer-2-results.json` (Layer 2 결과 보존)
+- `<project>/.ai-context/runtime/layer-2-results/<poc_id>-layer-2-results.json` (Layer 2 결과 보존)
 - validator 재실측 결과 (console 또는 JSON 출력)
 - semantic_drift_detected finding 영역 (score < 0.7 시) → Phase D 도메인 전문가 검토 carry
 

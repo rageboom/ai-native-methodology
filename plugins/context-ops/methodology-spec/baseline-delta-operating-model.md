@@ -7,7 +7,7 @@
 
 레거시 전체 full analysis 는 비용이 크다 (대형 코드베이스 context 부담 + 시간). 한 번 분석한 baseline 을 **두 종류의 baseline** 으로 고정하고, 이후 작업은 **변경분(delta)** 만 다룬다:
 
-- **분석 baseline** = canonical global `.ai-context/output/` (7대 BE + 8 FE 산출물). "이 시스템이 무엇인가" 의 단일 진실.
+- **분석 baseline** = canonical global `.ai-context/base/` (7대 BE + 8 FE 산출물). "이 시스템이 무엇인가" 의 단일 진실.
 - **품질 baseline** = `.ai-context/baseline-<date>.json`. 진입 시점 finding 을 grandfather 하고 신규 작업만 ratchet (품질 단조 증가).
 
 두 baseline 은 axis 가 다르다 — 분석 baseline = **사실 스냅샷** / 품질 baseline = **gate 기준선**. (혼동 금지.)
@@ -16,12 +16,12 @@
 
 | 자산                                        | 역할                                                                                                                                                      | 위치                                                                                                                                                                                  |
 | ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| canonical global                            | full analysis 산출물 (scope 무관 단일 진실)                                                                                                               | `.ai-context/output/`                                                                                                                                                                       |
+| canonical global                            | full analysis 산출물 (scope 무관 단일 진실)                                                                                                               | `.ai-context/base/`                                                                                                                                                                       |
 | 품질 baseline                               | finding ratchet 기준선                                                                                                                                    | `.ai-context/baseline-<date>.json`                                                                                                                                                          |
-| scope work-unit                             | feature/도메인 단위 작업 격리                                                                                                                             | `.ai-context/<scope>/manifest.{json,md}` (`work-unit-manifest.schema.json`)                                                                                                                 |
+| scope work-unit                             | feature/도메인 단위 작업 격리                                                                                                                             | `.ai-context/scopes/<scope>/manifest.{json,md}` (`work-unit-manifest.schema.json`)                                                                                                                 |
 | `analysis_refs` (schema 정공 명)            | scope ↔ canonical global 역인덱스 — 5 이식성 + DB 자산 4 (BR/endpoint/schemas/domain/antipattern + db_tables/db_procedures/db_functions/db_views)         | scope manifest 내부 (자연어 "related_artifacts" 와 동의어 / schema 필드 = `analysis_refs`)                                                                                            |
 | scope 슬라이싱 (실현분)                  | drift FP 제거 + validation 분모 정확화 (사본 파일 ❌ / SSOT 단일 / scope 는 canonical full 참조)                                              | drift = `sync.js hashBusinessRulesSubset`(bounded_context 필터 / v0.14.0) · validation 분모 = discovery-extraction-validator scope-token(v0.30.0). ⟨context-reduction prefix 필터 `subsetAnalysisRefs` = retired·미실현 — 근거 ## 인용⟩                                                                                |
-| canonical global DB 자산 디렉토리           | DB always-on 정책 (`db-assets-always-on.md` §4) 의 실 저장 위치                                                                                           | `.ai-context/output/stored-procedures/` (SP 정적 분석) + `.ai-context/output/functions/` (Function 정리) — `schema.json` 보존 (Tables + ERD axis / erd 는 schema.json 내 관계)                    |
+| canonical global DB 자산 디렉토리           | DB always-on 정책 (`db-assets-always-on.md` §4) 의 실 저장 위치                                                                                           | `.ai-context/base/stored-procedures/` (SP 정적 분석) + `.ai-context/base/functions/` (Function 정리) — `schema.json` 보존 (Tables + ERD axis / erd 는 schema.json 내 관계)                    |
 | `sync_state` (M4)                           | canonical global 변경 → scope drift 표지                                                                                                                  | scope manifest 내부 (`drift_detected` / `last_synced_at` / `sync_sources`)                                                                                                            |
 | `chain-driver sync`                         | drift scope 에 cascade (통제된 동기)                                                                                                                      | `chain-driver sync <project> --scope <slug>`                                                                                                                                          |
 
@@ -34,7 +34,7 @@ chain-driver init <project>
 "이 코드베이스 분석 시작"        → analysis stage full run
 ```
 
-→ canonical global `.ai-context/output/` (15종 중 해당분 + DB 자산 — `stored-procedures/` + `functions/` + `schema.json`) + `baseline-<date>.json` 생성. 이것이 **이후 모든 scope 의 기준선**. 1회성 — 매번 반복 ❌. DB always-on 정책 (`db-assets-always-on.md` §3) — Tables/Views/Functions/SP/ERD/도메인 노트 모두 입력 의무 (누락 시 사용자 결단).
+→ canonical global `.ai-context/base/` (15종 중 해당분 + DB 자산 — `stored-procedures/` + `functions/` + `schema.json`) + `baseline-<date>.json` 생성. 이것이 **이후 모든 scope 의 기준선**. 1회성 — 매번 반복 ❌. DB always-on 정책 (`db-assets-always-on.md` §3) — Tables/Views/Functions/SP/ERD/도메인 노트 모두 입력 의무 (누락 시 사용자 결단).
 
 ### (2) 신규 건마다 — scope delta
 

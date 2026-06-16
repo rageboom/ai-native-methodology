@@ -69,9 +69,9 @@ model: opus
 
 ## 산출 자산
 
-- `.ai-context/output/discovery-spec.json` (`schemas/discovery-spec.schema.json` 의무 — carry C-discovery-schema / json 단독 SSOT)
-- `.ai-context/output/findings.md` (discovery stage 의 발견 사항 누적)
-- `.ai-context/output/intervention-log.json` (discovery gate 사용자 결단 로그)
+- `.ai-context/base/discovery-spec.json` (`schemas/discovery-spec.schema.json` 의무 — carry C-discovery-schema / json 단독 SSOT)
+- `.ai-context/runtime/findings.md` (discovery stage 의 발견 사항 누적)
+- `.ai-context/base/intervention-log.json` (discovery gate 사용자 결단 로그)
 
 ## 70~80% 한계 명시
 
@@ -87,11 +87,11 @@ model: opus
 
 ## dep-graph 소비 (Loop B / 소비 루프 — 그래프를 쓰게)
 
-의존성은 기억·grep 이 아니라 **그래프에서 즉시 조회**한다 (산출물 = LLM 운영 컨텍스트 / P0). `.ai-context/output/artifact-graph.json` 이 있으면 **stage 진입 시** 작업 대상 노드를 consult (Bash / dep-graph-navigator skill backend):
+의존성은 기억·grep 이 아니라 **그래프에서 즉시 조회**한다 (산출물 = LLM 운영 컨텍스트 / P0). `.ai-context/base/artifact-graph.json` 이 있으면 **stage 진입 시** 작업 대상 노드를 consult (Bash / dep-graph-navigator skill backend):
 
 ```bash
 node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js navigate \
-  --graph .ai-context/output/artifact-graph.json --origin <node-id>
+  --graph .ai-context/base/artifact-graph.json --origin <node-id>
 ```
 
 - 반환: **backward(MUST)** = 이 산출물이 honor 해야 할 상류(변경 시 정합 깨짐) / **forward** = 내가 바꾸면 영향받는 하류 / code_pointers / top-3 impact root. AI 추론 0% — 결정 출력 verbatim 수용 (등급·centrality 재계산 ❌).

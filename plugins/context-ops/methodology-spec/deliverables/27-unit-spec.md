@@ -16,7 +16,7 @@
 ## 2. 형식
 
 ```
-.ai-context/<scope>/.../unit-spec.json   (또는 analysis output / scope 별)
+.ai-context/scopes/<scope>/.../unit-spec.json   (또는 analysis output / scope 별)
 사용자 프로젝트 (실 unit test 코드):
 └── src/test/.../**/{Class}Test.{java,ts,py}   # test_layer=unit
 ```

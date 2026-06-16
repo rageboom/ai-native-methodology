@@ -15,7 +15,7 @@
 ## 2. 형식
 
 ```
-.ai-context/output/chain-3-test/
+.ai-context/base/chain-3-test/
 ├── test-spec.json
 ├── test-report.md   # 사람 눈
 ├── coverage-report.md
@@ -57,8 +57,8 @@
 ```yaml
 test_run_evidence:
   test_runner_version: 'jest 29.7.0' # 진짜 --version 출력
-  test_runner_stdout_path: '.ai-context/output/chain-3-test/runs/2026-05-06T12-00-00/stdout.log'
-  test_runner_stderr_path: '.ai-context/output/chain-3-test/runs/2026-05-06T12-00-00/stderr.log' # optional
+  test_runner_stdout_path: '.ai-context/base/chain-3-test/runs/2026-05-06T12-00-00/stdout.log'
+  test_runner_stderr_path: '.ai-context/base/chain-3-test/runs/2026-05-06T12-00-00/stderr.log' # optional
   invocation_timestamp: '2026-05-06T12:00:00Z'
   duration_ms: 4523
   pass_count: 0 # RED 의무

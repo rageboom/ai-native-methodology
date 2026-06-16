@@ -30,7 +30,7 @@
 
 ```
 analysis Phase 1 (1회)
-  ↓ SP/Function 정적 분석 → canonical global .ai-context/output/stored-procedures/
+  ↓ SP/Function 정적 분석 → canonical global .ai-context/base/stored-procedures/
   ↓
 scope chain 1 discovery
   ↓ related_artifacts 역인덱스에 scope 관련 SP list 추가

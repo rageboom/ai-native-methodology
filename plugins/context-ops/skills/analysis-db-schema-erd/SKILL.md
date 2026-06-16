@@ -44,7 +44,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 산출물
 
-- `<user-project>/.ai-context/output/shared/schema.json` (json 단독 SSOT — erd.mermaid·db-schema.md 미산출)
+- `<user-project>/.ai-context/base/shared/schema.json` (json 단독 SSOT — erd.mermaid·db-schema.md 미산출)
 
 ## greenfield (code-optional) mode
 

@@ -30,9 +30,9 @@ sub-plan-3 plan 의 D9 옵션 A — `child_process.spawnSync('npm', ['test', '--
 
 **Test Runner Invocation Contract** 를 다음 5 정책으로 명문화 ( Aider 패턴 채택):
 
-### 1. 사용자 명시 우선 — `.ai-context/config/test-cmd.json`
+### 1. 사용자 명시 우선 — `.ai-context/runtime/config/test-cmd.json`
 
-프로젝트 루트의 `.ai-context/config/test-cmd.json` 이 single source of truth.
+프로젝트 루트의 `.ai-context/runtime/config/test-cmd.json` 이 single source of truth.
 
 ```json
 {
@@ -44,9 +44,9 @@ sub-plan-3 plan 의 D9 옵션 A — `child_process.spawnSync('npm', ['test', '--
 	"timeout_ms": 600000,
 	"flaky_retry_per_test": 2,
 	"report_format": "sarif-2.1.0",
-	"report_path": ".ai-context/output/test-report.sarif",
-	"stdout_path": ".ai-context/output/evidence/test-stdout.txt",
-	"stderr_path": ".ai-context/output/evidence/test-stderr.txt",
+	"report_path": ".ai-context/runtime/test-report.sarif",
+	"stdout_path": ".ai-context/runtime/evidence/test-stdout.txt",
+	"stderr_path": ".ai-context/runtime/evidence/test-stderr.txt",
 	"coverage_report_path": "coverage/lcov.info",
 	"allow_execute": true
 }
@@ -56,7 +56,7 @@ sub-plan-3 plan 의 D9 옵션 A — `child_process.spawnSync('npm', ['test', '--
 
 ### 2. 사용자 미명시 시 — `inventory.json` stack signal 자동 추론
 
-`.ai-context/config/test-cmd.json` 부재 시 `inventory.json` 의 `stack_signals` 로 자동 추론:
+`.ai-context/runtime/config/test-cmd.json` 부재 시 `inventory.json` 의 `stack_signals` 로 자동 추론:
 
 | stack_signal      | inferred test_cmd              | timeout_ms |
 | ----------------- | ------------------------------ | ---------- |
@@ -74,7 +74,7 @@ sub-plan-3 plan 의 D9 옵션 A — `child_process.spawnSync('npm', ['test', '--
 
 ### 3. 사용자 명시 override — CLI `--test-cmd <shell>`
 
-`test-impl-pass-validator --test-cmd "<shell>"` 옵션으로 한 번만 override 가능. 영구 override = `.ai-context/config/test-cmd.json` 갱신.
+`test-impl-pass-validator --test-cmd "<shell>"` 옵션으로 한 번만 override 가능. 영구 override = `.ai-context/runtime/config/test-cmd.json` 갱신.
 
 ### 4. no-simulation 강화 — `--allow-execute` 의무
 
@@ -132,7 +132,7 @@ linter_output_path       (impl-spec only / optional)
 
 ### 부정
 
-- 사용자가 `.ai-context/config/test-cmd.json` 작성 의무 → marginal friction (Aider 사례 = 1년 운영 입증 / 산업 검증된 friction).
+- 사용자가 `.ai-context/runtime/config/test-cmd.json` 작성 의무 → marginal friction (Aider 사례 = 1년 운영 입증 / 산업 검증된 friction).
 - inventory.stack_signals 추론 정확도 ≤ 80% (5 framework 외 시 fallback 의무).
 
 ### 중립

@@ -102,8 +102,8 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 
 ## 산출물
 
-- `<user-project>/.ai-context/output/shared/error-mapping-spec.json` (산출물 16)
-- raw Semgrep 출력 (`<user-project>/.ai-context/output/tool-runs/error-mapping-*.sarif`)
+- `<user-project>/.ai-context/base/shared/error-mapping-spec.json` (산출물 16)
+- raw Semgrep 출력 (`<user-project>/.ai-context/runtime/tool-runs/error-mapping-*.sarif`)
 - baseline 파일 (`<user-project>/.ai-context/baseline/error-mapping-baseline.json`)
 
 ## CI 통합 (drift-check.yml 정합)

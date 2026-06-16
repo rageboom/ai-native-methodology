@@ -7,6 +7,7 @@
 import { DatabaseSync } from 'node:sqlite';
 import { existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
+import { resolveProjectRoot } from '../../_shared/project-root.js';
 
 const SYMBOL_KINDS = ['function', 'method'];
 

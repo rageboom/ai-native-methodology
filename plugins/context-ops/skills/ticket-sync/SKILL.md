@@ -38,7 +38,7 @@ analysis/discovery/spec stage 에서 본 skill 호출 시 `F-TICKETSYNC-012 stag
 | ---------------------------- | ------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `stage`                      | const   | **`plan`**                                | `plan` 단일 const (analysis/discovery/spec/test/implement enum 미지원)                                                                                                                                                                                                                                                  |
 | `phase`                      | enum    | **`exit`**                                | `enter` (plan stage 진입 작업 Task) \| `exit` (4-level cascade 일괄 / 본 skill 본 흐름) \| `update-test-red` (chain 4 RED) \| `update-impl-green` (chain 5 GREEN)                                                                                                                                                                    |
-| `scope`                      | string  | state.scope                               | G3 scope slug (예: `car` / `payroll`) — `.ai-context/<scope>/` 경로 추출                                                                                                                                                                                                                                                                   |
+| `scope`                      | string  | state.scope                               | G3 scope slug (예: `car` / `payroll`) — `.ai-context/scopes/<scope>/` 경로 추출                                                                                                                                                                                                                                                                   |
 | `dry_run`                    | boolean | **`true`**                                | default true — reproduction_command 만 print / MCP 호출 ❌. 사용자 OK 후 `dry_run=false` 명시 호출.                                                                                                                                                                                                                                  |
 | `confluence_emit`            | boolean | `false`                                   | plan stage exit 시 Initiative-level Confluence overview page 생성 (default false)                                                                                                                                                                                                                                                    |
 | `parent_epic`                | string  | (없음)                                    | 명시 시 standard flow 의 Initiative 생성 skip + 본 Epic 키 하위에 직접 매핑. Initiative 생성 권한 부재 환경 / verification meta-cycle / migration carry / 기존 Epic 재사용 시 사용. `mode=verification` 시 의무. 예: `DWPD-1442`.                                                                                                    |
@@ -165,12 +165,12 @@ resolve(role→issuetype) · parent linking · body 템플릿 · summary 네이�
 
 ```bash
 node ${CLAUDE_PLUGIN_ROOT}/tools/ticket-cascade-builder/src/cli.js \
-  --task-plan .ai-context/output/task-plan.json \
-  --operational-task .ai-context/output/operational-task.json \
-  --behavior-spec .ai-context/output/behavior-spec.json \
-  --acceptance-criteria .ai-context/output/acceptance-criteria.json \
+  --task-plan .ai-context/base/task-plan.json \
+  --operational-task .ai-context/base/operational-task.json \
+  --behavior-spec .ai-context/base/behavior-spec.json \
+  --acceptance-criteria .ai-context/base/acceptance-criteria.json \
   --config .ai-context/ticket-sync-config.yaml \
-  --scope <scope> --out .ai-context/output/cascade-plan.json
+  --scope <scope> --out .ai-context/runtime/cascade-plan.json
 ```
 
 산출 `cascade-plan.json` (schema: `cascade-plan.schema.json`):
@@ -250,7 +250,7 @@ for call in cascade-plan.calls (order asc):
 
 ### 단계 7 — Evidence 기록
 
-`<project>/.ai-context/output/evidence/ticket-sync-plan-<phase>-<timestamp>.json` 작성 (schema: `ticket-sync-evidence.schema.json` / stage const=plan):
+`<project>/.ai-context/runtime/evidence/ticket-sync-plan-<phase>-<timestamp>.json` 작성 (schema: `ticket-sync-evidence.schema.json` / stage const=plan):
 
 골격 (전체 필드·제약 = `schemas/ticket-sync-evidence.schema.json` SSOT):
 
@@ -269,7 +269,7 @@ for call in cascade-plan.calls (order asc):
 > **conformance verify 의무** — evidence 작성 후 gate-green 전에:
 > ```bash
 > node ${CLAUDE_PLUGIN_ROOT}/tools/ticket-cascade-builder/src/cli.js verify \
->   --plan .ai-context/output/cascade-plan.json --evidence <위 evidence.json>
+>   --plan .ai-context/runtime/cascade-plan.json --evidence <위 evidence.json>
 > ```
 > exit 1 (위반) 시 gate green ❌ — 스킬이 cascade-plan 을 어겼다는 결정론 신호. `mcp_invocations[]` 에 `issue_type`·`ticket_level`·`parent_ticket_id`·`link_type` 캡쳐 의무 (verify 입력).
 
@@ -279,7 +279,7 @@ for call in cascade-plan.calls (order asc):
 
 ### 단계 9 — intervention-log append
 
-`.ai-context/output/intervention-log.jsonl` 에 1 entry append — 필드: `timestamp` / `skill:"ticket-sync"` / `stage:"plan"` / `phase` / `scope` / `decision:"ticket_sync_confirmed"` / `mcp_invocation_count` / `idempotency_skip_count` / `cascade_complete` / `evidence_ref` / `user`.
+`.ai-context/runtime/intervention-log.jsonl` 에 1 entry append — 필드: `timestamp` / `skill:"ticket-sync"` / `stage:"plan"` / `phase` / `scope` / `decision:"ticket_sync_confirmed"` / `mcp_invocation_count` / `idempotency_skip_count` / `cascade_complete` / `evidence_ref` / `user`.
 
 ## 금지 / 강제력
 

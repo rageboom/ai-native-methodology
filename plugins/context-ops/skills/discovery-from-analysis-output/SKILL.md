@@ -15,7 +15,7 @@ chain 1 (discovery) 의 **진입 skill** (analysis-output 채널). 1차 use case
 
 ## 입력
 
-`<project>/.ai-context/output/` 안:
+`<project>/.ai-context/base/` 안:
 
 - 7대 산출물: inventory / domain / rules / architecture / schema / openapi / antipatterns
 - 8 FE 산출물 (있으면): ui-spec / state-map / visual-manifest / a11y-spec / i18n-spec / static-security-spec / form-validation-spec / type-spec / legacy-spectrum
@@ -25,7 +25,7 @@ chain 1 (discovery) 의 **진입 skill** (analysis-output 채널). 1차 use case
 
 ## 산출물
 
-- `<project>/.ai-context/output/discovery-spec.json` (schemas/discovery-spec.schema.json 의무 / json 단독 SSOT)
+- `<project>/.ai-context/base/discovery-spec.json` (schemas/discovery-spec.schema.json 의무 / json 단독 SSOT)
 
 ## no-simulation 의무 (source-grounded)
 
@@ -55,9 +55,9 @@ discovery-spec 의 모든 BR-INTENT 와 UC 는 다음 5 필드 중 하나 이상
 
    ```bash
    node ${CLAUDE_PLUGIN_ROOT}/tools/discovery-extraction-validator/src/cli.js \
-     --discovery .ai-context/output/discovery-spec.json \
-     --rules     .ai-context/output/business-rules.json \
-     --domain    .ai-context/output/shared/domain.json \
+     --discovery .ai-context/base/discovery-spec.json \
+     --rules     .ai-context/base/business-rules.json \
+     --domain    .ai-context/base/shared/domain.json \
      --json
    ```
 
@@ -66,7 +66,7 @@ discovery-spec 의 모든 BR-INTENT 와 UC 는 다음 5 필드 중 하나 이상
 7. **schema-validator 자동 검증**:
 
    ```bash
-   node ${CLAUDE_PLUGIN_ROOT}/tools/schema-validator/src/cli.js .ai-context/output/discovery-spec.json
+   node ${CLAUDE_PLUGIN_ROOT}/tools/schema-validator/src/cli.js .ai-context/base/discovery-spec.json
    ```
 
 8. **gate #1 호출** — `_base-invoke-go-stop-gate` skill 호출. 사용자 검토 cluster 5~6:
@@ -102,7 +102,7 @@ chain 1 진입 시 사용자가 명시적으로 결단하기 어려운 BR-INTENT
 - **`user-explicit`** — 사용자가 명시적으로 답한 결단. `revisit_required: false` default. 사용자가 명시 의사를 표시한 path 만 본 enum 사용.
 - **`AI-default`** — Auto Mode 에서 AI 가 1차 default 적용 (예: "첫 옵션 자동 선택" / "BE escalate placeholder UI carry"). `revisit_required: true` 의무 + 후속 chain 2/3/4 stage gate 에서 사용자 confirm 의무.
 - **`AI-investigation-complete`** — AI 가 legacy code grep / 도메인 분석 / source-grounded evidence 로 결단 추출 (단순 default 가 아닌 본문 근거). `revisit_required: true` 권고 (사용자 검토).
-- **`carry`** — 이전 cycle / iter 의 결단 인계. `rationale` 에 evidence path (예: `.ai-context/output/iter-3/discovery-spec.json#decisions[2]`) 인용 의무.
+- **`carry`** — 이전 cycle / iter 의 결단 인계. `rationale` 에 evidence path (예: `.ai-context/base/iter-3/discovery-spec.json#decisions[2]`) 인용 의무.
 
 ### Auto Mode 흐름
 

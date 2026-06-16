@@ -15,14 +15,14 @@ chain 3 (plan) 의 **ADR 작성 sub-skill**. task-plan.adrs[] + integration_poin
 
 ## 입력
 
-- `<project>/.ai-context/output/task-plan.json` (chain 3 진행 중 / tasks[] 채워진 상태)
-- `<project>/.ai-context/output/behavior-spec.json` (BHV-\*)
-- `<project>/.ai-context/output/acceptance-criteria.json` (AC-\*)
-- `<project>/.ai-context/output/analysis-output/*.json` (architecture / domain — integration point source)
+- `<project>/.ai-context/base/task-plan.json` (chain 3 진행 중 / tasks[] 채워진 상태)
+- `<project>/.ai-context/base/behavior-spec.json` (BHV-\*)
+- `<project>/.ai-context/base/acceptance-criteria.json` (AC-\*)
+- `<project>/.ai-context/base/analysis-output/*.json` (architecture / domain — integration point source)
 
 ## 산출
 
-- `<project>/.ai-context/output/task-plan.json` 안 `adrs[]` 갱신 (schemas/task-plan.schema.json adrs[] 의무)
+- `<project>/.ai-context/base/task-plan.json` 안 `adrs[]` 갱신 (schemas/task-plan.schema.json adrs[] 의무)
 - 본 ADR 의 source-of-truth = task-plan.adrs[]. 별도 `decisions/DEC-*.md` 작성 = 산업 표준 ADR (Michael Nygard) 정합 권고 (사용자 결단 영역).
 
 ## ADR 자동 판정 trigger (Nygard 원본 5 category 기반 사내 구체화)
@@ -80,7 +80,7 @@ Nygard 원본 5 category (`task-plan.schema.json` adrs[].trigger_category enum �
 5. **자동 검증** (plan-coverage-validator 통합 검증 단계에서 schema validation 자동):
 
    ```bash
-   node ${CLAUDE_PLUGIN_ROOT}/tools/schema-validator/src/cli.js .ai-context/output/task-plan.json
+   node ${CLAUDE_PLUGIN_ROOT}/tools/schema-validator/src/cli.js .ai-context/base/task-plan.json
    ```
 
 6. **industry-case-researcher sub-agent 호출 권장** — risk 도출 3중 망 paradigm 안 ADR 대안 도출 보강 (외부 유사 결정 사례 carry).

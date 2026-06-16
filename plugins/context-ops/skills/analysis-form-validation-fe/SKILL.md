@@ -43,8 +43,8 @@ Zod / Yup / RHF / class-validator 등에서 form validation 규칙 추출 → bu
 
 ## 산출물
 
-- `<user-project>/.ai-context/output/business-rules.json` (fe_validation 추가)
-- `<user-project>/.ai-context/output/domains/<BC>/form-validation-spec.json`
+- `<user-project>/.ai-context/base/business-rules.json` (fe_validation 추가)
+- `<user-project>/.ai-context/base/domains/<BC>/form-validation-spec.json`
 
 ## 인용
 

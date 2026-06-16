@@ -205,6 +205,60 @@ test('no-domains N/A — domains/ 부재 → info(비차단) / 게이트 영향 
 	cleanup(root);
 });
 
+test('C5 duplicate-artifact — business-rules.json + business-rules/ dir 공존 → high(enforce)', () => {
+	const root = makeTree({
+		registry: [{ id: 'BC-ACM', verdict: 'core', verdict_basis: { write_ops: 5 } }],
+		bcs: { 'BC-ACM': { select: 1, insert: 3, update: 2, delete: 0 } },
+	});
+	const bcDir = join(root, 'domains', 'BC-ACM');
+	writeFileSync(join(bcDir, 'business-rules.json'), JSON.stringify({ business_rules: [] }));
+	mkdirSync(join(bcDir, 'business-rules'), { recursive: true });
+	writeFileSync(join(bcDir, 'business-rules', 'stale.json'), '{}');
+	const r = validateVerdicts(root, { enforce: true });
+	const d = byKind(r, 'duplicate-artifact');
+	assert.equal(d.length, 1, JSON.stringify(r.findings));
+	assert.equal(d[0].severity, 'high');
+	cleanup(root);
+});
+
+test('C4 incomplete-tier — 선언 tier=full-leaf 인데 baseline 파일만 보유 → low (advisory)', () => {
+	const root = makeTree({
+		registry: [{ id: 'BC-PARTIAL', verdict: 'core', verdict_basis: { write_ops: 5 }, tier: 'full-leaf' }],
+		bcs: { 'BC-PARTIAL': { select: 1, insert: 3, update: 2, delete: 0 } },
+	});
+	const bcDir = join(root, 'domains', 'BC-PARTIAL');
+	writeFileSync(join(bcDir, 'business-rules.json'), '{}');
+	writeFileSync(join(bcDir, 'openapi.yaml'), 'openapi: 3.0.0');
+	const r = validateVerdicts(root); // advisory
+	const t = byKind(r, 'incomplete-tier');
+	assert.equal(t.length, 1, JSON.stringify(r.findings));
+	assert.equal(t[0].severity, 'low', 'tier 완전성은 advisory low(비차단)');
+	assert.equal(r.summary.high, 0);
+	cleanup(root);
+});
+
+test('C4 — 선언 tier=baseline 충족 → 무 / tier 미선언 BC → 검사 skip(추론 ❌)', () => {
+	const root = makeTree({
+		registry: [
+			{ id: 'BC-BASE', verdict: 'core', verdict_basis: { write_ops: 5 }, tier: 'baseline' },
+			{ id: 'BC-NOTIER', verdict: 'core', verdict_basis: { write_ops: 5 } },
+		],
+		bcs: {
+			'BC-BASE': { select: 1, insert: 3, update: 2, delete: 0 },
+			'BC-NOTIER': { select: 1, insert: 3, update: 2, delete: 0 },
+		},
+	});
+	for (const bc of ['BC-BASE', 'BC-NOTIER']) {
+		const d = join(root, 'domains', bc);
+		writeFileSync(join(d, 'business-rules.json'), '{}');
+		writeFileSync(join(d, 'openapi.yaml'), 'openapi: 3.0.0');
+	}
+	const r = validateVerdicts(root);
+	assert.equal(byKind(r, 'incomplete-tier').length, 0, '선언 baseline 충족 + 미선언 skip: ' + JSON.stringify(r.findings));
+	assert.equal(byKind(r, 'tier-unknown').length, 0);
+	cleanup(root);
+});
+
 test('summary tally 정합 — findings 의 severity 분포와 summary 일치', () => {
 	const root = makeTree({
 		registry: [{ id: 'BC-A', verdict: 'core' }], // write=0 → contradiction

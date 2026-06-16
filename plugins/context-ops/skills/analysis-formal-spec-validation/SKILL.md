@@ -38,8 +38,8 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 
 ## 산출물
 
-- `<user-project>/.ai-context/output/cross-validation-report.json`
-- 각 도구의 raw 출력 보존 (`<user-project>/.ai-context/output/tool-runs/`)
+- `<user-project>/.ai-context/runtime/cross-validation-report.json`
+- 각 도구의 raw 출력 보존 (`<user-project>/.ai-context/runtime/tool-runs/`)
 
 ## 다음
 

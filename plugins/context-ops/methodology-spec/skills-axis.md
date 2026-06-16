@@ -275,7 +275,7 @@ paradigm 가능 입증 = `archive/v4-spike/_spike-planning-agent.md` (archive �
 main agent → Task(subagent_type="discovery-agent", prompt="""
 target: <project-path>
 goal: discovery-spec 추출 (discovery stage)
-input: .ai-context/output/{business-rules,domain,inventory,antipatterns}.json + findings.md
+input: .ai-context/base/{business-rules,domain,inventory,antipatterns}.json + findings.md
 """)
 
 # stage agent → skill chain (frontmatter skills 사전 주입 + Skill tool on-demand)

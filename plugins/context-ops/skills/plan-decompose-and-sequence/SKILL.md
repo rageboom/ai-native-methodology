@@ -16,13 +16,13 @@ chain 3 (plan) 의 **task 분해 sub-skill**. spec(BHV/AC) → task-plan.tasks[]
 
 ## 입력
 
-- `<project>/.ai-context/output/behavior-spec.json` (chain 2 산출 / BHV-\*)
-- `<project>/.ai-context/output/acceptance-criteria.json` (chain 2 산출 / AC-\*)
-- `<project>/.ai-context/output/discovery-spec.json` (chain 1 산출 / UC + intent context — cross-validation)
+- `<project>/.ai-context/base/behavior-spec.json` (chain 2 산출 / BHV-\*)
+- `<project>/.ai-context/base/acceptance-criteria.json` (chain 2 산출 / AC-\*)
+- `<project>/.ai-context/base/discovery-spec.json` (chain 1 산출 / UC + intent context — cross-validation)
 
 ## 산출
 
-- `<project>/.ai-context/output/task-plan.json` (schemas/task-plan.schema.json 의무 / tasks[] + dependencies[] + execution_order field)
+- `<project>/.ai-context/base/task-plan.json` (schemas/task-plan.schema.json 의무 / tasks[] + dependencies[] + execution_order field)
 
 ## task granularity 강제 (1~3 AC 묶음)
 
@@ -115,8 +115,8 @@ cycle 시 = `plan-coverage-validator validateDependencyCycle` critical finding (
 
    ```bash
    node ${CLAUDE_PLUGIN_ROOT}/tools/plan-coverage-validator/src/cli.js \
-     --task-plan  .ai-context/output/task-plan.json \
-     --acceptance .ai-context/output/acceptance-criteria.json
+     --task-plan  .ai-context/base/task-plan.json \
+     --acceptance .ai-context/base/acceptance-criteria.json
    ```
 
    exit 0 = ok / exit 1 = blocking findings (Senior BLOCKER-2 exit code contract).

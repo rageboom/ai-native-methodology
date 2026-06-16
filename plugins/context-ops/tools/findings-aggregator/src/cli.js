@@ -13,6 +13,12 @@ import {
 	aggregateForStage,
 	REQUIRED_VALIDATORS_PER_STAGE,
 } from './aggregator.js';
+import {
+	baseFileForRead,
+	baseDirForRead,
+	scopeFileForRead,
+	findingsFilePath,
+} from '../../_shared/ai-context-layout.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const SCRIPT_DIR = resolve(__filename, '..');
@@ -126,11 +132,11 @@ function resolveChainArtifact(projectDir, f, scopeCtx) {
 	if (scopeCtx?.scope) {
 		const sub = STAGE_SUBDIR[f];
 		if (sub) {
-			const cand = join(projectDir, '.ai-context', scopeCtx.scope, sub, f);
+			const cand = scopeFileForRead(projectDir, scopeCtx.scope, sub, f); // scopes/ NEW ↔ 최상위 OLD
 			if (existsSync(cand)) return cand;
 		}
 	}
-	return join(projectDir, '.ai-context/output', f);
+	return baseFileForRead(projectDir, f); // base/ NEW ↔ output/ OLD
 }
 
 // business-rules: scopeCtx 주입 시 BR-split leaf → canonical index(output/business-rules.json) existsSync 우선.
@@ -140,11 +146,11 @@ function resolveChainArtifact(projectDir, f, scopeCtx) {
 function resolveBusinessRules(projectDir, scopeCtx) {
 	if (scopeCtx?.scope) {
 		const bc = `BC-${scopeCtx.scope.toUpperCase()}`;
-		const zoneLeaf = join(projectDir, '.ai-context/output/domains', bc, 'business-rules.json');
+		const zoneLeaf = baseFileForRead(projectDir, 'domains', bc, 'business-rules.json');
 		if (existsSync(zoneLeaf)) return zoneLeaf;
-		const flatLeaf = join(projectDir, '.ai-context/output/business-rules', `${bc}.json`);
+		const flatLeaf = baseFileForRead(projectDir, 'business-rules', `${bc}.json`);
 		if (existsSync(flatLeaf)) return flatLeaf;
-		const canonical = join(projectDir, '.ai-context/output/business-rules.json');
+		const canonical = baseFileForRead(projectDir, 'business-rules.json');
 		if (existsSync(canonical)) return canonical;
 	}
 	return join(projectDir, 'input/business-rules.json');
@@ -154,9 +160,9 @@ function resolveBusinessRules(projectDir, scopeCtx) {
 //   v0.41.0 zone: shared/domain.json(zone) → output/domain.json(평면 backward-compat) 순.
 function resolveDomain(projectDir, scopeCtx) {
 	if (scopeCtx?.scope) {
-		const zoned = join(projectDir, '.ai-context/output/shared/domain.json');
+		const zoned = baseFileForRead(projectDir, 'shared', 'domain.json');
 		if (existsSync(zoned)) return zoned;
-		const flat = join(projectDir, '.ai-context/output/domain.json');
+		const flat = baseFileForRead(projectDir, 'domain.json');
 		if (existsSync(flat)) return flat;
 	}
 	return join(projectDir, 'input/domain.json');
@@ -169,7 +175,8 @@ export function buildValidatorArgs(validatorName, projectDir, stage, scopeCtx = 
 	switch (validatorName) {
 		case 'verdict-consistency-validator':
 			// analysis gate#0 — BC verdict 정합 (analysis output 루트 검사 / DEC-2026-06-15)
-			return ['--root', join(projectDir, '.ai-context', 'output'), '--json'];
+			// --enforce: high 유지 → gate-eval HARD block (fail-closed). DEC-2026-06-15 §enforce 승격(병렬 dogfood 머지 후).
+			return ['--root', baseDirForRead(projectDir), '--enforce', '--json'];
 		case 'discovery-extraction-validator':
 			return [
 				'--discovery',
@@ -360,7 +367,8 @@ function buildAnalysisArgs(validatorName, projectDir, artifacts) {
 		case 'verdict-consistency-validator': {
 			// DEC-2026-06-15 — BC verdict 정합. 입력 = analysis output 루트(전 BC sql-inventory + shared/domain.json).
 			const dir = abs(artifacts['analysis-output-dir']);
-			return ok(dir) ? ['--root', dir, '--json'] : null;
+			// --enforce: fail-closed (high 유지 → gate STOP). DEC-2026-06-15 enforce 승격.
+			return ok(dir) ? ['--root', dir, '--enforce', '--json'] : null;
 		}
 		default:
 			return null;
@@ -464,8 +472,7 @@ function main() {
 
 	if (!args.dryRun) {
 		const outputPath =
-			args.output ??
-			join(args.target, '.ai-context/output', `findings-${args.stage}.json`);
+			args.output ?? findingsFilePath(args.target, args.stage); // runtime/findings-<stage>.json
 		mkdirSync(dirname(outputPath), { recursive: true });
 		writeFileSync(
 			outputPath,

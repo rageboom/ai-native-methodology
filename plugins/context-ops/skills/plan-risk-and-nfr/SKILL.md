@@ -15,14 +15,14 @@ v9.x chain 3 (plan) 의 **risk + NFR + rollback sub-skill**. task-plan.risks[] +
 
 ## 입력
 
-- `<project>/.ai-context/output/task-plan.json` (chain 3 진행 중 / tasks[] + adrs[] 채워진 상태)
-- `<project>/.ai-context/output/acceptance-criteria.json` (AC-\* / NFR 관련 AC 식별 source)
-- `<project>/.ai-context/output/analysis-output/static-security-spec.json` (analysis stage 산출 / risk source)
-- `<project>/.ai-context/output/analysis-output/antipatterns.json` (AP-\* / risk source)
+- `<project>/.ai-context/base/task-plan.json` (chain 3 진행 중 / tasks[] + adrs[] 채워진 상태)
+- `<project>/.ai-context/base/acceptance-criteria.json` (AC-\* / NFR 관련 AC 식별 source)
+- `<project>/.ai-context/base/analysis-output/static-security-spec.json` (analysis stage 산출 / risk source)
+- `<project>/.ai-context/base/analysis-output/antipatterns.json` (AP-\* / risk source)
 
 ## 산출
 
-- `<project>/.ai-context/output/task-plan.json` 안 `risks[]` + `nfr_allocation[]` + `rollback_strategy` 갱신
+- `<project>/.ai-context/base/task-plan.json` 안 `risks[]` + `nfr_allocation[]` + `rollback_strategy` 갱신
 
 ## NFR allocation hard gate (Plan / Discovery soft 비대칭)
 
@@ -104,8 +104,8 @@ gate#3 hard-gate: `db-assets-validator` 가 `sp_unclassified_at_plan`(class 부�
 
    ```bash
    node ${CLAUDE_PLUGIN_ROOT}/tools/plan-coverage-validator/src/cli.js \
-     --task-plan  .ai-context/output/task-plan.json \
-     --acceptance .ai-context/output/acceptance-criteria.json
+     --task-plan  .ai-context/base/task-plan.json \
+     --acceptance .ai-context/base/acceptance-criteria.json
    ```
 
    `plan.nfr.allocation_missing` high finding + `plan.risk.no_mitigation` / `plan.risk.no_human_review` 확인.

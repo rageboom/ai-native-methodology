@@ -24,12 +24,12 @@ OpenAPI 3.1 / 3.0 / Swagger 2.0 spec 을 입력 받아 endpoint·schema 추출 +
 4. **schema 전수 추출** — `components/schemas/*` (또는 Swagger 2.0 `definitions/*`) → JSON Schema 정규화.
 5. **domain entity 추정** — schema 이름 / required 필드 / 연관 관계 분석 → `domain.json` seed.
 6. **rules seed 추정** — schema 의 enum / pattern / minimum / maximum / required 같은 제약 → `business-rules.json` seed (BR-* 후보).
-7. **산출 작성** — `.ai-context/<scope>/planning/swagger-extract.json` (schema = `schemas/swagger-extract.schema.json`).
+7. **산출 작성** — `.ai-context/scopes/<scope>/planning/swagger-extract.json` (schema = `schemas/swagger-extract.schema.json`).
 8. **(옵션) spectral 검증** — 본 skill scope 외 / orchestrate 또는 사용자가 명시 호출 (`npx spectral lint <input>`). auto-invoke ❌.
 
 ## 산출물
 
-- `.ai-context/<scope>/planning/swagger-extract.json` (strict / additionalProperties:false)
+- `.ai-context/scopes/<scope>/planning/swagger-extract.json` (strict / additionalProperties:false)
 - 정규화 openapi.yaml (옵션 — `analysis-openapi` 산출과 충돌 시 cross-ref / conflict 등재)
 - `domain.json` seed + `business-rules.json` seed (analysis 후속 skill 입력)
 

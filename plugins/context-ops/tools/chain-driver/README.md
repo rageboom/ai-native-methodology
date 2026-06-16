@@ -53,7 +53,7 @@ chain-driver init poc-17-ifrs-car-migration   # 자기 이름 인수 → 중첩 
 ## Inputs
 
 - `<project-dir>/.ai-context/state.json` — chain harness state (schema/state.schema.json 정합)
-- `<project-dir>/.ai-context/output/**` — chain stage 산출물
+- `<project-dir>/.ai-context/base/**` — chain stage 산출물
 - `<project-dir>/.ai-context/intervention-log.jsonl` — 사용자 결단 로그
 - `flows/sdlc-4stage-flow.json` — stage 순서 + 5 gate SSOT (v10.0.0 / chain N = gate #N 1:1)
 

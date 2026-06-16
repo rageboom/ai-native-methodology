@@ -23,7 +23,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 산출물
 
-`<user-project>/.ai-context/output/business-rules.json` (cross-link 강화 + meta_confidence 갱신)
+`<user-project>/.ai-context/base/business-rules.json` (cross-link 강화 + meta_confidence 갱신)
 
 ## 인용
 

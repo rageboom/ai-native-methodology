@@ -19,11 +19,20 @@ import {
 	readdirSync,
 } from 'node:fs';
 import { dirname, join, basename } from 'node:path';
+import {
+	bucketDirs,
+	scopeDirPath as layoutScopeDirPath,
+	scopeFileForRead,
+	scopesRootPath,
+	INTERVENTION_LOG_REL,
+} from '../../_shared/ai-context-layout.js';
 
 export const CURRENT_STATE_VERSION = '1.0';
 
 const DEFAULT_STATE = (projectId) => ({
-	$schema_origin: '../../../schemas/state.schema.json',
+	// 정규 스키마 포인터 = $schema_ref (basename 라우팅 / 프로젝트-상대 / 이식성).
+	// 레거시 $schema_origin(deprecated)의 깊은 ../ 상대경로는 프로젝트 밖을 가리켜 미해결이라 폐기.
+	$schema_ref: 'schemas/state.schema.json',
 	version: CURRENT_STATE_VERSION,
 	project_id: projectId,
 	current_chain: 'analysis',
@@ -44,7 +53,7 @@ const DEFAULT_STATE = (projectId) => ({
 	lock_holder_pid: null,
 	lock_acquired_at: null,
 	revisit_ignore_globs: [],
-	intervention_log_path: '.ai-context/output/intervention-log.jsonl',
+	intervention_log_path: INTERVENTION_LOG_REL,
 });
 
 export function statePath(projectRoot) {
@@ -56,10 +65,10 @@ function tmpPath(finalPath) {
 }
 
 export function ensureAimdDir(projectRoot) {
-	const dir = join(projectRoot, '.ai-context');
-	if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-	const out = join(dir, 'output');
-	if (!existsSync(out)) mkdirSync(out, { recursive: true });
+	// 3-버킷 골격 (.ai-context/ + base/ + scopes/ + runtime/) — DEC-2026-06-16.
+	for (const dir of bucketDirs(projectRoot)) {
+		if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+	}
 }
 
 export function recoverTmpFiles(projectRoot) {
@@ -304,16 +313,15 @@ function validateStage(stage) {
 export function scopeDirPath(projectRoot, scope, stage) {
 	validateScopeSlug(scope);
 	if (stage !== undefined && stage !== null) validateStage(stage);
-	return stage
-		? join(projectRoot, '.ai-context', scope, stage)
-		: join(projectRoot, '.ai-context', scope);
+	// 쓰기 경로 = NEW (.ai-context/scopes/<scope>[/<stage>]) — DEC-2026-06-16.
+	return layoutScopeDirPath(projectRoot, scope, stage);
 }
 
 export function ensureScopeDir(projectRoot, scope, scenario) {
 	validateScopeSlug(scope);
 	ensureAimdDir(projectRoot);
 
-	const scopeDir = join(projectRoot, '.ai-context', scope);
+	const scopeDir = layoutScopeDirPath(projectRoot, scope);
 	if (!existsSync(scopeDir)) mkdirSync(scopeDir, { recursive: true });
 
 	// Seed scope manifest (idempotent — only when absent). v11.9.0 scenario passthrough (use-scenario taxonomy).
@@ -370,18 +378,52 @@ export function writeManifest(projectRoot, scope, stage, manifest) {
 export function readManifest(projectRoot, scope, stage) {
 	validateScopeSlug(scope);
 	if (stage !== undefined && stage !== null) validateStage(stage);
-	const path = join(scopeDirPath(projectRoot, scope, stage), 'manifest.json');
+	// 읽기 = alias (NEW scopes/ 우선, 없으면 구 최상위 scope) — 배포된 구 manifest 호환.
+	const path = scopeFileForRead(projectRoot, scope, stage, 'manifest.json');
 	if (!existsSync(path)) return null;
 	return JSON.parse(readFileSync(path, 'utf-8'));
 }
 
+// 비-scope 디렉토리명 (구·신 레이아웃 공통 — deny-list 정밀화로 config/evidence/findings 오분류 결함 제거).
+const NON_SCOPE_DIRS = new Set([
+	'output',
+	'base',
+	'scopes',
+	'runtime',
+	'config',
+	'evidence',
+	'findings',
+	'tool-runs',
+	'layer-2-results',
+	'baseline-evidence',
+]);
+
 export function listScopes(projectRoot) {
+	// NEW 레이아웃: scopes/ 직접 readdir (allow-list — 오분류 구조적 불가) — DEC-2026-06-16.
+	const scopesRoot = scopesRootPath(projectRoot);
+	if (existsSync(scopesRoot)) {
+		const out = [];
+		for (const name of readdirSync(scopesRoot)) {
+			try {
+				if (
+					statSync(join(scopesRoot, name)).isDirectory() &&
+					SCOPE_SLUG_RE.test(name)
+				) {
+					out.push(name);
+				}
+			} catch {
+				/* skip */
+			}
+		}
+		return out;
+	}
+	// OLD 레이아웃 폴백: 최상위 deny-list (정밀화 — runtime/base/evidence/findings 등 제외).
 	const aimdDir = join(projectRoot, '.ai-context');
 	if (!existsSync(aimdDir)) return [];
 	const scopes = [];
 	for (const name of readdirSync(aimdDir)) {
 		if (
-			name === 'output' ||
+			NON_SCOPE_DIRS.has(name) ||
 			name.startsWith('.') ||
 			name.endsWith('.json') ||
 			name.endsWith('.md') ||

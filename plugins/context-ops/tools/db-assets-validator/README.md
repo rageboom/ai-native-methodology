@@ -34,7 +34,7 @@ db-assets-validator <manifest.json> [--stage <s>] [--format text|json] [--strict
 
 ## axis 분리 (결정론)
 
-본 validator 는 **결정론** 도구다 (LLM 판단 inject ❌ / `feedback_chain_driver_deterministic_axis` 정합). manifest **완성도** 검사 only — canonical global (`.ai-context/output/schema.json`) 와의 cross-resolution 은 `drift-validator` 영역이다.
+본 validator 는 **결정론** 도구다 (LLM 판단 inject ❌ / `feedback_chain_driver_deterministic_axis` 정합). manifest **완성도** 검사 only — canonical global (`.ai-context/base/schema.json`) 와의 cross-resolution 은 `drift-validator` 영역이다.
 
 ## 운영 위치
 

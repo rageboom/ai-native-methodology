@@ -58,7 +58,7 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 
 ## 산출물
 
-- `<user-project>/.ai-context/output/shared/run-manifest.json` (`schemas/run-manifest.schema.json` / analysis 산출물 #26 / source-grounded / env value 미저장)
+- `<user-project>/.ai-context/base/shared/run-manifest.json` (`schemas/run-manifest.schema.json` / analysis 산출물 #26 / source-grounded / env value 미저장)
 
 ## 한계 (정직)
 

@@ -40,12 +40,12 @@ analysis 입력에서 (c) layer 누락 시 **비즈니스 로직 일부 누락 =
 
 ## 4. baseline-delta 운영 통합
 
-- **canonical global `.ai-context/output/`** 에 DB 자산 분석 산출물 등록:
-  - `.ai-context/output/schema/` — Tables 정리
-  - `.ai-context/output/stored-procedures/` — SP 정적 분석
-  - `.ai-context/output/functions/` — Functions 정리
-  - `.ai-context/output/erd/` — ERD parse 결과 + 양 axis (전체 + scope focus)
-  - `.ai-context/output/business-rules/` — Java + sqlMap + SP/Function 통합 BR
+- **canonical global `.ai-context/base/`** 에 DB 자산 분석 산출물 등록:
+  - `.ai-context/base/schema/` — Tables 정리
+  - `.ai-context/base/stored-procedures/` — SP 정적 분석
+  - `.ai-context/base/functions/` — Functions 정리
+  - `.ai-context/base/erd/` — ERD parse 결과 + 양 axis (전체 + scope focus)
+  - `.ai-context/base/business-rules/` — Java + sqlMap + SP/Function 통합 BR
 - **scope `related_artifacts` 역인덱스** 에 DB 자산 link 의무:
   - `db_tables[]` — 관련 테이블 list
   - `db_procedures[]` — 관련 SP list (+ 분류 α/β/γ/δ)

@@ -1,10 +1,12 @@
 // scope-dir.test.js — G3 R5/R7 산출물 폴더 자동 + manifest 이중 렌더링.
-// RED 시점 (work-unit-manifest schema / state-store 신규 export 부재).
+// DEC-2026-06-16: scope 는 .ai-context/scopes/<scope>/ 아래 (was 최상위 평면).
 
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import {
 	mkdtempSync,
+	mkdirSync,
+	writeFileSync,
 	rmSync,
 	existsSync,
 	readFileSync,
@@ -29,7 +31,10 @@ after(() => {
 	rmSync(tmp, { recursive: true, force: true });
 });
 
-const STAGES = ['discovery', 'spec', 'plan', 'test', 'impl']; // v9.0 6-stage manifest dirs
+const STAGES = ['discovery', 'spec', 'plan', 'test', 'impl']; // 5-stage manifest dirs
+// NEW 레이아웃 scope 루트 헬퍼.
+const sdir = (root, ...parts) =>
+	join(root, '.ai-context', 'scopes', 'user-registration', ...parts);
 
 describe('validateScopeSlug', () => {
 	it('accepts kebab-case lowercase', () => {
@@ -74,14 +79,20 @@ describe('validateScopeSlug', () => {
 });
 
 describe('scopeDirPath', () => {
-	it('returns scope root when stage omitted', () => {
+	it('returns scope root under scopes/ when stage omitted', () => {
 		const p = scopeDirPath('/root', 'user-registration');
-		assert.equal(p, join('/root', '.ai-context', 'user-registration'));
+		assert.equal(
+			p,
+			join('/root', '.ai-context', 'scopes', 'user-registration'),
+		);
 	});
 
-	it('returns stage subdir when stage supplied', () => {
+	it('returns stage subdir under scopes/ when stage supplied', () => {
 		const p = scopeDirPath('/root', 'user-registration', 'discovery');
-		assert.equal(p, join('/root', '.ai-context', 'user-registration', 'discovery'));
+		assert.equal(
+			p,
+			join('/root', '.ai-context', 'scopes', 'user-registration', 'discovery'),
+		);
 	});
 
 	it('rejects invalid stage', () => {
@@ -93,27 +104,29 @@ describe('scopeDirPath', () => {
 });
 
 describe('ensureScopeDir', () => {
-	it('creates 5 stage dirs + scope root', () => {
+	it('creates 5 stage dirs + scope root under scopes/', () => {
 		const root = join(tmp, 'p1');
 		ensureScopeDir(root, 'user-registration');
-		assert.ok(existsSync(join(root, '.ai-context', 'user-registration')));
+		assert.ok(existsSync(sdir(root)));
 		for (const stage of STAGES) {
-			assert.ok(
-				existsSync(join(root, '.ai-context', 'user-registration', stage)),
-				`${stage} dir missing`,
-			);
+			assert.ok(existsSync(sdir(root, stage)), `${stage} dir missing`);
 		}
+	});
+
+	// anti-false-green: 쓰기는 NEW(scopes/)에만 — 구 최상위 경로엔 없어야 한다.
+	it('does NOT write to legacy top-level .ai-context/<scope>', () => {
+		const root = join(tmp, 'p1b');
+		ensureScopeDir(root, 'user-registration');
+		assert.ok(
+			!existsSync(join(root, '.ai-context', 'user-registration')),
+			'must not create legacy top-level scope dir',
+		);
 	});
 
 	it('seeds scope manifest with pending status', () => {
 		const root = join(tmp, 'p2');
 		ensureScopeDir(root, 'user-registration');
-		const scopeManifestPath = join(
-			root,
-			'.ai-context',
-			'user-registration',
-			'manifest.json',
-		);
+		const scopeManifestPath = sdir(root, 'manifest.json');
 		assert.ok(existsSync(scopeManifestPath));
 		const m = JSON.parse(readFileSync(scopeManifestPath, 'utf-8'));
 		assert.equal(m.scope, 'user-registration');
@@ -127,13 +140,7 @@ describe('ensureScopeDir', () => {
 		const root = join(tmp, 'p3');
 		ensureScopeDir(root, 'user-registration');
 		for (const stage of STAGES) {
-			const p = join(
-				root,
-				'.ai-context',
-				'user-registration',
-				stage,
-				'manifest.json',
-			);
+			const p = sdir(root, stage, 'manifest.json');
 			assert.ok(existsSync(p), `${stage} manifest.json missing`);
 			const m = JSON.parse(readFileSync(p, 'utf-8'));
 			assert.equal(m.scope, 'user-registration');
@@ -145,12 +152,7 @@ describe('ensureScopeDir', () => {
 	it('is idempotent — second call preserves manifests', () => {
 		const root = join(tmp, 'p5');
 		ensureScopeDir(root, 'user-registration');
-		const scopeManifestPath = join(
-			root,
-			'.ai-context',
-			'user-registration',
-			'manifest.json',
-		);
+		const scopeManifestPath = sdir(root, 'manifest.json');
 		const before = readFileSync(scopeManifestPath, 'utf-8');
 		ensureScopeDir(root, 'user-registration');
 		const after = readFileSync(scopeManifestPath, 'utf-8');
@@ -168,8 +170,7 @@ describe('ensureScopeDir', () => {
 	it('leaves no .tmp files', () => {
 		const root = join(tmp, 'p7');
 		ensureScopeDir(root, 'user-registration');
-		const scopeDir = join(root, '.ai-context', 'user-registration');
-		for (const f of readdirSync(scopeDir)) {
+		for (const f of readdirSync(sdir(root))) {
 			assert.ok(!f.endsWith('.tmp'), `dangling tmp: ${f}`);
 		}
 	});
@@ -233,8 +234,7 @@ describe('writeManifest / readManifest', () => {
 			scope: 'user-registration',
 			status: 'in_progress',
 		});
-		const dir = join(root, '.ai-context', 'user-registration');
-		for (const f of readdirSync(dir)) {
+		for (const f of readdirSync(sdir(root))) {
 			assert.ok(!f.endsWith('.tmp'), `dangling tmp: ${f}`);
 		}
 	});
@@ -243,5 +243,36 @@ describe('writeManifest / readManifest', () => {
 		const root = join(tmp, 'p12');
 		const m = readManifest(root, 'nonexistent');
 		assert.equal(m, null);
+	});
+
+	// read-alias: 배포된 구 최상위 manifest 를 읽어낸다 (backward-compat).
+	it('readManifest resolves legacy top-level manifest (alias)', () => {
+		const root = join(tmp, 'p13');
+		const legacyDir = join(root, '.ai-context', 'user-registration');
+		mkdirSync(legacyDir, { recursive: true });
+		writeFileSync(
+			join(legacyDir, 'manifest.json'),
+			JSON.stringify({ scope: 'user-registration', status: 'legacy' }),
+		);
+		const m = readManifest(root, 'user-registration');
+		assert.equal(m.status, 'legacy');
+	});
+
+	// precedence: NEW(scopes/)가 구 최상위보다 우선.
+	it('readManifest prefers NEW scopes/ over legacy when both exist', () => {
+		const root = join(tmp, 'p14');
+		const legacyDir = join(root, '.ai-context', 'user-registration');
+		mkdirSync(legacyDir, { recursive: true });
+		writeFileSync(
+			join(legacyDir, 'manifest.json'),
+			JSON.stringify({ scope: 'user-registration', status: 'legacy' }),
+		);
+		ensureScopeDir(root, 'user-registration'); // writes NEW
+		writeManifest(root, 'user-registration', null, {
+			scope: 'user-registration',
+			status: 'new-wins',
+		});
+		const m = readManifest(root, 'user-registration');
+		assert.equal(m.status, 'new-wins');
 	});
 });

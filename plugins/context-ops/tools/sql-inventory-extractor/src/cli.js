@@ -18,6 +18,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSy
 import { join, resolve, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildInventory, TOOL_VERSION } from './extract.js';
+import { baseDirForRead } from '../../_shared/ai-context-layout.js';
 
 function parseArgs(argv) {
 	const opts = { src: null, glob: null, relRoot: null, output: null, stdout: false };
@@ -112,7 +113,7 @@ function main() {
 		reproductionCommand,
 	});
 
-	const outDir = opts.output ? resolve(opts.output) : join(srcPath, '.ai-context', 'output');
+	const outDir = opts.output ? resolve(opts.output) : baseDirForRead(srcPath);
 	mkdirSync(outDir, { recursive: true });
 	const rawLines = result.raw_grep_lines;
 	delete result.raw_grep_lines; // raw-grep.txt 로 분리(JSON 비대화 방지).

@@ -35,7 +35,7 @@ purpose: D21' 정합 — suppressOutput=true / stderr only / additionalContext �
 ```
 matcher: Write|Edit|NotebookEdit
 action:  node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js hooks-bridge
-purpose: state.blocked=true + .ai-context/output/** 대상 시 permissionDecision=deny / exit 2
+purpose: state.blocked=true + .ai-context/base/** 대상 시 permissionDecision=deny / exit 2
 ```
 
 **Mechanical gate trio**:

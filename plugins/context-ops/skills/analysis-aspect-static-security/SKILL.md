@@ -82,8 +82,8 @@ baseline → `methodology-spec/policies/no-simulation.md` (원칙 / R19 Tier 정
 
 ## 산출물
 
-- `<user-project>/.ai-context/output/shared/static-security-spec.json`
-- 각 도구의 raw 출력 (`<user-project>/.ai-context/output/tool-runs/`)
+- `<user-project>/.ai-context/base/shared/static-security-spec.json`
+- 각 도구의 raw 출력 (`<user-project>/.ai-context/runtime/tool-runs/`)
 - baseline 파일 (`<user-project>/.ai-context/baseline/<tool>-baseline.json`)
 
 ## CI 통합

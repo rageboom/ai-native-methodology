@@ -259,11 +259,11 @@ function buildEvidence(
 	const reproduction =
 		`${testCmd.test_cmd} ${(testCmd.test_cmd_args ?? []).join(' ')}`.trim();
 	const stdout_path = resolvePath(
-		testCmd.stdout_path ?? '.ai-context/output/evidence/test-stdout.txt',
+		testCmd.stdout_path ?? '.ai-context/runtime/evidence/test-stdout.txt',
 		projectDir,
 	);
 	const stderr_path = resolvePath(
-		testCmd.stderr_path ?? '.ai-context/output/evidence/test-stderr.txt',
+		testCmd.stderr_path ?? '.ai-context/runtime/evidence/test-stderr.txt',
 		projectDir,
 	);
 
@@ -311,7 +311,7 @@ function writeEvidenceFiles(evidence, runResult, outPath, projectDir) {
 	const out =
 		outPath ??
 		resolvePath(
-			'.ai-context/output/evidence/test-invocation-evidence.json',
+			'.ai-context/runtime/evidence/test-invocation-evidence.json',
 			projectDir,
 		);
 	mkdirSync(dirname(out), { recursive: true });

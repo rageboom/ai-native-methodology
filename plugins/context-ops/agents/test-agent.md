@@ -36,7 +36,7 @@ chain 0~3 / chain 5 skill ❌ — 각 stage agent 권한.
 
 ## 호출 절차 (사용자 또는 main agent 가 dispatch 시)
 
-1. **input 확인** — `.ai-context/output/behavior-spec.json` + `acceptance-criteria.json` (chain 2) + `inventory.json` (stack_signals) 모두 존재? 부재 시 → 이전 stage agent 권한 위임
+1. **input 확인** — `.ai-context/base/behavior-spec.json` + `acceptance-criteria.json` (chain 2) + `inventory.json` (stack_signals) 모두 존재? 부재 시 → 이전 stage agent 권한 위임
 
 2. **framework 식별** — `inventory.stack_signals` 정합:
    - Java/Spring → JUnit 5 + Mockito
@@ -73,23 +73,23 @@ chain 0~3 / chain 5 skill ❌ — 각 stage agent 권한.
 ## paradigm 정합
 
 - **본 agent = paradigm 표준**
-- **본체 산출 경로** = `.ai-context/output/test-spec.json` + 실 test 파일 (Scenario 정합)
+- **본체 산출 경로** = `.ai-context/base/test-spec.json` + 실 test 파일 (Scenario 정합)
 
 ## 산출 자산 (chain 4)
 
-- `.ai-context/output/test-spec.json` (schemas/test-spec.schema.json 의무 / json 단독 SSOT)
+- `.ai-context/base/test-spec.json` (schemas/test-spec.schema.json 의무 / json 단독 SSOT)
 - 실 test 파일 (`*.test.ts` / `*.test.tsx` / `*Test.java` / `test_*.py` 등)
-- `.ai-context/output/evidence/test-invocation-evidence.json` (runner standalone 산출물 / 5종 물증 10 필드 / RED — test-spec 는 per-TC `test_run_evidence` / `test_pass_evidence` 는 chain 5 impl-spec)
-- `.ai-context/output/findings.md` (누적)
-- `.ai-context/output/intervention-log.json` (gate #4)
+- `.ai-context/runtime/evidence/test-invocation-evidence.json` (runner standalone 산출물 / 5종 물증 10 필드 / RED — test-spec 는 per-TC `test_run_evidence` / `test_pass_evidence` 는 chain 5 impl-spec)
+- `.ai-context/runtime/findings.md` (누적)
+- `.ai-context/base/intervention-log.json` (gate #4)
 
 ## dep-graph 소비 (Loop B / 소비 루프 — 그래프를 쓰게)
 
-의존성은 기억·grep 이 아니라 **그래프에서 즉시 조회**한다 (산출물 = LLM 운영 컨텍스트 / P0). `.ai-context/output/artifact-graph.json` 이 있으면 **stage 진입 시** 작업 대상 노드를 consult (Bash / dep-graph-navigator skill backend):
+의존성은 기억·grep 이 아니라 **그래프에서 즉시 조회**한다 (산출물 = LLM 운영 컨텍스트 / P0). `.ai-context/base/artifact-graph.json` 이 있으면 **stage 진입 시** 작업 대상 노드를 consult (Bash / dep-graph-navigator skill backend):
 
 ```bash
 node ${CLAUDE_PLUGIN_ROOT}/tools/chain-driver/src/cli.js navigate \
-  --graph .ai-context/output/artifact-graph.json --origin <node-id>
+  --graph .ai-context/base/artifact-graph.json --origin <node-id>
 ```
 
 - 반환: **backward(MUST)** = 이 산출물이 honor 해야 할 상류(변경 시 정합 깨짐) / **forward** = 내가 바꾸면 영향받는 하류 / code_pointers / top-3 impact root. AI 추론 0% — 결정 출력 verbatim 수용 (등급·centrality 재계산 ❌).

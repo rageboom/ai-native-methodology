@@ -90,7 +90,7 @@
             },
             "intervention_log_path": {
               "type": "string",
-              "description": "ADR-CHAIN-005 §8 / intervention-log.schema.json 정합 — 보통 .ai-context/output/intervention-log.jsonl"
+              "description": "ADR-CHAIN-005 §8 / intervention-log.schema.json 정합 — 기본 .ai-context/runtime/intervention-log.jsonl (구 .ai-context/output/ read-alias / DEC-2026-06-16)"
             }
           }
         }
@@ -174,8 +174,8 @@
     },
     "intervention_log_path": {
       "type": "string",
-      "description": "프로젝트별 intervention log 경로. 기본 = .ai-context/output/intervention-log.jsonl",
-      "default": ".ai-context/output/intervention-log.jsonl"
+      "description": "프로젝트별 intervention log 경로. 기본 = .ai-context/runtime/intervention-log.jsonl (구 .ai-context/output/ read-alias / DEC-2026-06-16)",
+      "default": ".ai-context/runtime/intervention-log.jsonl"
     }
   },
   "$defs": {

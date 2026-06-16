@@ -8,6 +8,7 @@
 import { resolve } from 'node:path';
 import { validateVerdicts } from './validator.js';
 import { writeStdoutSync } from '../../_shared/write-stdout-sync.js';
+import { baseDirForRead } from '../../_shared/ai-context-layout.js';
 
 const args = process.argv.slice(2);
 const getArg = (k, d) => { const i = args.indexOf(k); return i >= 0 && args[i + 1] ? args[i + 1] : d; };
@@ -17,7 +18,8 @@ if (args.includes('--help') || args.includes('-h')) {
   process.exit(2);
 }
 
-const root = resolve(getArg('--root', '.ai-context/output'));
+const rootArg = getArg('--root', null);
+const root = rootArg ? resolve(rootArg) : baseDirForRead(process.cwd()); // base/ NEW ↔ output/ OLD
 // 기본 advisory(비차단). --enforce 또는 CONTEXT_OPS_VERDICT_ENFORCE=1 일 때만 high 유지 → gate HARD block.
 const enforce = args.includes('--enforce') || process.env.CONTEXT_OPS_VERDICT_ENFORCE === '1';
 const result = validateVerdicts(root, { enforce });

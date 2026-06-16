@@ -124,7 +124,7 @@ node tools/<validator>/src/cli.js ... --baseline .baseline.json --ratchet
 
 **검증**:
 
-- `<project>/.ai-context/output/test/result_hash.json` 의 `pass_count: 0` + `fail_count: N` 확인
+- `<project>/.ai-context/base/test/result_hash.json` 의 `pass_count: 0` + `fail_count: N` 확인
 - `tool_stdout_path` 의 raw log 직접 확인 (test runner 출력)
 - `result_hash` 가 sha256 valid (SARIF Appendix F 정합 / framework_neutral)
 
@@ -137,7 +137,7 @@ node tools/<validator>/src/cli.js ... --baseline .baseline.json --ratchet
 
 - `pass_count` = `total_count` / `fail_count: 0`
 - `--allow-execute` flag 사용됨 (test-impl-pass-validator 의무)
-- chain 4 의 test code 가 변경 안 됨 (git diff `<project>/.ai-context/output/test/` 확인)
+- chain 4 의 test code 가 변경 안 됨 (git diff `<project>/.ai-context/base/test/` 확인)
 
 ## 5. Build / dist artifact
 

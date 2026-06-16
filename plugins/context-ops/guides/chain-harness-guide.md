@@ -67,7 +67,7 @@ next 호출 시점 = 보통 hook 자동 (UserPromptSubmit hook 이 stage 매칭 
 `state.blocked=true` 가 되면:
 
 - chain-driver `next` cli exit 2 (다음 stage 진입 거부)
-- PreToolUse hook 이 `<project>/.ai-context/output/**` Write/Edit 차단 (permissionDecision=deny)
+- PreToolUse hook 이 `<project>/.ai-context/base/**` Write/Edit 차단 (permissionDecision=deny)
 - 사용자가 finding fix 후 재시도
 
 ### 3.4 Unblock 절차

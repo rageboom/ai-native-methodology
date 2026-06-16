@@ -15,14 +15,14 @@ chain 4 (test) 의 **진입 skill**. AC → TC 1:N forward link / 실 test 코�
 
 ## 입력
 
-- `<project>/.ai-context/output/acceptance-criteria.json` (AC-\* 목록)
-- `<project>/.ai-context/output/behavior-spec.json` (BHV-\* + property_tests)
-- `<project>/.ai-context/output/shared/inventory.json` (stack_signals → framework match)
-- `<project>/.ai-context/config/test-cmd.json` (있으면 framework 명시)
+- `<project>/.ai-context/base/acceptance-criteria.json` (AC-\* 목록)
+- `<project>/.ai-context/base/behavior-spec.json` (BHV-\* + property_tests)
+- `<project>/.ai-context/base/shared/inventory.json` (stack_signals → framework match)
+- `<project>/.ai-context/runtime/config/test-cmd.json` (있으면 framework 명시)
 
 ## 산출물
 
-- `<project>/.ai-context/output/test-spec.json` (schemas/test-spec.schema.json 의무 / json 단독)
+- `<project>/.ai-context/base/test-spec.json` (schemas/test-spec.schema.json 의무 / json 단독)
 - 실 test 코드:
   - jest/vitest: `<project>/<src>/**/*.test.{ts,js}`
   - junit5: `<project>/src/test/java/**/*Test.java`
@@ -40,7 +40,7 @@ chain 4 종결 시 **모든 test fail 의무** (impl 부재). 한 test 라도 pa
 
 1. **acceptance-criteria 로드** — AC-\* + verifiable=true filter.
 
-2. **framework 추론** — `inventory.stack_signals` + `.ai-context/config/test-cmd.json` 우선:
+2. **framework 추론** — `inventory.stack_signals` + `.ai-context/runtime/config/test-cmd.json` 우선:
    - nodejs+jest → `jest` adapter
    - nodejs+vitest → `vitest` adapter
    - java+maven/gradle → `junit5` adapter
@@ -111,14 +111,14 @@ no-simulation 정합 — 진짜 도구 실행 의무 (R15 / R19 Tier 1/2 / Tier 
 8. **자동 검증** (schema-validator + spec-test-link-validator):
 
    ```bash
-   node ${CLAUDE_PLUGIN_ROOT}/tools/schema-validator/src/cli.js .ai-context/output/test-spec.json
+   node ${CLAUDE_PLUGIN_ROOT}/tools/schema-validator/src/cli.js .ai-context/base/test-spec.json
 
    node ${CLAUDE_PLUGIN_ROOT}/tools/spec-test-link-validator/src/cli.js \
-     --behavior   .ai-context/output/behavior-spec.json \
-     --acceptance .ai-context/output/acceptance-criteria.json \
-     --test-spec  .ai-context/output/test-spec.json \
-     --inventory  .ai-context/output/shared/inventory.json \
-     --unit-spec  .ai-context/output/unit-spec.json   # v0.36.0 — mock-soundness advisory (SOFT/propose-only/비차단 / unit-spec 있을 때만)
+     --behavior   .ai-context/base/behavior-spec.json \
+     --acceptance .ai-context/base/acceptance-criteria.json \
+     --test-spec  .ai-context/base/test-spec.json \
+     --inventory  .ai-context/base/shared/inventory.json \
+     --unit-spec  .ai-context/base/unit-spec.json   # v0.36.0 — mock-soundness advisory (SOFT/propose-only/비차단 / unit-spec 있을 때만)
    ```
 
 9. **test-impl-pass-validator dry-run 호출** — 진짜 실행 ❌ / config 검증만:
@@ -126,7 +126,7 @@ no-simulation 정합 — 진짜 도구 실행 의무 (R15 / R19 Tier 1/2 / Tier 
    ```bash
    node ${CLAUDE_PLUGIN_ROOT}/tools/test-impl-pass-validator/src/cli.js \
      --project <project> \
-     --inventory <project>/.ai-context/output/shared/inventory.json \
+     --inventory <project>/.ai-context/base/shared/inventory.json \
      --dry-run --json
    ```
 
@@ -153,7 +153,7 @@ no-simulation 정합 — 진짜 도구 실행 의무 (R15 / R19 Tier 1/2 / Tier 
 | -------------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | `meta.generation_mode`                 | enum           | `fresh-write` (default / 전체 신규 generate) \| `carry-from-iter` (이전 iter test 인계) \| `hybrid` (일부 carry + 일부 신규) |
 | `tests[].carry_from`                   | object \| null | TC 단위 carry 정보. null = 본 chain 4 신규 generate.                                                                         |
-| `tests[].carry_from.iter_path`         | string         | 이전 iter 의 path (예: `.ai-context/output/iter-3/test-spec.json`)                                                                 |
+| `tests[].carry_from.iter_path`         | string         | 이전 iter 의 path (예: `.ai-context/base/iter-3/test-spec.json`)                                                                 |
 | `tests[].carry_from.tc_id_prior`       | string         | 이전 iter 의 TC ID (rename 가능)                                                                                             |
 | `tests[].carry_from.source_file_prior` | string         | 이전 iter 의 test 파일 경로                                                                                                  |
 | `tests[].carry_from.rationale`         | string         | carry 사유 (예: "AC-USER-001 의미 불변 + framework 동일 vitest 14.x")                                                        |

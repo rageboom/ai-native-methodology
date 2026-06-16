@@ -117,7 +117,7 @@ describe('F-CHA-001 trio enforcement (plan gate #3 / Senior BLOCKER-2)', () => {
 			'block_reason=validator_critical 영속 의무',
 		);
 		// intervention log 기록 검증
-		const logPath = join(root, '.ai-context', 'output', 'intervention-log.jsonl');
+		const logPath = join(root, '.ai-context', 'runtime', 'intervention-log.jsonl');
 		assert.ok(existsSync(logPath), 'intervention-log.jsonl 기록 의무');
 		const logContent = readFileSync(logPath, 'utf-8');
 		assert.match(logContent, /gate_decision/, 'gate_decision event 기록 의무');

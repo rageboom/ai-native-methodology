@@ -93,7 +93,7 @@
 ### `archive/v4-spike/_spike-planning-agent.md`
 
 - **책임**: multi-agent paradigm 의 가능 입증 자산
-- **상태**: archive 위치 — 본 agent paradigm 의 source 자격 보존 / `_` prefix + EXPERIMENTAL 표기 / 별도 산출 디렉토리 (`.ai-context/output/_spike/`)
+- **상태**: archive 위치 — 본 agent paradigm 의 source 자격 보존 / `_` prefix + EXPERIMENTAL 표기 / 별도 산출 디렉토리 (`.ai-context/base/_spike/`)
 - **호출 가능 여부**: ❌ Claude Code 가 agents/ 의 sub-agent 만 로드 / archive/ 안 자산은 agent dispatch 대상 ❌
 
 ## paradigm 정합
@@ -113,12 +113,12 @@ main agent → Task(subagent_type="analysis-agent", prompt="""
 target: <target-project-dir>
 goal: 7대 + 8 FE 산출물 추출
 input: legacy code only
-expected: .ai-context/output/{inventory,architecture,domain,rules,schema,openapi,antipatterns}.json + FE 산출 (있으면)
+expected: .ai-context/base/{inventory,architecture,domain,rules,schema,openapi,antipatterns}.json + FE 산출 (있으면)
 """)
 
 # 산출물 hand-off via filesystem
 main agent → analysis-agent → discovery-agent → spec-agent → plan-agent → test-agent → implement-agent
-            (.ai-context/output/*.json 매개)
+            (.ai-context/base/*.json 매개)
 ```
 
 ## When NOT to use

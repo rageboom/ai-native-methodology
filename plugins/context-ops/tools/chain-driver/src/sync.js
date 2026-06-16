@@ -9,9 +9,10 @@
 
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, relative } from 'node:path';
 
 import { listScopes, readManifest, writeManifest } from './state-store.js';
+import { baseFileForRead } from '../../_shared/ai-context-layout.js';
 import { normalizeBusinessRules, loadBusinessRules } from '../../_shared/load-business-rules.js';
 
 export function hashFile(absPath) {
@@ -103,7 +104,13 @@ export function registerCanonicalSources(projectRoot, scope, opts = {}) {
     if (typeof v === 'string' && v.length > 0) byBasename.set(v.split('/').pop(), v);
   }
   for (const name of files) {
-    const rel = (byBasename.get(name) || join('.ai-context', 'output', name)).split('\\').join('/');
+    // 폴백 = base/ (NEW) ↔ output/ (OLD) alias 의 project-rel 경로 — DEC-2026-06-16.
+    const rel = (
+      byBasename.get(name) ||
+      relative(projectRoot, baseFileForRead(projectRoot, name))
+    )
+      .split('\\')
+      .join('/');
     const abs = join(projectRoot, rel);
     if (!existsSync(abs)) {
       skipped.push(name);
@@ -189,7 +196,7 @@ export function markDrift(projectRoot) {
 export function listUnbaselinedScopes(projectRoot, opts = {}) {
   const files = opts.canonicalFiles || CANONICAL_ANALYSIS_FILES;
   const anyCanonical = files.some((name) =>
-    existsSync(join(projectRoot, '.ai-context', 'output', name)),
+    existsSync(baseFileForRead(projectRoot, name)), // base/ NEW ↔ output/ OLD alias
   );
   if (!anyCanonical) return [];
   const out = [];

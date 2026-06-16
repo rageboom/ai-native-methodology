@@ -23,7 +23,7 @@ node src/cli.js --src <dir> [--glob <substr>] [--rel-root <dir>] [--output <dir>
 - `--src` (필수): mapper XML 스캔 루트. 부재 시 **exit 3**(환경 부재 / no-simulation — LLM 추론 대체 ❌).
 - `--glob`: 경로 부분문자열 필터(예: `/reqmng/`). mapper XML 자동판별(DOCTYPE/namespace) 후 추가 필터.
 - `--rel-root`: `mapper_xml` 상대경로 기준(기본 `--src`). 프로젝트 루트 권장.
-- `--output`: 산출 디렉토리(기본 `<src>/.ai-context/output`).
+- `--output`: 산출 디렉토리(기본 `<src>/.ai-context/base`).
 
 ### exit code
 

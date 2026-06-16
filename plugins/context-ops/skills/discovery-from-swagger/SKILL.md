@@ -13,7 +13,7 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) OpenAPI / Swagger s
 ## 사전 조건
 
 - openapi.yaml / swagger.json 파일 경로 또는 URL (WebFetch 가능).
-- (선택) `.ai-context/output/domains/<BC>/openapi.yaml` baseline (`analysis-from-swagger` / `@readme/openapi-parser` 결과) — 전체 API 표면 reference cross-check / 또는 manifest.analysis_refs.artifacts 해소.
+- (선택) `.ai-context/base/domains/<BC>/openapi.yaml` baseline (`analysis-from-swagger` / `@readme/openapi-parser` 결과) — 전체 API 표면 reference cross-check / 또는 manifest.analysis_refs.artifacts 해소.
 
 ## 입력
 
@@ -23,7 +23,7 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) OpenAPI / Swagger s
 
 ## 산출
 
-`.ai-context/output/discovery-spec.json` 의 다음 entries:
+`.ai-context/base/discovery-spec.json` 의 다음 entries:
 
 - `use_cases[]` — operation 별 사용자 의도 → UC-\* (id + name + description + acceptance_criteria_refs[])
 - `business_rules_intent[]` — request/response schema 의 constraint (required / enum / format / pattern) → entry (br_id = `BR-<DOMAIN>-<SUBJECT>-NNN` / 별도 BR-INTENT-\* id 없음)
@@ -46,7 +46,7 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) OpenAPI / Swagger s
 4. **request/response schema → business_rules_intent 추출**: `required` 필드 / `enum` 값 / `format` (date / email / uuid) / `pattern` regex → entry (br_id + reasoning). schema `$ref` 추적해 nested constraint 도 포함.
 5. **NFR (부 채널) 추출**: `security` schemes (auth 의무) / `x-ratelimit-*` (rate limit) / `responses` 의 4xx/5xx (error contract) → NFR-\*.
 6. **I/O contracts entries**: operation 별 request/response schema reference 저장 (chain 2 spec stage 의 behavior-spec 작성 시 참조).
-7. **baseline cross-check** (있을 시): `.ai-context/output/domains/<BC>/openapi.yaml` baseline 의 endpoint 목록과 비교 — 새 endpoint 인지 / 기존 modification 인지 / deprecated 인지 식별 → intent 정확화.
+7. **baseline cross-check** (있을 시): `.ai-context/base/domains/<BC>/openapi.yaml` baseline 의 endpoint 목록과 비교 — 새 endpoint 인지 / 기존 modification 인지 / deprecated 인지 식별 → intent 정확화.
 8. **discovery-spec.json append/merge** → discovery-agent 가 다른 어댑터 산출과 통합.
 9. **`discovery-extraction-validator` 통과** 자격 = 모든 entry source_grounded / spec 안 path:operationId 실재 검증.
 

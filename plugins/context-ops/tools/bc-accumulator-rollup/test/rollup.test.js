@@ -150,6 +150,63 @@ test('domain fragment 부재/불완전 → skip', () => {
 	assert.equal(dom.action, 'skipped');
 });
 
+test('verdict_basis — sql-inventory 실측 보정(write/read ops) + owned_aggregates 도출, verdict 불변', () => {
+	const DOMAIN_WITH_VERDICT = {
+		bounded_context: {
+			id: 'BC-X',
+			name: '신청관리 X',
+			verdict: 'core',
+			verdict_basis: { write_ops: 0, read_ops: 0, owned_aggregates: [], decided_by: 'rule' },
+			aggregates: [
+				{ root_entity_id: 'E-X-Req', members: ['T_A'] },
+				{ root_entity_id: 'E-X-Smry', members: ['T_B'] },
+				{ root_entity_id: 'E-X-Req', members: ['T_A'] }, // 중복 → dedupe
+			],
+		},
+	};
+	const SQL_INV = { summary: { by_type: { select: 23, insert: 7, update: 17, delete: 7 } } };
+	const { accumulators } = rollupBc({
+		bcId: 'BC-X',
+		fragments: { businessRules: null, cautions: null, findings: null, domain: DOMAIN_WITH_VERDICT, sqlInventory: SQL_INV },
+		accumulators: freshShared(),
+		leafRelPath: 'x',
+		nowIso: '2026-06-12T00:00:00.000Z',
+	});
+	const bc = accumulators.domain.bounded_contexts.find((b) => b.id === 'BC-X');
+	assert.equal(bc.verdict_basis.write_ops, 31); // 7+17+7 (실측 보정, 기존 0 덮어씀)
+	assert.equal(bc.verdict_basis.read_ops, 23); // select
+	assert.deepEqual(bc.verdict_basis.owned_aggregates, ['E-X-Req', 'E-X-Smry']); // dedupe + 정렬
+	assert.equal(bc.verdict_basis.decided_by, 'rule');
+	assert.equal(bc.verdict, 'core'); // verdict 값 불변(스킬/사람 결정)
+
+	// sql-inventory 부재 시 기존 basis 무변형(건드리지 않음).
+	const { accumulators: acc2 } = rollupBc({
+		bcId: 'BC-X',
+		fragments: { businessRules: null, cautions: null, findings: null, domain: DOMAIN_WITH_VERDICT },
+		accumulators: freshShared(),
+		leafRelPath: 'x',
+		nowIso: '2026-06-12T00:00:00.000Z',
+	});
+	const bc2 = acc2.domain.bounded_contexts.find((b) => b.id === 'BC-X');
+	assert.deepEqual(bc2.verdict_basis, { write_ops: 0, read_ops: 0, owned_aggregates: [], decided_by: 'rule' });
+
+	// human-override 보존.
+	const { accumulators: acc3 } = rollupBc({
+		bcId: 'BC-X',
+		fragments: {
+			businessRules: null, cautions: null, findings: null,
+			domain: { bounded_context: { id: 'BC-X', name: 'X', verdict: 'supporting', verdict_basis: { decided_by: 'human-override' }, aggregates: [] } },
+			sqlInventory: SQL_INV,
+		},
+		accumulators: freshShared(),
+		leafRelPath: 'x',
+		nowIso: '2026-06-12T00:00:00.000Z',
+	});
+	const bc3 = acc3.domain.bounded_contexts.find((b) => b.id === 'BC-X');
+	assert.equal(bc3.verdict_basis.decided_by, 'human-override'); // 보존
+	assert.equal(bc3.verdict_basis.write_ops, 31); // 숫자는 여전히 실측 보정
+});
+
 test('shared domain 부재 시 fresh 생성 ❌ (baseline 선재 의무)', () => {
 	const { report } = rollupBc({
 		bcId: 'BC-X',

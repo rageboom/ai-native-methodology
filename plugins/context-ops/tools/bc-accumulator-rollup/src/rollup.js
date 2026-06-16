@@ -78,20 +78,63 @@ export function rollupFindings(findingsObj, bcFindings) {
 	};
 }
 
+const WRITE_OP_TYPES = ['insert', 'update', 'delete'];
+
+// ── verdict_basis 숫자 도출 — sql-inventory summary.by_type 에서 결정론적 산출 ──
+//   write_ops = insert+update+delete, read_ops = select. sql-inventory 부재 = null 반환(미산출).
+//   verdict 값 자체는 스킬/사람 결정 — 본 헬퍼는 숫자 basis 만 (verdict-consistency-validator basis-mismatch(HARD) 통과용).
+function deriveSqlOps(sqlInventory) {
+	const byType = sqlInventory?.summary?.by_type;
+	if (!byType || typeof byType !== 'object') return null;
+	const num = (v) => (Number.isFinite(v) ? v : 0);
+	const write_ops = WRITE_OP_TYPES.reduce((sum, t) => sum + num(byType[t]), 0);
+	const read_ops = num(byType.select);
+	return { write_ops, read_ops };
+}
+
+// bcEntry.aggregates[].root_entity_id → owned_aggregates (결정론·정렬·중복 제거).
+function deriveOwnedAggregates(bcEntry) {
+	const ags = Array.isArray(bcEntry?.aggregates) ? bcEntry.aggregates : [];
+	const ids = ags.map((a) => a && a.root_entity_id).filter(Boolean);
+	return [...new Set(ids)].sort();
+}
+
+// bcEntry 의 verdict_basis 숫자(write_ops/read_ops)+owned_aggregates 를 실측으로 채움/보정.
+//   verdict 값은 불변(스킬/사람). decided_by 는 human-override 면 보존, 아니면 rule.
+//   sql-inventory 부재 시 건드리지 않음(no-simulation).
+function reconcileVerdictBasis(bcEntry, sqlInventory) {
+	const ops = deriveSqlOps(sqlInventory);
+	if (!ops) return null; // sql-inventory 부재 = 미산출(그대로 둠)
+	const prior = bcEntry.verdict_basis && typeof bcEntry.verdict_basis === 'object' ? bcEntry.verdict_basis : {};
+	const decided_by = prior.decided_by === 'human-override' ? 'human-override' : 'rule';
+	const owned_aggregates = deriveOwnedAggregates(bcEntry);
+	bcEntry.verdict_basis = {
+		...prior,
+		write_ops: ops.write_ops,
+		read_ops: ops.read_ops,
+		owned_aggregates,
+		decided_by,
+	};
+	return { write_ops: ops.write_ops, read_ops: ops.read_ops, owned_aggregates: owned_aggregates.length, decided_by };
+}
+
 // ── 4) per-BC domain fragment → shared domain.json bounded_contexts[] (upsert by id) ──
-export function rollupDomain(domainObj, bcDomain, { bcId }) {
+export function rollupDomain(domainObj, bcDomain, { bcId, sqlInventory } = {}) {
 	domainObj.bounded_contexts ??= [];
 	// fragment 가 bounded_context entry 를 직접 제공하거나, {bounded_context:{...}} 래핑.
-	const bcEntry = bcDomain?.bounded_context || bcDomain?.bounded_contexts?.[0] || bcDomain;
+	//   clone — verdict_basis 보정이 입력 fragment 를 변형하지 않도록(dry-run/멱등 안전).
+	const bcEntry = clone(bcDomain?.bounded_context || bcDomain?.bounded_contexts?.[0] || bcDomain);
 	if (!bcEntry || !bcEntry.id || !bcEntry.name) {
 		return { accumulator: 'domain', action: 'skipped', reason: 'fragment 에 {id,name} bounded_context 부재' };
 	}
 	if (bcEntry.id !== bcId) {
 		// 정직: bc-dir 와 fragment id 불일치 경고(여전히 fragment id 로 upsert).
 	}
+	// upsert 직전 verdict_basis 숫자 보정 — sql-inventory 실측. verdict 값은 불변.
+	const basis = reconcileVerdictBasis(bcEntry, sqlInventory);
 	const r = upsertById(domainObj.bounded_contexts, bcEntry, 'id');
 	const addedUl = mergeUbiquitousLanguage(domainObj, bcDomain?.ubiquitous_language_additions || []);
-	return { accumulator: 'domain', action: r.action, ubiquitous_language_added: addedUl };
+	return { accumulator: 'domain', action: r.action, ubiquitous_language_added: addedUl, verdict_basis: basis };
 }
 
 /**
@@ -135,7 +178,7 @@ export function rollupBc({ bcId, fragments, accumulators, leafRelPath, nowIso })
 				reason: 'shared domain.json 부재 — domain 은 baseline 선재 의무(fresh 생성 ❌). 선행 analysis-domain-model 필요.',
 			});
 		} else {
-			report.results.push(rollupDomain(out.domain, fragments.domain, { bcId }));
+			report.results.push(rollupDomain(out.domain, fragments.domain, { bcId, sqlInventory: fragments.sqlInventory }));
 		}
 	} else report.skipped.push({ accumulator: 'domain', reason: 'fragment 부재' });
 

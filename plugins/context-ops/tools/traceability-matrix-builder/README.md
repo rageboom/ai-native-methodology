@@ -16,12 +16,12 @@ DO-178C / ISO 26262 bidirectional traceability 차용 (S5 정합 — header `der
 
 ```bash
 node src/cli.js \
-  --planning .ai-context/output/planning-spec.json \
-  --behavior .ai-context/output/behavior-spec.json \
-  --acceptance .ai-context/output/acceptance-criteria.json \
-  --test-spec .ai-context/output/test-spec.json \
-  --impl-spec .ai-context/output/impl-spec.json \
-  --out-dir .ai-context/output/traceability/ \
+  --planning .ai-context/base/planning-spec.json \
+  --behavior .ai-context/base/behavior-spec.json \
+  --acceptance .ai-context/base/acceptance-criteria.json \
+  --test-spec .ai-context/base/test-spec.json \
+  --impl-spec .ai-context/base/impl-spec.json \
+  --out-dir .ai-context/base/traceability/ \
   [--dry-run]
 ```
 

@@ -66,7 +66,7 @@ exit code 1 만으론 LLM 무시 가능 → **3 layer 차단** 의무:
 | ----------- | ------------------------------------------------------------------------------ | --------------------------------- |
 | (i) state   | `state.blocked = true` 영속                                                    | 다음 invocation 시 자동 차단 유지 |
 | (ii) cli    | blocked 상태에선 모든 `chain-driver *` 명령 비대화형 exit 2 + 동일 메시지 반복 | LLM 우회 호출 차단                |
-| (iii) hooks | `PreToolUse` `permissionDecision: "deny"` + `.ai-context/output/**` Write/Edit 차단  | 직접 산출물 우회 작성 차단        |
+| (iii) hooks | `PreToolUse` `permissionDecision: "deny"` + `.ai-context/**` Write/Edit 차단 (state.blocked 시 base/scopes/runtime 전체 / DEC-2026-06-16)  | 직접 산출물 우회 작성 차단        |
 
 trio 모두 동작해야 enforcement 진짜 — 1개라도 누락 시 양심 의존 회귀.
 
@@ -118,11 +118,11 @@ state-store.migrate(fromVersion, toVersion, json) → json
 - `state --json` = raw state.json
 - `next --dry-run` = mutate ❌ / gate 평가만
 
-### 8. Observability = `.ai-context/output/intervention-log.jsonl`
+### 8. Observability = `.ai-context/runtime/intervention-log.jsonl`
 
 - `schemas/intervention-log.schema.json` 신설
 - 필수 필드: `event_type` / `stage` / `decision` (go|stop|revisit:<stage>) / `actor` (user|driver|llm) / `timestamp` / `validator_findings_ref` (옵션)
-- JSONL append-only / 월별 rotation `.ai-context/output/archive/yyyy-mm.jsonl`
+- JSONL append-only / 월별 rotation `.ai-context/runtime/archive/yyyy-mm.jsonl`
 - driver startup 시 `*.tmp` 잔존 detect → "이전 실행 중단 — recovery" prompt + auto-cleanup ( Senior F6)
 
 ## 인용 체인

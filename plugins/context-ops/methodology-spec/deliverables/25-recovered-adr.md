@@ -37,7 +37,7 @@
 ## 2. 형식
 
 ```
-.ai-context/output/recovered-adr.json   # meta + recovered_adrs[] + extraction (단일 파일 / json 단독 SSOT)
+.ai-context/base/recovered-adr.json   # meta + recovered_adrs[] + extraction (단일 파일 / json 단독 SSOT)
 ```
 
 `recovered_adrs[]` item: `id`(RADR-*) / `title` / `category`(Nygard 5+보안) / `status` / `decision`(관찰 사실) / `evidence[]`(≥1 / fail-closed) / `rationale{certainty, text, basis_evidence}` / `alternatives[]`(evidence 시만) / `consequences{positive,negative}`.

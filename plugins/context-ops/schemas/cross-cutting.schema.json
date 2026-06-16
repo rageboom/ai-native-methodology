@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/cross-cutting.schema.json",
+  "title": "Cross-Cutting Concerns (횡단 관심사 reconciliation)",
+  "description": "독립 BC 가 아니라 ≥2 BC 를 가로지르는 횡단(cross_cutting) 관심사 흡수 산출물. shared/cross-cutting/<module>/ 및 shared/*-cross-cutting.json reconciliation 파일에 담긴다 (예: reservation-cross-cutting.json, biztrip-cross-cutting.json). verdict 분류 정책: DEC-2026-06-15-bc-verdict-classification — cross_cutting = 소유 쓰기 aggregate 없는 횡단기능(domain.json bounded_contexts 미등재, shared/cross-cutting/). write_ops>0 으로 supporting BC 로 승격되면 cross_cutting twin 은 retired_concerns 로 폐기(VC3/VC4 reconciliation). additionalProperties 관대(true) — 기존 산출물이 origin_controller / origin_services / discriminator / sql_inventory_ref / consumers_note / source_branch / $comment 등 추가 필드를 보유.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["cross_cutting_concerns"],
+  "properties": {
+    "project_id": {
+      "type": "string",
+      "description": "프로젝트 식별자 (예: ep-be-gea)"
+    },
+    "generated_by": {
+      "type": "string",
+      "description": "산출 출처 (workflow id / decision id 등, 예: judge workflow wf_1a294c53 + DEC-2026-06-12-resve-multidomain-corroboration)"
+    },
+    "generated_at": {
+      "type": "string",
+      "description": "최초 산출 시각 (ISO-8601, 예: 2026-06-12T00:00:00Z)"
+    },
+    "reconciled_at": {
+      "type": "string",
+      "description": "verdict 재정합(승격/폐기 reconciliation) 시각 또는 일자 (예: 2026-06-16)"
+    },
+    "cross_cutting_concerns": {
+      "type": "array",
+      "description": "흡수된 횡단 관심사 목록 (≥2 BC 를 가로지름, 소유 쓰기 aggregate 0 / BC 미등재). 승격·폐기된 항목은 여기서 빠지고 retired_concerns 로 이전.",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["id", "name", "origin_module", "verdict"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "횡단 관심사 ID (예: XCUT-BIZTRIP-ADMIN-BASE, XCUT-RESV-ASSET-MASTER)"
+          },
+          "name": {
+            "type": "string",
+            "description": "관심사 이름 (예: 출장 기준·요율 마스터 (admin-base))"
+          },
+          "origin_module": {
+            "type": "string",
+            "description": "원 모듈 경로 (예: backoffice/biztrip/base)"
+          },
+          "verdict": {
+            "const": "cross_cutting",
+            "description": "BC 분류 판정 — 본 산출물은 항상 cross_cutting (소유 쓰기 aggregate 없는 횡단기능 / domain.json bounded_contexts 미등재). DEC-2026-06-15-bc-verdict-classification."
+          },
+          "shared_tables": {
+            "type": "array",
+            "description": "이 관심사가 공유하는(소유 아닌 read-only / cross-BC append) 테이블 목록.",
+            "items": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "table": {"type": "string"},
+                "role": {"type": "string", "description": "테이블 역할/접근 양상 설명 (예: 전사 도시 지리 마스터 (base 비소유, read-only join))"}
+              }
+            }
+          },
+          "consumers": {
+            "type": "array",
+            "description": "이 횡단 관심사를 소비하는 BC 목록 (≥2 면 횡단 입증). access(read/write) + evidence(파일:라인) 박제.",
+            "items": {
+              "type": "object",
+              "additionalProperties": true,
+              "properties": {
+                "bc": {"type": "string", "description": "소비 BC ID 또는 비-BC 진입점 (예: BC-BIZTRIP-EXECUTIVE)"},
+                "access": {"type": "string", "description": "접근 양상 (예: read, write)"},
+                "evidence": {"type": "string", "description": "코드 근거 (파일:라인)"}
+              }
+            }
+          },
+          "migration_caution": {
+            "type": "string",
+            "description": "AS-IS 경계 smell 박제 (characterize 만, 수정 금지). migration-cautions 와 동일 stance — 버그/비일관도 고치지 않고 기록."
+          },
+          "evidence": {
+            "type": "array",
+            "description": "추출 근거 (파일/라인 등). 형식 관대.",
+            "items": {}
+          }
+        }
+      }
+    },
+    "retired_concerns": {
+      "type": "array",
+      "description": "cross_cutting 분류에서 폐기된 관심사 (write_ops>0 으로 supporting/core BC 로 승격 → cross_cutting twin 폐기, VC3/VC4 reconciliation). 원 concern 문서는 relocated_to 가 가리키는 BC 디렉터리로 무손실 이전.",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "id": {"type": "string", "description": "폐기된 횡단 관심사 ID (예: XCUT-RESV-ASSET-MASTER)"},
+          "origin_module": {"type": "string"},
+          "relocated_to": {"type": "string", "description": "이전 대상 경로 (예: domains/BC-RESV-BASE/shared-master-concern.json)"},
+          "reason": {"type": "string", "description": "폐기 사유 (예: promoted to supporting BC BC-RESV-BASE (write_ops>0))"}
+        }
+      }
+    }
+  }
+}

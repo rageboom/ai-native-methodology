@@ -37,7 +37,7 @@ export function validateVerdicts(outputRoot, opts = {}) {
   }
 
   const domainJson = readJson(join(SHARED, 'domain.json')) || {};
-  const registry = new Map((domainJson.bounded_contexts || []).map((b) => [b.id, { verdict: b.verdict || null, basis: b.verdict_basis || null }]));
+  const registry = new Map((domainJson.bounded_contexts || []).map((b) => [b.id, { verdict: b.verdict || null, basis: b.verdict_basis || null, tier: b.tier || null }]));
   const bcDirs = readdirSync(DOMAINS).filter((d) => /^BC-[A-Z0-9-]+$/.test(d) && isDir(join(DOMAINS, d)));
 
   const facts = new Map();
@@ -83,7 +83,9 @@ export function validateVerdicts(outputRoot, opts = {}) {
     return cands.length === 1 ? cands[0] : null;
   };
 
-  for (const xn of ['biztrip-cross-cutting.json', 'reservation-cross-cutting.json']) {
+  // de-hardcoded: glob shared/*-cross-cutting.json (프로젝트 무관 일반화) — 과거 ['biztrip-..','reservation-..'] 고정.
+  const xcutFiles = existsSync(SHARED) ? readdirSync(SHARED).filter((n) => /-cross-cutting\.json$/.test(n)) : [];
+  for (const xn of xcutFiles) {
     const xf = join(SHARED, xn);
     if (!existsSync(xf)) continue;
     for (const c of (readJson(xf)?.cross_cutting_concerns || [])) {
@@ -97,6 +99,36 @@ export function validateVerdicts(outputRoot, opts = {}) {
   if (isDir(xd)) for (const mod of readdirSync(xd).filter((m) => isDir(join(xd, m)))) {
     const bc = promotedBc(mod);
     if (bc) add('high', 'double-classification', bc, `shared/cross-cutting/${mod}/ 쌍둥이가 등록 BC ${bc} 와 공존 — 은퇴`);
+  }
+
+  // C5 — 같은 canonical 산출물의 stale 중복 표현 (business-rules.json + business-rules/ dir). high (enforce 차단).
+  for (const bc of bcDirs) {
+    const dir = join(DOMAINS, bc);
+    if (existsSync(join(dir, 'business-rules.json')) && isDir(join(dir, 'business-rules')))
+      add('high', 'duplicate-artifact', bc, `${bc} 에 business-rules.json(canonical) + business-rules/ dir 공존 — dir 형 stale/inert (삭제)`);
+  }
+
+  // C4 — 선언 tier 기반 완전성 (advisory low). tier 는 domain.json#bounded_contexts[].tier 명시 선언만 신뢰
+  //   (파일 유무 추론 ❌ — use_cases-backfill leaf=domain.json 1개가 full-leaf 로 오판되던 결함 차단). 미선언 BC = 검사 skip(opt-in).
+  const TIER_MANDATORY = {
+    baseline: ['business-rules.json', 'openapi.yaml', 'sql-inventory'],
+    characterized: ['business-rules.json', 'openapi.yaml', 'sql-inventory', 'characterization'],
+    'full-leaf': ['business-rules.json', 'openapi.yaml', 'sql-inventory', 'characterization', 'bc-scope.json', 'domain.json', 'findings-analysis.json', 'migration-cautions.json', 'README.md'],
+  };
+  const hasArtifact = (dir, name) => {
+    const p = join(dir, name);
+    if (name === 'characterization') return isDir(p) && readdirSync(p).length > 0;
+    if (name === 'sql-inventory') return existsSync(join(p, 'sql-inventory.json'));
+    return existsSync(p);
+  };
+  for (const bc of bcDirs) {
+    const tier = registry.get(bc)?.tier;
+    if (!tier) continue; // 미선언 → skip (추론 ❌ / 명시 opt-in)
+    const mand = TIER_MANDATORY[tier];
+    if (!mand) { add('low', 'tier-unknown', bc, `${bc} tier='${tier}' 미정의 (baseline|characterized|full-leaf 아님)`); continue; }
+    const dir = join(DOMAINS, bc);
+    const missing = mand.filter((a) => !hasArtifact(dir, a));
+    if (missing.length) add('low', 'incomplete-tier', bc, `${bc} 선언 tier='${tier}' 인데 mandatory 누락: ${missing.join(', ')}`);
   }
 
   // advisory 기본: high → medium 강등(게이트 비차단). enforce 시 high 유지(HARD block).

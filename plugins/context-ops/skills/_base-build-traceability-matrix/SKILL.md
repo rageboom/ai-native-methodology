@@ -22,18 +22,18 @@ chain harness 의 **cross-gate matrix builder skill** (forward+backward bidirect
 
 ## 절차
 
-1. **chain 산출물 5종 path 확인** — 사용자 프로젝트 `.ai-context/output/` 안의 `discovery-spec.json` / `behavior-spec.json` / `acceptance-criteria.json` / `test-spec.json` / `impl-spec.json` 존재 확인. 누락 시 status=red 표기 (사용자에게 명시).
+1. **chain 산출물 5종 path 확인** — 사용자 프로젝트 `.ai-context/base/` 안의 `discovery-spec.json` / `behavior-spec.json` / `acceptance-criteria.json` / `test-spec.json` / `impl-spec.json` 존재 확인. 누락 시 status=red 표기 (사용자에게 명시).
 
 2. **traceability-matrix-builder 도구 호출**:
 
    ```bash
    node ${CLAUDE_PLUGIN_ROOT}/tools/traceability-matrix-builder/src/cli.js \
-     --discovery  <project>/.ai-context/output/discovery-spec.json \
-     --behavior   <project>/.ai-context/output/behavior-spec.json \
-     --acceptance <project>/.ai-context/output/acceptance-criteria.json \
-     --test-spec  <project>/.ai-context/output/test-spec.json \
-     --impl-spec  <project>/.ai-context/output/impl-spec.json \
-     --out-dir    <project>/.ai-context/output/traceability/
+     --discovery  <project>/.ai-context/base/discovery-spec.json \
+     --behavior   <project>/.ai-context/base/behavior-spec.json \
+     --acceptance <project>/.ai-context/base/acceptance-criteria.json \
+     --test-spec  <project>/.ai-context/base/test-spec.json \
+     --impl-spec  <project>/.ai-context/base/impl-spec.json \
+     --out-dir    <project>/.ai-context/base/traceability/
    ```
 
 3. **matrix.json 검토** — 사용자에게 `coverage_summary` / `status` 요약 (green/yellow/red 카운트) 제공.
@@ -49,19 +49,19 @@ chain harness 의 **cross-gate matrix builder skill** (forward+backward bidirect
    ```bash
    # (a) artifact-graph.json 합성 — matrix 와 동일 source + --graph
    node ${CLAUDE_PLUGIN_ROOT}/tools/traceability-matrix-builder/src/cli.js \
-     --discovery  <project>/.ai-context/output/discovery-spec.json \
-     --behavior   <project>/.ai-context/output/behavior-spec.json \
-     --acceptance <project>/.ai-context/output/acceptance-criteria.json \
-     --task-plan  <project>/.ai-context/output/task-plan.json \
-     --test-spec  <project>/.ai-context/output/test-spec.json \
-     --impl-spec  <project>/.ai-context/output/impl-spec.json \
-     --analysis-dir <project>/.ai-context/output \
+     --discovery  <project>/.ai-context/base/discovery-spec.json \
+     --behavior   <project>/.ai-context/base/behavior-spec.json \
+     --acceptance <project>/.ai-context/base/acceptance-criteria.json \
+     --task-plan  <project>/.ai-context/base/task-plan.json \
+     --test-spec  <project>/.ai-context/base/test-spec.json \
+     --impl-spec  <project>/.ai-context/base/impl-spec.json \
+     --analysis-dir <project>/.ai-context/base \
      --scope-id <scope> --repo-root <project> \
-     --out-dir <project>/.ai-context/output/ --graph
+     --out-dir <project>/.ai-context/base/ --graph
 
    # (b) graph-integrity-validator — cycle/orphan/unknown 검사 (gate-eval REQUIRED.implement)
    node ${CLAUDE_PLUGIN_ROOT}/tools/graph-integrity-validator/src/cli.js \
-     <project>/.ai-context/output/artifact-graph.json --format json
+     <project>/.ai-context/base/artifact-graph.json --format json
    ```
 
    - `passed: false` (cycle/orphan/unknown ≥ 1) → **blocking finding**: severity = critical (cycle/unknown — topological sort 불가) / high (orphan — artifact chain 단절). `_base-log-finding` 등록 후 go-stop-gate 가 차단.

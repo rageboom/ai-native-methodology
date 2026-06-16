@@ -18,7 +18,7 @@
 ## 2. 형식
 
 ```
-.ai-context/output/chain-1-discovery/
+.ai-context/base/chain-1-discovery/
 ├── discovery-spec.json   # json 단독 SSOT
 └── _manifest.yml
 ```
@@ -46,7 +46,7 @@
 ## 5. 예시 (chain 1 sample)
 
 ```yaml
-# .ai-context/output/chain-1-discovery/discovery-spec.json
+# .ai-context/base/chain-1-discovery/discovery-spec.json
 meta:
   generated_at: '2026-05-06T12:00:00Z'
   confidence: 0.85
@@ -54,8 +54,8 @@ meta:
 derivation_source:
   type: legacy-extraction
   source_artifacts:
-    - .ai-context/output/business-rules.json
-    - .ai-context/output/domain.json
+    - .ai-context/base/business-rules.json
+    - .ai-context/base/domain.json
 business_intent:
   domain_purpose: 'RealWorld blogging platform — article CRUD + social follow'
   stakeholders: [reader, writer, admin]

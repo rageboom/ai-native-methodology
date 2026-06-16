@@ -47,7 +47,7 @@ TypeScript 코드베이스의 type 정의 → type-spec.json + framework_neutral
 
 ## 산출물
 
-`<user-project>/.ai-context/output/domains/<BC>/type-spec.json`
+`<user-project>/.ai-context/base/domains/<BC>/type-spec.json`
 
 ## 인용
 

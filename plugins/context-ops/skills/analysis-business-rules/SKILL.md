@@ -10,7 +10,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 사전 조건
 
-- `<user-project>/.ai-context/output/shared/domain.json` 존재 (analysis-domain-model 완료 / 또는 manifest.analysis_refs.artifacts 해소)
+- `<user-project>/.ai-context/base/shared/domain.json` 존재 (analysis-domain-model 완료 / 또는 manifest.analysis_refs.artifacts 해소)
 
 ## 절차
 
@@ -25,13 +25,14 @@ allowed-tools: Read, Glob, Grep, Bash, Write
    }
    ```
 3. **business-rules 산출 (분할 / BR-split STEP 3 / v0.24.0)** — BC 그룹핑 후 **per-BC leaf 파일 + index** 로 산출(단일 파일 ❌):
-   - **per-BC leaf**: `<user-project>/.ai-context/output/domains/<BC-slug>/business-rules.json` — 해당 BC 의 `business_rules[]` 만. schema = `schemas/business-rules-bc.schema.json` (`required:["bounded_context","business_rules"]`). 인스턴스에 `"$schema_ref": "schemas/business-rules-bc.schema.json"` 명시(파일명 fallback 부정합 → 라우팅 명시 필수).
-   - **index**: `<user-project>/.ai-context/output/business-rules.json` — `bc_files[]`(per-BC 파일 명단/통계) + `total_rules`. schema = `schemas/business-rules-index.schema.json`. 인스턴스에 `"$schema_ref": "schemas/business-rules-index.schema.json"` 명시 **필수**(basename 이 business-rules.json 이라 명시 없으면 옛 단일파일 schema 로 오라우팅).
+   - **per-BC leaf**: `<user-project>/.ai-context/base/domains/<BC-slug>/business-rules.json` — 해당 BC 의 `business_rules[]` 만. schema = `schemas/business-rules-bc.schema.json` (`required:["bounded_context","business_rules"]`). 인스턴스에 `"$schema_ref": "schemas/business-rules-bc.schema.json"` 명시(파일명 fallback 부정합 → 라우팅 명시 필수).
+   - **정규 스키마 포인터 키 = `$schema_ref` (값 = 프로젝트-상대 `schemas/<name>.schema.json`)**. 레거시 `$schema_origin`(깊은 `../` 상대경로 / 프로젝트밖 미해결)은 deprecated — **신규 산출물에 절대 방출 ❌**. (id-conventions §$schema 포인터 참조)
+   - **index**: `<user-project>/.ai-context/base/business-rules.json` — `bc_files[]`(per-BC 파일 명단/통계) + `total_rules`. schema = `schemas/business-rules-index.schema.json`. 인스턴스에 `"$schema_ref": "schemas/business-rules-index.schema.json"` 명시 **필수**(basename 이 business-rules.json 이라 명시 없으면 옛 단일파일 schema 로 오라우팅).
    - BC 미정 rule = `domains/_uncategorized/business-rules.json` 버킷(단 `bounded_context` required 라 실무상 미발생 / 안전망).
    - loader(`loadBusinessRules`)가 index 를 감지해 per-BC sibling 을 재조립 → 소비자(br-cross / federator / traceability / graph)는 전체 rule 전수 로드(분할 투명).
    - **writer (multi-BC append / F-1)**: 여러 BC 가 같은 index 에 누적될 때 index 를 **통째 재작성 ❌**(BC#2 가 BC#1 엔트리 덮음). `tools/_shared/append-catalog.js` 의 `appendBcFileToIndex(indexPath, {bounded_context, file, rule_count, rule_ids})` 사용 = upsert-by-`bounded_context`(sibling BC 보존) + `total_rules` 재계산 + 기존 indent 보존(reformat 가짜 diff 차단). loader 의 writer 짝.
    ```json
-   // .ai-context/output/business-rules.json  (index)
+   // .ai-context/base/business-rules.json  (index)
    {
    	"$schema_ref": "schemas/business-rules-index.schema.json",
    	"bc_files": [
@@ -39,7 +40,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
    	],
    	"total_rules": 1
    }
-   // .ai-context/output/domains/BC-USER/business-rules.json  (per-BC leaf)
+   // .ai-context/base/domains/BC-USER/business-rules.json  (per-BC leaf)
    {
    	"$schema_ref": "schemas/business-rules-bc.schema.json",
    	"bounded_context": "BC-USER",
@@ -67,13 +68,13 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 산출물
 
-`<user-project>/.ai-context/output/business-rules.json` (분할 **index** — top-level 유지) + `<user-project>/.ai-context/output/domains/<BC-slug>/business-rules.json` (per-BC leaf 1개 이상).
+`<user-project>/.ai-context/base/business-rules.json` (분할 **index** — top-level 유지) + `<user-project>/.ai-context/base/domains/<BC-slug>/business-rules.json` (per-BC leaf 1개 이상).
 
 ## greenfield (code-optional) mode
 
 `work-unit-manifest.scenario == "greenfield"` (legacy 코드 없음 / §2.4 옵션 A) 일 때 — if/switch/policy 코드 스캔 대신 **입력어댑터 extract** 에서 산출:
 
-- 입력 = `.ai-context/<scope>/planning/{swagger,figma,plan-doc,prompt}-extract.json` (`analysis-greenfield-bootstrap` 진입점).
+- 입력 = `.ai-context/scopes/<scope>/planning/{swagger,figma,plan-doc,prompt}-extract.json` (`analysis-greenfield-bootstrap` 진입점).
 - BR 후보 = swagger `rules_seed[]` (enum/pattern/min/max/required/format 제약) + PRD acceptance rule (NL md 기획문서) + form-validation-spec (FE 검증).
 - `source_grounded_evidence` = **입력 출처 인용** (코드 grep ❌): `swagger:User.email` / `doc:§3.2` (verbatim quote 권장 / LLM fabrication 회피).
 - `code_pointers` = N/A (`meta.code_pointers_na` 동형 / 가리킬 코드 부재). business-rules.schema.json 은 code_pointers hard-require ❌.
@@ -93,7 +94,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 다음
 
-- **산출 후 exit-gate (F-2)**: `schema-validator` 는 `REQUIRED_VALIDATORS_PER_STAGE.analysis`(gate#0)에 등재돼 있으나 **skill-direct / multi-agent 병렬 분석** 경로에선 chain-driver 를 안 거쳐 자동으로 안 돈다. 직접 `node ../../tools/schema-validator/src/cli.js .ai-context/output` 실행 → leaf+index RED 0 확인(validate→repair = per-BC 완료 정의 / §schema enum 주의).
+- **산출 후 exit-gate (F-2)**: `schema-validator` 는 `REQUIRED_VALIDATORS_PER_STAGE.analysis`(gate#0)에 등재돼 있으나 **skill-direct / multi-agent 병렬 분석** 경로에선 chain-driver 를 안 거쳐 자동으로 안 돈다. 직접 `node ../../tools/schema-validator/src/cli.js .ai-context/base` 실행 → leaf+index RED 0 확인(validate→repair = per-BC 완료 정의 / §schema enum 주의).
 - `analysis-formal-spec-validation` 호출 권장 (도메인 ↔ 규칙 ↔ 인벤토리 정합)
 
 ## 인용

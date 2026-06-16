@@ -51,7 +51,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 ## 산출물
 
-`<user-project>/.ai-context/output/shared/inventory.json` (validate against `schemas/inventory.schema.json`)
+`<user-project>/.ai-context/base/shared/inventory.json` (validate against `schemas/inventory.schema.json`)
 
 ## 다음
 

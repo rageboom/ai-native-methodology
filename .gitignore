@@ -31,3 +31,7 @@ Thumbs.db
 .idea/
 .vscode/
 *.swp
+
+# 임시 dogfood — repo-root project-level .mcp.json (headroom/codegraph companion 수동 검증용 / 절대경로 launcher).
+# plugin-bundled plugins/context-ops/.mcp.json 은 anchored 라 무영향. DEC-2026-06-15-headroom-companion 검증용.
+/.mcp.json

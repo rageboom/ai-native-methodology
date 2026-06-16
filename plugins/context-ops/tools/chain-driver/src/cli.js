@@ -21,7 +21,7 @@
 //   4 = state-corrupt
 
 import { existsSync, readFileSync, appendFileSync, mkdirSync, writeFileSync } from 'node:fs';
-import { basename, dirname, join, resolve, isAbsolute } from 'node:path';
+import { basename, dirname, join, resolve, isAbsolute, relative } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import {
@@ -43,6 +43,16 @@ import {
 import { executeQuery } from './query.js';
 import { markDrift, cascade, registerCanonicalSources, diffBusinessRulesByRule, listUnbaselinedScopes } from './sync.js';
 import { isBusinessRulesIndex, normalizeBusinessRules, loadBusinessRules } from '../../_shared/load-business-rules.js';
+import {
+	SEG,
+	INTERVENTION_LOG_REL,
+	interventionLogPathForRead,
+	baseFileForRead,
+	baseDirForRead,
+	scopeFileForRead,
+	scopeDirForRead,
+} from '../../_shared/ai-context-layout.js';
+import { planLayoutMigration, applyLayoutMigration } from './migrate-layout.js';
 
 const MANIFEST_STAGES = ['discovery', 'spec', 'plan', 'test', 'impl'];
 function stageToManifestStage(stage) {
@@ -144,6 +154,7 @@ function usage(code = 3) {
 			'  suggest-skill --prompt <text>',
 			'  hooks-bridge          (reads stdin JSON, writes stdout JSON)',
 			'  migrate <project>',
+			'  migrate-layout <project> [--dry-run]   (구 .ai-context/output+최상위 scope → base/scopes/runtime 인플레이스 이주)',
 			'  revisit-detect <project> [--base <sha>] [--user-decision <go|ignore>]',
 			'',
 			'exit codes: 0=ok, 1=blocked, 2=invariant-violation, 3=usage, 4=state-corrupt',
@@ -211,9 +222,10 @@ function parseArgs(argv) {
 }
 
 function logIntervention(state, projectRoot, entry) {
-	const path = join(
+	// 감사 추적 분리 방지: 기존 로그 위치를 alias 로 해소 (state 설정 → NEW runtime/ → 구 output/) — DEC-2026-06-16.
+	const path = interventionLogPathForRead(
 		projectRoot,
-		state?.intervention_log_path || '.ai-context/output/intervention-log.jsonl',
+		state?.intervention_log_path,
 	);
 	mkdirSync(dirname(path), { recursive: true });
 	const line =
@@ -443,8 +455,7 @@ function cmdNext(args) {
 				low: findings.low || 0,
 				info: findings.info || 0,
 			},
-			intervention_log_path:
-				s.intervention_log_path || '.ai-context/output/intervention-log.jsonl',
+			intervention_log_path: s.intervention_log_path || INTERVENTION_LOG_REL,
 		};
 		s.stage_progress[stage] = {
 			...(s.stage_progress[stage] || {}),
@@ -1334,15 +1345,15 @@ function cmdSuggestSkill(args) {
 // 그래프 없으면 null (non-fatal).
 function buildGraphSessionContext(root) {
 	const candidates = [
-		join(root, '.ai-context', 'output', 'artifact-graph.json'),
+		baseFileForRead(root, 'artifact-graph.json'), // base/ (NEW) ↔ output/ (OLD) alias
 		join(root, '.ai-context', 'artifact-graph.json'),
 	];
 	let graphPath = candidates.find((p) => existsSync(p));
 	if (!graphPath) {
-		// scope 별 위치도 탐색 (.ai-context/<scope>/artifact-graph.json)
+		// scope 별 위치도 탐색 (scopes/<scope>/ NEW ↔ 최상위 <scope>/ OLD)
 		try {
 			for (const scope of listScopes(root)) {
-				const p = join(root, '.ai-context', scope, 'artifact-graph.json');
+				const p = scopeFileForRead(root, scope, null, 'artifact-graph.json');
 				if (existsSync(p)) {
 					graphPath = p;
 					break;
@@ -1650,6 +1661,68 @@ function cmdMigrate(args) {
 	}
 }
 
+function cmdMigrateLayout(args) {
+	if (!args.project) usage(3);
+	const root = resolve(args.project);
+	const plan = planLayoutMigration(root);
+	if (plan.noAimd) {
+		console.error('[chain-driver migrate-layout] .ai-context 없음');
+		process.exit(3);
+	}
+	if (plan.collisions.length > 0) {
+		console.error(
+			`[chain-driver migrate-layout] 충돌 ${plan.collisions.length}건 — 대상 경로 이미 존재 (half-migrated?). --dry-run 으로 확인:`,
+		);
+		for (const c of plan.collisions)
+			console.error(`  ✖ ${c.from} → ${c.to}`);
+		process.exit(3);
+	}
+	if (args.dryRun) {
+		if (plan.alreadyMigrated || plan.moves.length === 0) {
+			process.stdout.write('[chain-driver migrate-layout] (dry-run) 이주 대상 없음 (이미 신 레이아웃).\n');
+			process.exit(0);
+		}
+		process.stdout.write(
+			`[chain-driver migrate-layout] (dry-run) 이주 계획 ${plan.moves.length}건:\n`,
+		);
+		for (const m of plan.moves)
+			process.stdout.write(`  [${m.kind}] ${m.from} → ${m.to}\n`);
+		process.exit(0);
+	}
+	const result = applyLayoutMigration(root, { dryRun: false });
+	if (!result.applied) {
+		process.stdout.write(`[chain-driver migrate-layout] ${result.reason}\n`);
+		process.exit(0);
+	}
+	// state.json intervention_log_path 갱신 + 이주 이벤트 기록 (로그 이동 후).
+	try {
+		const state = readState(root);
+		if (state) {
+			writeStateCAS(root, (s) => ({
+				...s,
+				intervention_log_path: INTERVENTION_LOG_REL,
+			}));
+			logIntervention({ ...state, intervention_log_path: INTERVENTION_LOG_REL }, root, {
+				event_type: 'layout_migration',
+				actor: 'driver',
+				message: `migrated ${result.moves.length} entries to base/scopes/runtime`,
+			});
+		}
+	} catch {
+		/* state 없거나 손상 — 이주 자체는 성공 */
+	}
+	const byKind = result.moves.reduce((acc, m) => {
+		acc[m.kind] = (acc[m.kind] || 0) + 1;
+		return acc;
+	}, {});
+	process.stdout.write(
+		`[chain-driver migrate-layout] 완료 — ${result.moves.length}건 이주 (${Object.entries(byKind)
+			.map(([k, v]) => `${k}:${v}`)
+			.join(' / ')}).\n`,
+	);
+	process.exit(0);
+}
+
 function cmdRevisitDetect(args) {
 	if (!args.project) usage(3);
 	const root = resolve(args.project);
@@ -1946,7 +2019,7 @@ function cmdSyncLoop(args) {
 			process.exit(3);
 		}
 		const root = args.project ? resolve(args.project) : process.cwd();
-		const brRel = args.brPath || join('.ai-context', 'output', 'business-rules.json');
+		const brRel = args.brPath || relative(root, baseFileForRead(root, 'business-rules.json'));
 		const brAbs = isAbsolute(brRel) ? brRel : join(root, brRel);
 		if (!existsSync(brAbs)) {
 			console.error(`[chain-driver] sync-loop --br-diff: business-rules.json 부재: ${brAbs}`);
@@ -1990,7 +2063,7 @@ function cmdSyncLoop(args) {
 			console.error(`[chain-driver] sync-loop --git: git diff 실패: ${diff.error}`);
 			process.exit(3);
 		}
-		const brRel = args.brPath || join('.ai-context', 'output', 'business-rules.json');
+		const brRel = args.brPath || relative(root, baseFileForRead(root, 'business-rules.json'));
 		const brRelPosix = brRel.split('\\').join('/');
 		const changed = diff.files.map((f) => f.path.split('\\').join('/'));
 		// BLOCKER-1 (STEP 3): 분할 후 실 rule 편집은 business-rules/<bc>.json 에서 발생 → index 정확매치만으론
@@ -2428,7 +2501,7 @@ function cmdSyncConverge(args) {
 		console.error(`[chain-driver] sync-converge --git: git diff 실패: ${diff.error}`);
 		process.exit(3);
 	}
-	const brRel = args.brPath || join('.ai-context', 'output', 'business-rules.json');
+	const brRel = args.brPath || relative(root, baseFileForRead(root, 'business-rules.json'));
 	const brRelPosix = brRel.split('\\').join('/');
 	const changed = diff.files.map((f) => f.path.split('\\').join('/'));
 	// STEP 3 partition (BR-split BLOCKER-1): index 파일 OR per-BC 디렉토리 prefix = BR 변경.
@@ -3020,14 +3093,15 @@ function cmdResyncGraph(args) {
 		outputDir = resolve(args.outDir);
 	} else {
 		const candidates = [];
-		if (args.scope) candidates.push(join(projectRoot, '.ai-context', args.scope));
-		candidates.push(join(projectRoot, '.ai-context', 'output'));
+		// NEW scopes/·base/ 우선, 구 최상위 scope·output/ alias 폴백 — DEC-2026-06-16.
+		if (args.scope) candidates.push(scopeDirForRead(projectRoot, args.scope));
+		candidates.push(baseDirForRead(projectRoot));
 		candidates.push(join(projectRoot, '.ai-context'));
 		outputDir =
 			candidates.find((d) => existsSync(join(d, 'artifact-graph.json'))) ||
 			(args.scope
-				? join(projectRoot, '.ai-context', args.scope)
-				: join(projectRoot, '.ai-context', 'output'));
+				? scopeDirForRead(projectRoot, args.scope)
+				: baseDirForRead(projectRoot));
 	}
 
 	// 2) chain 입력 convention 스캔 (존재하는 것만 builder flag 로).
@@ -3168,6 +3242,8 @@ function main() {
 			return cmdHooksBridge(args);
 		case 'migrate':
 			return cmdMigrate(args);
+		case 'migrate-layout':
+			return cmdMigrateLayout(args);
 		case 'revisit-detect':
 			return cmdRevisitDetect(args);
 		case '--help':

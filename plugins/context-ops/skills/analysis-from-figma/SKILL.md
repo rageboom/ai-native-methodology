@@ -24,7 +24,7 @@ Figma 디자인을 입력 받아 화면 + 컴포넌트 + 디자인 토큰 추출
 4. **visual ref 캡처** — `get_screenshot` 1회 호출 → PNG 저장 (산출물 asset_refs 등재). verbatim 채취 cross-check 보조 (LLM 환각 차단).
 5. **디자인 토큰 흡수** — `get_variable_defs` → color / spacing / typography variable + style.
 6. **컴포넌트 트리 정리** — node map 기반 component hierarchy 구축 (parent_id 추적). TEXT 노드는 `text_content` + `provenance` 동반.
-7. **산출 작성** — `.ai-context/<scope>/planning/figma-extract.json` (schema = `schemas/figma-extract.schema.json`).
+7. **산출 작성** — `.ai-context/scopes/<scope>/planning/figma-extract.json` (schema = `schemas/figma-extract.schema.json`).
 
 ## 산출 자격 조건 (gate)
 
@@ -38,8 +38,8 @@ Figma 디자인을 입력 받아 화면 + 컴포넌트 + 디자인 토큰 추출
 
 ## 산출물
 
-- `.ai-context/<scope>/planning/figma-extract.json` (strict / additionalProperties:false)
-- `.ai-context/<scope>/planning/assets/figma-screenshot-*.png` (visual ref / binary 보관)
+- `.ai-context/scopes/<scope>/planning/figma-extract.json` (strict / additionalProperties:false)
+- `.ai-context/scopes/<scope>/planning/assets/figma-screenshot-*.png` (visual ref / binary 보관)
 
 ## scope-out (Figma MCP 표면에 없음)
 

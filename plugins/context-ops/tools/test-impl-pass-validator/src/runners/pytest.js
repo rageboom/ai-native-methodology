@@ -44,7 +44,7 @@ export function parsePytestJson(jsonOrText) {
 
 export function buildArgs(
 	testCmdArgs = [],
-	reportPath = '.ai-context/output/evidence/pytest-report.json',
+	reportPath = '.ai-context/runtime/evidence/pytest-report.json',
 ) {
 	// pytest-json-report plugin: --json-report --json-report-file=<path>
 	return [...testCmdArgs, '--json-report', `--json-report-file=${reportPath}`];

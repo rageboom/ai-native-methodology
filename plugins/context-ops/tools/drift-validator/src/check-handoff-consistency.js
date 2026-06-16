@@ -63,8 +63,8 @@ const HANDOFF_NON_DELIVERABLE = new Set([
 	'finding-system.findings.json',
 	'chain-intervention-log.jsonl',
 ]);
-// 사용자 환경 config — handoff 계약 아님 (`.ai-context/config/` prefix + basename).
-const CONFIG_PREFIX_RE = /(^|\/)\.ai-context\/config\//i;
+// 사용자 환경 config — handoff 계약 아님 (`.ai-context/runtime/config/` NEW ↔ `.ai-context/config/` OLD / DEC-2026-06-16).
+const CONFIG_PREFIX_RE = /(^|\/)\.ai-context\/(?:runtime\/)?config\//i;
 const CONFIG_BASENAMES = new Set(['test-cmd.json']);
 
 // .json/.jsonl/.yaml 만 비교 → .md/.mermaid 토큰 무시 (C3-before-C4 green).
