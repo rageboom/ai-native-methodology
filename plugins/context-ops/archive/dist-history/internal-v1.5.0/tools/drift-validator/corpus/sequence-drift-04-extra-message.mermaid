@@ -1,9 +1,0 @@
-sequenceDiagram
-    actor Client
-    participant Auth
-    participant Resource
-
-    Client->>Auth: login
-    Auth-->>Client: token
-    Client->>Resource: GET data with token
-    Resource-->>Client: data

@@ -1,8 +1,0 @@
-{
-  "id": "Corpus-Equiv-01",
-  "initial": "idle",
-  "states": {
-    "idle": { "on": { "START": "active" } },
-    "active": { "on": { "STOP": "idle", "TERMINATE": "idle" } }
-  }
-}

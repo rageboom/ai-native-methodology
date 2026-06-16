@@ -1,7 +1,0 @@
-stateDiagram-v2
-    [*] --> idle
-    idle --> authenticating: submit
-    authenticating --> authenticated: success
-    authenticating --> error: fail
-    error --> idle: retry
-    authenticated --> [*]
