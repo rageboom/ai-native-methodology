@@ -10,6 +10,14 @@
 
 ---
 
+## [0.48.2] — 2026-06-16 — PATCH — chain-driver scope별 진행 상태 독립 분리 (#19 GHE 통합 출하)
+
+GHE(origin-smilegate) PR #19 를 canonical 라인에 머지(`525c5ecc`)하고 출하. v0.48.1 packaging fix 와 동일 라인.
+
+- **scope별 chain 진행 독립**: `state.scope_states` map(optional / additive) 신설 — 여러 scope 가 한 프로젝트에서 각자 독립적으로 chain 진행 상태를 보유(이전 글로벌 single progress → per-scope 분리). `state.schema.json` scope_states + cli.js + state-store.js (+466 / multi-scope-chain.test.js 13 test 신규). backward-compat(scope_states 부재 = 기존 동작).
+- v0.48.1(packaging lean + js-yaml) 과 #19(chain-driver scope)는 **서로 다른 파일** → 충돌 0 머지. 검증: chain-driver 563/563 (#19 multi-scope + 레이아웃 작업 공존) + _shared 34 + schema-validator 111 GREEN.
+- 양쪽 원격(origin GitHub / origin-smilegate GHE) 525c5ecc 동기화 (force-push 없이 통합).
+
 ## [0.48.1] — 2026-06-16 — PATCH — npm 패키지 lean-ification + ticket-cascade js-yaml 동봉 누락 fix
 
 출하 tarball 에서 tool-local `node_modules` 트리(spectral-runner stale cruft 등 ~9400파일)를 제거하고, 누락됐던 `js-yaml` 동봉을 추가.
