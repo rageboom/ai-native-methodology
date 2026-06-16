@@ -174,11 +174,98 @@
     },
     "intervention_log_path": {
       "type": "string",
-      "description": "프로젝트별 intervention log 경로. 기본 = .ai-context/runtime/intervention-log.jsonl (구 .ai-context/output/ read-alias / DEC-2026-06-16)",
+            "description": "프로젝트별 intervention log 경로. 기본 = .ai-context/runtime/intervention-log.jsonl (구 .ai-context/output/ read-alias / DEC-2026-06-16)",
       "default": ".ai-context/runtime/intervention-log.jsonl"
+    },
+    "scope_states": {
+      "type": "object",
+      "description": "scope 별 chain 진행 상태 맵 (key = scope slug). current_scope 가 설정된 경우 cmdNext 는 전역 current_chain/stage_progress 대신 여기에 read/write 한다. backward-compat: 필드 부재 = scope 없는 기존 프로젝트 (전역 필드만 사용).",
+      "propertyNames": { "pattern": "^[a-z0-9][a-z0-9-]{1,63}$" },
+      "additionalProperties": {
+        "$ref": "#/$defs/ScopeChainState"
+      },
+      "default": {}
+    },
+    "block_scope": {
+      "anyOf": [
+        { "type": "null" },
+        { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,63}$" }
+      ],
+      "description": "어느 scope 가 현재 block 을 설정했는지 추적. null = global/no-scope block. 다른 scope 의 next 성공이 이 block 을 지우지 않도록 cross-scope clear 방지에 사용."
     }
   },
   "$defs": {
+    "ScopeChainState": {
+      "type": "object",
+      "description": "scope 단위 chain 진행 상태. state.json 전역 current_chain/stage_progress 와 구조 동형.",
+      "required": ["current_chain", "stage_progress"],
+      "additionalProperties": false,
+      "properties": {
+        "current_chain": {
+          "type": "string",
+          "enum": ["analysis", "discovery", "spec", "plan", "test", "implement", "revisit_pending"]
+        },
+        "stage_progress": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["analysis", "discovery", "spec", "plan", "test", "implement"],
+          "properties": {
+            "analysis": { "$ref": "#/$defs/StageRecord" },
+            "discovery": { "$ref": "#/$defs/StageRecord" },
+            "spec": { "$ref": "#/$defs/StageRecord" },
+            "plan": { "$ref": "#/$defs/StageRecord" },
+            "test": { "$ref": "#/$defs/StageRecord" },
+            "implement": { "$ref": "#/$defs/StageRecord" }
+          }
+        },
+        "last_gate": {
+          "anyOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/GateRecord" }
+          ]
+        }
+      }
+    },
+    "GateRecord": {
+      "type": "object",
+      "required": ["id", "stage", "decision", "decision_at"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "enum": ["#0", "#1", "#2", "#3", "#4", "#5"],
+          "description": "ADR-CHAIN-002 gate ID — v10.0.0 MAJOR (Phase 4-4') gate 번호 재정렬 (chain 번호 = gate 번호 1:1 INTERNAL CONVENTION). analysis=#0 (DEC-2026-06-06-analysis-exit-gate / pre-chain exit gate) / discovery=#1 / spec=#2 / plan=#3 / test=#4 / implement=#5."
+        },
+        "stage": {
+          "type": "string",
+          "enum": ["analysis", "discovery", "spec", "plan", "test", "implement"],
+          "description": "v10.0.0 MAJOR (Phase 4-4' / DEC-2026-05-25-axis-a-phase-4-4-prime) — gate #1~#5 = discovery/spec/plan/test/implement. analysis=#0 (DEC-2026-06-06-analysis-exit-gate / pre-chain exit gate). plan stage 본격 hard gate 진입 (v9.3.0 placeholder '#plan' 폐기 + v10.0.0 '#3' 본격)."
+        },
+        "decision": {
+          "type": "string",
+          "enum": ["go", "stop", "revisit"]
+        },
+        "decision_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "validator_findings": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "critical": { "type": "integer", "minimum": 0 },
+            "high": { "type": "integer", "minimum": 0 },
+            "medium": { "type": "integer", "minimum": 0 },
+            "low": { "type": "integer", "minimum": 0 },
+            "info": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "intervention_log_path": {
+          "type": "string",
+          "description": "ADR-CHAIN-005 §8 / intervention-log.schema.json 정합 — 보통 .ai-context/output/intervention-log.jsonl"
+        }
+      }
+    },
     "StageRecord": {
       "type": "object",
       "required": ["status"],
