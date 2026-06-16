@@ -33,6 +33,7 @@
     { "name": "discovery-spec.json", "stage": "discovery", "produced_by": "discovery", "deliverable": 17, "track": "common" },
     { "name": "behavior-spec.json", "stage": "spec", "produced_by": "spec", "deliverable": 18, "track": "common" },
     { "name": "acceptance-criteria.json", "stage": "spec", "produced_by": "spec", "deliverable": 19, "track": "common" },
+    { "name": "unit-spec.json", "stage": "spec", "produced_by": "spec", "deliverable": 27, "track": "common" },
     { "name": "task-plan.json", "stage": "plan", "produced_by": "plan", "deliverable": 22, "track": "common" },
     { "name": "test-spec.json", "stage": "test", "produced_by": "test", "deliverable": 20, "track": "common" },
     { "name": "impl-spec.json", "stage": "implement", "produced_by": "implement", "deliverable": 21, "track": "common", "note": "flow token non-literal (impl-spec.impl_modules[]) — produced_by bridge" },

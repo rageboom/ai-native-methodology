@@ -30,6 +30,15 @@
       "skills": ["spec-derive-acceptance-criteria"]
     },
     {
+      "id": "unit-spec-derive",
+      "name": "TDD/unit 층 인벤토리 (UNIT-* / S2 characterized_from_code emit)",
+      "depends_on": ["behavior-spec-compose"],
+      "inputs": ["domain.json", "characterization-spec.json", "behavior-spec.json"],
+      "outputs": ["unit-spec.json"],
+      "introduced": "v0.50.0",
+      "skills": ["spec-derive-unit-spec"]
+    },
+    {
       "id": "cross-link-7-deliverables",
       "name": "7대 산출물 cross-link 통합",
       "depends_on": ["behavior-spec-compose", "acceptance-criteria-derive"],

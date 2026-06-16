@@ -6,6 +6,7 @@ skills:
   [
     spec-compose-behavior-spec,
     spec-derive-acceptance-criteria,
+    spec-derive-unit-spec,
     spec-integrate-deliverables,
     _base-build-traceability-matrix,
     _base-apply-template,
@@ -17,7 +18,7 @@ model: opus
 
 # spec-agent — chain 2 (spec) 전문 agent
 
-executable behavioral contract 추출 전문. 3 spec skill + 4 base utility = 7 skill 사전 주입.
+executable behavioral contract 추출 전문. 4 spec skill + 4 base utility = 8 skill 사전 주입.
 
 ## 책임 범위
 
@@ -27,6 +28,7 @@ executable behavioral contract 추출 전문. 3 spec skill + 4 base utility = 7 
 | --------------------------------- | ----------------------------------------------- | ---------------------------------------------------------------------------------- |
 | `spec-compose-behavior-spec`      | chain 2 진입 / behavior-spec 본격 작성          | behavior-spec.json (BHV-\* + state machine + sequence + invariant + property test) |
 | `spec-derive-acceptance-criteria` | behavior-spec 채움 후 sub                       | acceptance-criteria.json (AC-\* Gherkin Given/When/Then + MoSCoW)                  |
+| `spec-derive-unit-spec`           | behavior-spec 채움 후 sub (S2 / code-graph∩domain) | unit-spec.json (UNIT-\* / characterized_from_code / mocking-soundness backbone)    |
 | `spec-integrate-deliverables`     | cross_links.to_analysis_artifacts backward link | 7대 + 8 FE 산출물 모두 ref 등재                                                    |
 | `_base-apply-template`            | 진입 시 behavior-spec.json 골조                 | template 자동 적용                                                                 |
 | `_base-build-traceability-matrix` | UC → BHV → AC forward link 갱신                 | matrix.json (갱신)                                                                 |
@@ -56,15 +58,20 @@ chain 0 / 1 / 3~5 skill ❌ — 각 stage agent 권한.
    - MoSCoW 우선순위 (Must / Should / Could / Won't)
    - test_case_refs (chain 4 → TC forward link 의무)
 
-4. **spec-integrate-deliverables skill 호출** — cross_links 채움:
+4. **spec-derive-unit-spec skill 호출** (S2 / unit 층) — UNIT-\* emit:
+   - `code-graph ∩ domain.behaviors` 격리 빌딩블록 → characterized_from_code
+   - obligation 보수 default (mock collaborator 미핀 = `waived`+reason)
+   - 격리 순수 단위 0 BC = 파일 미생성 (behavior-only 정상 / busywork ❌)
+
+5. **spec-integrate-deliverables skill 호출** — cross_links 채움:
    - 7대 BE + 8 FE 산출물 모두 ref 등재
    - chain-coverage-validator 자동 검증 통과 의무
 
-5. **gate #2 진입 — `_base-invoke-go-stop-gate` skill 호출**:
+6. **gate #2 진입 — `_base-invoke-go-stop-gate` skill 호출**:
    - 사용자 결단 cluster 5~6
    - intervention-log 본체 등재
 
-6. **종결 보고**:
+7. **종결 보고**:
    - behavior-spec.json + acceptance-criteria.json path
    - traceability-matrix UC → BHV → AC forward 갱신 상태
    - chain 3 (plan) 진입 권고 → `plan-agent` dispatch (phase-flow next_chain=plan / plan stage 건너뜀 금지)
@@ -79,6 +86,7 @@ chain 0 / 1 / 3~5 skill ❌ — 각 stage agent 권한.
 
 - `.ai-context/base/behavior-spec.json` (schemas/behavior-spec.schema.json 의무 / json 단독 SSOT)
 - `.ai-context/base/acceptance-criteria.json` (schemas/acceptance-criteria.schema.json 의무 / json 단독 SSOT)
+- `.ai-context/base/unit-spec.json` (schemas/unit-spec.schema.json / 멀티스코프 시 `scopes/<scope>/spec/unit-spec.json` / S2 emit / 격리 순수 단위 0 BC = 미생성)
 - `.ai-context/runtime/findings.md` (누적)
 - `.ai-context/base/intervention-log.json` (gate #2 사용자 결단 로그)
 

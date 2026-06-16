@@ -10,6 +10,27 @@
 
 ---
 
+## [0.50.0] — 2026-06-16 — MINOR — TDD/unit 층 `unit-spec.json` EMIT 단계 spec stage 배선 (integration gap 해소)
+
+unit 층은 v0.36.0 에 1급화(스키마 `unit-spec.schema.json` + `UNIT-*` + deliverable 27 + 정책 test-layering.md)되고 v0.40.0 에 두 검증기(`validateMockSoundness` test gate#4 / `validateUnitTestObligation` plan gate#3)가 HARD 격상됐으나, **그 게이트의 입력(`unit-spec.json`)을 생성하는 에이전트 경로가 한 번도 배선된 적이 없었다**. 실측(0.49.0): `analysis-unit*`/`spec-*-unit*` skill 0 · 11 agent 프롬프트 unit-spec 언급 0 · phase-flow unit 0. 결과 = 채택처(ep-be-gea 34 BC)가 전부 composition-only(unit TC 0 / mock 0)로 돌았고, 게이트는 unit-spec 부재 시 clean-skip 이라 거짓 GREEN 이 미점검 통과. event 만 PoC #1 으로 수기 emit. **"machinery shipped, agent workflow not wired".** SSOT: `DEC-2026-06-16-unit-spec-emit-wiring`.
+
+### 변경
+
+- **신규 skill** `skills/spec-derive-unit-spec/SKILL.md` — S2(characterized_from_code) emit. analysis `code-graph ∩ domain.behaviors` 교집합에서 격리 빌딩블록(순수 클래스·함수·enum)을 `UNIT-*` 로 발견 → `unit-spec.json`. no-simulation grounding(code_pointer ast_symbol 실존 검증 / 미존재 시 emit 거부) + 보수 obligation 안전판 + read-only/CRUD BC 미생성(busywork 금지).
+- **편집** `flows/spec.phase-flow.json` — phase `unit-spec-derive`(depends_on `behavior-spec-compose` / spec_file 없음 / skills `spec-derive-unit-spec`).
+- **편집** `agents/spec-agent.md` — frontmatter `skills:[]` + 책임표 + 호출 절차 step + 산출 자산(4 spec skill + 4 base = 8 skill).
+- **doc 정정** (emit 단계 analysis→spec / 미구현 aspiration 정정): `lifecycle-contract.md:221` + 자산 매핑 매트릭스 spec 행 / `deliverables/27-unit-spec.md` 생성 phase / `policies/test-layering.md` S2 행. emit 단계 = **spec**(양 provenance / work-unit spec zone) — 소비자 resolver(`STAGE_SUBDIR['unit-spec.json']='spec'`) + 유일 실례 event 가 모두 spec zone 이므로 게이트 plumbing 무변경.
+
+### 게이트 소급 발화 안전판
+
+emit 즉시 그 scope 의 HARD 게이트가 살아난다(거짓 GREEN 포착 = 목적). mid-flight 체인 파손 방지: mock 협력자인데 이번 사이클 unit TC 미작성이면 `waived`+`waiver_reason`(`validateMockSoundness` 유일 면제값 — `characterization_only` 는 면제 ❌ / validator.js 실측). `required`/`characterization_only` 는 test-generate bottom-up 이 `test_layer=unit` TC 를 실제 생성할 때만.
+
+### §8.1
+
+emit-wiring = 스키마·게이트 본체 무변경 → **fresh PoC 면제**(unit 층 ratchet 은 v0.40.0 에서 ep-be-gea S2/Java + poc-18 S2/TS + poc-21 greenfield/JS 3-도메인 이미 충족). dogfood = event BC 를 새 skill 로직으로 재생성 → 수기본(4 UNIT / mock-sound 0 findings) 재현(신규 finding 0). over-claim 가드 5항(검증됨 ❌ · 34-BC 백필됨 ❌ · greenfield 배선 ❌ · RED→GREEN 순서 보증 ❌ · method-axis 게이트 승격 ❌). 범위 밖(후속): greenfield/designed_from_spec 분기 + ep-be-gea 34-BC 실 unit-spec 백필.
+
+---
+
 ## [0.49.0] — 2026-06-16 — MINOR — `domain-bc.schema.json` 신설 (per-BC domain 샤드 verdict-optional 라우팅)
 
 per-BC `domain.json` 샤드(`domains/<BC>/`·`shared/cross-cutting/<x>/`)가 카탈로그용 `domain.schema.json`(bounded_contexts 항목 verdict REQUIRED)에 basename 라우팅돼 schema RED 이던 문제를, per-BC 전용 schema 신설로 해소. verdict 는 카탈로그(`shared/domain.json`)가 SSOT 소유이고 샤드는 의도적 미보유(DEC-2026-06-15-bc-verdict-classification).

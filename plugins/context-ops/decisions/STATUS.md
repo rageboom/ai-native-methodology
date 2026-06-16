@@ -9,6 +9,11 @@
 
 > 다음 세션 진입 = 아래 frontier 중 **사용자 선택** (방법론 원칙: 다음 의제 = 사용자 결단 / 하드코딩 ❌).
 
+### ★ 다음 세션 인계 (2026-06-16 / **v0.50.0 — unit-spec EMIT 배선(integration gap 해소): 신규 skill `spec-derive-unit-spec`** / DEC-2026-06-16-unit-spec-emit-wiring)
+
+- unit 층 게이트(v0.40.0 HARD)는 있는데 입력 생산자(unit-spec emit)가 미배선이던 갭 해소. spec stage 에 S2(characterized_from_code) emit skill 추가. 상세 = CHANGELOG [0.50.0] + DEC SSOT.
+- **carry(후속 frontier)**: ① greenfield/designed_from_spec 분기(formal-spec.invariants → 동일 skill 확장) ② ep-be-gea 34-BC 실 unit-spec 백필(write·계산-heavy BC 우선 / event 외 전 BC composition-only 잠복).
+
 ### ★ 다음 세션 인계 (2026-06-14 / **carry ④ 최종 종결 — BC-COMMON-CALC(근무일·환율 supporting) + extractor 철자-quirk gotcha 발견** / methodology 무bump / ep-be-gea `a4aa922a08` GHE pending ahead 35)
 
 - **사용자 "잔여" → 가치 토론 → "calc 2개만 하고 종결"**: 공통-마스터/calc 티어 중 wokingdays·exchange(다중 도메인 의존 calc)만 가치 있다고 합의(epbcommon code/company/department·chargemanagement = 의도적 skip / business 도메인 아님). "이게 뭐하는 작업인가" 질의에 **공통/유틸 분석은 양 축(AX·plugin) 모두 저가치**임을 정직 인정한 뒤 calc 2개만 진행.

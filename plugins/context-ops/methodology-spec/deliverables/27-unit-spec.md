@@ -3,7 +3,7 @@
 # 산출물 #27: Unit Spec (TDD/unit 층 / UNIT-* SSOT)
 
 > **schema**: `schemas/unit-spec.schema.json`
-> **생성 phase**: analysis (S2 발견) 또는 spec (greenfield 설계) — provenance 별
+> **생성 phase**: spec (work-unit spec zone emit / 양 provenance). 소스는 provenance 별 — S2=analysis `code-graph ∩ domain.behaviors` (characterized_from_code / `spec-derive-unit-spec` skill / v0.50.0 배선 / DEC-2026-06-16-unit-spec-emit-wiring) / greenfield=`formal-spec.invariants` (designed_from_spec / 후속 carry).
 > **정책 SSOT**: `methodology-spec/policies/test-layering.md`
 > **신설**: v0.36.0 (DEC-2026-06-11-tdd-unit-layer-thread)
 
