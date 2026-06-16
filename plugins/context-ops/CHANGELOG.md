@@ -10,6 +10,14 @@
 
 ---
 
+## [0.48.1] — 2026-06-16 — PATCH — npm 패키지 lean-ification + ticket-cascade js-yaml 동봉 누락 fix
+
+출하 tarball 에서 tool-local `node_modules` 트리(spectral-runner stale cruft 등 ~9400파일)를 제거하고, 누락됐던 `js-yaml` 동봉을 추가.
+
+- **packaging bloat 제거**: `files` 에 `"!**/node_modules"` 추가 → tool-local node_modules(spectral-runner es-abstract/lodash/@stoplight 7000+·schema-validator/sql-inventory 중복 ajv/fast-xml-parser) 출하 제외. **9.3MB/14730파일 → 3.3MB/5429파일**(−65%). 루트 bundledDependencies 는 그대로 동봉(Node 상향탐색으로 도구가 루트에서 해소).
+- **잠복 버그 fix**: `ticket-cascade-builder` 가 lazy-require 하는 `js-yaml`(YAML config 파싱)이 루트 bundledDependencies 에 없어 0.48.0·이전 출하본에서 YAML 경로가 깨져 있었음 → 루트 `dependencies`+`bundledDependencies` 에 `js-yaml@^4.1.0` 추가. 전 도구 외부 import 합집합 {ajv·ajv-formats·fast-xml-parser·js-yaml} 4종 전부 루트 bundle 로 커버.
+- 검증: dry-pack 4종 bundle 동봉 확인 / tool-local node_modules 0 / 도구 src 127 보존 / release-readiness 통과.
+
 ## [0.48.0] — 2026-06-16 — MINOR — `.ai-context/` 레이아웃 재구조화 (base/scopes/runtime + read-alias)
 
 사용자 프로젝트의 `.ai-context/` 온-디스크 레이아웃을 평면 → **3-버킷 + 루트 싱글톤**으로 재구조화. **read-alias 비파괴**(배포된 구 `output/`·최상위 scope 디스크 무손상) / DEC-2026-06-16-ai-context-layout-restructure.
