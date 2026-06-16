@@ -39,6 +39,8 @@ import {
 	readManifest,
 	writeManifest,
 	listScopes,
+	initScopeChainState,
+	getActiveScopeChain,
 } from './state-store.js';
 import { executeQuery } from './query.js';
 import { markDrift, cascade, registerCanonicalSources, diffBusinessRulesByRule, listUnbaselinedScopes } from './sync.js';
@@ -291,7 +293,9 @@ function cmdInit(args) {
 		if (args.scope) {
 			ensureScopeDir(root, args.scope, args.scenario); // v11.9.0 use-scenario taxonomy seed
 			state = writeStateCAS(root, (s) => {
+				const inheritGlobal = s.current_scope === args.scope;
 				s.current_scope = args.scope;
+				initScopeChainState(s, args.scope, { inheritGlobal });
 				return s;
 			});
 		}
@@ -333,15 +337,26 @@ function cmdState(args) {
 	if (args.json) {
 		process.stdout.write(JSON.stringify(state, null, 2) + '\n');
 	} else {
+		const active = getActiveScopeChain(state);
 		const lines = [
 			`project_id     : ${state.project_id}`,
-			`current_chain  : ${state.current_chain}`,
+			`current_scope  : ${state.current_scope ?? '-'}`,
+			`current_chain  : ${active.current_chain}${active.scoped ? ` (scope: ${active.scope})` : ' (global)'}`,
 			`current_phase  : ${state.current_phase}`,
 			`blocked        : ${state.blocked} (${state.block_reason || '-'})`,
-			`last_gate      : ${state.last_gate ? `${state.last_gate.id} ${state.last_gate.decision}` : '-'}`,
+			`last_gate      : ${active.last_gate ? `${active.last_gate.id} ${active.last_gate.decision}` : '-'}`,
 			`pending_revisit: ${state.pending_revisit ? state.pending_revisit.target_stage : '-'}`,
 			`regen_queue    : ${regenQueueSummary(state.regen_queue)}`,
 		];
+		// 다중 scope 요약: 2개 이상이면 모든 scope 의 chain 단계 표시
+		const scopeEntries = Object.entries(state.scope_states ?? {});
+		if (scopeEntries.length > 1) {
+			lines.push('scope progress :');
+			for (const [slug, sc] of scopeEntries) {
+				const marker = slug === state.current_scope ? ' *' : '';
+				lines.push(`  ${slug}${marker}: chain=${sc.current_chain}`);
+			}
+		}
 		process.stdout.write(lines.join('\n') + '\n');
 	}
 	process.exit(0);
@@ -391,9 +406,10 @@ function cmdNext(args) {
 	//   → soft block 사후 ack 경로 복원 (dogfood: 블록 후 --user-decision 이 가드에 막혀 미도달). anti-bypass 무손상.
 	if (state.blocked && !args.userDecision) blockedExit(state, root);
 
-	// DEC-2026-06-06-analysis-exit-gate — analysis 자체 gate(#0) 평가. 구: analysis→'discovery' 매핑이
-	//   gate 를 discovery(#1)로 평가 + nextStage('discovery')='spec' 로 discovery 를 스킵하던 latent 버그 → analysis→discovery 정상 전이로 교정.
-	const stage = state.current_chain;
+	// DEC-2026-06-06-analysis-exit-gate — analysis 자체 gate(#0) 평가.
+	// scope 활성 시 scope_states[scope].current_chain 사용 (전역 current_chain 과 분리).
+	const activeChain = getActiveScopeChain(state);
+	const stage = activeChain.current_chain;
 	const findings = loadFindings(args.findingsPath);
 	// v11.9.0 — use-scenario taxonomy: scope manifest.scenario → gate matrix (미지정 → 'S1' default / backward-compat).
 	let scenario;
@@ -419,6 +435,7 @@ function cmdNext(args) {
 		writeStateCAS(root, (s) => {
 			s.blocked = true;
 			s.block_reason = finalDecision.primary_reason || 'validator_high';
+			s.block_scope = s.current_scope ?? null; // 어느 scope 가 block 을 설정했는지 추적
 			return s;
 		});
 		logIntervention(state, root, {
@@ -443,7 +460,7 @@ function cmdNext(args) {
 			finalDecision.decision === 'go-with-warnings'
 				? 'go'
 				: finalDecision.decision || 'go';
-		s.last_gate = {
+		const gateRecord = {
 			id: getGateForStage(stage),
 			stage,
 			decision,
@@ -457,22 +474,51 @@ function cmdNext(args) {
 			},
 			intervention_log_path: s.intervention_log_path || INTERVENTION_LOG_REL,
 		};
-		s.stage_progress[stage] = {
-			...(s.stage_progress[stage] || {}),
-			status: 'complete',
-			completed_at: nowIso,
-			gate_decision: decision === 'stop' ? 'stop' : 'go',
-		};
-		if (next) {
-			s.current_chain = next;
-			s.stage_progress[next] = {
-				...(s.stage_progress[next] || {}),
-				status: 'in_progress',
-				started_at: nowIso,
+
+		// scope 활성 시 scope_states 에 기록 / 미활성 시 전역 필드 (backward-compat).
+		const scopeSlug = s.current_scope;
+		if (scopeSlug && s.scope_states && Object.hasOwn(s.scope_states, scopeSlug)) {
+			const sc = s.scope_states[scopeSlug];
+			sc.last_gate = gateRecord;
+			sc.stage_progress[stage] = {
+				...(sc.stage_progress[stage] || {}),
+				status: 'complete',
+				completed_at: nowIso,
+				gate_decision: decision === 'stop' ? 'stop' : 'go',
 			};
+			if (next) {
+				sc.current_chain = next;
+				sc.stage_progress[next] = {
+					...(sc.stage_progress[next] || {}),
+					status: 'in_progress',
+					started_at: nowIso,
+				};
+			}
+		} else {
+			s.last_gate = gateRecord;
+			s.stage_progress[stage] = {
+				...(s.stage_progress[stage] || {}),
+				status: 'complete',
+				completed_at: nowIso,
+				gate_decision: decision === 'stop' ? 'stop' : 'go',
+			};
+			if (next) {
+				s.current_chain = next;
+				s.stage_progress[next] = {
+					...(s.stage_progress[next] || {}),
+					status: 'in_progress',
+					started_at: nowIso,
+				};
+			}
 		}
-		s.blocked = false;
-		s.block_reason = null;
+		// cross-scope block clear 방지: block 을 설정한 scope 와 현재 scope 가 같을 때만 해제.
+		// scope A가 block 됐을 때 scope B의 next 성공이 A의 block 을 지우지 않도록 한다.
+		const unblockingScope = s.current_scope ?? null;
+		if (s.block_scope === undefined || s.block_scope === null || s.block_scope === unblockingScope) {
+			s.blocked = false;
+			s.block_reason = null;
+			s.block_scope = null;
+		}
 		return s;
 	});
 	// G3 manifest sync — only when current_scope is set.

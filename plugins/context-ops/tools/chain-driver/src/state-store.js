@@ -29,6 +29,15 @@ import {
 
 export const CURRENT_STATE_VERSION = '1.0';
 
+const DEFAULT_STAGE_PROGRESS = () => ({
+	analysis: { status: 'in_progress' },
+	discovery: { status: 'pending' },
+	spec: { status: 'pending' },
+	plan: { status: 'pending' },
+	test: { status: 'pending' },
+	implement: { status: 'pending' },
+});
+
 const DEFAULT_STATE = (projectId) => ({
 	// 정규 스키마 포인터 = $schema_ref (basename 라우팅 / 프로젝트-상대 / 이식성).
 	// 레거시 $schema_origin(deprecated)의 깊은 ../ 상대경로는 프로젝트 밖을 가리켜 미해결이라 폐기.
@@ -38,14 +47,7 @@ const DEFAULT_STATE = (projectId) => ({
 	current_chain: 'analysis',
 	current_phase: 'input.0',
 	current_scope: null,
-	stage_progress: {
-		analysis: { status: 'in_progress' },
-		discovery: { status: 'pending' },
-		spec: { status: 'pending' },
-		plan: { status: 'pending' },
-		test: { status: 'pending' },
-		implement: { status: 'pending' },
-	},
+	stage_progress: DEFAULT_STAGE_PROGRESS(),
 	last_gate: null,
 	pending_revisit: null,
 	blocked: false,
@@ -54,6 +56,7 @@ const DEFAULT_STATE = (projectId) => ({
 	lock_acquired_at: null,
 	revisit_ignore_globs: [],
 	intervention_log_path: INTERVENTION_LOG_REL,
+	scope_states: {},
 });
 
 export function statePath(projectRoot) {
@@ -245,6 +248,48 @@ export function initState(projectRoot, projectId) {
 	const initial = DEFAULT_STATE(projectId);
 	atomicWrite(path, JSON.stringify(initial, null, 2) + '\n');
 	return initial;
+}
+
+// scope_states[scope] 가 없으면 기본값으로 초기화 (idempotent).
+// options.inheritGlobal=true: 이전 버전에서 upgrade 하는 기존 scope 에 대해
+//   전역 chain state 를 복사한다 (신규 scope 는 analysis 에서 시작).
+// CAS 뮤테이터 안에서 호출 — caller 가 이미 clone 된 state 를 넘김.
+export function initScopeChainState(state, scope, options = {}) {
+	if (!state.scope_states) state.scope_states = {};
+	if (!Object.hasOwn(state.scope_states, scope)) {
+		if (options.inheritGlobal) {
+			// Upgrade path: scope 가 이미 활성 상태였으나 scope_states 미생성 버전에서 왔음.
+			// 전역 chain state 를 그대로 승계해 진행 상태 손실 방지.
+			state.scope_states[scope] = {
+				current_chain: state.current_chain,
+				stage_progress: structuredClone(state.stage_progress),
+				last_gate: state.last_gate ? structuredClone(state.last_gate) : null,
+			};
+		} else {
+			state.scope_states[scope] = {
+				current_chain: 'analysis',
+				stage_progress: DEFAULT_STAGE_PROGRESS(),
+				last_gate: null,
+			};
+		}
+	}
+	return state;
+}
+
+// 활성 scope 의 chain 필드를 반환 (scope 없으면 전역 필드 fallback).
+// { current_chain, stage_progress, last_gate, scoped: boolean }
+export function getActiveScopeChain(state) {
+	const scope = state.current_scope;
+	if (scope && state.scope_states && Object.hasOwn(state.scope_states, scope)) {
+		return { ...state.scope_states[scope], scoped: true, scope };
+	}
+	return {
+		current_chain: state.current_chain,
+		stage_progress: state.stage_progress,
+		last_gate: state.last_gate,
+		scoped: false,
+		scope: null,
+	};
 }
 
 // Error types
