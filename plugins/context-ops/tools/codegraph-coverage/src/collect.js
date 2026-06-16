@@ -166,6 +166,16 @@ export function collectSymbolAnchors(deliverables = {}) {
 	for (const tc of ts?.test_cases ?? [])
 		eatSymbolAnchors(tc?.code_pointers, 'test-spec', anchors, seen);
 
+	// unit-spec 은 unit 당 단수 code_pointer 객체 (타 산출물의 code_pointers 배열과 상이) → 배열 래핑.
+	const us = present('unit-spec');
+	for (const u of us?.units ?? [])
+		eatSymbolAnchors(
+			u?.code_pointer ? [u.code_pointer] : [],
+			'unit-spec',
+			anchors,
+			seen,
+		);
+
 	anchors.sort(
 		(a, b) =>
 			a.artifact.localeCompare(b.artifact) || a.symbol.localeCompare(b.symbol),

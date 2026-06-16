@@ -10,6 +10,30 @@
 
 ---
 
+## [0.51.0] — 2026-06-17 — MINOR — `codegraph-coverage --verify-anchors` 에 unit-spec deliverable 추가 (unit-spec 심볼 정적 codegraph 실존검증)
+
+`unit-spec.json` 의 `units[].code_pointer.symbol`(ast_symbol)이 **실제 소스에 존재하는가** 를 검증할 결정론 경로가 없었다. ep-be-gea 34-BC 백필(301 UNIT)에서는 즉석 LLM grep 워크플로우로 검증 — LLM 판단이라 비결정·재현불가·매번 재작성. 한편 `codegraph-coverage --verify-anchors`(`anchor-verify.js`)는 산출물 ast_symbol 앵커를 codegraph sqlite 심볼 인덱스에 정적 대조하는 기능을 이미 보유했으나, 앵커 수집기 `collectSymbolAnchors` 가 5 산출물(ac/discovery/behavior/impl/test-spec)만 보고 **`unit-spec` 을 누락**했다. SSOT: `DEC-2026-06-17-unit-spec-anchor-verify`.
+
+### 변경
+
+- **편집** `tools/codegraph-coverage/src/cli.js` — `DELIVERABLE_FILES` 에 `'unit-spec': 'unit-spec.json'` 추가(로더 `Object.entries` 순회 / zone-aware 읽기 그대로 적용).
+- **편집** `tools/codegraph-coverage/src/collect.js` — `collectSymbolAnchors` 에 unit-spec 분기. unit-spec 은 unit 당 **단수 `code_pointer` 객체**(타 산출물의 `code_pointers` 배열과 상이)라 `[u.code_pointer]` 배열 래핑 후 기존 `eatSymbolAnchors`(anchor_type='ast_symbol' 필터·dedup·normalizeSymbol) 재사용. `collectRefs`(정방향 coverage)에는 미추가(unit-spec 은 코드 전수 커버 의무 아님 / 역방향 앵커 검증만).
+- **테스트** `tools/codegraph-coverage/test/anchor-verify.test.js` — 4 케이스(단수 code_pointer 수집 / 부재 스킵 / strict_path 제외 / dedup / provenance=unit-spec). codegraph-coverage 121→125 GREEN.
+
+### 불변 (trust 경계 보존)
+
+reference-lens 유지 — DEC-2026-05-28 §4.2 codegraph gate-inject 금지 보존. unit-spec 앵커도 비차단(severity ceiling `low|medium`), 환경/DB 부재 시 exit 3(no-simulation), 하드 게이트화 ❌. 최종 evidence = 실코드 grep.
+
+### 알려진 한계
+
+codegraph 가 **Java record / 중첩 record 타입을 심볼 노드로 추출하지 않아** 해당 앵커는 `stale`(파일 인덱싱됨·심볼 미발견)로 분류된다(실제 부재 아님). 향후 record 추출 보강 또는 informational 하위범주 재분류 carry.
+
+### dogfood (ep-be-gea / 301 UNIT / 34 scope)
+
+300 distinct anchor(issue-acm 내부 동일 symbol+path 1쌍 dedup) → **298 live + 2 stale(Java record `BoResveAthrtAssetFavoriteSyncEvent`·중첩 record `BoGolfRestService.TimeRange` = 상기 codegraph 사각 / 실소스 grep 재확인 = 날조 0) + 0 blind**. 별도 LLM 적대검증(301/301 confirmed)과 **교차일치** — 정적·LLM 두 독립 경로 동일 결론. §8.1: 스키마·게이트 본체 무변경(앵커 소스 1종 추가) → fresh PoC 면제.
+
+---
+
 ## [0.50.0] — 2026-06-16 — MINOR — TDD/unit 층 `unit-spec.json` EMIT 단계 spec stage 배선 (integration gap 해소)
 
 unit 층은 v0.36.0 에 1급화(스키마 `unit-spec.schema.json` + `UNIT-*` + deliverable 27 + 정책 test-layering.md)되고 v0.40.0 에 두 검증기(`validateMockSoundness` test gate#4 / `validateUnitTestObligation` plan gate#3)가 HARD 격상됐으나, **그 게이트의 입력(`unit-spec.json`)을 생성하는 에이전트 경로가 한 번도 배선된 적이 없었다**. 실측(0.49.0): `analysis-unit*`/`spec-*-unit*` skill 0 · 11 agent 프롬프트 unit-spec 언급 0 · phase-flow unit 0. 결과 = 채택처(ep-be-gea 34 BC)가 전부 composition-only(unit TC 0 / mock 0)로 돌았고, 게이트는 unit-spec 부재 시 clean-skip 이라 거짓 GREEN 이 미점검 통과. event 만 PoC #1 으로 수기 emit. **"machinery shipped, agent workflow not wired".** SSOT: `DEC-2026-06-16-unit-spec-emit-wiring`.

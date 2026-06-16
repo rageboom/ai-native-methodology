@@ -286,3 +286,62 @@ describe('collectSymbolAnchors — provenance 보존 + ast_symbol 한정', () =>
 		assert.ok(sources.includes('test-spec'));
 	});
 });
+
+describe('collectSymbolAnchors — unit-spec (unit 당 단수 code_pointer)', () => {
+	const deliverables = {
+		'unit-spec': {
+			units: [
+				{
+					id: 'UNIT-X-001',
+					code_pointer: {
+						anchor_type: 'ast_symbol',
+						symbol: 'DrawNumberGenerator.generateUniqueNumber',
+						path: 'src/Draw.java',
+					},
+				},
+				{
+					id: 'UNIT-X-002',
+					code_pointer: { symbol: 'MaskingUtils.maskName', path: 'src/Mask.java' }, // anchor_type 미명시 + symbol → 수용
+				},
+				{
+					id: 'UNIT-X-003', // code_pointer 부재 → 스킵 (방어)
+				},
+				{
+					id: 'UNIT-X-004',
+					code_pointer: { anchor_type: 'strict_path', path: 'src/NoSym.java' }, // symbol 없음 → 제외
+				},
+				{
+					id: 'UNIT-X-005', // UNIT-X-001 과 동일 symbol+path → dedup
+					code_pointer: {
+						anchor_type: 'ast_symbol',
+						symbol: 'DrawNumberGenerator.generateUniqueNumber',
+						path: 'src/Draw.java',
+					},
+				},
+			],
+		},
+	};
+	const { anchors, sources } = collectSymbolAnchors(deliverables);
+
+	it('단수 code_pointer 를 앵커로 수집 / 부재·strict_path 제외', () => {
+		const syms = anchors.map((a) => a.symbol).sort();
+		assert.deepEqual(syms, [
+			'DrawNumberGenerator.generateUniqueNumber',
+			'MaskingUtils.maskName',
+		]);
+	});
+	it('동일 symbol+path 중복 unit 은 1회만 (dedup)', () => {
+		const draws = anchors.filter(
+			(a) => a.symbol === 'DrawNumberGenerator.generateUniqueNumber',
+		);
+		assert.equal(draws.length, 1);
+	});
+	it('provenance(artifact)=unit-spec 보존', () => {
+		const a = anchors.find((x) => x.symbol === 'MaskingUtils.maskName');
+		assert.equal(a.artifact, 'unit-spec');
+		assert.equal(a.anchor_path, 'src/Mask.java');
+	});
+	it('sources 에 unit-spec 키 기록', () => {
+		assert.ok(sources.includes('unit-spec'));
+	});
+});

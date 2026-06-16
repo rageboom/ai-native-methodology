@@ -5,6 +5,8 @@
 //
 //   v12.10.0 STEP 2 (DEC §5 STEP 2 / finding 채널) — --emit-findings: coverage-hole → finding-system promote-ready 레코드
 //     (discoverer:'codegraph' + code_graph_ref / finding_id 미부여 = 사람 promote) + handler-set reading-aid (implements/extends).
+//   v0.51.0 (DEC-2026-06-17-unit-spec-anchor-verify) — --verify-anchors 앵커 수집에 unit-spec 추가.
+//     unit-spec 은 unit 당 단수 code_pointer 객체(타 산출물 code_pointers 배열과 상이) → collect.js 에서 배열 래핑. 한계: codegraph 가 Java record/중첩 record 미추출 → stale 분류(실 부재 아님 / reference-lens 비차단).
 //
 //   usage:
 //     codegraph-coverage --target <projectDir> [--deliverables <dir>] [--inventory <path>] [--axes route,method] [--out <file>] [--json]
@@ -53,6 +55,7 @@ const DELIVERABLE_FILES = {
 	'behavior-spec': 'behavior-spec.json',
 	'impl-spec': 'impl-spec.json',
 	'test-spec': 'test-spec.json',
+	'unit-spec': 'unit-spec.json',
 };
 
 // v0.41.0 (DEC-2026-06-12-artifact-zone) — canonical 산출물이 output/shared/ 또는 output/domains/<BC>/ 로 이동 가능 →
