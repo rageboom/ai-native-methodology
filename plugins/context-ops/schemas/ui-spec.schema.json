@@ -164,11 +164,19 @@
               "type": "object",
               "required": ["from", "to"],
               "properties": {
-                "from": {"type": "string"},
-                "to": {"type": "string"},
+                "from": {
+                  "type": "string",
+                  "pattern": "^PAGE-[A-Z0-9_-]+-\\d+$",
+                  "description": "v0.57.0 (FE dogfood cycle4 §8.1 ui-spec-05). 전이 출발 페이지 ID — pages[].id 와 동일 패턴(^PAGE-…)으로 제약해 referential 검증 가능. user_flows = '페이지 간 전이' 이므로 from/to 는 페이지 상태다. 컴포넌트/이벤트 디테일은 trigger 필드에 기록."
+                },
+                "to": {
+                  "type": "string",
+                  "pattern": "^PAGE-[A-Z0-9_-]+-\\d+$",
+                  "description": "v0.57.0 신규. 전이 도착 페이지 ID — pages[].id 대조 검증 대상."
+                },
                 "trigger": {
                   "type": "string",
-                  "description": "전이 트리거 (예: '로그인 버튼 클릭', '결제 성공')"
+                  "description": "전이 트리거 (예: '로그인 버튼 클릭', '결제 성공'). 컴포넌트(CMP-*) 상호작용/이벤트는 여기에 기술."
                 },
                 "condition": {"type": "string"}
               }

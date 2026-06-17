@@ -10,6 +10,28 @@
 
 ---
 
+## [0.57.0] — 2026-06-17 — MINOR — mis-fe-admin FE dogfood cycle 4 잔여: 22 finding re-verify + 7건 반영 (design 결단 4 + safe §8.1 2 + a_priori 1)
+
+mis-fe-admin `apps/common` (2nd FE 도메인) dogfood 의 cycle4 **잔여 작업**. v0.54.0 run 의 produce-stage 신규 finding 22건이 Verify stage 세션한도로 죽어 carry 됐던 것을 현재 dev v0.56.0 기준 **adversarial 재검증**(22 verifier + synthesis): **7 real_a_priori · 2 stale_already_fixed · 7 false_positive · 6 design_decision** (2nd 도메인이 over-claim 을 정확히 걸러냄). 본 릴리스는 그중 **즉시 반영 가능 7건**만 반영 — 사용자 결단 4 + safe §8.1 2 + clean a_priori 1.
+
+### Added / Changed — 사용자 design 결단 4건 (전부 사용자 추천 = A안)
+- **token home = `ui-spec.design_tokens` SSOT** (visual-manifest-03 / corroborated_STRONG eam+common). `analysis-ui-visual-manifest-fe` SKILL 전면 재작성 — 과거 SKILL 이 지시하던 `tokens`/`token_format`/`components` 추출(스키마가 `additionalProperties:false` 로 거부 = skill↔schema 모순)을 제거하고, visual-manifest 는 **PNG 스냅샷 매니페스트 전용**으로 명확화. 디자인 토큰은 ui-spec.design_tokens(DTCG 2025.10) 가 단일 SSOT, `cross_links` 로 참조. (cycle2/3 이월 모순 해소.)
+- **i18n namespace registry** (i18n-spec-04). `i18n-spec.schema.json` `runtime` 에 `namespaces[]` + `default_ns` + `registration_model`(`single_merged`|`per_namespace`) 추가. i18next `ns`/`defaultNS` init option 동형 + MF host 공유 catalog 의 "여러 논리 ns → 1 런타임 ns" 패턴(single_merged, i18n-spec-02 정합) 표현.
+- **ui-spec transition referential constraint** (ui-spec-05). `ui-spec.schema.json` `user_flows[].transitions[].from`/`to` 를 free-text → `^PAGE-[A-Z0-9_-]+-\d+$` 패턴으로 제약 (pages[].id 대조 검증 가능). 컴포넌트/이벤트 디테일은 `trigger` 필드.
+- **a11y NOT-ASSESSABLE 분리** (a11y-spec-02). `a11y-spec.schema.json` 에 top-level `not_assessable[]` 배열 신설 — static tier 에서 판정 불가한 runtime-only check(color-contrast 등)를 `violations[]` 에 `blocks_baseline=false` 로 욱여넣던 것을 분리. baseline/ratchet 게이트는 `not_assessable[]` 무시 → '위반 없음' vs '검증 불가' 구조적 구분. `analysis-aspect-a11y` SKILL 절차에 기록 의무 명문화.
+
+### Added — safe §8.1 promotion 2건 (eam+common 2도메인 corroborated / skill-only)
+- **ui-spec target_state back-fill 지침** (ui-spec-04). `_base-apply-template` SKILL — `event_handlers[].target_state` 를 state-map machine state 로 cross-link 역참조해 채우도록 명문화 (FSM 있는데 anchor 없이 비워두던 eam·common 공통 누락).
+- **ui-spec ↔ codegraph 교차 점검 지침** (ui-spec-06). `_base-apply-template` SKILL — `.codegraph/` 존재 시 `components[]` 를 codegraph symbol edge 와 교차 점검 (단 reference-lens / gate inject ❌ — DEC-2026-05-30-codegraph-essential trust 모델).
+
+### Changed — clean a_priori 1건
+- **type-spec manual_extraction provenance 강제** (F-C4-type-spec-04). `type-spec.schema.json` `allOf` 에 `captured_by=manual_extraction → reproduction_command` 의무 조건 추가 (기존 ts_morph/simulation 조건 패턴과 동형 — 정적 fallback 의 provenance 누수 차단). `analysis-type-spec-fe` SKILL 에 manual_extraction fallback 절차 명문화.
+
+### Carry (별도 배치)
+- **design-gated a_priori 3** (fix-shape 결단 필요): type-spec-05(out-of-scope/external ref 채널) / state-map-03(per-transition source_ref) / state-map-04(machine→finding link).
+- **design_decision 6** (cycle5): state-map-01(present_unused vs active) / state-map-02(url_state route-param vs navigation) / ui-spec-01(external token source) / ui-spec-02(MF lazy-remote 경계) / i18n-spec-04-pluralization(CASE_COUNT 수동 복수형 smell) / characterization-04(cross-file rule locations[]).
+- **validator 코드변경 2** (RED→GREEN TDD 별도): characterization-01(coverage-validator snapshots[] root-vs-dir 계약 분열) / characterization-02(schema-validator FILENAME_ALIASES characterization 별칭 누락 false-green — canonical 파일명 선결 필요).
+
 ## [0.56.0] — 2026-06-17 — MINOR — mis-fe-admin FE dogfood cycle 4: apps/common 2nd FE 도메인 §8.1 corroboration + safe-additive 3건
 
 apps/common(shell/layout/navigation — forms 0 / RealGrid 0)을 **2nd 구별 FE 도메인**으로 v0.54.0 분석 실행(7 FE deliverable schema-valid 산출 / `.ai-context/dogfood-common/`). 목적 = cycle3 deferred(§8.1 단일도메인 보류)의 **≥2 도메인 corroboration**. 본 릴리스는 그 중 **design 불요·검증완료 safe-additive 3건** 반영(전부 additive — 기존 산출물 불파괴). SSOT: `DEC-2026-06-17-fe-dogfood-cycle4`.

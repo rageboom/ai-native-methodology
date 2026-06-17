@@ -21,7 +21,9 @@ TypeScript 코드베이스의 type 정의 → type-spec.json + framework_neutral
    ```bash
    npx tsx extract-types.ts
    ```
-   환경 부재 시 사용자에게 환경 준비 요청 또는 사용자 위임 (CI) 명시.
+   환경 부재 시 사용자에게 환경 준비 요청 또는 사용자 위임 (CI) 명시. 불가피하게 정적 추출 시 `captured_by=manual_extraction` (real-tool 도 simulation 도 아닌 정직한 fallback tier):
+   - `grep -rnE 'interface |type |enum '` 등으로 declaration 을 열거하고 각 type 의 `file:line` 을 인용한다.
+   - `summary.reproduction_command` 에 실제 추출 명령을 기록한다 (schema `allOf` 가 `manual_extraction → reproduction_command` 를 의무화 — 환경 복원 시 AST 재추출 가능하도록 provenance 보존).
 2. **Type 추출** — interface / type alias / enum / class type
 3. **Framework neutrality score 정량** — type 의 framework coupling 정도:
    - 0 = pure data (e.g., `User { id, email }`)

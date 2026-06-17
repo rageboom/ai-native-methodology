@@ -114,6 +114,34 @@
         }
       }
     },
+    "not_assessable": {
+      "type": "array",
+      "description": "v0.57.0 (FE dogfood cycle4 a11y-spec-02). 현재 tier 에서 판정 불가(NOT-ASSESSABLE)한 check 목록. baseline_pass / ratchet_pass 게이트는 본 배열을 무시한다 — violations[] 와 분리해 '위반 없음(verified OK)' 과 '검증 불가(could not verify)' 의 혼동을 차단. 주로 captured_by=static_source_review 시 runtime-only check (color-contrast SC 1.4.3 / computed accessible-name / focus-order / reflow) 가 여기 들어간다. violations[] 에 blocks_baseline=false 로 욱여넣지 말 것.",
+      "items": {
+        "type": "object",
+        "required": ["check_id", "reason"],
+        "properties": {
+          "check_id": {
+            "type": "string",
+            "description": "판정 불가 check id — axe-core rule id 또는 WCAG SC (예: 'color-contrast', 'SC 1.4.3')."
+          },
+          "wcag_criterion": { "type": "string", "description": "WCAG 성공 기준 ID (선택, 예: 'SC 1.4.3')." },
+          "wcag_level": {
+            "type": "string",
+            "enum": ["2.1-A", "2.1-AA", "2.1-AAA", "2.2-A", "2.2-AA", "2.2-AAA"]
+          },
+          "reason": {
+            "type": "string",
+            "description": "왜 현재 tier 에서 판정 불가인지 (예: 'static_source_review tier — runtime DOM 부재로 computed contrast 미산출')."
+          },
+          "requires_tier": {
+            "type": "string",
+            "enum": ["axe_core_real", "pa11y_real", "lighthouse_a11y_real"],
+            "description": "판정에 필요한 상위 tier (선택)."
+          }
+        }
+      }
+    },
     "summary": {
       "type": "object",
       "required": ["total_violations", "baseline_pass", "captured_by"],

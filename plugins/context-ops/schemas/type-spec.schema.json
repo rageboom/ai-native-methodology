@@ -192,6 +192,14 @@
           "then": {
             "required": ["simulation_reason"]
           }
+        },
+        {
+          "if": {
+            "properties": { "captured_by": {"const": "manual_extraction"} }
+          },
+          "then": {
+            "required": ["reproduction_command"]
+          }
         }
       ]
     },

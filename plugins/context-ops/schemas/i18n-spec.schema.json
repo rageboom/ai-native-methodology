@@ -62,6 +62,20 @@
         "mf1_fallback_present": {
           "type": "boolean",
           "description": "MF2 사용 시 의무 — MF1 폴백 병기 여부. supports_mf2=true & mf1_fallback_present=false → finding 등록."
+        },
+        "namespaces": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "v0.57.0 (FE dogfood cycle4 §8.1 i18n-spec-04). 등록된 namespace 목록 (i18next `ns` init option 동형). resources[].namespace 가 개별 key 의 소속을 태그한다면, 본 배열은 런타임에 등록된 ns 전체 집합 (registry). 비어 있으면 namespace 미사용 (단일 catalog)."
+        },
+        "default_ns": {
+          "type": "string",
+          "description": "v0.57.0 신규. 기본 namespace (i18next `defaultNS` init option 동형). namespaces[] 중 하나여야 함."
+        },
+        "registration_model": {
+          "type": "string",
+          "enum": ["single_merged", "per_namespace"],
+          "description": "v0.57.0 신규. 논리적 namespace 들이 런타임에 어떻게 등록되는가. single_merged = 여러 논리 ns 가 하나의 런타임 ns(예: 'translation')로 병합 (Module-Federation host 공유 catalog 의 흔한 패턴 — i18n-spec-02 정합). per_namespace = 논리 ns 가 1:1 런타임 ns 로 분리 등록. namespaces[] 길이 > 1 & single_merged → key 경로만 분기하고 실제 ns 는 단일임을 의미."
         }
       }
     },
