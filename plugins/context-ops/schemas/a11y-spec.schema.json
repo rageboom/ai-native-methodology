@@ -53,7 +53,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "description": "axe-core rule id (예: 'color-contrast', 'image-alt', 'aria-allowed-attr')."
+            "description": "위반 rule id (detection-dependent). detection=axe_emitted 시 axe-core rule id (예: 'color-contrast', 'image-alt', 'aria-allowed-attr'). detection=static_heuristic 시 정적 linter vocabulary — 보통 eslint-plugin-jsx-a11y rule id (예: 'click-events-have-key-events', 'no-static-element-interactions', 'no-noninteractive-element-interactions')."
           },
           "impact": {
             "type": "string",

@@ -22,7 +22,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
    - ICU MessageFormat
 2. **Locale catalog 추출** — `locales/<lang>/translation.json` 등
 3. **Message format 분석** — 단순 string vs ICU (plural / select / number / date)
-4. **Untranslated string 검출** — 코드에 hardcoded string 있는지
+4. **Untranslated string 검출 + orphan-key 판정** — 코드에 hardcoded string 있는지 / 정의됐으나 미사용(orphan) key 검출. ⚠️ MF host-global 단일 i18next(공유 카탈로그)에서는 한 앱 내 `source_files=[]`(로컬 `t()` 호출 0)가 곧 orphan 이 아님 — 타 앱이 cross-app 으로 소비하는 공유 키일 수 있음(예: host 가 register 한 `common.*` 를 다른 MF 앱이 사용). orphan 단정 전 repo 전역 사용처 확인 의무(단일 앱 scope 로 orphan 판정 ❌).
 5. **AP-I18N-XXX 등재** — anti-pattern (`quality` phase 통합)
 6. **i18n-spec.json 작성** — `schemas/i18n-spec.schema.json`
    - **provenance (meta) 기록**:

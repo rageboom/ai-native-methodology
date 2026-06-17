@@ -19,6 +19,7 @@ baseline → `methodology-spec/policies/no-simulation.md`. (persona 시뮬 = 신
 ## 사전 조건
 
 - analysis output 존재 — business-rules.json (phase 4) + antipatterns.json (phase 6 / phase 4 partial)
+- **HARD guard — 선행 산출물 부재 시**: business-rules.json / antipatterns.json 부재 시 BR/AP/UC id 를 **날조 금지**. (a) 산출물을 먼저 생성하거나, (b) 부득이 진행 시 `meta_confidence.warnings` + `intent_vs_bug` 에 `self_fabricated_rule_ids: true` 명시 + 도메인 expert carry(결단 전 chain 진입 ❌). self-coined id 를 analysis SSOT 인 양 표기 ❌.
 - (권장) formal-spec (phase 4.5 / state-machine + decision-table)
 - 도메인 expert 인터뷰 가능 OR carry 명시 의무 (ambiguous > 0 시)
 

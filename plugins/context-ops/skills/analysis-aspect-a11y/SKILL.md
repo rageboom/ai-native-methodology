@@ -23,7 +23,7 @@ WCAG 2.2 기반 접근성 점검. axe-core / Playwright 진짜 실행 (no-simula
    npx @axe-core/cli <url>
    ```
    환경 부재 시 사용자 위임 (CI) 명시 + 신뢰도 -5%p 기록
-   - **running app 부재 분기 (v0.53.0)** — running app 부재 시 `static_source_review` tier 로 grep/semgrep 기반 정적 a11y(예: hardcoded `aria-label`, `role` 오용) 부분 산출 가능. simulation(-5%p)과 구분되는 정직 중간 tier (real-tool 도 simulation 도 아님). 이 tier 사용 시 `summary.reproduction_command`(grep·semgrep 명령) + 각 `violation.detection=static_heuristic` 기록 의무.
+   - **running app 부재 분기 (v0.53.0)** — running app 부재 시 `static_source_review` tier 로 grep/semgrep 기반 정적 a11y(예: hardcoded `aria-label`, `role` 오용) 부분 산출 가능. simulation(-5%p)과 구분되는 정직 중간 tier (real-tool 도 simulation 도 아님). 이 tier 사용 시 `summary.reproduction_command`(grep·semgrep 명령) + 각 `violation.detection=static_heuristic` 기록 의무. static_heuristic violation 의 `id` 는 axe-core id 가 아니라 정적 linter(eslint-plugin-jsx-a11y) rule id 로 기록 (예: onClick-on-non-interactive → `click-events-have-key-events` / `no-static-element-interactions`).
 2. **WCAG 2.2 기준** — Level A / AA / AAA 위반 분류
 3. **AP-FE-A11Y-XXX 등재** — anti-pattern 형태 (`quality` phase 통합). `id-conventions.md` §3 카테고리 정합 (AP-FE prefix / sub `A11Y` / `AP-FE-{SUB}-NNN` 패턴 정합).
 4. **a11y-spec.json 작성** — `schemas/a11y-spec.schema.json`

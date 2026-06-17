@@ -10,6 +10,30 @@
 
 ---
 
+## [0.56.0] — 2026-06-17 — MINOR — mis-fe-admin FE dogfood cycle 4: apps/common 2nd FE 도메인 §8.1 corroboration + safe-additive 3건
+
+apps/common(shell/layout/navigation — forms 0 / RealGrid 0)을 **2nd 구별 FE 도메인**으로 v0.54.0 분석 실행(7 FE deliverable schema-valid 산출 / `.ai-context/dogfood-common/`). 목적 = cycle3 deferred(§8.1 단일도메인 보류)의 **≥2 도메인 corroboration**. 본 릴리스는 그 중 **design 불요·검증완료 safe-additive 3건** 반영(전부 additive — 기존 산출물 불파괴). SSOT: `DEC-2026-06-17-fe-dogfood-cycle4`.
+
+### 변경
+
+- **편집** `schemas/a11y-spec.schema.json` + `skills/analysis-aspect-a11y/SKILL.md` — `violations[].id` description 을 detection-dependent 로 확장: `detection=static_heuristic` 시 axe-core id 가 아니라 eslint-plugin-jsx-a11y rule id(`click-events-have-key-events` / `no-static-element-interactions` 등) 기록 + SKILL static tier 에 rule-id vocab + onClick-on-non-interactive 예시. cycle3 가 `static_source_review` tier + `detection` 필드를 추가했으나 그 tier 의 id vocabulary 가 axe-core-only 로 남아있던 갭(검증완료 real a-priori / common MenuTab·SidebarNavMenu onClick-on-non-interactive 실증). [F-C4-a11y-spec-01]
+- **편집** `skills/analysis-aspect-i18n/SKILL.md` — step 4 에 orphan-key 판정 caveat: MF host-global 단일 i18next 공유 카탈로그에서 한 앱 내 `source_files=[]`(로컬 `t()` 0)는 곧 orphan 이 아님(타 앱 cross-app 소비 가능) — orphan 단정 전 repo 전역 사용처 확인 의무. eam(cycle3)+common(cycle4) 2 도메인 corroborated. [i18n-spec-02 promotion]
+- **편집** `skills/analysis-characterization-test/SKILL.md` — 사전 조건에 HARD guard: business-rules.json / antipatterns.json 부재 시 BR/AP/UC id 날조 금지(산출물 선생성 또는 `self_fabricated_rule_ids: true` 명시 + expert carry). common run 이 선행산출물 부재로 self-fabricated id 진행한 사례 실증 / 2 도메인 corroborated. [characterization-03 promotion]
+
+### 검증
+
+- `release:check` 42/42 GREEN. 편집 a11y schema valid JSON. 3 SSOT(package.json + .claude-plugin/plugin.json + parent CLAUDE.md) + README 0.56.0 동기화.
+- harvest durable: `mis-fe-admin/.ai-context/dogfood-common/cycle4-findings.json`(37건 분류) + 7 deliverable `.ai-context/dogfood-common/domains/common/`.
+
+### Drop / 보류
+
+- **§8.1 refuted 3** (2nd 도메인이 cycle3 단일도메인 과적합 걸러냄 — NOT promoted): typespec-02(common 에서 references[] 16/19 실제 채워짐) / typespec-03(coupling_score 0.5 tier 최대 = binary collapse 아님) / a11y-spec-05(MUI Dialog focus-trap = contract-assessable / RealGrid 와 반대).
+- **§8.1 N/A 1**: state-map-03(common 에 RealGrid 데이터 그리드 없음).
+- **보류 design 결단 3건**(corroborated 이나 방향 결정 필요): visual-manifest-03 token home(visual-manifest vs ui-spec design_tokens) / i18n-04 namespaces[] 채널 shape / ui-spec-05 transitions 참조 대상(PAGE-id vs CMP-id).
+- **보류 미검증 15건**: cycle4 verify stage 세션한도 중단 → re-verify 후 처리(ui-spec-04/06 promotion 포함).
+
+---
+
 ## [0.55.0] — 2026-06-17 — MINOR — Semgrep 기본 룰셋 사내망 로컬화 (security-only 벤더링 팩 / registry 의존 제거)
 
 윤주스 PC(사내망)에서 Semgrep 스캔이 SSL 로 깨지는 현상을 진단 → **`semgrep.dev` 룰 레지스트리(`p/owasp-top-ten`)가 사내 SSL 검사 프록시에 가로채여 fetch 실패**(F-DOGFOOD-015 동형)임을 실측 재현. `curl`/PyPI 는 통과하나 Semgrep(Python `requests`+certifi)만 사내 root CA 미신뢰로 `CERTIFICATE_VERIFY_FAILED` → semgrep exit 7 → scan FAILED. 네트워크가 사내망으로 균일 = **전 PC 동일 실패**(캐시도 비어있음). DEC-2026-06-11 §4 carry("기본 ruleset 레지스트리 의존 / 벤더링 로컬 기본화 정책 결정 필요") 종결. SSOT: `DEC-2026-06-17-semgrep-local-security-ruleset`.
