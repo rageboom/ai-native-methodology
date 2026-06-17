@@ -93,6 +93,10 @@
             "type": "string",
             "description": "feature / domain namespace (선택)."
           },
+          "manual_pluralization": {
+            "type": "boolean",
+            "description": "v0.57.0 (FE dogfood cycle5 §i18n-spec-04). true = 이 key 의 값이 ICU plural rule 로 구동되지 않는 count-의존 literal (수동 복수형 smell). 예: 고정 counter-word 카탈로그 값 '건'/'명'/'case(s)' 가 별도 count 와 함께 렌더되거나 count===1 ? 단수 : 복수 ternary/switch(count) 로 분기. format=plain & uses_plural_rule=false 동반이 통상 시그널. 등록은 cross_links → antipatterns (to_id=AP-I18N-PLURALIZE-MISS, link_type=registers_as_antipattern). 비-t() 렌더 채널(예: gridInfo.ts 하드코딩 counter word, 카탈로그 key 부재)은 본 필드가 아니라 quality phase AP-FE-I18N 로 라우팅."
+          },
           "translations": {
             "type": "array",
             "items": {
@@ -138,7 +142,10 @@
                   "type": "string",
                   "enum": ["ui-spec", "state-map", "antipatterns"]
                 },
-                "to_id": {"type": "string"},
+                "to_id": {
+                  "type": "string",
+                  "description": "대상 artifact 의 항목 id (free-form 유지). antipatterns 링크 시 analyst-invented id drift 방지를 위해 canonical 예약 id 사용 권고: AP-I18N-PLURALIZE-MISS (수동 복수형 smell — ICU plural rule 미적용 count-의존 literal), AP-I18N-ORPHAN-SHARED (MF 공유 카탈로그에서 로컬 source_files=[] 이나 cross-app 소비되는 공유 key). 신규 i18n antipattern 은 AP-I18N-<UPPER-SNAKE> 형식."
+                },
                 "link_type": {
                   "type": "string",
                   "enum": ["shown_on", "displayed_in_state", "registers_as_antipattern"]

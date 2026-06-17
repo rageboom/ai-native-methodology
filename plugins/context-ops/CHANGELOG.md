@@ -10,6 +10,27 @@
 
 ---
 
+## [0.59.0] — 2026-06-17 — MINOR — mis-fe-admin FE dogfood cycle 5: cycle4 carry queue 11건 청산 (design 9 + validator TDD 2)
+
+cycle4(v0.56/0.57)가 §8.1 2nd-도메인(apps/common)으로 한 차례 거른 carry 11건을 청산. **편집 전 dev v0.57.0 소스 재대조 + 독립 적대검증**(12-agent: 6 ground → 6 adversarial-verify) 결과 **11건 전부 real 확정 (stale 0 · false_positive 0)** — 이미 over-claim 을 거른 carry 라 정제도가 높음(cycle3 stale 10 / cycle4 FP 7 과 대조). **전부 additive-safe**(기존 valid 산출물·bundled example 무파손). 사용자 design 결단 = 전부 추천 채택. SSOT: `DEC-2026-06-17-fe-dogfood-cycle5`.
+
+> **양보**: 동시 작업(codegraph 토큰절감 companion)이 v0.58.0 을 선점 → cycle5 는 v0.59.0 으로 양보(cycle4 Semgrep v0.55.0 양보 선례 동형 / 파일단위 분리 커밋). 두 작업 파일셋 disjoint.
+
+### Added — schema 구조화 채널 (design 9 / 전부 optional·additive)
+- **type-spec-05**: `references[]` items 를 `oneOf:[string(legacy bare name), object{ref, resolution:enum[intra_spec,in_repo,external_workspace,node_module,unresolved], t_id}]` 로 확장 + `summary.framework_neutrality_basis`(all_types|scope_internal_only) + `summary.scope_internal_type_count`. monorepo 에서 외부 워크스페이스(@sg/* / node_modules) 참조를 분류해 neutrality_score 분모를 정직하게(2nd 도메인 apps/common 에서만 표면화 — eam 은 references[] 0).
+- **state-map 01~04**: `state_sources[].liveness`(present_unused|present_active — 탐지됐으나 미배선 vs 활성) + `state_sources[].url_model`(route_param|pathname_as_truth) + transition object `source_ref`(per-transition 코드 앵커 — action 문자열에 file:line stuffing 금지) + `cross_links.to_artifact` enum 에 `findings` 추가 & `machines[].related_findings[]`(primary_source_type=mixed → finding 의무인데 machine→finding 링크 채널 부재였음). SKILL `mixed`/`finding` 미언급 discoverability 버그 동시 해소.
+- **ui-spec 01~02**: `design_tokens` 에 `token_ownership`(local|external_package|mixed|unknown)+`external_token_source`(외부 패키지 토큰 출처 — @sg/ui-bo foundation/*) + component `suspense_boundary.is_remote_boundary`+`remote_name`(Module-Federation lazy-remote 경계 — 평범한 React.lazy code-split 과 구별).
+- **i18n-spec-04**: `resources[].manual_pluralization` bool(count 의존 리터럴이 ICU plural rule 미사용 — CASE_COUNT 건/명/case(s) smell) + `cross_links.to_id` description 에 표준 예약 AP-id(`AP-I18N-PLURALIZE-MISS`/`AP-I18N-ORPHAN-SHARED`) 명문화(analyst-invented id drift 차단). SKILL 수동복수형 탐지 규칙 + 비-t() 렌더 채널(gridInfo 하드코딩 카운터워드 → quality AP-FE-I18N) 안내.
+- **characterization-04**: `$defs.scenario` 에 optional `realized_in[]`(file required + lines/role/note) — 한 scenario 가 여러 파일(hook+component+api)에 걸칠 때 단일 snapshot 앵커로 표현 못 하던 갭. snapshot.endpoint/service_method = canonical primary 유지, realized_in[] = machine-traversable 보조 앵커.
+
+### Fixed — characterization validator 정합 (validator TDD 2 / RED→GREEN)
+- **characterization-01**: `characterization-coverage-validator` 가 snapshots 를 `snapshots/` 서브디렉토리에서만 읽어, schema 가 required 로 강제하는 embedded root `snapshots[]`/`coverage` 산출물을 false-FAIL(dir_missing critical). entry-file 읽기를 snapshot/coverage 블록 위로 hoist + `entry.snapshots`/`entry.coverage` fallback 추가. 기존 7 disk-layout fixture 무회귀 / RED→GREEN(embedded single-file fixture) / 24→25 tests.
+- **characterization-02**: schema-validator 가 파일명으로 schema 라우팅하는데 `characterization.json` 은 alias 부재 → 미존재 `characterization.schema.json` 라우팅 → **silent SKIP(false-green / 검증 안 됨)**. canonical 파일명 = `characterization-spec.json`(skill L3/118/145 + 양 validator 일치)이 정설 → **alias 추가 ❌ / producer skill 에 명시 파일명 guard + consumer 2파일 rename** + RED/GREEN 회귀 테스트(bare name = not-found/null 가드 → canonical = valid:true). SKILL 산출물 레이아웃 wording 도 split→embedded(schema SSOT) 정합.
+
+### 인용
+- DEC-2026-06-17-fe-dogfood-cycle5 (cycle5 carry queue 청산 / design 9 + validator TDD 2 / 전부 additive)
+- DEC-2026-05-28 §4.2 (codegraph reference-lens / gate inject ❌ — 불변)
+
 ## [0.58.0] — 2026-06-17 — MINOR — codegraph 토큰절감 companion 정식 격상: P1(codegraph/headroom MCP default-on) + P2(비차단 nudge 신설)
 
 토큰절감 기사(siosio3103/abdulgafoorabid · CBM·headroom·RTK·context-mode·caveman 스택)의 #1 레이어("구조검색 → 파일 안 읽고 압축답")를 **우리가 이미 보유한 codegraph(CodeGraph OSS 0.9.6)** 로 재현하는 작업. 그간 draft 로 묻어 출하되던 P1 companion 을 정식 격상하고, P2 비차단 nudge 를 신설한다. SSOT: `DEC-2026-06-15-codegraph-search-token-saving` (+2026-06-17 P2 시행).

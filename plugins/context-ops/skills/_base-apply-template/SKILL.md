@@ -24,6 +24,7 @@ User triggers this skill when starting a new deliverable. 매칭 대상:
 - **ui-spec.json producer 명문화 (v0.53.0)** — `ui-spec.json` 은 전용 추출 도구(extractor)가 없는 schema-driven **합성 산출물**(domain + state-map + visual-manifest 종합)이며, 본 `_base-apply-template` 가 명시적 producer 다 (전용 producer skill 부재 → drift-validator 가 orphan 으로 안 잡는 문서 갭이라 여기서 명문화).
   - **target_state 역참조 back-fill (v0.57.0 / cycle4 §8.1 ui-spec-04)** — `event_handlers[].target_state` 를 비워두지 말고 state-map.json 의 machine state(예: menuStore.openMenus, AuthGuard token state)를 cross-link 로 역참조해 채운다. state-map 선행 산출물이 있으면 그 state id 를 anchor 로 쓰고, 없으면 `_base-log-finding` 으로 갭을 남긴다 (FSM 은 있는데 anchor 없이 빈 채로 두지 말 것 — eam·common 두 도메인 공통 누락 패턴이었음).
   - **codegraph 교차 점검 (v0.57.0 / cycle4 §8.1 ui-spec-06)** — `<user-project>/.codegraph/` 가 있으면 `components[]` 를 pattern_matching 으로만 뽑지 말고 codegraph symbol edge 와 교차 점검해 누락/추가 컴포넌트 후보를 찾는다. 단 codegraph 는 reference-lens 일 뿐 결정적 gate 에 inject ❌ — 불일치는 finding 으로만 수용한다 (codegraph trust 모델 근거는 ## 인용 참조).
+  - **Module-Federation remote 경계 마킹 (v0.58.0 / cycle5 ui-spec-02)** — 컴포넌트가 Module-Federation lazy-remote(별도 빌드/런타임에서 로드되는 remote 노출 모듈)면 `suspense_boundary.is_remote_boundary=true` + `suspense_boundary.remote_name`(예: `common/Visualizer`)로 기재한다. 평범한 `React.lazy`/dynamic import 코드분할은 MF remote 가 아니므로 `lazy_loaded=true` 로만 두고 `is_remote_boundary` 는 비운다 — 둘을 혼동하지 말 것. remote 경계는 자체 error boundary 와 짝지어 기록한다. MF 여부를 prose(description)에 적지 말고 본 boolean 필드로 표현한다 (근거는 ## 인용 참조).
 
 ### chain stage (6 templates / `templates/{discovery,spec,plan,test,implement}/`)
 
@@ -79,5 +80,6 @@ See `methodology-spec/deliverables/<NN>-*.md` for each artifact's input requirem
 - ADR: ADR-011 (json-only / twin 폐지)
 - 결단: DEC-2026-05-26-v11-paradigm-결단 (chain stage 산출물 6종)
 - 결단: DEC-2026-05-30-codegraph-essential (codegraph reference-lens trust 모델 — ui-spec-06 교차점검 근거)
+- 결단: DEC-2026-06-17-fe-dogfood-cycle5 (cycle5 ui-spec-02 — suspense_boundary.is_remote_boundary / remote_name = MF remote 경계 vs 평범한 React.lazy 코드분할 구분)
 - 정책: methodology-spec/lifecycle-contract.md
 - schema: schemas/<artifact>.schema.json

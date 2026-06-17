@@ -249,6 +249,14 @@
               "lazy_loaded": {
                 "type": "boolean",
                 "description": "code splitting 적용 여부 (React.lazy / dynamic import)."
+              },
+              "is_remote_boundary": {
+                "type": "boolean",
+                "description": "v0.58.0 신규 (FE dogfood cycle5 ui-spec-02). Module-Federation lazy-remote 경계 여부. lazy_loaded(=React.lazy/dynamic import 코드분할)와 구분 — 이것은 별도 빌드/런타임에서 로드되는 MF remote 경계다. remote 가 아닌 평범한 code-split 은 lazy_loaded=true 로 두고 본 필드는 비운다."
+              },
+              "remote_name": {
+                "type": "string",
+                "description": "v0.58.0 신규 (FE dogfood cycle5 ui-spec-02). MF remote/exposed module 이름 (예: 'common/Visualizer'). is_remote_boundary=true 일 때 기재."
               }
             }
           }
@@ -289,6 +297,15 @@
               "scss_variables"
             ]
           }
+        },
+        "token_ownership": {
+          "type": "string",
+          "enum": ["local", "external_package", "mixed", "unknown"],
+          "description": "v0.58.0 신규 (FE dogfood cycle5 ui-spec-01). SET 레벨 토큰 소유권 마커. 토큰이 분석 대상 앱에서 정의되는가, 외부 패키지에서 import 되는가. external_package = 외부 디자인시스템(예: @sg/ui-bo foundation/*)에서 정의되고 본 스코프는 소비만 함. mixed = 일부 로컬+일부 외부. (과거 colors._note / colors._token_source_note 자유텍스트로 우회하던 externality 신호의 정식 home — 더 이상 token map value 에 출처를 욱여넣지 말 것.)"
+        },
+        "external_token_source": {
+          "type": "string",
+          "description": "v0.58.0 신규 (FE dogfood cycle5 ui-spec-01). 외부 토큰 카탈로그 패키지/경로 (예: '@sg/ui-bo foundation/*') — token_ownership=external_package|mixed 일 때 기재."
         },
         "colors": {
           "type": "object",

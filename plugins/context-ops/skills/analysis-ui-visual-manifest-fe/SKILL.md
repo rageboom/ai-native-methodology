@@ -10,6 +10,8 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 
 > ⚠️ **토큰 home (v0.57.0 / cycle4 visual-manifest-03 결단).** 디자인 토큰(DTCG color/typography/spacing/shadow)의 SSOT 는 본 산출물이 아니라 **`ui-spec.design_tokens`** (DTCG 2025.10 정합)다. 본 스키마에는 token/component 필드가 없다(=스냅샷 전용). 여기서 토큰을 재추출하지 말고 `cross_links` 로 ui-spec 을 참조하라. (과거 SKILL 이 `tokens`/`token_format`/`components` 추출을 지시했으나 스키마가 이를 거부 = skill↔schema 모순이었고, 본 결단으로 ui-spec.design_tokens 로 단일화.)
 
+> ⚠️ **토큰 소유권 마커 (v0.58.0 / cycle5 ui-spec-01).** `ui-spec.design_tokens` 에 토큰을 채울 때, 토큰이 분석 대상 앱에서 **정의**되는지 외부 패키지에서 **import** 되는지를 SET 레벨 `token_ownership` (`local`/`external_package`/`mixed`/`unknown`) 로 명시하라. 외부 디자인시스템(예: `@sg/ui-bo` `foundation/*`)에서 가져오는 경우 `token_ownership: external_package` + `external_token_source: "@sg/ui-bo foundation/*"` 로 선언한다. 출처/소유권 정보를 `colors._note` / `colors._token_source_note` 같은 자유텍스트 키에 욱여넣지 말 것 — 이제 전용 필드가 있다 (근거는 ## 인용 참조).
+
 ## 사전 조건
 
 - FE 트랙 (디자인 token / Tailwind / shadcn / MUI 시그널 = 시각 시스템 존재 신호)
@@ -35,3 +37,4 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 - schema: schemas/visual-manifest.schema.json
 - 토큰 SSOT: schemas/ui-spec.schema.json (design_tokens)
 - ADR: ADR-FE-005 (권위 매개체 표준) / ADR-FE-002 (§2.3 baseline 정책)
+- 결단: DEC-2026-06-17-fe-dogfood-cycle5 (cycle5 ui-spec-01 — design_tokens.token_ownership / external_token_source 외부 토큰 출처 정식 channel)

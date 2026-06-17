@@ -143,6 +143,35 @@
           "type": "array",
           "items": { "type": "string" },
           "description": "(**복수 항목 ARRAY of string** — 이름은 단수형이나 배열) 새 시스템에서 의도적 다른 결과 (modern_alternative)."
+        },
+        "realized_in": {
+          "type": "array",
+          "description": "(optional / F-C4-characterization-04) 본 scenario 의 rule/behavior 가 cross-file 로 실현되는 **추가 코드 anchor 집합**. snapshot.endpoint / controller_method / service_method / sql_id 는 여전히 canonical PRIMARY anchor — realized_in[] 은 그 외 N 개 파일을 구조화로 열거 (free-text '+' concat 대체). drift / coverage validator 가 추후 traverse 가능.",
+          "items": {
+            "type": "object",
+            "required": ["file"],
+            "additionalProperties": false,
+            "properties": {
+              "file": {
+                "type": "string",
+                "description": "코드 파일 경로 (예: 'utils/saveRolesHandler.ts')."
+              },
+              "lines": {
+                "type": "string",
+                "pattern": "^[0-9]+(-[0-9]+)?$",
+                "description": "단일 행 '36' 또는 범위 '36-48'."
+              },
+              "role": {
+                "type": "string",
+                "enum": ["hook", "component", "util", "store", "api", "validator", "controller", "service", "sql", "test", "config", "other"],
+                "description": "anchor 의 코드 역할."
+              },
+              "note": {
+                "type": "string",
+                "description": "이 anchor 가 scenario 에서 맡는 역할 설명 (선택)."
+              }
+            }
+          }
         }
       },
       "if": {

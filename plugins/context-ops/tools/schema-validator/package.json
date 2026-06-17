@@ -5,7 +5,7 @@
   "type": "module",
   "engines": {"node": ">=18"},
   "bin": {"schema-validator": "./src/cli.js"},
-  "scripts": {"test": "node --test test/chain-schemas.test.js test/rules-cross-consistency.test.js test/v880-cycle-carry.test.js test/adopter-corroboration.test.js"},
+  "scripts": {"test": "node --test test/chain-schemas.test.js test/rules-cross-consistency.test.js test/v880-cycle-carry.test.js test/adopter-corroboration.test.js test/characterization-filename-routing.test.js"},
   "dependencies": {
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1"

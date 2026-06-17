@@ -99,8 +99,42 @@
           },
           "references": {
             "type": "array",
-            "items": { "type": "string" },
-            "description": "본 타입이 참조하는 다른 타입 ID 또는 이름."
+            "items": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "description": "legacy bare 이름 또는 T-ID (additive 보존)."
+                },
+                {
+                  "type": "object",
+                  "required": ["ref"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "ref": {
+                      "type": "string",
+                      "description": "참조 타입 이름 또는 T-ID."
+                    },
+                    "resolution": {
+                      "type": "string",
+                      "enum": [
+                        "intra_spec",
+                        "in_repo",
+                        "external_workspace",
+                        "node_module",
+                        "unresolved"
+                      ],
+                      "description": "monorepo reference 해소 분류. intra_spec=본 type-spec 내 T-ID / in_repo=동일 repo 다른 scope / external_workspace=@sg/* 등 workspace 패키지(분석 scope 밖) / node_module=서드파티(@okta/@mui 등) / unresolved=해소 불가."
+                    },
+                    "t_id": {
+                      "type": "string",
+                      "pattern": "^T-[A-Z0-9_-]+-\\d+$",
+                      "description": "resolution=intra_spec 일 때 매핑되는 T-ID."
+                    }
+                  }
+                }
+              ]
+            },
+            "description": "본 타입이 참조하는 다른 타입 ID 또는 이름. bare 문자열(legacy) 또는 {ref, resolution, t_id} 객체. 외부(external_workspace/node_module)는 resolved-ratio 산정에서 제외."
           },
           "domain_entity_id": {
             "type": "string",
@@ -159,6 +193,17 @@
           "type": "integer",
           "minimum": 0,
           "description": "framework_coupling_score > 0 인 타입 개수 → 신규 스택 정해진 후 재추출 권장."
+        },
+        "framework_neutrality_basis": {
+          "type": "string",
+          "enum": ["all_types", "scope_internal_only"],
+          "default": "all_types",
+          "description": "framework_neutrality_score 의 분모 라벨 (metric 정의 변경 아님 — 보조 label). all_types=전체 추출 타입 / scope_internal_only=외부(external_workspace/node_module) 제외한 scope-내부 타입만. monorepo 에서 외부 참조가 분모를 왜곡할 때 scope_internal_only 로 명시."
+        },
+        "scope_internal_type_count": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "외부 workspace/node_module 참조를 제외한 scope-내부 타입 개수 (선택). framework_neutrality_basis=scope_internal_only 일 때 representable 분모."
         },
         "captured_by": {
           "type": "string",

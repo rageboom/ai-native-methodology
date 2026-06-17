@@ -1,0 +1,76 @@
+{
+  "meta_confidence": {
+    "generated_at": "2026-06-17T00:00:00Z",
+    "confidence": 0.9,
+    "inputs_used": ["source_code", "test_code"]
+  },
+  "snapshots": [
+    {
+      "snapshot_id": "SNAP-UC-USER-LOGIN-001",
+      "use_case": "UC-USER-LOGIN-001",
+      "endpoint": "POST /api/login",
+      "service_method": "AuthService.login",
+      "data_source_status": "existing_test_file",
+      "scenarios": [
+        {
+          "id": "SCN-LOGIN-001",
+          "name": "valid credentials → JWT",
+          "given": { "request_body": { "email": "a@b.com", "password": "pw" } },
+          "when": "POST /api/login → AuthService.login",
+          "then": { "expected_response": { "status": 200 } },
+          "intent_classification": [
+            { "rule": "BR-AUTH-LOGIN-001", "type": "intent" }
+          ],
+          "behavior_to_preserve": ["JWT 발급"],
+          "realized_in": [
+            { "file": "auth/login.controller.ts", "lines": "20-34", "role": "controller" },
+            { "file": "auth/auth.service.ts", "lines": "12", "role": "service" }
+          ]
+        }
+      ]
+    },
+    {
+      "snapshot_id": "SNAP-UC-USER-SIGNUP-001",
+      "use_case": "UC-USER-SIGNUP-001",
+      "endpoint": "POST /api/users",
+      "service_method": "UserService.create",
+      "data_source_status": "existing_test_file",
+      "scenarios": [
+        {
+          "id": "SCN-SIGNUP-001",
+          "name": "valid signup → 201",
+          "given": { "request_body": { "email": "a@b.com" } },
+          "when": "POST /api/users → UserService.create",
+          "then": { "expected_response": { "status": 201 } },
+          "intent_classification": [
+            { "rule": "BR-USER-EMAIL-FORMAT-001", "type": "intent" }
+          ],
+          "behavior_to_preserve": ["email 형식 검증"]
+        }
+      ]
+    }
+  ],
+  "intent_vs_bug": {
+    "br_total": 2,
+    "br_intent": 2,
+    "br_bug": 0,
+    "br_ambiguous": 0,
+    "br_self_recognized": 0,
+    "ap_total": 0,
+    "ap_intent": 0,
+    "ap_bug": 0,
+    "ap_ambiguous": 0,
+    "ap_self_recognized": 0,
+    "named_classified_ratio": 1.0,
+    "self_recognized_grep_count": 0
+  },
+  "coverage": {
+    "matrix": [
+      { "uc": "UC-USER-LOGIN-001", "snapshot": "✅", "covered_by": ["SNAP-UC-USER-LOGIN-001"], "scope_decision": "covered" },
+      { "uc": "UC-USER-SIGNUP-001", "snapshot": "✅", "covered_by": ["SNAP-UC-USER-SIGNUP-001"], "scope_decision": "covered" }
+    ],
+    "coverage_summary": { "ucs_total": 2, "ucs_covered": 2, "uc_coverage_ratio": 1.0 },
+    "coverage_target": 0.8,
+    "coverage_strategy": "absolute"
+  }
+}

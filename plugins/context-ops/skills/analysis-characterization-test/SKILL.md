@@ -77,9 +77,14 @@ scenarios:
         type: 'intent'
     behavior_to_preserve: ['validation 4종', 'JWT 응답']
     behavior_likely_bug: ['DB UQ 부재 race window']
+    realized_in: # (optional) cross-file 실현 anchor — supplementary
+      - { file: 'utils/saveRolesHandler.ts', lines: '36-48', role: 'util' }
+      - { file: 'utils/mutationPayload.ts', lines: '13', role: 'util', note: 'request 빌드' }
 ```
 
 권장 scenario 수: happy + edge 1~2 + likely_bug 1~2.
+
+> **realized_in[] (선택 / 보조 multi-anchor 집합)** — rule/behavior 가 여러 파일에 걸쳐 실현될 때 그 추가 코드 anchor 를 **구조화 배열**로 열거한다. snapshot 의 `endpoint` / `controller_method` / `service_method` / `sql_id` 는 여전히 **canonical PRIMARY anchor** (진입점 / 사람이 읽는 단일값) 이고, `realized_in[]` 은 그 외 전체 anchor 집합 (machine-traversable). `service_method: "fnA (a.ts:1) + fnB (b.ts:2)"` 식 free-text '+' concat 을 중단하고, 2번째 이후 파일은 `realized_in[]` 으로 옮긴다. 항목 = `{file (필수), lines?, role?, note?}`.
 
 ### 5. coverage matrix + ratchet 정책
 
@@ -142,9 +147,12 @@ node ../../tools/characterization-coverage-validator/src/cli.js \
 
 ## 산출물
 
-- `<user-project>/.ai-context/base/domains/<BC>/characterization/characterization-spec.json` (산출물 23 / 통합 entry — `intent_vs_bug` 객체 + `snapshots[].intent_classification` 에 분류 통합 / 구 intent-vs-bug.md 사람-눈 twin 폐지)
-- `<user-project>/.ai-context/base/domains/<BC>/characterization/coverage.json`
-- `<user-project>/.ai-context/base/domains/<BC>/characterization/snapshots/UC-*.json`
+> **파일명 = `characterization-spec.json` (NOT `characterization.json`).** schema 라우팅 + 두 validator (schema-validator 파일명 추론 / coverage-validator entry read) 모두 정확한 canonical 파일명 `characterization-spec.json` 을 기대한다. bare `characterization.json` 은 schema 미라우팅(silent skip) + entry read 실패 → 절대 emit ❌.
+
+- `<user-project>/.ai-context/base/domains/<BC>/characterization/characterization-spec.json` (산출물 23 / **단일 통합 파일 — schema SSOT**)
+  - schema (`characterization-spec.schema.json`) 가 `required: [meta_confidence, snapshots, intent_vs_bug, coverage]` + `additionalProperties:false` 로 **embedded root 레이아웃을 강제**한다: `snapshots[]` (배열) / `coverage` (객체) / `intent_vs_bug` (객체) 모두 이 단일 파일의 root 키.
+  - 별도 `coverage.json` / `snapshots/UC-*.json` subdir 분리 레이아웃 ❌ (구 split 표기 폐지 — schema 가 single-file 을 SSOT 로 못박음 / 분리 시 schema `required` 위반).
+  - 구 intent-vs-bug.md 사람-눈 twin 도 폐지 (`intent_vs_bug` 객체가 SSOT / ADR-011 json 단독).
 
 ## chain 1 입력 보강
 

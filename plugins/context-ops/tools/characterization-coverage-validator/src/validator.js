@@ -53,7 +53,26 @@ export function validateCharacterization(
 		evidence_cross_check: null,
 	};
 
-	// 1. snapshots/UC-*.json read
+	// 0. characterization-spec.json read (entry file / 통합 검증용).
+	//   F-C4-characterization-01: schema(characterization-spec.schema.json) 는 snapshots[]/coverage 를 이 entry 파일의
+	//   root 키로 강제(embedded single-file SSOT / additionalProperties:false). 따라서 split-layout(snapshots/ subdir +
+	//   coverage.json) 부재 시 entry.snapshots / entry.coverage 로 fallback 한다. entry read 를 snapshot/coverage 블록
+	//   위로 hoist (이전엔 L348 에서 늦게 읽혀 fallback 불가 → embedded 산출물이 false-FAIL 됐음).
+	const entryPath = join(targetDir, 'characterization-spec.json');
+	let entry = null;
+	if (existsSync(entryPath)) {
+		try {
+			entry = loadJson(entryPath);
+		} catch (e) {
+			findings.push({
+				kind: 'entry.parse_error',
+				severity: 'medium',
+				message: `characterization-spec.json: ${e.message}`,
+			});
+		}
+	}
+
+	// 1. snapshots read — split-layout(snapshots/UC-*.json subdir) 우선 / 부재 시 entry.snapshots[] (embedded) fallback.
 	const snapshotsDir = join(targetDir, 'snapshots');
 	let snapshots = [];
 	if (existsSync(snapshotsDir)) {
@@ -70,11 +89,17 @@ export function validateCharacterization(
 				});
 			}
 		}
+	} else if (Array.isArray(entry?.snapshots)) {
+		// embedded single-file 레이아웃 (schema SSOT) — entry.snapshots[] 를 사용.
+		snapshots = entry.snapshots.map((d, i) => ({
+			file: `entry.snapshots[${i}]`,
+			data: d,
+		}));
 	} else {
 		findings.push({
 			kind: 'snapshot.dir_missing',
 			severity: 'critical',
-			message: `${snapshotsDir} not found — phase characterization 산출 부재`,
+			message: `${snapshotsDir} not found (그리고 characterization-spec.json 의 embedded snapshots[] 도 부재) — phase characterization 산출 부재`,
 		});
 	}
 	summary.snapshot_count = snapshots.length;
@@ -207,7 +232,9 @@ export function validateCharacterization(
 		}
 	}
 
-	// 3. coverage.json read + strategy 검증
+	// 3. coverage read + strategy 검증 — split-layout(coverage.json) 우선 / 부재 시 entry.coverage (embedded) fallback.
+	//   F-C4-characterization-01: coverage 는 schema-required root 키이자 consumer 의 실 source → disk-only 로 두면
+	//   embedded 산출물이 coverage.missing(HIGH) 로 false-FAIL.
 	const coveragePath = join(targetDir, 'coverage.json');
 	let coverage = null;
 	if (existsSync(coveragePath)) {
@@ -220,11 +247,13 @@ export function validateCharacterization(
 				message: `coverage.json: ${e.message}`,
 			});
 		}
+	} else if (entry?.coverage) {
+		coverage = entry.coverage;
 	} else {
 		findings.push({
 			kind: 'coverage.missing',
 			severity: 'high',
-			message: `${coveragePath} not found`,
+			message: `${coveragePath} not found (그리고 characterization-spec.json 의 embedded coverage 도 부재)`,
 		});
 	}
 
@@ -344,20 +373,7 @@ export function validateCharacterization(
 		intentVsBugContent = readFileSync(intentVsBugPath, 'utf8');
 	}
 
-	// 5. characterization-spec.json read (선택 / entry file / 통합 검증용)
-	const entryPath = join(targetDir, 'characterization-spec.json');
-	let entry = null;
-	if (existsSync(entryPath)) {
-		try {
-			entry = loadJson(entryPath);
-		} catch (e) {
-			findings.push({
-				kind: 'entry.parse_error',
-				severity: 'medium',
-				message: `characterization-spec.json: ${e.message}`,
-			});
-		}
-	}
+	// 5. characterization-spec.json (entry) 는 §0 에서 이미 read 됨 (F-C4-characterization-01 hoist).
 
 	// F-R2-29 (DEC-2026-06-12): intent_vs_bug SSOT 부재 = medium (md 강제 high 대체).
 	//   entry.intent_vs_bug 객체(=json SSOT) 도 없고 intent-vs-bug.md(legacy twin) 도 없으면 intent/bug 분류 신호 전무 → 정직 medium.
