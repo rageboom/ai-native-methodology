@@ -37,6 +37,55 @@ function round4(x) {
 const SEP = String.fromCharCode(1); // commit 구분자 (\x01 control byte / git --format=<\x01>%H)
 const PAIR = String.fromCharCode(2); // pair key 구분자 (파일 경로에 안 나타나는 제어문자)
 
+// 기본 path 제외 — co-change/hotspot 입력에서 generated/infra/CI 파일 배제.
+//   이들은 거의 모든 release commit 에 동반 변경되어 support·churn 을 inflate → top-N 점유(infra noise).
+//   F-DOGFOOD-FE-NOISE (mis-fe-admin dogfood): top co-change pair 전부 deploy/lockfile, hotspot #1 = pnpm-lock.yaml.
+//   locale·일반 config(.json/.yaml)는 제외 ❌ — i18n↔component 같은 진짜 논리결합 보존.
+//   도메인 무관(BE 도 lockfile/CI/Dockerfile 동반변경) / 파라미터 path_excludes 로 override 가능(soft-gate 노출).
+export const DEFAULT_PATH_EXCLUDES = [
+	'**/*-lock.yaml',
+	'**/*-lock.json',
+	'**/*.lock',
+	'**/go.sum',
+	'deploy/**',
+	'**/deploy/**',
+	'**/*.groovy',
+	'**/Jenkinsfile*',
+	'**/docker-compose*.y*ml',
+	'**/Dockerfile*',
+	'**/.env*',
+	'**/dist/**',
+	'**/build/**',
+	'**/node_modules/**',
+	'**/*.generated.*',
+	'**/generated/**',
+];
+
+// glob → RegExp (anchored). `**/` = 0+ 디렉토리 / `**` = 임의 / `*` = 슬래시 제외 임의.
+function globToRegExp(glob) {
+	let re = '';
+	for (let i = 0; i < glob.length; i++) {
+		const c = glob[i];
+		if (c === '*') {
+			if (glob[i + 1] === '*') {
+				i++;
+				if (glob[i + 1] === '/') {
+					i++;
+					re += '(?:.*/)?';
+				} else re += '.*';
+			} else re += '[^/]*';
+		} else if ('.+^${}()|[]\\'.includes(c)) {
+			re += '\\' + c;
+		} else re += c;
+	}
+	return new RegExp('^' + re + '$');
+}
+
+function makeExcluder(globs) {
+	const res = (globs || []).map(globToRegExp);
+	return (p) => res.some((re) => re.test(p));
+}
+
 export function mineCoChange({ gitRunner, params }) {
 	if (typeof gitRunner !== 'function') {
 		return {
@@ -71,6 +120,12 @@ export function mineCoChange({ gitRunner, params }) {
 		};
 	}
 
+	// path 제외 준비 (generated/infra/CI noise) — parse 단계 1회 적용 → fileChurn(hotspot)·txns(pairs) 양쪽 정화 (단일 chokepoint).
+	const isExcluded = makeExcluder(
+		params.path_excludes === undefined ? DEFAULT_PATH_EXCLUDES : params.path_excludes,
+	);
+	let excludedOccurrences = 0;
+
 	// commit 파싱 (newest-first)
 	const commits = [];
 	for (const block of out.split(SEP)) {
@@ -80,7 +135,14 @@ export function mineCoChange({ gitRunner, params }) {
 		const files = lines
 			.slice(1)
 			.map((l) => l.trim())
-			.filter(Boolean);
+			.filter(Boolean)
+			.filter((f) => {
+				if (isExcluded(f)) {
+					excludedOccurrences++;
+					return false;
+				}
+				return true;
+			});
 		if (sha && files.length) commits.push({ sha, files });
 	}
 
@@ -144,6 +206,6 @@ export function mineCoChange({ gitRunner, params }) {
 		transactions_analyzed: txns.length,
 		pairs,
 		file_churn: fileChurnObj,
-		note: `git log 이력 mining (commit ${commits.length}건 중 max_tx_size<=${params.max_transaction_size} 통과 ${txns.length}건 / min_support>=${params.min_support} / min_confidence>=${params.min_confidence}${params.window ? ` / window=${params.window}` : ''}${params.since ? ` / since=${params.since}` : ''}).`,
+		note: `git log 이력 mining (commit ${commits.length}건 중 max_tx_size<=${params.max_transaction_size} 통과 ${txns.length}건 / min_support>=${params.min_support} / min_confidence>=${params.min_confidence}${params.window ? ` / window=${params.window}` : ''}${params.since ? ` / since=${params.since}` : ''}${excludedOccurrences ? ` / path-excludes: ${excludedOccurrences} occurrence 제외(generated/infra noise)` : ''}).`,
 	};
 }

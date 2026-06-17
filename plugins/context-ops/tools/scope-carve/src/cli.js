@@ -52,6 +52,9 @@ function parseArgs(argv) {
 		else if (a === '--hotspot-top-n') opts.hotspot.top_n = Number(argv[++i]);
 		else if (a === '--min-churn') opts.hotspot.min_churn = Number(argv[++i]);
 		else if (a === '--tab-width') opts.hotspot.tab_width = Number(argv[++i]);
+		else if (a === '--exclude')
+			opts.co.path_excludes = [...(opts.co.path_excludes || []), argv[++i]];
+		else if (a === '--no-default-excludes') opts.co.path_excludes = [];
 	}
 	return opts;
 }
@@ -71,6 +74,9 @@ function usage() {
 		'    [--hotspot-top-n N] [--min-churn N] [--tab-width N] [--stdout]',
 	);
 	console.error(
+		'    [--exclude <glob> (반복가능, 기본목록에 추가)] [--no-default-excludes (제외 끔)]',
+	);
+	console.error(
 		'  (architecture.json 부재 시 exit 3 / no-simulation — reference-lens / NOT gate-injected)',
 	);
 }
@@ -88,6 +94,10 @@ function buildReproCommand(opts) {
 	parts.push(`--hotspot-top-n ${opts.hotspot.top_n}`);
 	parts.push(`--min-churn ${opts.hotspot.min_churn}`);
 	parts.push(`--tab-width ${opts.hotspot.tab_width}`);
+	const defaultExcludes = DEFAULT_PARAMS.co_change.path_excludes || [];
+	const px = opts.co.path_excludes || [];
+	if (px.length === 0) parts.push('--no-default-excludes');
+	else for (const g of px.slice(defaultExcludes.length)) parts.push(`--exclude ${g}`);
 	return parts.join(' ');
 }
 

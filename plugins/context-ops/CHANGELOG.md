@@ -10,6 +10,31 @@
 
 ---
 
+## [0.52.0] — 2026-06-17 — MINOR — mis-fe-admin FE dogfood cycle 1: scope-carve infra-noise 필터 + FE provenance/계약 정합 (F-DOGFOOD-FE-\*)
+
+mis-fe-admin(React18 + MUI Module-Federation 7-app 모노레포)에 analysis stage step 0~2(input→inventory→architecture→scope-carve)를 **실제 실행한 dogfood**에서 수확한 finding 중 **a-priori 결함·정합성 5건** 반영(§8.1 무관 — 도메인 일반화가 아닌 코드/계약 사실). 적용 전 v0.48.2(consumer 설치본) 기준 finding 7건을 **v0.51.0 소스에 재대조** → 2건 드롭(F2 = scope-carve는 architecture.json을 *생성* 안 함 / 오프레이밍, F1-a = 이미 codegraph-coverage/sqlite로 리다이렉트됨). SSOT: `DEC-2026-06-17-fe-dogfood-cycle1`.
+
+### 변경
+
+- **편집** `tools/scope-carve/src/co-change.js` — `DEFAULT_PATH_EXCLUDES`(lockfile/deploy/CI/build/generated glob 16종) + `globToRegExp`/`makeExcluder`. parse 단계 **단일 chokepoint** 필터(fileChurn→hotspot · txns→pairs 양쪽 정화). locale/일반 config는 제외 ❌(i18n↔component 진짜 결합 보존). `co_change.note` 에 제외 occurrence 관측성 기록. [F-DOGFOOD-FE-NOISE]
+- **편집** `tools/scope-carve/src/carve.js` — `DEFAULT_PARAMS.co_change.path_excludes = DEFAULT_PATH_EXCLUDES`.
+- **편집** `tools/scope-carve/src/cli.js` — `--exclude <glob>`(반복가능, 기본목록에 추가) / `--no-default-excludes`(제외 끔) + usage + `reproduction_command`(soft-gate 노출/override).
+- **편집** `schemas/scope-carve.schema.json` — `params.co_change.path_excludes` property(required 제외 → 하위호환).
+- **편집** `schemas/meta-confidence.schema.json` — `inputs_used` enum에 FE-native 4종 additive 추가: `codegraph`/`import_graph`/`package_manifest`/`design_tokens`(기존 14종 BE/legacy 형이라 FE run이 provenance를 source_code로 뭉개던 갭 해소). [F-DOGFOOD-FE-INPUTS]
+- **편집** `methodology-spec/id-conventions.md` — inventory `scope_candidate.id`(kebab) ↔ architecture `module.id`(MOD-) **별개 namespace** + 상관 채널(`members`∩`path` 집합 멤버십, 문자열 변환 ❌) 명문화(1:1 아님 / Vertical Slice 관통). [F-DOGFOOD-FE-IDMAP]
+- **편집** `skills/analysis-source-inventory/SKILL.md` — scope_candidate id를 **ASCII kebab** 명시(한글·언더스코어·대문자 ❌ — 스키마 패턴과 정합) + 예시 `scope_candidates` 객체화(string[] 타입 거짓 해소) + 값 제약(kebab / `architecture_style_candidates[].confidence` ≤0.7 cap) SSOT 노트.
+- **편집** `skills/analysis-input-collection/SKILL.md` — `input.json` flat `stack` ≠ inventory nested stackTier 명시 + FE/Module-Federation 예시 추가(BE 편향 템플릿 보완).
+
+### 검증
+
+- scope-carve 단위테스트 **38/38 GREEN**(patched).
+- mis-fe-admin 재실행 before/after: co-change infra pair **21→0** / hotspot infra **3→0** / hotspot #1 `pnpm-lock.yaml` → 실제 컴포넌트(`BizcardDetailInfoDialog.tsx`). `co_change.note` "178 occurrence 제외".
+- schema-validator: `shared/` 4 산출물 전부 valid. drift-validator `--check-layout`: **12 phases / 33 skills / 0 orphans / 0 missing**.
+
+### 보류 (1st FE 도메인 / §8.1 — 2nd FE 도메인 corroboration 필요)
+
+scope-carve SCC가 acyclic feature-sliced FE에서 **0/35 기여**(Martin·co-change가 신호 담당) / Martin `sink`→`clean_seam`이 FE page(구조상 sink·8/9)에서 공허·**efferent 누수 무시**(IA page는 clean이라며 cross-feature violation 2건 끌고감) / FE-only repo의 db·BE phase **선언적 track-gate 부재** / codegraph `component=3/3604`(React arrow-fn 미인식). dogfood STATUS에 finding으로 적재(promotion 보류).
+
 ## [0.51.0] — 2026-06-17 — MINOR — `codegraph-coverage --verify-anchors` 에 unit-spec deliverable 추가 (unit-spec 심볼 정적 codegraph 실존검증)
 
 `unit-spec.json` 의 `units[].code_pointer.symbol`(ast_symbol)이 **실제 소스에 존재하는가** 를 검증할 결정론 경로가 없었다. ep-be-gea 34-BC 백필(301 UNIT)에서는 즉석 LLM grep 워크플로우로 검증 — LLM 판단이라 비결정·재현불가·매번 재작성. 한편 `codegraph-coverage --verify-anchors`(`anchor-verify.js`)는 산출물 ast_symbol 앵커를 codegraph sqlite 심볼 인덱스에 정적 대조하는 기능을 이미 보유했으나, 앵커 수집기 `collectSymbolAnchors` 가 5 산출물(ac/discovery/behavior/impl/test-spec)만 보고 **`unit-spec` 을 누락**했다. SSOT: `DEC-2026-06-17-unit-spec-anchor-verify`.

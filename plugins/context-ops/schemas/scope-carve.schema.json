@@ -66,7 +66,8 @@
             "min_confidence": { "type": "number", "minimum": 0, "maximum": 1, "description": "조건부 동시변경 비율 최소값." },
             "window": { "type": ["integer", "null"], "minimum": 1, "description": "최근 N commit 으로 제한 (null = 전체 / cold-start·이력 편향 제어)." },
             "max_transaction_size": { "type": "integer", "minimum": 2, "description": "이 파일 수 초과 commit 제외 (tangled commit 결합 inflate 회피)." },
-            "since": { "type": ["string", "null"], "description": "git --since 시점 제한 (null = 무제한)." }
+            "since": { "type": ["string", "null"], "description": "git --since 시점 제한 (null = 무제한)." },
+            "path_excludes": { "type": "array", "items": { "type": "string" }, "description": "co-change/hotspot 입력에서 제외할 glob (lockfile/deploy/CI/build/generated). infra noise 가 support·churn 을 inflate 해 top-N 점유하는 것 방지 (F-DOGFOOD-FE-NOISE). 미지정 = 기본 제외목록 / [] = 제외 없음." }
           }
         },
         "martin_thresholds": {

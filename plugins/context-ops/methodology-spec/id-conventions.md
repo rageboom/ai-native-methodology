@@ -86,6 +86,19 @@ scope 는 사용자가 작업 시작 시 자유 명명 (chain-driver init --scop
 discovery-spec 의 use_cases 는 기존 UC-_ 차용 (analysis stage UC-_ 와 동일 namespace / backward link).
 BR-INTENT-_ prefix ❌ — rules.schema 의 BR-_ 에 `intent` sub-object 확장 (Senior 권고 / B1 정합).
 
+### inventory `scope_candidate.id` ↔ architecture `module.id` (별개 namespace / 매핑 채널)
+
+> F-DOGFOOD-FE-IDMAP (mis-fe-admin dogfood) — analysis stage 의 두 id 는 **다른 namespace** 이며 1:1 변환식이 **없다**. downstream 이 추측하지 않도록 명문화.
+
+| 산출물            | 필드                    | 형식                          | 성격                                                       |
+| ----------------- | ----------------------- | ----------------------------- | ---------------------------------------------------------- |
+| inventory.json    | `scope_candidates[].id` | `^[a-z0-9][a-z0-9-]{1,63}$`   | scope 슬러그 / reference-lens / 사용자 절단 결단 산출 (advisory) |
+| architecture.json | `modules[].id`          | `^MOD-[A-Z0-9_-]+$`           | 구조 모듈·패키지 단위 (결정론 의존 그래프 노드)            |
+
+- **1:1 아님 — 한 scope 가 N 개 module 관통(Vertical Slice)**: 예) inventory `eam-integration-authority` = architecture `MOD-EAM-PAGES-INTEGRATION-AUTHORITY` + `MOD-EAM-APIS-INTEGRATION-AUTHORITY`.
+- **상관 채널 = 문자열 변환 ❌ / 집합 멤버십**: `scope_candidates[].members`(소스 경로) ∩ `modules[].path` 교집합으로 한 scope 가 관통하는 MOD-\* 를 해소한다. id 문자열을 변형·추측하지 말 것 (이 멤버십이 유일한 정식 bridge).
+- BC↔module 축(`related_bounded_context`)과 혼동 ❌ — 그건 domain BC ↔ architecture module 축이고, 여기는 scope ↔ module 축으로 별개다.
+
 ---
 
 ## 규칙

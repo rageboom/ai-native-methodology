@@ -31,7 +31,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write
      - ⓑ **shared-kernel** = Martin afferent-hub(Ca 최상위 = 만물이 의존하는 공통 유틸/코드: cache·base·utils·공통 예외/응답 등). 이건 **개별 scope 가 아니라** `scope_candidates[].role=backbone` 으로 빼서 **1회 분석 / 모든 scope 가 참조**.
      - **이유**: hub 를 빼면 feature 의 external coupling 상당분(주로 kernel 행)이 사라져 **feature 가 깨끗한 scope 로 분리**된다 (Martin "hub 쪼개면 파편화" + DDD shared-kernel + Vertical Slice "slice 간 결합 최소"). 그 후 남은 feature = `role=scope`.
    - **coarseness 재점검 (coarse-to-fine 재귀)**: 측정으로 도출한 candidate 라도 members 가 **복수 독립 응집 sub-unit 을 한 묶음**으로 담을 수 있다(명목 패키지 1개 = 실제 N개 도메인). 이때 candidate 를 더 잘게 **재-carve**(측정 단계 재적용)한 뒤 절단한다 — 한 번의 coupling 집계가 항상 최종 응집 단위를 주지 않는다. 거칠음 신호(advisory): ⓐ members 가 다수 독립 하위 트리(각자 domain/service/infra 세트)로 갈림 ⓑ candidate 내부 coupling 약하게 분절(SCC 가 candidate 안에서 재분할) ⓒ 후행 — scope 진입 후 `discovery.uc.under_decomposition`(UC/entity<1.5) 발화 = scope 가 거칠었다는 사후 증거. 재분해 절단은 사용자 soft gate #0 결단(자동 재분해 ❌).
-   - **`scope_candidates[]` 산출** (schema `scope_candidates`): id(slug / 사용자가 알아듣기 쉬운 의미 명칭 — 패키지 약칭 그대로 ❌) / members(명목 BC 경계 관통 가능 — 한 업무의 두 얼굴) / internal·external_coupling / crosses_nominal_boundary / decay_grade / `role`(scope|backbone) / `source` / `carve_signals`. **advisory — reference-lens / gate inject ❌ / 최종 절단은 사용자 soft gate #0 결단.**
+   - **`scope_candidates[]` 산출** (schema `scope_candidates`): id(ASCII kebab 슬러그 `^[a-z0-9][a-z0-9-]{1,63}$` / 의미 전달되는 **영문** 슬러그 — 한글·언더스코어·대문자 ❌, 패키지 약칭 그대로도 ❌ / 예: `integration-authority` · `overseas-trip`) / members(명목 BC 경계 관통 가능 — 한 업무의 두 얼굴) / internal·external_coupling / crosses_nominal_boundary / decay_grade / `role`(scope|backbone) / `source` / `carve_signals`. **advisory — reference-lens / gate inject ❌ / 최종 절단은 사용자 soft gate #0 결단.**
    - **환경 부재 시**: codegraph exit 3 신호면 사용자에게 codegraph/scope-carve 실행·CI 위임 안내 (no-simulation / 안 돌린 신호로 표기 ❌).
    - **경계 위반 라우팅**: codegraph 가 드러낸 의존성 규칙 위반(domain→infrastructure 역참조, feature 축 벗어난 교차참조)은 버그가 아니라 **1급 산출물** → `analysis-quality-antipattern`(category=ARCH) + `migration-cautions` + finding 으로 흘린다. decay = 분석 가치.
 5. **inventory.json 작성** — `schemas/inventory.schema.json` (strict / SSOT) 기준:
@@ -42,10 +42,10 @@ allowed-tools: Read, Glob, Grep, Bash, Write
    	"stack": { "...": "..." },
    	"architecture_style_candidates": ["..."],
    	"modules_for_priority_analysis": ["..."],
-   	"scope_candidates": ["... (대형/decayed 시 — coupling 측정 도출 / advisory)"]
+   	"scope_candidates": [{ "id": "<kebab-slug>", "members": ["..."], "source": "scope_carve", "role": "scope" }]
    }
    ```
-   top-level required = `meta` · `repo` · `stack` (strict `additionalProperties:false`). 정확한 하위 구조는 `schemas/inventory.schema.json` 이 SSOT — 위 키 외 필드 추가 시 schema-validator fail.
+   top-level required = `meta` · `repo` · `stack` (strict `additionalProperties:false`). 정확한 하위 구조는 `schemas/inventory.schema.json` 이 SSOT — 위 키 외 필드 추가 시 schema-validator fail. 위 예시는 **형태 안내일 뿐** (제약은 schema): `scope_candidates[]` = 객체 배열(`id`·`members`·`source` 필수, `["..."]` 문자열 배열 ❌) / `id` = kebab `^[a-z0-9][a-z0-9-]{1,63}$` / `architecture_style_candidates[].confidence` ≤ 0.7 cap(Phase-1).
 6. **drift-validator 검증** — schema 정합 자동 확인 (PostToolUse hook).
 7. **finding 등재** — gap / unclear module ownership / 경계 위반 등 발견 시 `log-finding`.
 

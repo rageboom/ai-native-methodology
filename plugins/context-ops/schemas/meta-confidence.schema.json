@@ -25,7 +25,7 @@
     },
     "inputs_used": {
       "type": "array",
-      "description": "분석에 사용된 입력 출처 목록. ADR-003 §6.3의 modifier 항목과 정합.",
+      "description": "분석에 사용된 입력 출처 목록. ADR-003 §6.3의 modifier 항목과 정합. v0.52.0 확장 (F-DOGFOOD-FE-INPUTS / mis-fe-admin dogfood) — FE-native 입력 4종 추가: codegraph(CodeGraph 인덱스) / import_graph(정적 import 의존 그래프) / package_manifest(package.json·lockfile) / design_tokens(DTCG·Tailwind·MUI theme). 기존 14종은 BE/legacy-archaeology 형이라 FE run 이 provenance 를 source_code/config_files 로 뭉개던 갭 해소 (additive / 기존 산출물 호환).",
       "items": {
         "type": "string",
         "enum": [
@@ -42,7 +42,11 @@
           "postman_or_api_test",
           "diagrams_other",
           "characterization",
-          "sql_inventory"
+          "sql_inventory",
+          "codegraph",
+          "import_graph",
+          "package_manifest",
+          "design_tokens"
         ]
       },
       "minItems": 1,

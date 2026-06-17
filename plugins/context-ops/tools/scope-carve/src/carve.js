@@ -9,7 +9,7 @@
 import { createHash } from 'node:crypto';
 import { tarjanScc } from './scc.js';
 import { martinMetrics } from './martin.js';
-import { mineCoChange } from './co-change.js';
+import { mineCoChange, DEFAULT_PATH_EXCLUDES } from './co-change.js';
 import { computeHotspot } from './hotspot.js';
 
 export const TOOL_VERSION = '0.1.0';
@@ -21,6 +21,7 @@ export const DEFAULT_PARAMS = {
 		window: null,
 		max_transaction_size: 30,
 		since: null,
+		path_excludes: DEFAULT_PATH_EXCLUDES,
 	},
 	martin_thresholds: {
 		unstable_instability: 0.7,

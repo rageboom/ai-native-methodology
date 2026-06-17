@@ -42,6 +42,8 @@ allowed-tools: Read, Glob, Grep, Bash
    	"phase_0_completed_at": "..."
    }
    ```
+   > `stack` 은 input.json 의 **평면 시그널** — inventory.json 의 nested `stack.{backend|frontend...}.{language,framework,db}`(stackTier)와 형태가 다르다 (SSOT: `schemas/inventory.schema.json`). input.json 자체엔 전용 schema 없음(teaching meta).
+   > FE/모노레포 예: `"stack": { "language": "typescript", "framework": "react-18", "db": "none" }`, `"tracks": ["FE"]` — DB 부재면 db/BE phase 는 N/A. Module-Federation 멀티앱이면 `target.scope` 에 app/module 범위를 명시.
 6. **다음 단계 안내** — `analysis-source-inventory` 호출 권장.
 
 ## 산출물
