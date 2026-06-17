@@ -6,7 +6,7 @@
 
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, rmSync, existsSync, readdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
@@ -21,6 +21,7 @@ import {
 	EVIDENCE_TRUST,
 	augmentEnv,
 	localPmdBinDir,
+	SEMGREP_SECURITY_PACK_DIR,
 } from '../src/runner.js';
 
 test('REQUIRED_EVIDENCE has 7 fields (5 evidence + 2 path)', () => {
@@ -71,6 +72,37 @@ test('SemgrepPlugin extraRules empty default — no extra --config', () => {
 	});
 	const configCount = args.filter((a) => a === '--config').length;
 	assert.equal(configCount, 1);
+});
+
+// DEC-2026-06-17 — ruleset 미지정 시 기본값 = plugin-local 벤더링 security 팩 (레지스트리 ❌).
+//   사내 SSL 검사가 semgrep.dev 를 가로채는 환경에서 네트워크 의존 제거 (F-DOGFOOD-015 동형 차단).
+test('SemgrepPlugin default ruleset = local security pack when omitted (no registry)', () => {
+	const args = SemgrepPlugin.mandatoryArgs({
+		targetDir: '/x',
+		sarifPath: '/y/out.sarif',
+	});
+	const configIdx = args.indexOf('--config');
+	const cfg = args[configIdx + 1];
+	assert.equal(cfg, SEMGREP_SECURITY_PACK_DIR);
+	// 로컬 절대경로여야 함 — 레지스트리 엔트리(p/...) 로 회귀 ❌.
+	assert.ok(cfg.endsWith('semgrep-rules-security'));
+	assert.ok(!cfg.startsWith('p/'));
+});
+
+// 출하 가드 — 벤더링 security 팩이 실제로 존재 + 비어있지 않아야 함.
+//   팩 누락/공백 = 기본 ruleset 이 semgrep exit 7(invalid/missing config) 로 silent break.
+//   scripts/build-semgrep-security-pack.js 로 재생성 후 커밋 (DEC-2026-06-17).
+test('shipped security pack present and non-trivial (missing → default exit 7)', () => {
+	assert.ok(existsSync(SEMGREP_SECURITY_PACK_DIR), 'security pack dir 부재 — build-semgrep-security-pack.js 재실행 필요');
+	const walk = (dir) =>
+		readdirSync(dir, { withFileTypes: true }).reduce((n, e) => {
+			const p = join(dir, e.name);
+			if (e.isDirectory()) return n + walk(p);
+			return n + (/\.ya?ml$/i.test(e.name) ? 1 : 0);
+		}, 0);
+	const count = walk(SEMGREP_SECURITY_PACK_DIR);
+	// 1386 조립 실측 — 회귀/공백 차단용 하한(여유 두고 1000).
+	assert.ok(count >= 1000, `security pack rule 수 ${count} < 1000 — 조립 누락 의심`);
 });
 
 // R19 Tier 1 — PmdPlugin in-plugin 자동실행 (DEC-2026-06-07-pmd-tier1)

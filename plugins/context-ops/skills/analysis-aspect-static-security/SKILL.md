@@ -34,26 +34,27 @@ baseline → `methodology-spec/policies/no-simulation.md` (원칙 / R19 Tier 정
 4. **번들 룰 우선 사용** — `tools/semgrep-rules/` 가 git subtree 로 vendor (install 시 자동 동봉, 사내 정책으로 semgrep registry 막힌 환경 1차 대응):
 
    ```bash
-   # 번들 룰 (registry 의존 0 — 권장 default)
+   # 기본값 = plugin-local 벤더링 security 팩 (전 언어 security-only 1386 / registry 의존 0 / 권장)
+   #   --ruleset 생략 시 자동. 사내 SSL 검사가 semgrep.dev 를 가로채는 환경에서도 네트워크 0 으로 동작.
    node ${CLAUDE_PLUGIN_ROOT}/tools/static-runner/src/cli.js \
      --plugin semgrep \
      --target <dir> \
-     --output <dir> \
+     --output <dir>
+   #  (명시하려면: --ruleset ${CLAUDE_PLUGIN_ROOT}/tools/semgrep-rules-security)
+
+   # per-language 벤더 룰 (security 외 카테고리 포함 / override — pro-only 룰 혼입 시 exit 7 주의)
+   node ${CLAUDE_PLUGIN_ROOT}/tools/static-runner/src/cli.js \
+     --plugin semgrep --target <dir> --output <dir> \
      --ruleset ${CLAUDE_PLUGIN_ROOT}/tools/semgrep-rules/python
 
-   # registry pack (registry 접근 가능 환경에서만)
+   # registry pack (registry 접근 가능 환경에서만 — 사내 SSL 검사 환경은 fetch 실패 exit 7)
    node ${CLAUDE_PLUGIN_ROOT}/tools/static-runner/src/cli.js \
-     --plugin semgrep \
-     --target <dir> \
-     --output <dir> \
+     --plugin semgrep --target <dir> --output <dir> \
      --ruleset p/owasp-top-ten
 
-   # `--extra-rules <path>` 사내 custom rule 병행 (멀티 지정 가능)
+   # `--extra-rules <path>` 사내 custom rule 병행 (기본 security 팩 + custom / 멀티 지정 가능)
    node ${CLAUDE_PLUGIN_ROOT}/tools/static-runner/src/cli.js \
-     --plugin semgrep \
-     --target <dir> \
-     --output <dir> \
-     --ruleset ${CLAUDE_PLUGIN_ROOT}/tools/semgrep-rules/javascript \
+     --plugin semgrep --target <dir> --output <dir> \
      --extra-rules tools/static-runner/rules/jwt-localstorage.yml
    ```
 

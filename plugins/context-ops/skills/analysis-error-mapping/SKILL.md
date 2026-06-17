@@ -45,9 +45,10 @@ baseline → `methodology-spec/policies/no-simulation.md`.
      --plugin semgrep \
      --target <src>/ \
      --output <output>/ \
-     --ruleset p/owasp-top-ten \
      --extra-rules tools/static-runner/rules/error-mapping-missing.yml
    ```
+
+   - `--ruleset` 미지정 = 기본값 plugin-local 벤더링 security 팩(`tools/semgrep-rules-security/`) 사용 — 사내 SSL 검사가 `semgrep.dev` 레지스트리(`p/owasp-top-ten`)를 가로채는 환경에서 네트워크 의존 0. 레지스트리·per-language 룰이 필요하면 `--ruleset` 명시 override.
 
    - Spring rule = `error-mapping-generic-exception-in-service` (throw_unmapped mechanism)
    - NestJS rule = `error-mapping-nestjs-delete-201-decorator-drift` (decorator-drift mechanism)

@@ -32,6 +32,13 @@ const PLUGIN_ROOT =
 	resolve(dirname(fileURLToPath(import.meta.url)), '../../../');
 const MARKER_DIR = join(PLUGIN_ROOT, '.static-tools');
 
+// Semgrep 기본 룰셋 = plugin-local 벤더링 security 팩 (DEC-2026-06-17-semgrep-local-security-ruleset).
+//   사내 SSL 검사 프록시가 semgrep.dev 레지스트리(`p/owasp-top-ten`)를 가로채 SSL fetch 실패 →
+//   semgrep exit 7 → scan FAILED (F-DOGFOOD-015 동형 / 사내망 전 PC 동형). 로컬 팩(security-only
+//   1386 / scripts/build-semgrep-security-pack.js 결정적 조립)으로 네트워크 의존 제거.
+//   사용자 명시 --ruleset override 시 그대로 사용 (레지스트리/per-language/custom 룰 보존).
+export const SEMGREP_SECURITY_PACK_DIR = join(PLUGIN_ROOT, 'tools', 'semgrep-rules-security');
+
 // .pmd-bin-dir marker → 유효한 PMD bin 디렉터리 또는 null (결정적).
 export function localPmdBinDir() {
 	try {
@@ -262,7 +269,7 @@ export const SemgrepPlugin = new Plugin({
 	}) => [
 		'scan',
 		'--config',
-		ruleset ?? 'p/owasp-top-ten',
+		ruleset ?? SEMGREP_SECURITY_PACK_DIR,
 		...extraRules.flatMap((r) => ['--config', r]),
 		'--sarif',
 		'--sarif-output',

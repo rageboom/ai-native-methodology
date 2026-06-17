@@ -10,6 +10,31 @@
 
 ---
 
+## [0.55.0] — 2026-06-17 — MINOR — Semgrep 기본 룰셋 사내망 로컬화 (security-only 벤더링 팩 / registry 의존 제거)
+
+윤주스 PC(사내망)에서 Semgrep 스캔이 SSL 로 깨지는 현상을 진단 → **`semgrep.dev` 룰 레지스트리(`p/owasp-top-ten`)가 사내 SSL 검사 프록시에 가로채여 fetch 실패**(F-DOGFOOD-015 동형)임을 실측 재현. `curl`/PyPI 는 통과하나 Semgrep(Python `requests`+certifi)만 사내 root CA 미신뢰로 `CERTIFICATE_VERIFY_FAILED` → semgrep exit 7 → scan FAILED. 네트워크가 사내망으로 균일 = **전 PC 동일 실패**(캐시도 비어있음). DEC-2026-06-11 §4 carry("기본 ruleset 레지스트리 의존 / 벤더링 로컬 기본화 정책 결정 필요") 종결. SSOT: `DEC-2026-06-17-semgrep-local-security-ruleset`.
+
+### 변경
+
+- **신설** `tools/semgrep-rules-security/` — 벤더 트리(`tools/semgrep-rules/` 2178)에서 **전 언어 security 카테고리만** 추린 단일 팩(1386 룰 / 구조보존 / 5.7M). 전체 트리는 pro-only·비룰 yaml 혼입으로 `--config` 시 exit 7(invalid rule / semgrep 은 깨진 룰 skip 불가)이므로 큐레이션 필수. owasp 의도 보존(security 카테고리 / owasp 메타 1493) + track-agnostic(Java legacy·JS/TS modern 무관 / 언어 자동필터로 타깃 외 룰은 로드만).
+- **신설** `scripts/build-semgrep-security-pack.js` — 벤더 트리에서 security 룰을 결정적·네트워크 0 으로 재조립(멱등 / test·fixtures 제외). `--verify` 시 semgrep on PATH 면 smoke 스캔으로 config 유효성(exit 0/1) 확인(no-simulation — 실 실행만 / 부재 시 honest skip).
+- **편집** `tools/static-runner/src/runner.js` — `SemgrepPlugin` 기본 ruleset `p/owasp-top-ten` → `SEMGREP_SECURITY_PACK_DIR`(`PLUGIN_ROOT/tools/semgrep-rules-security`). `--ruleset`/`--extra-rules` override 는 **무변경**(레지스트리·per-language·custom 룰 보존).
+- **편집** `skills/analysis-aspect-static-security/SKILL.md` + `skills/analysis-error-mapping/SKILL.md` — `--ruleset p/owasp-top-ten` 하드코딩 제거 → 기본값(로컬 팩) 사용. registry 예시는 "registry 접근 가능 환경에서만 — 사내 SSL 환경은 fetch 실패" 로 명시 강등.
+
+### 검증
+
+- static-runner 49→**50 테스트 GREEN** — 신규: ① 기본값(미지정)=로컬 팩 경로 단언(레지스트리 회귀 ❌) ② 출하 가드(security 팩 존재 + rule 수 ≥1000 / 누락 시 default exit 7 silent break 차단).
+- **사내망 실측(no-simulation)**: 기본값 `cli.js` 호출 = `semgrep.dev`/SSL 접근 흔적 **0**(네트워크 0) + `runs: 1 (ok:1, failed:0)` + `real_tool:true` / `scan_failed_count:0` / `scan_status:ok` + 328 룰 실행·3 findings. error-mapping(`--extra-rules`) 경로도 통과(220 룰·1 finding).
+- 3 SSOT 버전 동기화(`package.json` + `.claude-plugin/plugin.json` + parent `CLAUDE.md`) 0.55.0.
+
+### 정직 carry
+
+- **baseline 재수립 가능성** — `p/owasp-top-ten`(서버 큐레이션) ≠ security 디렉토리 1386(더 넓음 / 로컬 팩엔 owasp 매니페스트 부재 → 1:1 재현 불가). 기존 semgrep baseline 쓰던 곳은 재수립 필요할 수 있음.
+- **PATH carry(직교)** — pipx·brew 없는 fresh PC 의 `pip3 --user` → `~/.local/bin` 미등록 가능. 본 룰 fix 와 별개(hook 경고 기존 유지).
+- **full tree(2178) 유지** — SKILL per-language override 예시 의존 → 보안 팩은 additive(전체 트리 출하 제외는 별도 검토).
+
+---
+
 ## [0.54.0] — 2026-06-17 — MINOR — mis-fe-admin FE dogfood cycle 3: cycle2 enforcement 짝 완성 (schema/skill 정합 9건)
 
 mis-fe-admin(React18 + MUI Module-Federation 7-app 모노레포) `integration-authority` BC 에 analysis stage 전체(8 FE-track 산출물 + scope-carve)를 **실제 실행한 dogfood cycle 3** 에서 수확한 finding 중 **real a-priori 9건** 반영(§8.1 무관 — 도메인 일반화가 아닌 schema↔skill↔example 정합 사실). run 은 consumer 설치본 **v0.48.2** 로 돌아 finding 37건 중 stale 10(이미 v0.49–0.53 수정) / defer §8.1 12(단일도메인 일반화 / 2nd FE 도메인 필요) / false-positive 3 을 **dev v0.53.0 소스 직접 재대조로 드롭**. 핵심 인사이트: cycle 3 = **cycle 2 가 절반만 적용한 enforcement 짝의 완성** (cycle2 가 schema enum / skill note 한쪽만 건드린 자리의 반대쪽). 전부 additive → 기존 산출물 검증 불파괴. SSOT: `DEC-2026-06-17-fe-dogfood-cycle3`.
