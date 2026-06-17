@@ -21,6 +21,7 @@ User triggers this skill when starting a new deliverable. 매칭 대상:
 - "inventory 시작해줘" → fills `templates/analysis/inventory.template.json`
 - "openapi.yaml 작성" → fills `templates/analysis/openapi-extension.template.json`
 - 그 외 analysis 산출물 (architecture / domain / business-rules / antipatterns / schema / ui-spec 등) = 해당 `schemas/<artifact>.schema.json` 기반 skill 본문 inline placeholder (.template.md·.template.mermaid twin 폐지). decision-table·finding·formal-spec = 작성 가이드 `.template.md` 유지.
+- **ui-spec.json producer 명문화 (v0.53.0)** — `ui-spec.json` 은 전용 추출 도구(extractor)가 없는 schema-driven **합성 산출물**(domain + state-map + visual-manifest 종합)이며, 본 `_base-apply-template` 가 명시적 producer 다 (전용 producer skill 부재 → drift-validator 가 orphan 으로 안 잡는 문서 갭이라 여기서 명문화).
 
 ### chain stage (6 templates / `templates/{discovery,spec,plan,test,implement}/`)
 

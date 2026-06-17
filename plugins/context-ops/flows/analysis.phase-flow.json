@@ -110,6 +110,7 @@
       "spec_file": "ui.md",
       "depends_on": ["architecture", "business-logic", "characterization"],
       "outputs": ["ui-spec.json", "state-map.json", "visual-manifest.json", "type-spec.json"],
+      "$comment": "v0.53.0 FE dogfood — ui-spec.json producer = _base-apply-template (전용 extractor 없는 schema-driven 합성 산출물 / domain+state-map+visual-manifest 종합). state-map/visual-manifest/type-spec 는 전용 skill 보유 / ui-spec 만 합성이라 producer 가 _base-apply-template.",
       "skills": ["analysis-ui-state-map-fe", "analysis-ui-visual-manifest-fe", "analysis-type-spec-fe"]
     },
     {

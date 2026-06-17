@@ -147,9 +147,12 @@
               "no_operational_db",
               "fe_absent",
               "external_dep_absent",
-              "single_module"
+              "single_module",
+              "no_visual_capture",
+              "no_a11y_runner",
+              "no_storybook"
             ],
-            "description": "v2.4.0 확장 — PoC #01 사례 'no_operational_db' + 'fe_absent' + 'external_dep_absent' + 'single_module' 추가 (N영역 부재 자연 표현 흡수 / ADR-CHAIN-011 §5.2 정합 / Senior R5 'schema vs PoC 잘못 분석' 정합)."
+            "description": "v2.4.0 확장 — PoC #01 사례 'no_operational_db' + 'fe_absent' + 'external_dep_absent' + 'single_module' 추가 (N영역 부재 자연 표현 흡수 / ADR-CHAIN-011 §5.2 정합 / Senior R5 'schema vs PoC 잘못 분석' 정합). v0.53.0 FE dogfood — FE 부재축 추가 'no_visual_capture' + 'no_a11y_runner' + 'no_storybook' (inputs_used FE 4종과 대칭 — FE run 이 도구 부재를 정직히 페널티 표현)."
           },
           "value": {
             "type": "number",

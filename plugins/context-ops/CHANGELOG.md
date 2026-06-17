@@ -10,6 +10,31 @@
 
 ---
 
+## [0.53.0] — 2026-06-17 — MINOR — mis-fe-admin FE dogfood cycle 2: FE-track(L340) 검증 산출 6 정합 수정
+
+mis-fe-admin(React18 + MUI Module-Federation 7-app 모노레포) `integration-authority` BC 에 FE-track 산출물(L340 — form-validation / a11y / type-spec / ui-spec / visual-manifest / state-map)을 **실제 추출한 dogfood cycle 2** 에서 수확한 finding 중 **검증 완료(still_exists / safe-additive) 6건** 반영(§8.1 무관 — 도메인 일반화가 아닌 schema/skill 사실). 전부 additive → 기존 산출물 검증 불파괴. SSOT: `DEC-2026-06-17-fe-dogfood-cycle2`.
+
+### 변경
+
+- **편집** `schemas/form-validation-spec.schema.json` — `validation_type` enum 에 numeric 술어 5종 additive: `int` / `positive` / `nonnegative` / `finite` / `multipleOf`(Zod number 1급 술어 — 기존 enum 이 string-format 위주라 numeric 빈약하던 갭 해소). [AC-NUMERIC]
+- **편집** `schemas/meta-confidence.schema.json` — `applied_penalties.items.properties.name` enum 에 FE 부재축 3종 additive: `no_visual_capture` / `no_a11y_runner` / `no_storybook`(inputs_used FE-native 4종과 대칭 — FE run 이 도구 부재를 정직히 페널티 표현). [AC-PENALTIES]
+- **편집** `schemas/a11y-spec.schema.json` — `summary.captured_by` enum 에 `static_source_review` additive(running app 부재 시 grep/semgrep 기반 정직 정적 중간 tier — real-tool 도 simulation(-5%p) 도 아님). [AC-DYNAMIC]
+- **편집** `skills/analysis-aspect-a11y/SKILL.md` — running app 부재 분기 노트(static_source_review tier / reproduction_command(grep·semgrep) + violation.detection=static_heuristic 기록 의무 / axe-core 실행 의무 문구 유지).
+- **편집** `skills/analysis-type-spec-fe/SKILL.md` — Step 1 dead command `npx ts-morph project`(비존재 CLI) → `extract-types.ts`(ts-morph `Project({tsConfigFilePath})` 라이브러리 스크립트) + 실행 `npx tsx extract-types.ts` 교체 / 사전조건 `npm i -D ts-morph tsx` 명시. [AC-TSMORPH] + step 5 인라인 예시 3중 불일치 교정(`meta_confidence`→`meta` / required `summary` 보강 / `framework_neutrality_score`·`captured_by` → summary 하위 / `framework_coupling_reasons` → types[] 하위 / 비-schema 키 `tool_evidence` 제거). [AC-DRIFT a]
+- **편집** `skills/_base-apply-template/SKILL.md` + `flows/analysis.phase-flow.json`(ui 노드 `$comment`) — ui-spec.json producer 명문화(전용 extractor 없는 schema-driven 합성 산출물 / domain+state-map+visual-manifest 종합 / producer = _base-apply-template). drift-validator 가 orphan 으로 안 잡는 문서 갭. [AC-UISPEC]
+
+### 검증
+
+- scope-carve 단위테스트 **38/38 GREEN**(영향 없음).
+- 편집한 3 schema valid JSON + mis-fe-admin `shared/` 4 산출물 valid 유지 + `domains/integration-authority/` form-validation-spec.json·a11y-spec.json 해당 schema 재검증 valid(additive 라 통과).
+- drift-validator `--check-layout`: **12 phases / 33 skills / 0 orphans / 0 missing** 유지.
+
+### Drop / 보류
+
+- **Drop #5** gate evidence_missing fail-open — category error(evidence_missing 은 별도 필드 + `failClosedOnNull` 이 이미 처리) → 손대지 않음.
+- **Drop** characterization `$schema_ref` — v0.52.0 에 부재 → 손대지 않음.
+- **보류** visual-manifest schema(snapshot manifest) ↔ skill(token catalog) 근본 contradiction — 이번 additive 범위 아닌 별도 설계결단(격상 carry).
+
 ## [0.52.0] — 2026-06-17 — MINOR — mis-fe-admin FE dogfood cycle 1: scope-carve infra-noise 필터 + FE provenance/계약 정합 (F-DOGFOOD-FE-\*)
 
 mis-fe-admin(React18 + MUI Module-Federation 7-app 모노레포)에 analysis stage step 0~2(input→inventory→architecture→scope-carve)를 **실제 실행한 dogfood**에서 수확한 finding 중 **a-priori 결함·정합성 5건** 반영(§8.1 무관 — 도메인 일반화가 아닌 코드/계약 사실). 적용 전 v0.48.2(consumer 설치본) 기준 finding 7건을 **v0.51.0 소스에 재대조** → 2건 드롭(F2 = scope-carve는 architecture.json을 *생성* 안 함 / 오프레이밍, F1-a = 이미 codegraph-coverage/sqlite로 리다이렉트됨). SSOT: `DEC-2026-06-17-fe-dogfood-cycle1`.

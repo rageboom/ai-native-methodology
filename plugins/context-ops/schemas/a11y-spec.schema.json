@@ -137,8 +137,8 @@
         },
         "captured_by": {
           "type": "string",
-          "enum": ["axe_core_real", "pa11y_real", "lighthouse_a11y_real", "simulation"],
-          "description": "no-simulation 정책 (ADR-009 §2.2.1). simulation 시 -5%p 패널티 + simulation_reason 의무."
+          "enum": ["axe_core_real", "pa11y_real", "lighthouse_a11y_real", "static_source_review", "simulation"],
+          "description": "no-simulation 정책 (ADR-009 §2.2.1). simulation 시 -5%p 패널티 + simulation_reason 의무. v0.53.0 FE dogfood — 'static_source_review' 추가 (running app 부재 시 grep/semgrep 기반 정적 source-grounded a11y 부분 산출 / real-tool 도 simulation 도 아닌 정직한 중간 tier)."
         },
         "captured_by_version": {
           "type": "string",

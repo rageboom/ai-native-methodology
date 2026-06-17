@@ -81,6 +81,11 @@
               "max_length",
               "min_value",
               "max_value",
+              "int",
+              "positive",
+              "nonnegative",
+              "finite",
+              "multipleOf",
               "pattern",
               "email",
               "url",
@@ -99,7 +104,7 @@
               "union",
               "discriminated_union"
             ],
-            "description": "Zod / Yup / Joi 패턴 통합 enum. custom_refine = .refine() / .superRefine() / .test()."
+            "description": "Zod / Yup / Joi 패턴 통합 enum. custom_refine = .refine() / .superRefine() / .test(). v0.53.0 FE dogfood — numeric 술어 추가 (int / positive / nonnegative / finite / multipleOf = Zod number 1급 술어)."
           },
           "rule_value": {
             "description": "Validation rule 값 (min=8, regex pattern, custom function name 등)."
