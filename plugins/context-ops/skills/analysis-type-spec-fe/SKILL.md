@@ -27,15 +27,17 @@ TypeScript 코드베이스의 type 정의 → type-spec.json + framework_neutral
    - 0 = pure data (e.g., `User { id, email }`)
    - 0.5 = mild coupling (TanStack Query type 의 일부)
    - 1.0 = full coupling (React component props with hooks)
-4. **Coupling 사유 enum 분류** (8종):
-   - react-hook-coupling
-   - jsx-element
-   - dom-event
-   - browser-api
-   - framework-decorator
-   - css-in-js
-   - state-lib-specific
-   - other
+4. **Coupling 사유 enum 분류** (`types[].framework_coupling_reasons` / `schemas/type-spec.schema.json` enum 정합 — snake_case 8종):
+   - `react_fc_import`
+   - `react_node_import`
+   - `react_props_pattern`
+   - `vue_setup_helper`
+   - `vue_defineProps_macro`
+   - `angular_decorator`
+   - `angular_observable`
+   - `rxjs_import`
+
+   > ⚠️ schema enum 은 snake_case. kebab-case(`jsx-element` 등)로 emit 하면 validation 실패. step 5 인라인 예시(`react_props_pattern`)와 동일 표기.
 5. **type-spec.json 작성** — `schemas/type-spec.schema.json` (required = `meta` / `types` / `summary`. `framework_neutrality_score`·`framework_coupled_count`·`captured_by` 는 `summary` 하위 / `framework_coupling_reasons` 는 `types[]` 하위):
    ```json
    {

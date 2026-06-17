@@ -10,6 +10,34 @@
 
 ---
 
+## [0.54.0] — 2026-06-17 — MINOR — mis-fe-admin FE dogfood cycle 3: cycle2 enforcement 짝 완성 (schema/skill 정합 9건)
+
+mis-fe-admin(React18 + MUI Module-Federation 7-app 모노레포) `integration-authority` BC 에 analysis stage 전체(8 FE-track 산출물 + scope-carve)를 **실제 실행한 dogfood cycle 3** 에서 수확한 finding 중 **real a-priori 9건** 반영(§8.1 무관 — 도메인 일반화가 아닌 schema↔skill↔example 정합 사실). run 은 consumer 설치본 **v0.48.2** 로 돌아 finding 37건 중 stale 10(이미 v0.49–0.53 수정) / defer §8.1 12(단일도메인 일반화 / 2nd FE 도메인 필요) / false-positive 3 을 **dev v0.53.0 소스 직접 재대조로 드롭**. 핵심 인사이트: cycle 3 = **cycle 2 가 절반만 적용한 enforcement 짝의 완성** (cycle2 가 schema enum / skill note 한쪽만 건드린 자리의 반대쪽). 전부 additive → 기존 산출물 검증 불파괴. SSOT: `DEC-2026-06-17-fe-dogfood-cycle3`.
+
+### 변경
+
+- **편집** `skills/analysis-type-spec-fe/SKILL.md` — Step 4 `framework_coupling_reasons` 8종을 kebab-case(`jsx-element` 등) → **snake_case**(`react_fc_import` 등)로 교정(schema enum + step 5 인라인 예시는 snake_case 였는데 step 4 만 kebab — producer 가 step 4 verbatim emit 시 validation 실패). [F-C3-typespec-01 / cycle2 가 Step 1·5 만 고치고 Step 4 누락한 짝]
+- **편집** `skills/analysis-ui-state-map-fe/SKILL.md` — 절차를 schema required 정합으로 확장: `state_sources` 정확히 5 진실(server_cache/client_state/url_state/form_state/dom_state, 부재도 detected:false) + `machines`(REQUIRED / SCXML 1.0·XState v5+ / FSM-FE-* 패턴) + `cross_links` + `validation_summary`·`trust_step`(scxml_export 미실행 정직 기록). 기존 skill(36줄)은 client/server state shape 만 다뤄 **producer 가 valid 산출 불가**였음. [F-C3-state-map-01]
+- **편집** `schemas/state-map.schema.json` — `cross_links[].to_artifact` enum 에 `state-map` additive. `link_type=depends_on`(="다른 machine 의존")인데 to_artifact 에 machine 타겟이 없어 **구조적 표현 불가**(self-contradiction)였음 — to_id 에 FSM-FE-* 지정 가능. [F-C3-state-map-02]
+- **편집** `schemas/a11y-spec.schema.json` — (1) `summary.allOf` 에 `captured_by=static_source_review` 분기 additive(`reproduction_command` required) / (2) `violations.items` 에 `detection` enum(`axe_emitted`/`static_heuristic`) additive. cycle2 가 `static_source_review` enum + SKILL 의무 문구만 추가하고 **schema 강제는 누락**한 짝 — SKILL 이 의무화한 reproduction_command·detection 을 schema 가 안 받던 갭. [F-C3-a11y-spec-01 / F-C3-a11y-spec-02]
+- **편집** `skills/analysis-form-validation-fe/SKILL.md` — (1) Step 3 에 **numeric 복합 술어 분해** 지침 additive(`z.number().int().positive()` → 술어당 1행 `int`/`positive`/`nonnegative`/`finite`/`multipleOf`). cycle2 가 schema enum 만 추가하고 skill 분해 지침은 누락한 짝. (2) Step 6 에 `source_libraries` 필드 shape 명문화(`library_version`/`scope_files`/`schemas_count` / 비-schema alias `version`·`usage_count` emit 금지). [F-C3-form-validation-spec-02 / F-C3-form-validation-spec-03]
+- **편집** `skills/analysis-aspect-i18n/SKILL.md` — Step 6 provenance 기록 additive: `captured_by=static_extraction`(runtime 미검증 정직 tier / simulation -5%p 과 구분) + `inputs_used` FE-native 태깅(`package_manifest`/`import_graph`/`codegraph` — package.json read 를 source_code/config_files 로 뭉개지 말 것). schema affordance(v0.52.0 inputs_used FE 4종 / captured_by static_extraction)는 있는데 skill 미배선. [F-C3-i18n-spec-01 / F-C3-i18n-spec-03]
+
+### 검증
+
+- 편집한 2 schema(a11y / state-map) valid JSON 유지. 3 SSOT 버전 동기화(`package.json` + `.claude-plugin/plugin.json` + parent `CLAUDE.md`) 0.54.0.
+- harvest 산출 `mis-fe-admin/.ai-context/runtime/cycle3-findings.json`(37건 분류 durable 기록).
+
+### Drop / 보류
+
+- **Drop 10(stale)** — run v0.48.2 가 v0.49–0.53 이미 수정분 재발견: scope-carve infra-noise(`DEFAULT_PATH_EXCLUDES` v0.52.0) / form-validation numeric enum / a11y static_source_review tier / meta-confidence FE penalty 등.
+- **Drop 3(false-positive)** — 정상 동작 오인(captured_by=static_extraction 정직 표기 / state-map stage5 optional escalation / methodology_version self-report).
+- **보류 §8.1 12** — 전부 단일도메인(integration-authority = cycle1/2 와 동일) FE-behavior 일반화 → **2nd FE 도메인(common/gea) corroboration 필요**. (예: Zod schema runtime-wired 여부 / RealGrid dom_state penalty axis / type-spec references[] 채움 / ui-spec event→state cross-link discipline.)
+- **보류 visual-manifest schema(snapshot manifest) ↔ skill(token catalog) 근본 contradiction** — cycle2 부터 이월된 **별도 설계결단**(token 소유: visual-manifest vs ui-spec design_tokens). additive 불가 / 격상 carry. [F-C3-visual-manifest-01]
+- **보류 characterization validator 정합 2건** — (1) `ambiguous_carry` rule_id ⊆ scenario-ambiguous 재조정 부재(intent/ambiguous 자기모순 미검출) / (2) self-declared `br_total` verbatim 신뢰(distinct scenario rule ID 대조 없음). **validator 코드 변경** — 오탐 시 analysis gate 차단(category error) 위험이라 별도 RED→GREEN TDD 패스로 분리. [F-C3-characterization-01 / F-C3-characterization-02]
+
+---
+
 ## [0.53.0] — 2026-06-17 — MINOR — mis-fe-admin FE dogfood cycle 2: FE-track(L340) 검증 산출 6 정합 수정
 
 mis-fe-admin(React18 + MUI Module-Federation 7-app 모노레포) `integration-authority` BC 에 FE-track 산출물(L340 — form-validation / a11y / type-spec / ui-spec / visual-manifest / state-map)을 **실제 추출한 dogfood cycle 2** 에서 수확한 finding 중 **검증 완료(still_exists / safe-additive) 6건** 반영(§8.1 무관 — 도메인 일반화가 아닌 schema/skill 사실). 전부 additive → 기존 산출물 검증 불파괴. SSOT: `DEC-2026-06-17-fe-dogfood-cycle2`.

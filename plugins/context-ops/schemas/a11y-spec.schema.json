@@ -105,6 +105,11 @@
           "blocks_ratchet": {
             "type": "boolean",
             "description": "ratchet_wcag 위반 여부. true 시 권장 (block ❌)."
+          },
+          "detection": {
+            "type": "string",
+            "enum": ["axe_emitted", "static_heuristic"],
+            "description": "위반 검출 방식. axe_emitted = axe-core/pa11y 등 runtime 도구 산출. static_heuristic = static_source_review tier 의 grep/semgrep 정적 검출. summary.captured_by=static_source_review 시 각 violation 에 detection=static_heuristic 기록 의무 (SKILL.md §1)."
           }
         }
       }
@@ -169,6 +174,14 @@
           },
           "then": {
             "required": ["simulation_reason"]
+          }
+        },
+        {
+          "if": {
+            "properties": { "captured_by": {"const": "static_source_review"} }
+          },
+          "then": {
+            "required": ["reproduction_command"]
           }
         }
       ]

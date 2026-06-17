@@ -258,8 +258,8 @@
           },
           "to_artifact": {
             "type": "string",
-            "enum": ["ui-spec", "api", "rules", "domain", "antipatterns"],
-            "description": "참조 산출물 종류."
+            "enum": ["ui-spec", "api", "rules", "domain", "antipatterns", "state-map"],
+            "description": "참조 산출물 종류. state-map = 동일/타 state-map 의 machine(FSM-FE-*). link_type=depends_on(machine 간 의존) 시 to_artifact=state-map + to_id 에 FSM-FE-* 지정."
           },
           "to_id": {
             "type": "string",

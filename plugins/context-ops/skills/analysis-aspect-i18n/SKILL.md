@@ -25,6 +25,9 @@ allowed-tools: Read, Glob, Grep, Bash, Write
 4. **Untranslated string 검출** — 코드에 hardcoded string 있는지
 5. **AP-I18N-XXX 등재** — anti-pattern (`quality` phase 통합)
 6. **i18n-spec.json 작성** — `schemas/i18n-spec.schema.json`
+   - **provenance (meta) 기록**:
+     - `captured_by` — runtime 검증(앱 실행 / i18next 런타임 catalog merge) 없이 source 코드·locale catalog 만 정적 read 한 경우 `static_extraction` 기록(정직 tier — `simulation` -5%p 과 구분). runtime 검증 시 `icu_real` / `formatjs_real` / `i18next_real`.
+     - `inputs_used` — FE-native 출처를 정확히 태깅: `package.json`/lockfile read 시 `package_manifest`, 정적 import 의존 분석 시 `import_graph`, CodeGraph 인덱스 사용 시 `codegraph`. package.json read 를 `source_code`/`config_files` 로 뭉개지 말 것(`schemas/meta-confidence.schema.json` inputs_used FE-native 4종).
 
 ## 산출물
 
