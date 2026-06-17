@@ -10,6 +10,23 @@
 
 ---
 
+## [0.58.0] — 2026-06-17 — MINOR — codegraph 토큰절감 companion 정식 격상: P1(codegraph/headroom MCP default-on) + P2(비차단 nudge 신설)
+
+토큰절감 기사(siosio3103/abdulgafoorabid · CBM·headroom·RTK·context-mode·caveman 스택)의 #1 레이어("구조검색 → 파일 안 읽고 압축답")를 **우리가 이미 보유한 codegraph(CodeGraph OSS 0.9.6)** 로 재현하는 작업. 그간 draft 로 묻어 출하되던 P1 companion 을 정식 격상하고, P2 비차단 nudge 를 신설한다. SSOT: `DEC-2026-06-15-codegraph-search-token-saving` (+2026-06-17 P2 시행).
+
+> **trust 불변**: codegraph 출력 = reference-lens / SEARCH only — 어떤 결정적 chain gate 에도 inject ❌ (DEC-2026-05-28 §4.2). nudge 는 **절대 차단하지 않고**(additionalContext 만 / exit 2·deny ❌) Grep 은 영구 비차단 반증밸브. P3 hard-block(차단형 강제)은 §8.1-차단 유지(calibration PASS 타깃 0 + CBM 논문 9%p 품질갭).
+
+### Added — P2 codegraph nudge (신설)
+- **`scripts/codegraph-nudge.js`** — PreToolUse(matcher `Read|Glob`) 훅. 소스 Read/Glob 직전 **비차단 additive-injection** 으로 구조질의를 codegraph 로 유도(P1 노출만으로는 습관적 파일덤프로 절감 미실현). **트리거별 분기**(net-saving 최적): Glob(소스 디렉토리)=`codegraph files --filter` 구조맵 주입(후속 다수 Read 대체) / Read(단일 소스파일)=포인터 한 줄(~50토큰·codegraph 호출 0·낭비 제거) / Grep=matcher 제외 영구 미발동.
+- **기본 = DEFAULT ON (opt-out `CONTEXT_OPS_CODEGRAPH_NUDGE=0`)**. 게이트: opt-out·바이너리 부재·`.codegraph` 미인덱스·비소스 확장자·once-per-(session,target) frustration cap → no-op exit 0. 항상 exit 0 / stdout=훅 JSON 전용 / chain-driver(결정적 게이트 엔진)와 분리(trust 경계 보존).
+- 검증: 순수로직 단위테스트 15 GREEN(`scripts/test/codegraph-nudge.test.js`) + 모의 stdin 스모크 5(Read 소스→포인터 / Read .md→no-op / Glob 소스디렉토리→구조맵 / Grep→미발동 / opt-out→no-op).
+- `hooks/hooks.json` PreToolUse 에 `Read|Glob` matcher 객체 추가(기존 `Write|Edit` 게이트와 disjoint). `package.json` `files[]` 출하.
+
+### Changed — P1 companion 정식 격상 (구 draft)
+- **codegraph + headroom companion MCP default-on (opt-out)** 을 정식 릴리스로 격상(`2999ab23`→`ef47a255` draft 상태 → 본 버전에서 CHANGELOG 명문화). `.mcp.json` `codegraph`/`headroom` 서버 + `scripts/{codegraph,headroom}-mcp-launch.js` 런처(opt-out·바이너리·인덱스 3중 게이트) + `scripts/install-companion-tools.js`(SessionStart 자동 설치 + 프로젝트 인덱스 부트스트랩 / 멱등). opt-out: codegraph=`CONTEXT_OPS_DISABLE_CODEGRAPH=1` / headroom=`CONTEXT_OPS_DISABLE_HEADROOM=1`.
+- codegraph 구조검색 MCP(`callers`/`callees`/`impact`/`query`/`context`/`files`) = 파일 안 읽고 압축답(기사 CBM 슬라이스 재현). headroom = 프록시 압축(API 요청 in-flight). **freshness = codegraph 네이티브 데몬 워처 무료 + ⚠️ stale-배너 = 내장 verify**(SessionStart sync 자작 불요).
+- P0 calibration 도구(`tools/codegraph-calibrate`)는 v0.x draft(`ddd9ae99`)로 기수록 — caller-resolution 일치도 reference-lens verdict.
+
 ## [0.57.0] — 2026-06-17 — MINOR — mis-fe-admin FE dogfood cycle 4 잔여: 22 finding re-verify + 7건 반영 (design 결단 4 + safe §8.1 2 + a_priori 1)
 
 mis-fe-admin `apps/common` (2nd FE 도메인) dogfood 의 cycle4 **잔여 작업**. v0.54.0 run 의 produce-stage 신규 finding 22건이 Verify stage 세션한도로 죽어 carry 됐던 것을 현재 dev v0.56.0 기준 **adversarial 재검증**(22 verifier + synthesis): **7 real_a_priori · 2 stale_already_fixed · 7 false_positive · 6 design_decision** (2nd 도메인이 over-claim 을 정확히 걸러냄). 본 릴리스는 그중 **즉시 반영 가능 7건**만 반영 — 사용자 결단 4 + safe §8.1 2 + clean a_priori 1.

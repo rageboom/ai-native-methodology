@@ -1,6 +1,6 @@
 # DEC-2026-06-15-codegraph-search-token-saving
 
-**code-graph 를 토큰절감 구조-검색 MCP 로 노출 — P1 시행(DEFAULT-ON 설치+MCP / opt-out) / P3 hard-block §8.1-차단 / navigation-authority bounded by cheap-falsifiability (draft — release bump 대기 / 2026-06-15 사용자 결단으로 opt-in→opt-out 반전)**
+**code-graph 를 토큰절감 구조-검색 MCP 로 노출 — P1 시행(DEFAULT-ON 설치+MCP / opt-out) + P2 시행(DEFAULT-ON 비차단 nudge / opt-out) / P3 hard-block §8.1-차단 / navigation-authority bounded by cheap-falsifiability (draft — release bump 대기 / 2026-06-15 사용자 결단으로 opt-in→opt-out 반전 + 2026-06-17 P2 nudge 시행·동일 반전)**
 
 > **2026-06-15 갱신 (사용자 결단 반전)**: 최초 결정 #5 는 "기본 opt-in flag off" 였으나, 사용자(TF Lead)가 headroom 자매 companion 과 동일하게 **"default on"** 으로 지시 → P1 **설치+MCP 기본 활성 + opt-out**(`CONTEXT_OPS_DISABLE_CODEGRAPH=1` / `CONTEXT_OPS_CODEGRAPH_MCP=0` 도 허용)으로 변경. 본문의 "opt-in / 기본 off" 표현은 본 갱신으로 supersede. **반전 범위 = P1(설치+MCP 활성) 한정** — P3 hard-block(navigation 을 유일 ground-truth 로 강제)·reference-lens trust(결정적 gate inject ❌)·Grep 영구 비차단은 **불변**(§8.1-차단 유지). 즉 codegraph 가 *기본 켜지지만* 여전히 reference-lens/SEARCH 일 뿐 gate 권위는 0. ⚠️ default-on blast radius = 전 adopter 첫 세션이 `npm i -g` + 프로젝트 인덱스 부트스트랩 수행(idempotent: `.codegraph` 있으면 skip / 대형 legacy 첫 인덱싱은 수~수십초 / 실패=non-fatal honest carry).
 
@@ -35,6 +35,19 @@ codegraph callers ↔ 실 grep 호출 site 대조:
 - 신규 tool: 실 `codegraph callers` ↔ 독립 identifier-call grep proxy 일치도 측정 + fabrication-risk 구조 스캔 → reference-lens verdict {PASS=navigation-authority 적격 / WARN=reference-lens 유지}. 순수 코어(calibrate.js / 18 test) + I/O(cli.js / 실 codegraph·index 부재 exit3 / test 파일 scope 제외).
 - **자동 측정 = 수동 calibration 자가교정**([[feedback_self_recorded_fact_validation]]): 수동은 깨끗한 유틸 심볼 cherry-pick → 100% 주장이었으나, **넓은 자동 샘플 실측 = poc-18 WARN(precision 0.941 / recall 0.889 / fab_risk 0) · tools/ WARN(0.667 / fab_risk 1)**. 불일치는 namespace 멤버호출 경계(static frontier)에 군집 — grep proxy ≠ ground truth(agreement smell-test). PASS 는 의도적 고-bar(bidirectional ≥0.9 ∧ fab 0).
 
+## 시행 (P2 — 비차단 additive-injection nudge / 2026-06-17 / draft)
+P1 은 codegraph 를 *노출만* 하므로 에이전트가 습관적으로 Read/Grep 로 파일을 덤프해 codegraph 절감이 실현 안 되는 한계. P2 = 소스 Read/Glob 직전 비차단 nudge 로 구조질의를 codegraph 로 유도.
+- `scripts/codegraph-nudge.js` **신규**: PreToolUse(matcher `Read|Glob`) 훅. stdin 이벤트 JSON 파싱 → **트리거별 분기**(net-saving 최적):
+  - **Glob(소스 디렉토리)** → `codegraph files --filter <dir> --format flat` 구조맵(ANSI strip + 25줄 cap) `additionalContext` 주입 = 후속 다수 Read 대체(확실한 이득).
+  - **Read(단일 소스파일)** → 포인터 한 줄만(~50토큰 / codegraph 호출 0 / 파일이 어차피 필요한 경우 낭비 제거).
+  - **Grep** = matcher 제외 = 영구 비차단·미발동(반증밸브).
+- **항상 exit 0 / stdout=훅 JSON 전용 / 차단 0**(exit 2·permissionDecision deny ❌ — 위 Write|Edit 게이트와 disjoint). 게이트: opt-out(`CONTEXT_OPS_CODEGRAPH_NUDGE=0`)·바이너리 부재·`.codegraph` 부재·비소스 확장자·once-per-(session,target) 마커(`.static-tools/.nudge-*` / gitignored / frustration cap) → no-op.
+- **기본 = DEFAULT ON (opt-out)** — 사용자(TF Lead) 결단(2026-06-17). 위험 통제 레버 = 플래그가 아니라 주입 내용(Read=포인터로 낭비 제거)이라는 합의 → P1 반전과 동형(최초 결정 #5 "기본 off" supersede). P1(수동 노출)과 달리 P2 는 능동 주입이나, 트리거별 분기로 blast radius bounded.
+- **chain-driver(결정적 게이트 엔진)와 분리** = reference-lens 가 게이트에 새지 않게 trust 경계 보존(DEC-2026-05-28 §4.2). 모든 주입에 면책문구("reference-lens · grep authoritative · gate-inject ❌").
+- **검증**: 순수로직 단위테스트 15 GREEN(`scripts/test/codegraph-nudge.test.js` / isSourcePath·globDir·classifyIntent·capOutput·build*·isOptedOut) + 모의 stdin 스모크 5(Read 소스→포인터 / Read .md→no-op / Glob 소스디렉토리→구조맵 / Grep→미발동 / opt-out→no-op) + once-per-target 마커 동작 + `node --check` + hooks.json·package.json valid.
+- **package.json files[]** 에 `scripts/codegraph-nudge.js` 출하(launcher 2종 동일 패턴 / 테스트는 `!**/test`·`!**/*.test.js` 제외).
+- **draft** — plugin.json·CHANGELOG 무변경(P1 companion 과 동일 draft 상태). 정식 release(MINOR bump + CHANGELOG + 마켓플레이스 republish)는 P1+P2 companion 묶음으로 별도 사용자 결단 시.
+
 ## 보류 (P3 hard-block = §8.1-차단 / 강화됨)
 **자동 calibration 결과 PASS 타깃 = 0개**(poc-18 도 WARN / 수동 "100%"는 cherry-pick 과대 — 정정). → 출하 전 최소: ① **독립 PASS ≥2**(다른 shape/언어 / 현재 0) ② hard-block = `verdict=PASS ∧ index_fresh` 둘 다 ③ 밸브 = deny 가 정확한 grep 제공 ④ **Read/Glob 한정 / Grep 영구 비차단**. P3 는 PASS 나오는 near-perfect 타깃 발견 전까지 영구 보류 가능 — reference-lens 기본이 정합(품질1). codegraph-calibrate 의 값 = PASS/WARN bit 뿐 아니라 **투명 agreement 지표 + 불일치 파일 목록 + fab 스캔**(reference-lens with confidence vs caution 판단 보조).
 
@@ -42,7 +55,7 @@ codegraph callers ↔ 실 grep 호출 site 대조:
 **navigation-authority ≠ gate-authority**: code-graph 는 navigation 을 *제안*할 권위 OK / *유일한* ground-truth 경로면 ❌. grep(반증 밸브)을 영구 비차단 = 싼 반증 항상 가능. DEC-2026-05-28 §4.2 reference-lens(결정적 chain gate inject ❌) **불변** — 검색층이지 gate 아님. codegraph ⚠️ 배너 = 내장 verify.
 
 ## §8.1
-P1 = additive·기본on(opt-out)·무회귀(검증 — opt-out no-op + reference-lens trust 불변). P3 hard-block = 행위변경 → §8.1-차단(독립 PASS 2 전 금지 / default-on 과 무관 — 설치 기본값 ≠ gate 권위). draft(plugin.json·CHANGELOG·MANDATORY 무변경) — release MINOR bump 시 본체 격상 + package.json lockstep(0.40↔0.46.6) 선결.
+P1 = additive·기본on(opt-out)·무회귀(검증 — opt-out no-op + reference-lens trust 불변). **P2 nudge = 행위변경(능동 주입)이나 비차단·기본on(opt-out)·무회귀**(검증 — exit 2·deny ❌ / Grep 미발동 / 결정적 gate inject ❌ / opt-out·미인덱스 no-op / chain-driver 분리). ∴ P2 = §8.1-차단 아님(P3 와 분리). P3 hard-block = 차단형 행위변경 → §8.1-차단(독립 PASS 2 전 금지 / default-on 과 무관 — 설치 기본값 ≠ gate 권위). draft(plugin.json·CHANGELOG·MANDATORY 무변경) — release MINOR bump 시 본체 격상 + package.json lockstep 선결.
 
 ## Relates
 - DEC-2026-06-15-headroom-companion (companion MCP 자매 / install-companion-tools 공유) · DEC-2026-05-28-codegraph-probe-결과 §4.2 (reference-lens 불변 / gate inject ❌) · DEC-2026-05-30-codegraph-essential · DEC-2026-05-18-runtime-tool-exclusion (R19 user-owned·honest carry) · [[feedback_no_static_tool_simulation]] · [[feedback_research_fact_validation]] (CodeGraph·CBM 실 fetch) · [[feedback_quality_priority]] · [[feedback_diagnose_before_design_check_existing]] (calibration 으로 "정적=정확" 액면수용 ❌). plan = `.claude/plans/plan-codegraph-search-token-saving.md` + research = `.claude/plans/research-codegraph-search-token-saving.md`.
