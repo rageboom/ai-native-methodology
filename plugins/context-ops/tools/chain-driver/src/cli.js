@@ -71,6 +71,11 @@ import {
 	applyUserDecision,
 	requiredValidators,
 } from './gate-eval.js';
+import {
+	summarizeGate,
+	renderGateSummaryText,
+	REASON_LABELS,
+} from './gate-summary.js';
 import { loadSkill, formatSkillSuggestion } from './invoke-skill.js';
 import {
 	parseHookInput,
@@ -240,9 +245,10 @@ function logIntervention(state, projectRoot, entry) {
 function blockedExit(state, projectRoot) {
 	// mechanical gate trio (ii) — non-interactive exit 2 + same message.
 	const reason = state.block_reason || 'unknown';
+	const reasonLabel = REASON_LABELS[reason]?.label;
 	console.error(
-		`[chain-driver] BLOCKED — block_reason=${reason}. ` +
-			`Resolve via /aimd-next or /aimd-stage <name>. (mechanical trio (ii))`,
+		`[chain-driver] ⛔ 진행 불가 (BLOCKED) — ${reasonLabel ? `${reasonLabel} ` : ''}(block_reason=${reason}). ` +
+			`해결 후 /aimd-next 또는 /aimd-stage <name> 로 재개. (mechanical trio (ii))`,
 	);
 	logIntervention(state, projectRoot, {
 		event_type: 'trio_block',
@@ -424,11 +430,17 @@ function cmdNext(args) {
 	}
 	const gateResult = evaluateGate(stage, findings, scenario);
 	const finalDecision = applyUserDecision(gateResult, args.userDecision);
+	// 평이 요약(결정론) — 사용자가 영어 jargon 없이 go/stop 을 즉시 읽도록. gate-summary.js (레이어 1).
+	const gateSummary = summarizeGate(finalDecision);
 
 	if (args.dryRun) {
+		console.error(renderGateSummaryText(gateSummary));
 		process.stdout.write(
-			JSON.stringify({ stage, gate: finalDecision, dry_run: true }, null, 2) +
-				'\n',
+			JSON.stringify(
+				{ stage, gate: finalDecision, summary: gateSummary, dry_run: true },
+				null,
+				2,
+			) + '\n',
 		);
 		process.exit(finalDecision.blocked ? 1 : 0);
 	}
@@ -448,6 +460,7 @@ function cmdNext(args) {
 			exit_code: 1,
 			message: finalDecision.reasons.map((r) => r.detail).join('; '),
 		});
+		console.error(renderGateSummaryText(gateSummary));
 		console.error(
 			`[chain-driver] gate blocked: ${finalDecision.primary_reason}`,
 		);
@@ -591,9 +604,13 @@ function cmdNext(args) {
 				`자동 전송 ❌ (데이터 주권 / 명시 공유 시 maintainer 에 전달). EXT-CAPTURE-05.\n`,
 		);
 	}
+	console.error(gateSummary.headline);
 	process.stdout.write(
-		JSON.stringify({ stage, advanced_to: next, gate: finalDecision }, null, 2) +
-			'\n',
+		JSON.stringify(
+			{ stage, advanced_to: next, gate: finalDecision, summary: gateSummary },
+			null,
+			2,
+		) + '\n',
 	);
 	process.exit(0);
 }
@@ -2442,6 +2459,7 @@ function cmdSyncNext(args) {
 			exit_code: 1,
 			message: finalDecision.reasons.map((r) => r.detail).join('; '),
 		});
+		console.error(renderGateSummaryText(summarizeGate(finalDecision)));
 		console.error(
 			`[chain-driver] sync-next: stage ${sel.stage} gate blocked: ${finalDecision.primary_reason}. ` +
 				`(regen_queue.blocked 표기 / state.blocked 미접촉)`,

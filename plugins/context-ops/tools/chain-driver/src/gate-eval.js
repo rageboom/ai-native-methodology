@@ -248,7 +248,8 @@ export function evaluateGate(stage, findings, scenario = 'S1') {
 //   별도 집합 = layer2_threshold/coverage_threshold/findings_unverified(rank 2, WARN 의도) 와 명시 분리
 //     (hasCriticalOrHigh 술어 = "critical/high severity" 의미 오염 회피 / Senior REVISE @0.88).
 //   state_corrupt 미포함 = 본 격상 scope 외(기존 override 거부 집합 = critical/high 뿐 / 별도 latent 이슈로 carry / 무관 behavior 변경 회피).
-const HARD_BLOCK_CODES = new Set([
+// export: gate-summary.js (평이 verdict 도출)가 단일 SSOT로 재사용 — hard-block 집합 중복 정의 금지.
+export const HARD_BLOCK_CODES = new Set([
 	'validator_critical',
 	'validator_high',
 	's2_outcome_mismatch',

@@ -10,6 +10,24 @@
 
 ---
 
+## [0.62.0] — 2026-06-18 — MINOR — gate 결정 근거 "평이 요약" 레이어 (한 줄 평결 + [평이 라벨—뜻—행동])
+
+**문제**: 각 chain gate(#0~#5)에서 go/stop/revisit 을 판단해야 하는데, gate 가 보여주는 근거가 `validator_critical` / `coverage 0.62 < threshold 0.85` / `Layer 2 llm_consistency_score 0.61 < 0.7` / `s2_outcome_mismatch` / `forward_coverage` / `5종 물증` 같은 영어 약어·내부 jargon 의 나열이라, 사용자가 "그래서 진행이냐 멈춤이냐"를 읽어낼 수 없었다(6 서브시스템 audit = 한국어 평이 라벨·한 줄 평결·glossary 자산 전무). 사용자 결단 = **도구+skill 양쪽 평이화 / 균형형**. SSOT: `DEC-2026-06-18-gate-plain-summary`.
+
+### Added — 결정론 평이 요약 모듈 (chain-driver / 레이어 1)
+- **`tools/chain-driver/src/gate-summary.js` 신설**: `REASON_LABELS`(11 reason code → 한국어 `{label, meaning, action}` 고정 lookup) + `summarizeGate(gateResult)`(verdict `go`/`review`/`stop`/`revisit` 도출 — hard-block 판정은 `gate-eval.HARD_BLOCK_CODES` SSOT 재사용 / 중복 정의 금지) + `renderGateSummaryText()`(균형형: 한 줄 평결 + "■ 막는 문제 / ■ 검토 권장" [라벨—뜻—행동]). **순수 결정론**(LLM inject ❌) / display-only(어떤 결정적 gate 에도 inject ❌). `feedback_chain_driver_deterministic_axis` 정합.
+- **`gate-eval.js`**: `HARD_BLOCK_CODES` export(SSOT 공유). reason `detail`(영어 원문·수치) **무변** — 추적 보존 / 기존 정규식 테스트 무영향.
+
+### Changed — gate 출력 경로 평이화 (cli.js + skill / 레이어 2)
+- **`cli.js`**: `next`(block/pass/dry-run) + `blockedExit` + `sync-next` 가 평이 요약을 stderr 출력 + `--json` 에 `summary` 필드 노출. 영어 라인(`block_reason`/`primary_reason`)은 추적용 보존(평이 라벨 병기).
+- **`skills/_base-invoke-go-stop-gate/SKILL.md`**: 입력 수집에 chain-driver `summary` 추가 + 프롬프트를 한 줄 평결(도구 `summary.headline` SSOT) + 막는 문제/검토 권장 [라벨—뜻—행동] + 영어 필드명 한국어 병기(`forward_coverage` → 추적 커버리지 등) + 3선택(go/stop/revisit:<단계>) 평이 설명으로 개정. verdict 재판단 ❌(도구가 SSOT).
+- **`docs/adr/ADR-CHAIN-002-go-stop-gate.md`**: §1-A 평이 요약 레이어 신설.
+
+### Tests
+- chain-driver 581 → 606 (신규 25): `gate-summary.test.js` — REASON_LABELS 완전성(모든 reason code 라벨 보유 / drift fail) + verdict 도출(go/review/stop/revisit) + headline 형식 + render 영어 code 병기. 기존 `gate-eval.test.js` 무변 통과(detail 보존). release-readiness `criteria_total=42` 무변경(신 check 무 / count-coupling 무).
+
+---
+
 ## [0.61.0] — 2026-06-18 — MINOR — discovery 보편-라우터 진입점 정렬 (하이브리드: advisory 폴백 + cold-start 결정론 hard-block)
 
 **맹점 제거**: "분석 외 모든 작업은 discovery(입구·라우터)에서 시작"이라는 불변식이 `living-sync-operating-model §4`(DEC-2026-06-07)에는 명시돼 있으나 **진입 라우팅 코드에는 미구현**이었다. 진입 stage 선택은 결정론 state machine 이 아니라 LLM skill-description 매칭(System B)이 하는데, `hooks-bridge` 권고가 discovery 를 "6 stage 중 키워드로 고르는 하나"로 취급 → 4 실패모드: ① stage 키워드 없는 일반 변경요청은 silent pass-through(라우팅 0) ② "구현 시작"/"spec 만들어"가 later-stage 로 직행(skip-ahead) ③ layer-2 동사-리스트 비대칭 dead-zone("구현해줘"가 미매칭) ④ `route` 명령은 post-discovery 그래프 라우터일 뿐 prompt→discovery 진입 라우터 부재. 사용자 결단 = **하이브리드**(정상경로 advisory / 최악경로 결정론 차단). SSOT: `DEC-2026-06-18-discovery-universal-entry-router`.

@@ -49,6 +49,16 @@ UX 결정 영역:
 결단 사유 (명시 의무 / intervention_log 보존)
 ```
 
+### 1-A. 평이 요약 레이어 (결정론 / v0.62.0 — DEC-2026-06-18-gate-plain-summary)
+
+§1 prompt 가 노출하던 영어 약어·내부 jargon(`validator_critical` / `coverage 0.62 < threshold 0.85` / `s2_outcome_mismatch` / `forward_coverage` / `5종 물증` ...)만으로는 사용자가 go/stop 을 판단하기 어렵다는 실사용 피드백 → gate 출력 맨 위에 **결정론 한 줄 평결 + [평이 라벨 — 무슨 뜻 — 권장 행동]**(균형형)을 의무화.
+
+- **레이어 1 (결정론 / chain-driver `gate-summary.js`)** — `REASON_LABELS` 고정 lookup(reason code → 한국어 label/meaning/action) + `summarizeGate()`(verdict 도출 = `go`(진행 가능) / `review`(검토 후 진행) / `stop`(진행 불가·중단) / `revisit`(되돌아가기)) + `renderGateSummaryText()`(균형형 텍스트). verdict 의 hard-block 판정은 `gate-eval.HARD_BLOCK_CODES` 를 **SSOT 재사용**(중복 정의 금지 / verdict ↔ override 거부 정합). 순수 결정론 — LLM 판단 inject ❌ (`feedback_chain_driver_deterministic_axis` 정합). 출력은 어떤 결정적 gate 에도 inject ❌(display-only). `chain-driver next` 가 block/pass 양쪽에서 평이 요약을 stderr 출력 + `--json` 의 `summary` 필드로 노출(`blockedExit` / `sync-next` 동일).
+- **레이어 2 (LLM 의미 / `_base-invoke-go-stop-gate` skill)** — 도구 `summary`(verdict·headline·blocking·review)를 SSOT 입력으로 받아 사용자 prompt 의 한 줄 평결 + 막는 문제/검토 권장 + 영어 필드명 한국어 병기로 조립. verdict 자체는 재판단 ❌.
+- **추적성 보존** — reason `detail`(영어 원문, 수치 포함)은 무변 — render 에서 "근거:" 보조줄로 병기. 영어 code 는 라벨 옆 괄호 병기(`(coverage_threshold)`).
+
+verdict ↔ §2 Auto Mode 정합: hard-block(`stop`) 은 Auto Mode go 로도 통과 불가(`applyUserDecision` override 거부와 동일 SSOT) / soft(`review`) 만 `--user-decision go` ack 가능.
+
 ### 2. Auto Mode 위임 정책
 
 - Auto Mode 활성 시 = 사용자 명시 토글 ❌ → 일반 결단 영역
@@ -136,3 +146,4 @@ intervention_log entry:
 
 - 2026-05-06: 신설 (sub-plan-2).
 - 2026-05-25: v10.0.0 본격 갱신 (Phase 4-4' / DEC-2026-05-25-axis-a-phase-4-4-prime) — 4 gate → 5 gate / plan gate (#3) 신설 / gate 재번호 (test #3→#4 / impl #4→#5) / Auto Mode 위임 정책 갱신 (gate #5 impl 만 ❌).
+- 2026-06-18: §1-A 평이 요약 레이어 신설 (v0.62.0 / DEC-2026-06-18-gate-plain-summary) — gate 출력 영어 jargon → 결정론 한 줄 평결 + [평이 라벨—뜻—행동] (균형형) / chain-driver `gate-summary.js`(REASON_LABELS·summarizeGate·renderGateSummaryText) + skill 프롬프트 평이화 / detail 무변(추적 보존).
