@@ -31,11 +31,12 @@ describe('detectGraphArtifactWrite', () => {
 		assert.equal(r.filename, 'behavior-spec.json');
 	});
 
-	it('chain artifacts 전체 매핑 (discovery/behavior/acceptance/test/impl)', () => {
+	it('chain artifacts 전체 매핑 (discovery/behavior/acceptance/task-plan/test/impl)', () => {
 		const map = {
 			'discovery-spec.json': 'UC',
 			'behavior-spec.json': 'BHV',
 			'acceptance-criteria.json': 'AC',
+			'task-plan.json': 'TASK', // DEC-2026-06-18 — plan-stage 산출물 (이전 누락)
 			'test-spec.json': 'TC',
 			'impl-spec.json': 'IMPL',
 		};

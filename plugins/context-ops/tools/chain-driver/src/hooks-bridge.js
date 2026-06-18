@@ -103,28 +103,31 @@ const TRIGGER_PATTERNS = [
 		skillId: 'analysis-input-collection',
 		agentId: 'analysis-agent',
 	},
+	// DEC-2026-06-18 — 6 stage 패턴 동사 셋 통일 (시작|진입|해줘|만들어|드라이브).
+	// 이전: spec/plan/test/implement 가 (시작|진입|만들어) 3종만 가져 "구현해줘" 등이
+	// layer-1(hooks.json) 통과·layer-2 미매칭 dead-zone(③). 통일로 비대칭 제거.
 	{
-		regex: /(discovery|발견|탐색|planning|기획)\s*(시작|진입|만들어|드라이브)/i,
+		regex: /(discovery|발견|탐색|planning|기획)\s*(시작|진입|해줘|만들어|드라이브)/i,
 		skillId: 'discovery-from-analysis-output',
 		agentId: 'discovery-agent',
 	},
 	{
-		regex: /(spec|명세|behavior)\s*(시작|진입|만들어)/i,
+		regex: /(spec|명세|behavior)\s*(시작|진입|해줘|만들어|드라이브)/i,
 		skillId: 'spec-compose-behavior-spec',
 		agentId: 'spec-agent',
 	},
 	{
-		regex: /(plan|계획)\s*(시작|진입|만들어)/i,
+		regex: /(plan|계획)\s*(시작|진입|해줘|만들어|드라이브)/i,
 		skillId: 'plan-decompose-and-sequence',
 		agentId: 'plan-agent',
 	},
 	{
-		regex: /(test|테스트)\s*(시작|진입|만들어)/i,
+		regex: /(test|테스트)\s*(시작|진입|해줘|만들어|드라이브)/i,
 		skillId: 'test-generate-test-spec',
 		agentId: 'test-agent',
 	},
 	{
-		regex: /(implement|구현)\s*(시작|진입|만들어)/i,
+		regex: /(implement|구현)\s*(시작|진입|해줘|만들어|드라이브)/i,
 		skillId: 'implement-generate-impl-spec',
 		agentId: 'implement-agent',
 	},
@@ -156,6 +159,72 @@ export function suggestAgentForPrompt(prompt) {
 	return null;
 }
 
+// ── 진입 라우터 (DEC-2026-06-18-discovery-universal-entry-router) ──────────────
+// living-sync-operating-model §4: "자연어 변경 요청은 전부 discovery 로 들어온다.
+// discovery 는 입구·라우터다." 이 불변식을 진입점에 결선 — 두 갈래:
+//   (advisory) routeEntry — stage 명시 트리거가 아니면서 변경-의도가 있으면 discovery 로
+//              폴백 (① silent pass-through 제거). 비-작업 prompt(질문/설명)는 null 유지.
+//   (deterministic) coldStartSkipAheadReason — discovery 미진입 상태에서 later-stage chain
+//              산출물 write = orphan → PreToolUse hard-block (②).
+
+// 변경-의도(work intent) 양성 키워드 — layer-1 matcher(hooks.json) 와 동기화 의무
+// (hooks-bridge.test.js 가 matcher ⊇ WORK_INTENT_KEYWORDS 강제 / dead-zone ③ 회귀 차단).
+// 보수적 시작 — 오발(질문/설명) 회피. 표현 누락은 finding 으로 보강(cookbook Tip 3).
+export const WORK_INTENT_KEYWORDS = Object.freeze([
+	'추가',
+	'수정',
+	'고쳐',
+	'고치',
+	'변경',
+	'삭제',
+	'제거',
+	'리팩터',
+	'리팩토링',
+	'붙여',
+	'만들',
+	'개발',
+	'신규',
+	'기능',
+]);
+const WORK_INTENT_REGEX = new RegExp(WORK_INTENT_KEYWORDS.join('|'), 'i');
+
+// later-stage chain skill — discovery 미진입 시 advisory redirect / hard-block 대상 판정.
+const LATER_STAGE_SKILLS = new Set([
+	'spec-compose-behavior-spec',
+	'plan-decompose-and-sequence',
+	'test-generate-test-spec',
+	'implement-generate-impl-spec',
+]);
+
+export function isLaterStageSkill(skillId) {
+	return LATER_STAGE_SKILLS.has(skillId);
+}
+
+// 진입 라우터 — prompt → { skillId, agentId, source } | null. 순수(prompt 만 / I/O·state·LLM 0).
+//   source: 'stage' (명시 stage 트리거 / suggestSkillForPrompt 위임)
+//         | 'discovery-default' (변경-의도 있으나 stage 미지정 → discovery 입구·라우터 폴백)
+// null = 비-작업 prompt(질문/설명/감사) → 기존 침묵 보존(오발 회피).
+export function routeEntry(prompt) {
+	if (!prompt || typeof prompt !== 'string') return null;
+	const stageSkill = suggestSkillForPrompt(prompt);
+	if (stageSkill) {
+		return {
+			skillId: stageSkill,
+			agentId: suggestAgentForPrompt(prompt),
+			source: 'stage',
+		};
+	}
+	if (WORK_INTENT_REGEX.test(prompt)) {
+		// 자연어 변경 요청 = discovery(입구·라우터)부터. NL 어댑터 진입.
+		return {
+			skillId: 'discovery-from-nl-md',
+			agentId: 'discovery-agent',
+			source: 'discovery-default',
+		};
+	}
+	return null;
+}
+
 // dep-graph P3 (operation.md 결정 5) — PostToolUse 시 chain/analysis artifact write 감지.
 // 파일명 → artifact_subkind 매핑. 한 파일이 여러 노드(예: behavior-spec.json = 다수 BHV)에 대응하므로
 // hook 은 "어떤 종류의 artifact 가 바뀌었나"만 판정하고, per-node 영향 분석은 `chain-driver impact` 로 분리.
@@ -163,6 +232,7 @@ const ARTIFACT_FILENAME_TO_SUBKIND = Object.freeze({
 	'discovery-spec.json': 'UC', // v11.0.0 planning-spec → discovery-spec rename (DEC-2026-05-26-discovery-spec-rename)
 	'behavior-spec.json': 'BHV',
 	'acceptance-criteria.json': 'AC',
+	'task-plan.json': 'TASK', // DEC-2026-06-18 — plan-stage 산출물 (이전 누락 / graph-artifact 미감지 잠재버그 + cold-start hard-block 대상)
 	'test-spec.json': 'TC',
 	'impl-spec.json': 'IMPL',
 });
@@ -227,6 +297,31 @@ export function detectGraphArtifactWrite({ toolName, toolInput }) {
 		};
 	}
 	return null;
+}
+
+// cold-start skip-ahead hard-block (DEC-2026-06-18 / ② / 결정론 = state + 파일명만 / LLM inject ❌).
+// discovery 미진입 상태에서 later-stage chain 산출물(behavior-spec/acceptance-criteria/
+// task-plan/test-spec/impl-spec) write = orphan 산출물 → deny reason 반환. discovery-spec(UC)
+// 자신은 허용(입구). 정상 순차 흐름(analysis→discovery→spec…)은 `chain-driver next` 가
+// discovery 를 'in_progress'/'complete' 로 전이하므로 트립되지 않는다 — cold-start(discovery
+// 'pending')에서 later-stage 산출물 직접 write 만 차단.
+//
+// @param {Object} activeChain  getActiveScopeChain(state) 결과 (scope-aware / stage_progress 포함).
+//                              부재/판정불가(stage_progress 없음) = null 반환(allow / graceful).
+// @returns {string|null}       deny reason 또는 null(allow).
+export function coldStartSkipAheadReason({ toolName, toolInput, activeChain }) {
+	const art = detectGraphArtifactWrite({ toolName, toolInput });
+	if (!art || art.artifact_kind !== 'chain') return null; // chain 산출물 write 아님 = 무관
+	if (art.artifact_subkind === 'UC') return null; // discovery-spec 자신 = 허용(입구·라우터)
+	if (!activeChain?.stage_progress) return null; // state 판정 불가 = allow (graceful / 정직 한계)
+	const discoveryStatus = activeChain.stage_progress?.discovery?.status;
+	// discovery 가 진입(in_progress) 또는 완료(complete) = 허용. 'pending' 만 cold-start skip-ahead.
+	if (discoveryStatus !== 'pending') return null;
+	return (
+		`cold-start skip-ahead 차단 (discovery 미진입): ${art.artifact_subkind} 산출물 ` +
+		`'${art.filename}' write 시도 — 분석 외 모든 작업은 discovery(입구·라우터)부터. ` +
+		`discovery-from-nl-md 로 진입하거나 chain-driver next 로 정식 전진하세요.`
+	);
 }
 
 // operation.md "evaluate_policy()" deliverable — 영향 노드 집합에 대해 정책 평가 + propose record 생성.

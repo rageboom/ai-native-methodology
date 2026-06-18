@@ -27,6 +27,15 @@
  */
 
 import { spawnSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
+
+// DEC-2026-06-18 — tool probe 무한 hang 차단. `<tool> --version` 은 정상이면 즉시(<2s) 반환하지만,
+// semgrep 등 일부 도구는 실행 시 네트워크/업데이트 호출을 하고 사내망 SSL 차단 시 무응답 → 동기
+// spawnSync 가 영원히 블록 → release-readiness check#14 전체 hang(외부 30s timeout 도 node-blocked-in-
+// sync-spawn 은 SIGTERM 처리 불가라 무력). 내부 timeout 으로 libuv 가 도구 프로세스를 직접 kill →
+// 무응답 도구는 absent(timed_out) 정직 처리하고 진행. (R19 "환경 부재 = 정직 신호" 의도 보존 / hang ❌.)
+export const TOOL_PROBE_TIMEOUT_MS =
+	Number(process.env.CONTEXT_OPS_PREFLIGHT_TIMEOUT_MS) || 10000;
 
 const TOOLS = {
 	// core (없으면 exit 1)
@@ -73,6 +82,10 @@ const TOOLS = {
 		kind: 'analysis',
 		cmd: 'semgrep',
 		versionFlag: '--version',
+		// DEC-2026-06-18 — runner 와 동일 오프라인 env 로 탐지. naked `semgrep --version` 은 version-check
+		// 네트워크 호출을 하고 egress 차단 사내망서 ~96s+ 무응답(F-DOGFOOD-016) → 거짓 absent/hang.
+		// static-runner 가 실제 스캔 시 쓰는 env(runner.js extraEnv)를 probe 에도 적용 = "쓰는 방식대로 탐지".
+		probeEnv: { SEMGREP_ENABLE_VERSION_CHECK: '0', SEMGREP_SEND_METRICS: 'off' },
 		fallback:
 			'사내 SSL 차단 시 local rules (e.g. tools/static-runner/rules/legacy-korean/*.yml + 자체 -f inline rule) / cycle-2~7 cache 영구화 paradigm',
 	},
@@ -129,10 +142,15 @@ const TOOLS = {
 	},
 };
 
-function checkTool(name, spec) {
+export function checkTool(name, spec, timeoutMs = TOOL_PROBE_TIMEOUT_MS) {
 	const probe = spawnSync(spec.cmd, [spec.versionFlag], {
 		encoding: 'utf-8',
 		shell: true,
+		// (1) 1차 = 정확한 탐지: 도구를 "실제 쓰는 방식"의 env 로 probe (spec.probeEnv) — 예: semgrep 은
+		//     runner 와 동일 오프라인 env 라 version-check 네트워크 hang 없이 즉시 present 로 탐지(거짓 absent ❌).
+		env: spec.probeEnv ? { ...process.env, ...spec.probeEnv } : process.env,
+		// (2) 2차 = 백스톱: probeEnv 로도 무응답인 도구가 게이트 전체를 hang 시키지 않도록 상한 (DEC-2026-06-18).
+		timeout: timeoutMs,
 	});
 	if (probe.status === 0 || (probe.stdout && probe.stdout.trim())) {
 		const version = (probe.stdout || probe.stderr || '').split('\n')[0].trim();
@@ -145,13 +163,20 @@ function checkTool(name, spec) {
 			fallback: null,
 		};
 	}
+	// timeout = 도구는 설치돼 있으나 --version 이 무응답(네트워크/SSL/stdin 블록 추정) → hang 방지 위해
+	// absent 로 처리하되 "미설치"와 구분되게 timed_out 표기(정직 신호). core 아닌 도구라 게이트는 경고만.
+	const timedOut =
+		probe.error?.code === 'ETIMEDOUT' || probe.signal === 'SIGTERM';
 	return {
 		name,
 		kind: spec.kind,
 		installed: false,
 		version: null,
 		status: 'absent',
-		fallback: spec.fallback || null,
+		timed_out: timedOut || undefined,
+		fallback: timedOut
+			? `probe ${Math.round(timeoutMs / 1000)}s 무응답 → absent 처리 (네트워크/SSL 차단 또는 stdin 블록 추정 — 예: semgrep 사내망 version-check). ${spec.fallback || ''}`.trim()
+			: spec.fallback || null,
 	};
 }
 
@@ -281,4 +306,7 @@ function main() {
 	process.exit(passed ? 0 : 1);
 }
 
-main();
+// CLI 직접 실행 시에만 main() — import(테스트) 시에는 실행 안 함 (checkTool 단위 테스트용).
+if (import.meta.url === pathToFileURL(process.argv[1] || '').href) {
+	main();
+}

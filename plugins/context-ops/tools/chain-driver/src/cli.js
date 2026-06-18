@@ -77,8 +77,10 @@ import {
 	buildSuggestOutput,
 	buildBlockOutput,
 	suggestSkillForPrompt,
-	suggestAgentForPrompt,
+	routeEntry,
+	isLaterStageSkill,
 	shouldBlockToolUse,
+	coldStartSkipAheadReason,
 	checkCascadeConformance,
 	detectGraphArtifactWrite,
 	evaluatePolicyForEdges,
@@ -1553,8 +1555,10 @@ function cmdHooksBridge(args) {
 		process.exit(0);
 	}
 	if (event === 'UserPromptSubmit') {
-		const skillId = suggestSkillForPrompt(payload.prompt);
-		if (!skillId) {
+		// DEC-2026-06-18 — routeEntry 진입 라우터 (suggestSkillForPrompt 대체).
+		// stage 명시 트리거 또는 변경-의도 자연어 → discovery 폴백. 비-작업 prompt = null(침묵 보존).
+		const route = routeEntry(payload.prompt);
+		if (!route) {
 			process.stdout.write(
 				JSON.stringify({ suppressOutput: true, continue: true }) + '\n',
 			);
@@ -1563,20 +1567,42 @@ function cmdHooksBridge(args) {
 		const repoRoot = args.repoRoot || resolveRepoRoot(process.cwd());
 		let meta = null;
 		try {
-			meta = loadSkill(repoRoot, skillId).meta;
+			meta = loadSkill(repoRoot, route.skillId).meta;
 		} catch {
 			/* ok */
 		}
-		// v4.0 multi-agent paradigm (DEC-2026-05-17) — agent dispatch 권고 동봉 (C19: 기존 dead export 결선).
-		const agentId = suggestAgentForPrompt(payload.prompt);
+		// v4.0 multi-agent paradigm (DEC-2026-05-17) — agent dispatch 권고 동봉.
 		const out = buildSuggestOutput({
-			skillId,
+			skillId: route.skillId,
 			meta,
 			sessionId: payload.session_id,
-			agentId,
+			agentId: route.agentId,
 		});
+		// 진입 라우터 부가 안내 (DEC-2026-06-18 / living-sync §4 "discovery = 입구·라우터"):
+		//   discovery-default — stage 미지정 변경요청을 discovery 로 ground 하라는 사유 명시.
+		//   stage(later-stage) + cold-start(discovery 'pending') — skip-ahead advisory redirect
+		//     (결정론 차단은 PreToolUse coldStartSkipAheadReason hard-block 이 최종 가드).
+		let routeNote = null;
+		if (route.source === 'discovery-default') {
+			routeNote =
+				'진입 라우터: stage 미지정 자연어 변경요청 — 분석 외 모든 작업은 discovery(입구·라우터)부터 ground 후 진행. rule 변경이면 discovery 가 analysis 로 상향 라우팅.';
+		} else if (route.source === 'stage' && isLaterStageSkill(route.skillId)) {
+			try {
+				const st = readState(payload.cwd || process.cwd());
+				const ac = getActiveScopeChain(st);
+				if (ac?.stage_progress?.discovery?.status === 'pending') {
+					routeNote =
+						'skip-ahead 주의: discovery 미진입 상태의 later-stage 트리거 — 먼저 discovery(입구·라우터)부터 진행 권고. (later-stage 산출물 직접 write 는 PreToolUse 에서 차단됨.)';
+				}
+			} catch {
+				/* state 부재 = cold-start 판정 불가 → advisory 생략 (hard-block 이 최종 가드) */
+			}
+		}
+		if (routeNote && out.hookSpecificOutput) {
+			out.hookSpecificOutput.additionalContext = `${out.hookSpecificOutput.additionalContext} ${routeNote}`;
+		}
 		process.stdout.write(JSON.stringify(out) + '\n');
-		process.stderr.write(formatSkillSuggestion(skillId, meta) + '\n');
+		process.stderr.write(formatSkillSuggestion(route.skillId, meta) + '\n');
 		process.exit(0);
 	}
 	if (event === 'PreToolUse') {
@@ -1602,6 +1628,27 @@ function cmdHooksBridge(args) {
 				});
 				process.stdout.write(JSON.stringify(out) + '\n');
 				process.stderr.write(`[chain-driver] PreToolUse blocked: ${reason}\n`);
+				process.exit(2);
+			}
+			// DEC-2026-06-18 — cold-start skip-ahead hard-block (②). discovery 미진입(stage_progress
+			// .discovery='pending')에서 later-stage chain 산출물(behavior-spec/acceptance-criteria/
+			// task-plan/test-spec/impl-spec) write = orphan → deny. getActiveScopeChain 로 scope-aware.
+			// 결정론: state + 파일명만 (LLM inject ❌ / feedback_chain_driver_deterministic_axis).
+			const skipReason = coldStartSkipAheadReason({
+				toolName: payload.tool_name,
+				toolInput: payload.tool_input,
+				activeChain: getActiveScopeChain(state),
+			});
+			if (skipReason) {
+				const out = buildBlockOutput({
+					reason: skipReason,
+					sessionId: payload.session_id,
+					hookEventName: event,
+				});
+				process.stdout.write(JSON.stringify(out) + '\n');
+				process.stderr.write(
+					`[chain-driver] PreToolUse blocked: ${skipReason}\n`,
+				);
 				process.exit(2);
 			}
 		}

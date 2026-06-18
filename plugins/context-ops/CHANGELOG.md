@@ -10,6 +10,31 @@
 
 ---
 
+## [0.61.0] — 2026-06-18 — MINOR — discovery 보편-라우터 진입점 정렬 (하이브리드: advisory 폴백 + cold-start 결정론 hard-block)
+
+**맹점 제거**: "분석 외 모든 작업은 discovery(입구·라우터)에서 시작"이라는 불변식이 `living-sync-operating-model §4`(DEC-2026-06-07)에는 명시돼 있으나 **진입 라우팅 코드에는 미구현**이었다. 진입 stage 선택은 결정론 state machine 이 아니라 LLM skill-description 매칭(System B)이 하는데, `hooks-bridge` 권고가 discovery 를 "6 stage 중 키워드로 고르는 하나"로 취급 → 4 실패모드: ① stage 키워드 없는 일반 변경요청은 silent pass-through(라우팅 0) ② "구현 시작"/"spec 만들어"가 later-stage 로 직행(skip-ahead) ③ layer-2 동사-리스트 비대칭 dead-zone("구현해줘"가 미매칭) ④ `route` 명령은 post-discovery 그래프 라우터일 뿐 prompt→discovery 진입 라우터 부재. 사용자 결단 = **하이브리드**(정상경로 advisory / 최악경로 결정론 차단). SSOT: `DEC-2026-06-18-discovery-universal-entry-router`.
+
+### Changed — 진입 라우팅 (advisory)
+- **`hooks-bridge.js` 동사 셋 통일** (③): 6 stage `TRIGGER_PATTERNS` 모두 `(시작|진입|해줘|만들어|드라이브)` 로 정렬 — 이전 spec/plan/test/implement 의 3종 동사 dead-zone 제거("구현해줘" 등 인식).
+- **`routeEntry(prompt)` 신설** (①): stage 명시 트리거(=`suggestSkillForPrompt` 위임 / `source:'stage'`) 아니면서 변경-의도(`WORK_INTENT_KEYWORDS`) 있으면 `discovery-from-nl-md` 폴백(`source:'discovery-default'`). 비-작업 prompt(질문/설명)는 null(침묵 보존 / 오발 회피). `cmdHooksBridge` UserPromptSubmit 분기가 `routeEntry` 사용 + discovery-default/cold-start skip-ahead advisory note 주입.
+- **`hooks.json` UserPromptSubmit matcher 확장**: work-intent 키워드(추가/수정/고쳐/변경/삭제/리팩터/붙여/만들/개발/신규/기능 …) 추가 → 일반 기능요청이 hooks-bridge 에 도달.
+
+### Added — cold-start skip-ahead 결정론 hard-block (②)
+- **`coldStartSkipAheadReason()` 신설** + `cli.js` PreToolUse 결선: discovery 미진입(`stage_progress.discovery='pending'`) 상태에서 later-stage chain 산출물(behavior-spec/acceptance-criteria/task-plan/test-spec/impl-spec) Write 시도 = orphan → exit 2 deny. discovery-spec(UC) 자신은 허용(입구). 결정론(state + 파일명만 / LLM inject ❌). 정상 순차 흐름(`chain-driver next` 가 discovery 를 in_progress/complete 로 전이)은 무회귀. state.json 부재 = allow(graceful / 정직 한계).
+- **부수 갭 수정**: `ARTIFACT_FILENAME_TO_SUBKIND` 에 `task-plan.json → TASK` 추가 (이전 누락 — plan-stage write 가 graph-artifact 로 미감지되던 잠재버그 동시 해소).
+
+### Tests
+- chain-driver 563 → 581 (신규 18): 동사-비대칭 회귀 / `routeEntry` 폴백·stage / `isLaterStageSkill` / `coldStartSkipAheadReason` 8종 / `WORK_INTENT_KEYWORDS ⊆ hooks.json matcher` 동기화 / integration(spawnSync) 변경요청→discovery + cold-start Write→exit2 + discovery-spec allow. release-readiness `criteria_total=42` 무변경(신 check 무 / count-coupling 무).
+
+### Docs
+- `living-sync-operating-model.md` §4·§7 — 진입-라우터 last-mile = "advisory routeEntry 폴백 + cold-start hard-block 시행분"으로 정직 전환(미구현→시행). `first-prompt-cookbook.md` — default-to-discovery 라우팅 + skip-ahead 차단 + `route`(post-discovery) ≠ 진입 라우터 구분 명기.
+
+### Fixed — release gate preflight semgrep 오탐지 + 무한 hang (위 변경 검증 중 발견)
+- **근본 원인 = 탐지 방식 불일치(거짓 absent)**, hang 은 그 증상이었다. `preflight-check.js` 가 `semgrep --version` 을 **naked**(env 없이) 호출 → semgrep 의 version-check 네트워크 호출이 egress 차단 사내망서 ~96s+ 무응답(F-DOGFOOD-016 동형) → 무한 블록 → release-readiness check#14(`--stack all`) 전체 hang(외부 30s timeout 도 node-blocked-in-sync-spawn 은 SIGTERM 처리 불가라 무력). 정작 `static-runner`(실제 스캔 경로)는 `SEMGREP_ENABLE_VERSION_CHECK=0`+`SEMGREP_SEND_METRICS=off` 오프라인 env 로 semgrep 을 **정상 실행**하고 있었다 — preflight 만 "쓰는 방식과 다르게" 탐지해 멀쩡한 semgrep(v1.163.0)을 잡지 못한 것.
+- **1차 fix (정확한 탐지)**: tool spec 에 `probeEnv` 신설 + `checkTool` 이 probe 자식 env 에 병합 → semgrep 을 runner 와 동일 오프라인 env(`SEMGREP_ENABLE_VERSION_CHECK=0`/`SEMGREP_SEND_METRICS=off`)로 probe → version-check 네트워크 없이 ~1s 에 **present(v1.163.0) 로 정확 탐지**(거짓 absent ❌ / hang ❌). 실측: `--stack all` 16분+ hang → **2.4s 완주 / semgrep status=ok**.
+- **2차 fix (백스톱)**: `checkTool` `spawnSync` 에 `timeout`(기본 10s / `CONTEXT_OPS_PREFLIGHT_TIMEOUT_MS` override) — probeEnv 로도 무응답인 *다른* 도구가 게이트를 hang 시키지 않도록 상한. timeout 시 `absent`+`timed_out:true`(미설치와 구분 / R19 "환경 부재=정직 신호" 보존).
+- `checkTool`/`TOOL_PROBE_TIMEOUT_MS` export + `main()` CLI-guard + 신규 `scripts/test/preflight-check.test.js`(5 test / `test:preflight` — probeEnv 전파·timeout·정상/미설치 probe).
+
 ## [0.60.0] — 2026-06-18 — MINOR — mis-fe-admin FE dogfood cycle 6: 3rd FE 도메인(apps/gea/healium) 신규 harvest → 38건 반영 (real a-priori 11 + design 27)
 
 cycle5 로 carry queue 청산 후 첫 **신규 harvest**. 3rd FE 도메인 = `apps/gea/healium`(react-hook-form + zustand + @sg/ui-bo/real-grid + react-i18next, 7 feature slice) — apps/common 이 thin(0 forms / 0 real grids)해 corroborate 못 하던 §8.1 carry 를 정면 exercise. Workflow(produce 9 deliverable 전부 schema-valid → 59 finding → 적대검증 59 skeptic vs dev v0.59.0): **real 11 · design 29 · false_positive 7 · stale 12** (cycle3 stale 10 / cycle4 FP 7 처럼 over-claim 필터 재현). 사용자 design 결단 = 전부 추천 채택 + 정책 4 fork 확정. **전부 optional·additive**(enum APPEND / 신규 필드 optional / 기존 valid 산출물·bundled example 무파손). SSOT: `DEC-2026-06-18-fe-dogfood-cycle6`.

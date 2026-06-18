@@ -62,6 +62,8 @@ aspect skill = 코드베이스 시그널 (`package.json` react / `pom.xml` sprin
 
 ## 2. Chain harness stage (Layer 2 통합)
 
+> **진입 기본값 = discovery (입구·라우터)**: 분석 외 **모든 작업의 시작은 discovery** 다. stage 를 명시하지 않은 자연어 변경요청("예약 취소 기능 추가해줘" / "이 버그 고쳐줘")은 `hooks-bridge.routeEntry` 가 `discovery-from-nl-md` 로 폴백한다(이전엔 silent pass-through 였음). discovery 가 의도를 ground 한 뒤, 룰 변경이면 analysis 로 상향 라우팅한다(`living-sync-operating-model §4`). **skip-ahead 차단**: discovery 미진입 상태에서 spec/plan/test/impl 산출물을 직접 쓰려 하면(예: discovery 없이 `behavior-spec.json` write) PreToolUse 가 결정론적으로 차단(exit 2 / orphan 방지) — `discovery-from-nl-md` 진입 또는 `chain-driver next` 정식 전진으로 풀린다. (참고: `chain-driver route` 명령은 *이미 만들어진* discovery-spec 의 매핑을 그래프 origin 으로 바꾸는 post-discovery 라우터 — prompt→discovery **진입** 라우팅과 별개.)
+
 ### 2.1 Chain 1 (discovery) — Layer 2 LLM 의무 통과
 
 | 자연어 prompt                                                            | 발동 skill                                                                            | 산출                                   |

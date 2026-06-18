@@ -27,7 +27,7 @@
     ],
     "UserPromptSubmit": [
       {
-        "matcher": "(분석|검토|legacy|레거시|analysis|discovery|발견|탐색|planning|기획|spec|명세|behavior|plan|계획|test|테스트|implement|구현|세션|session|인계|handoff)",
+        "matcher": "(분석|검토|legacy|레거시|analysis|discovery|발견|탐색|planning|기획|spec|명세|behavior|plan|계획|test|테스트|implement|구현|세션|session|인계|handoff|추가|수정|고쳐|고치|변경|삭제|제거|리팩터|리팩토링|붙여|만들|개발|신규|기능)",
         "hooks": [
           {
             "type": "command",

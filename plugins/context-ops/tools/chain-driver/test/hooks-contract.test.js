@@ -218,3 +218,67 @@ describe('hooks-contract — session-handoff', () => {
 		assert.doesNotMatch(ctx, /dispatch agent/); // cross-cutting = agentId null
 	});
 });
+
+// DEC-2026-06-18 — discovery 보편-라우터 진입점 e2e (living-sync §4 "discovery = 입구·라우터").
+describe('hooks-contract — discovery 보편-라우터 (DEC-2026-06-18)', () => {
+	it('UserPromptSubmit: stage 미지정 변경요청 → discovery 폴백 + 입구·라우터 안내 (① silent 제거)', () => {
+		const r = runHooksBridge(
+			JSON.stringify({
+				hook_event_name: 'UserPromptSubmit',
+				prompt: '예약 취소 기능 추가해줘',
+				session_id: 's1',
+				cwd: process.cwd(),
+			}),
+		);
+		assert.equal(r.status, 0);
+		const out = JSON.parse(r.stdout);
+		assert.equal(out.suppressOutput, true);
+		const ctx = out.hookSpecificOutput.additionalContext;
+		assert.match(ctx, /discovery-from-nl-md/);
+		assert.match(ctx, /입구·라우터/);
+	});
+
+	it('PreToolUse: cold-start(discovery 미진입)에서 behavior-spec write → exit 2 deny (②)', () => {
+		const root = mkdtempSync(join(tmpdir(), 'coldstart-skipahead-'));
+		try {
+			const init = runCli(['init', root]); // current_chain=analysis / discovery=pending
+			assert.equal(init.status, 0, init.stderr);
+			const r = runHooksBridge(
+				JSON.stringify({
+					hook_event_name: 'PreToolUse',
+					tool_name: 'Write',
+					tool_input: {
+						file_path: join(root, '.ai-context', 'output', 'behavior-spec.json'),
+					},
+					cwd: root,
+				}),
+			);
+			assert.equal(r.status, 2, r.stderr);
+			const out = JSON.parse(r.stdout);
+			assert.equal(out.hookSpecificOutput.permissionDecision, 'deny');
+			assert.match(out.reason, /cold-start skip-ahead/);
+		} finally {
+			rmSync(root, { recursive: true, force: true });
+		}
+	});
+
+	it('PreToolUse: discovery-spec write 는 cold-start 여도 허용 (입구 exempt)', () => {
+		const root = mkdtempSync(join(tmpdir(), 'coldstart-uc-'));
+		try {
+			runCli(['init', root]);
+			const r = runHooksBridge(
+				JSON.stringify({
+					hook_event_name: 'PreToolUse',
+					tool_name: 'Write',
+					tool_input: {
+						file_path: join(root, '.ai-context', 'output', 'discovery-spec.json'),
+					},
+					cwd: root,
+				}),
+			);
+			assert.equal(r.status, 0, r.stderr);
+		} finally {
+			rmSync(root, { recursive: true, force: true });
+		}
+	});
+});
