@@ -10,6 +10,27 @@
 
 ---
 
+## [0.63.0] — 2026-06-18 — MINOR — revisit 근거 생성 + 자동 감지 (ADR-CHAIN-003 §2·§3 미배선 갭 해소)
+
+**문제**: chain revisit loop(되돌아가기)가 ADR-CHAIN-003 에서 "자동 감지 + 사용자 결단(go/무시/abort)"으로 설계됐으나 ① `detectRevisit` 가 revisit_target/LOC/changed_paths 만 산출 → ADR §3 약속(영향 stages[from→to] + 영향 trace UC/BHV/AC/TC/IMPL ID + traceability cell 수) 미산출(갭1), ② ADR §2 "Write/Edit 후 자동 호출" 미배선 — `detectRevisit` 가 수동 `chain-driver revisit-detect` 명령으로만 도달(갭2). 사용자 결단 = **하이브리드 자동 감지 / ADR 풀세트 근거**. SSOT: `DEC-2026-06-18-revisit-impact-autodetect`.
+
+### Added — 의미적 근거 (갭1 / revisit-impact.js)
+- **`tools/chain-driver/src/revisit-impact.js` 신설**: `enrichRevisitImpact(revisitResult, graph, currentChain)` — `resolveOriginNodeIds`(변경파일→그래프 노드) → `analyzeImpact(…,{includeBackward:false})`(forward 영향) → subkind 버킷(UC/BHV/AC/TASK/TC/IMPL) + `affected_cells`(leaf 수 = traceability cell 근사) + `stage_range`. graph 부재·미매핑 시 `degraded:true` 정직 표기. `renderRevisitPrompt` = ADR §3 평이 텍스트(한 줄 권고 + 영향 trace + cell 수 + 3선택). **순수 결정론**(LLM inject ❌). 재사용: resolveOriginNodeIds·analyzeImpact·downstreamOf 패턴(재발명 ❌).
+- `detectRevisit`(revisit-detect.js) **시그니처/반환 무변** — 별도 enrich(기존 revisit-detect.test.js 보존).
+
+### Added — 하이브리드 자동 감지 (갭2)
+- **`hooks-bridge.revisitCandidateNote`**: PostToolUse 에서 변경 산출물 stage 가 현재 chain 의 upstream 이면 1줄 advisory(결정론 / git diff·graph 없음 / `coldStartSkipAheadReason` 패턴). exit 0.
+- **`chain-driver next`(gate 진입)**: git diff → detectRevisit → enrichRevisitImpact(graph best-effort) → revisit_target 시 `renderRevisitPrompt` stderr + `--json` 의 `revisit` 필드. **advisory(gate 차단 ❌)** — 사용자가 결단 `revisit:<stage>` 로 선택.
+- **수동 `chain-driver revisit-detect`**: 동일 enrich 적용(풀세트 근거).
+
+### Changed
+- `docs/adr/ADR-CHAIN-003-revisit-loop.md`: §2 하이브리드 배선 + §3 enrich 구현 정합 + 변경 이력.
+
+### Tests
+- chain-driver 606 → 614 (신규 `revisit-impact.test.js` 12): enrichRevisitImpact(버킷/cell/stage_range/degraded/null) + renderRevisitPrompt(형식/degraded) + revisitCandidateNote(upstream/downstream/graceful). 기존 `revisit-detect.test.js` 무변 통과. release-readiness `criteria_total=42` 무변경.
+
+---
+
 ## [0.62.0] — 2026-06-18 — MINOR — gate 결정 근거 "평이 요약" 레이어 (한 줄 평결 + [평이 라벨—뜻—행동])
 
 **문제**: 각 chain gate(#0~#5)에서 go/stop/revisit 을 판단해야 하는데, gate 가 보여주는 근거가 `validator_critical` / `coverage 0.62 < threshold 0.85` / `Layer 2 llm_consistency_score 0.61 < 0.7` / `s2_outcome_mismatch` / `forward_coverage` / `5종 물증` 같은 영어 약어·내부 jargon 의 나열이라, 사용자가 "그래서 진행이냐 멈춤이냐"를 읽어낼 수 없었다(6 서브시스템 audit = 한국어 평이 라벨·한 줄 평결·glossary 자산 전무). 사용자 결단 = **도구+skill 양쪽 평이화 / 균형형**. SSOT: `DEC-2026-06-18-gate-plain-summary`.

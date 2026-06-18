@@ -53,6 +53,13 @@ hook 통합 (sub-plan-5):
 - `hooks/hooks.json` 의 `PostToolUse` 에 chain-revisit-detector 등록
 - Write/Edit 후 자동 호출
 
+구현 (v0.63.0 / 하이브리드 / DEC-2026-06-18-revisit-impact-autodetect — ADR §2 "Write/Edit 후 자동 호출" last-mile 충족):
+
+- **PostToolUse 가벼운 후보 신호** — `hooks-bridge.revisitCandidateNote` (결정론 / git diff·graph 없음): 변경 산출물 stage 가 현재 chain 의 upstream 이면 1줄 advisory note 를 PostToolUse note 에 append (`coldStartSkipAheadReason` 패턴). exit 0 (차단 ❌).
+- **`chain-driver next`(gate 진입) 정식 enrich** — git diff → `detectRevisit` → `enrichRevisitImpact`(graph) → revisit_target 시 `renderRevisitPrompt` stderr + `--json` 의 `revisit` 필드. advisory (gate 차단 ❌ / 사용자가 결단의 `revisit:<stage>` 로 선택).
+- **수동 `chain-driver revisit-detect`** — 동일 enrich 적용 (풀세트 근거 출력).
+- 결정론 axis: 전 단계 순수 결정론 (LLM inject ❌ / `feedback_chain_driver_deterministic_axis`). graph 부재 시 degraded 정직 표기.
+
 ### 3. 사용자 결단 ( Q4 정합)
 
 자동 감지 → **사용자 prompt** (자동 진행 ❌):
@@ -73,6 +80,8 @@ trigger reason: {trigger}
 2.   무시 + 결단 logged ("이 변경은 영향 없음" 사용자 명시)
 3.    chain abort (재plan 의무)
 ```
+
+구현 (v0.63.0): `revisit-impact.renderRevisitPrompt(enriched)` 가 본 형식을 산출 — `enrichRevisitImpact` 가 `resolveOriginNodeIds`(변경파일→그래프 노드) → `analyzeImpact`(forward 영향) → subkind 버킷(UC/BHV/AC/TASK/TC/IMPL) + 영향 cell 수를 결정론으로 채운다. graph 부재·변경파일 미매핑 시 trace/cell 줄을 degraded 정직 표기(날조 ❌).
 
 ### 4. revisit cap ( Industry research 정합)
 
@@ -151,3 +160,4 @@ revisit decision = `stop+revisit` 의 sub-type (ADR-CHAIN-002 §1):
 ## 변경 이력
 
 - 2026-05-06: 신설 (sub-plan-2).
+- 2026-06-18: §2 하이브리드 자동 감지 배선 + §3 영향 trace/cell enrich 구현 (v0.63.0 / DEC-2026-06-18-revisit-impact-autodetect). revisit-impact(`enrichRevisitImpact`/`renderRevisitPrompt`) 신설 + PostToolUse `revisitCandidateNote` + `chain-driver next` advisory 통합. detectRevisit 시그니처 무변(별도 enrich).

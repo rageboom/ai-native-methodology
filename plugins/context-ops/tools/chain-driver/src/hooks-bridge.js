@@ -16,6 +16,8 @@ import {
 	formatHookBlockContext,
 	formatSkillSuggestion,
 } from './invoke-skill.js';
+import { SUBKIND_TO_STAGE } from './sync-loop.js';
+import { isUpstream } from './stage-graph.js';
 
 // M2 (DEC-2026-06-10-cascade-conformance) — PreToolUse pre-fire 차단.
 // jira_create 의 summary 가 cascade-plan.calls 에 없으면 = 스킬이 계획 밖 ticket 발사 (정책 11) → deny.
@@ -321,6 +323,23 @@ export function coldStartSkipAheadReason({ toolName, toolInput, activeChain }) {
 		`cold-start skip-ahead 차단 (discovery 미진입): ${art.artifact_subkind} 산출물 ` +
 		`'${art.filename}' write 시도 — 분석 외 모든 작업은 discovery(입구·라우터)부터. ` +
 		`discovery-from-nl-md 로 진입하거나 chain-driver next 로 정식 전진하세요.`
+	);
+}
+
+// PostToolUse 가벼운 revisit 후보 신호 (하이브리드 자동 감지 / ADR-CHAIN-003 §2).
+//   변경 산출물의 stage 가 현재 진행 chain 의 upstream 이면 1줄 advisory (정식 enrich 판정은 chain-driver next).
+//   순수 결정론 (stage 매핑 + isUpstream / git diff·graph 없음 / LLM 0). coldStartSkipAheadReason 패턴.
+export function revisitCandidateNote({ detected, currentChain }) {
+	if (!detected || !currentChain) return null;
+	const fileStage =
+		detected.artifact_kind === 'analysis'
+			? 'analysis'
+			: SUBKIND_TO_STAGE[detected.artifact_subkind];
+	if (!fileStage) return null;
+	if (!isUpstream(fileStage, currentChain)) return null;
+	return (
+		`revisit 후보: ${fileStage} 산출물 변경(${detected.filename}) — 현재 ${currentChain} 진행 중. ` +
+		`다음 gate(chain-driver next)에서 영향 정식 판정.`
 	);
 }
 

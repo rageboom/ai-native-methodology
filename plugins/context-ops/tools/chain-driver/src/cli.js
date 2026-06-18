@@ -89,8 +89,10 @@ import {
 	checkCascadeConformance,
 	detectGraphArtifactWrite,
 	evaluatePolicyForEdges,
+	revisitCandidateNote,
 } from './hooks-bridge.js';
 import { gitDiffNumstat, detectRevisit } from './revisit-detect.js';
+import { enrichRevisitImpact, renderRevisitPrompt } from './revisit-impact.js';
 import { analyzeImpact, EDGE_TYPE_CATALOG } from './impact-analyzer.js';
 import {
 	loadPolicy,
@@ -390,6 +392,17 @@ function loadFindings(path) {
 	return JSON.parse(readFileSync(path, 'utf-8'));
 }
 
+// artifact-graph.json best-effort 로드 (revisit enrich 용 / 부재·파싱 실패 → null → degraded 정직 표기).
+function loadArtifactGraphSafe(root) {
+	try {
+		const p = baseFileForRead(root, 'artifact-graph.json');
+		if (!existsSync(p)) return null;
+		return JSON.parse(readFileSync(p, 'utf-8'));
+	} catch {
+		return null;
+	}
+}
+
 function cmdNext(args) {
 	if (!args.project) usage(3);
 	const root = resolve(args.project);
@@ -433,11 +446,50 @@ function cmdNext(args) {
 	// 평이 요약(결정론) — 사용자가 영어 jargon 없이 go/stop 을 즉시 읽도록. gate-summary.js (레이어 1).
 	const gateSummary = summarizeGate(finalDecision);
 
+	// revisit 정식 enrich (advisory / ADR-CHAIN-003 §2 하이브리드 / gate 차단 아님).
+	//   upstream 산출물 누적 변경 → 영향 trace + cell 수 (graph 부재 시 degraded 정직 표기). revisit-impact.js.
+	let revisitAdvisory = null;
+	try {
+		const rbase =
+			activeChain.stage_progress?.[stage]?.git_baseline_sha || 'HEAD~1';
+		const rdiff = gitDiffNumstat(root, rbase, 'HEAD');
+		if (rdiff.ok) {
+			const rev = detectRevisit({
+				changedFiles: rdiff.files,
+				currentChain: stage,
+				ignoreGlobs: state.revisit_ignore_globs || [],
+			});
+			if (rev.revisit_target) {
+				revisitAdvisory = enrichRevisitImpact(
+					rev,
+					loadArtifactGraphSafe(root),
+					stage,
+				);
+			}
+		}
+	} catch {
+		/* graceful — git/graph 부재 시 revisit advisory 생략 */
+	}
+	if (revisitAdvisory) {
+		console.error('\n' + renderRevisitPrompt(revisitAdvisory) + '\n');
+	}
+
 	if (args.dryRun) {
 		console.error(renderGateSummaryText(gateSummary));
 		process.stdout.write(
 			JSON.stringify(
-				{ stage, gate: finalDecision, summary: gateSummary, dry_run: true },
+				{
+					stage,
+					gate: finalDecision,
+					summary: gateSummary,
+					revisit: revisitAdvisory
+						? {
+								target: revisitAdvisory.revisit_target,
+								impact: revisitAdvisory.impact,
+							}
+						: null,
+					dry_run: true,
+				},
 				null,
 				2,
 			) + '\n',
@@ -607,7 +659,18 @@ function cmdNext(args) {
 	console.error(gateSummary.headline);
 	process.stdout.write(
 		JSON.stringify(
-			{ stage, advanced_to: next, gate: finalDecision, summary: gateSummary },
+			{
+				stage,
+				advanced_to: next,
+				gate: finalDecision,
+				summary: gateSummary,
+				revisit: revisitAdvisory
+					? {
+							target: revisitAdvisory.revisit_target,
+							impact: revisitAdvisory.impact,
+						}
+					: null,
+			},
 			null,
 			2,
 		) + '\n',
@@ -1696,8 +1759,14 @@ function cmdHooksBridge(args) {
 		if (detected) {
 			const root = payload.cwd || process.cwd();
 			let markedScope = null;
+			let revNote = null;
 			try {
 				const state = readState(root);
+				// 하이브리드 자동 감지 (ADR-CHAIN-003 §2) — 가벼운 revisit 후보 1줄 (upstream 변경 시).
+				revNote = revisitCandidateNote({
+					detected,
+					currentChain: state?.current_chain,
+				});
 				const scope = state?.current_scope;
 				if (scope) {
 					const manifest = readManifest(root, scope);
@@ -1716,7 +1785,8 @@ function cmdHooksBridge(args) {
 			const note =
 				`[ai-native-methodology] graph artifact 변경 감지 (${detected.artifact_kind}/${detected.artifact_subkind}: ${detected.filename})` +
 				`${markedScope ? ` — scope '${markedScope}' impact_pending=true` : ''}. ` +
-				`영향 분석: chain-driver impact --graph <artifact-graph.json> --origin <node-id>`;
+				`영향 분석: chain-driver impact --graph <artifact-graph.json> --origin <node-id>` +
+				`${revNote ? ` ${revNote}` : ''}`;
 			const out = {
 				suppressOutput: true,
 				hookSpecificOutput: { hookEventName: event, additionalContext: note },
@@ -1855,6 +1925,12 @@ function cmdRevisitDetect(args) {
 		currentChain: state.current_chain,
 		ignoreGlobs: state.revisit_ignore_globs || [],
 	});
+	// 의미적 근거 enrich (ADR-CHAIN-003 §3 / 영향 trace + cell 수 / graph 부재 시 degraded 정직 표기).
+	const enriched = enrichRevisitImpact(
+		result,
+		loadArtifactGraphSafe(root),
+		state.current_chain,
+	);
 	logIntervention(state, root, {
 		event_type: 'revisit_detect',
 		actor: 'driver',
@@ -1878,8 +1954,11 @@ function cmdRevisitDetect(args) {
 			return s;
 		});
 	}
-	process.stdout.write(JSON.stringify(result, null, 2) + '\n');
-	process.exit(result.revisit_target ? 0 : 0);
+	if (enriched.revisit_target) {
+		console.error('\n' + renderRevisitPrompt(enriched) + '\n');
+	}
+	process.stdout.write(JSON.stringify(enriched, null, 2) + '\n');
+	process.exit(0);
 }
 
 function resolveRepoRoot(start) {
