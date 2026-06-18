@@ -28,6 +28,7 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 ## 사전 조건
 
 - `architecture.json`(`analysis-architecture` 산출물) — SCC + Martin 입력 (필수). 부재 시 exit 3.
+  - **부재 시 all-or-nothing 회피 — minimal grep import-graph 가 valid 입력**: 전면 `analysis-architecture` 를 아직 돌리지 않았어도, carve 목적에 한해 grep/import-resolution 으로 만든 모듈 그래프(`modules[].id` + `dependencies[].from/to` 만 채운 architecture.json)면 충분하다. carve 는 그 두 필드만 읽기 때문에 코드 무변경으로 즉시 신호를 낼 수 있다. 단 이 그래프는 **정적 import 만** 본다 — 동적 dispatch / lazy route 등록 / DI 주입은 안 잡히므로(codegraph 의 FE arrow-fn blind 와 같은 부류) confidence 를 낮추고 `meta`·finding 에 한계를 명시한다. grep 으로 *측정*한 그래프이지 LLM 이 *추정*한 것이 아니므로 no-simulation 위반은 아니다.
 - (선택) co-change 대상 git repo — `--repo`. git 이력이 있어야 logical-coupling mining 동작(없으면 honest skip).
 
 ## 절차
@@ -41,17 +42,22 @@ baseline → `methodology-spec/policies/no-simulation.md`.
      --output <user-project>/.ai-context/base \
      [--min-support N] [--min-confidence F] [--window N] [--max-transaction-size N] \
      [--unstable-instability F] [--hub-afferent N] [--since <date>] \
-     [--hotspot-top-n N] [--min-churn N] [--tab-width N]
+     [--hotspot-top-n N] [--min-churn N] [--tab-width N] \
+     [--scope-root <path>] [--exclude <glob>] [--no-default-excludes]
    ```
 
    - `--repo` 생략 = SCC+Martin 만 (co-change·hotspot `not_run` — 둘 다 git 이력 의존).
    - co-change·hotspot 파라미터·Martin 임계는 모두 출력 JSON `params` 에 기록 = soft gate 가 사람에게 노출. `--tab-width` = 들여쓰기 환산(2-space 코드는 2 / 기본 4).
+   - **monorepo 1앱 carve = `--scope-root <subtree>` 필수**: `--repo` 가 monorepo 루트면 git log 가 repo 전체 이력을 mining → co-change pair·hotspot 이 형제 앱 변경으로 오염(SCC·Martin 은 architecture.json scope 라 이미 해당 앱으로 한정 = 신호 비대칭). `--scope-root apps/<app>` 으로 git log 를 `-- <path>` pathspec 제한하면 양쪽이 같은 subtree 로 정조준. 미지정 시 architecture.json `modules[].path` 가 공통 prefix 를 공유하면 그 값으로 자동 default(공통 prefix 없으면 repo-wide 유지).
+   - **project-level noise 추가 제외 = `--exclude <glob>`(반복가능, 기본목록에 추가)** / `--no-default-excludes`(기본 제외 끔). 기본 제외목록은 lockfile/deploy/CI/build/generated + methodology markdown(spec·plan·work-log)을 거른다 — 프로젝트 고유의 동반-변경 noise 는 `--exclude` 로 추가.
 
 2. **환경 부재 시 (exit 3)** — `architecture.json` 부재 → `analysis-architecture` 먼저. finding 등재(`Type: gap`).
 
 3. **신호 검토 (reference-lens)**:
    - **SCC** — `scc.components[].is_atomic=true` = 분할 불가 atomic 단위(함께 carve 또는 cycle 먼저 해소). `condensation_order` = 안전 추출 위상순서.
    - **Martin** — `role`: sink(깨끗 추출) / hub(shared kernel — 쪼개면 파편화, 경계 신중) / unstable / isolated. `instability` 숫자는 결정론, 임계 판정은 convention(soft gate).
+     - **sink→clean_seam 은 형제 feature 가 많은 app-scale 에서 주 WHERE 신호**: 한 도메인만 잘라낸 좁은 슬라이스에서는 sink 가 거의 안 잡혀(공허) 보이지만, 여러 feature 가 공존하는 앱 전체에서는 서로를 의존하지 않는 feature 들이 다수의 깨끗한 추출 후보(clean_seam)로 드러난다. sink 공허는 단일-도메인 슬라이스의 속성이지 FE 일반의 한계가 아니다 — 앱 전체 architecture.json 을 입력하면 sink/clean_seam 이 지배적 신호가 된다.
+     - **external 모듈은 hub_warning 에서 자동 suppress**: architecture.json `modules[].external=true`(vendor/외부 패키지 — 예: `@sg/*` workspace 의존)는 Martin afferent 가 높아도 hub_warning 후보로 노출하지 않는다(절대 carve 금지 대상이라 추출-회피 경고가 무의미). architecture.json 의 `modules` 는 **app-internal 만** 두는 것이 원칙이며, 외부 의존은 carve 입력 전에 prune 하는 것을 권장한다(미prune 시 `external` 플래그로 구분).
    - **co-change** — `pairs[]` 정적 그래프 비가시 결합(config↔code / mapper↔DAO 동시편집). 가르는 cut 은 leaky 후보.
    - **hotspot** (우선순위 axis / WHICH-first) — `hotspot.items[]` = churn × indentation-complexity score 내림차순. 자주 변경+복잡 = **먼저** carve/격리/hardening. flat 파일(고churn but 들여쓰기~0)은 저score(Tornhill 의도). WHERE(3 구조신호)에 직교.
 
@@ -68,6 +74,7 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 ## 한계 (정직)
 
 - **SCC garbage-in** — architecture.json deps 가 동적 dispatch/DI/iBATIS XML 매핑 누락 시 false 'sliceable'(codegraph iBATIS2 blind 정합). co-change 가 직교 보완하나 완전성 보장 ❌.
+- **SCC = acyclic-by-construction FE 에서 confirmatory(생성적 아님)** — feature-sliced FE / 잘 계층화된 앱처럼 구조상 순환이 거의 없는 코드베이스에서 SCC 는 거의 항상 0 atomic-unit 만 낸다(분할-불가 덩어리 부재). 이때 SCC 의 가치는 새 seam 을 *생성*하는 게 아니라 "불법 cut 이 없다"를 *확인*하는 데 있다 — 실질 carve 안내는 Martin(seam/hub) + co-change + hotspot 가 짊어진다. SCC 가 0 을 냈다고 신호가 실패한 게 아니라 그 구조가 안전하게 분할 가능함을 증명한 것.
 - **co-change = git 이력 필수** — 신규/sparse 이력 = cold-start(구조 중심이어도 신호 0). tangled commit = `max_transaction_size` 로 inflate 제어(soft gate).
 - 구조 3신호 모두 **cohesion·도메인 의미 미포함** — 구조 신호 한정, 의미 경계 확정은 soft gate #0 의 사람.
 - **hotspot complexity = indentation proxy**(cyclomatic 아님 / research "약한 proxy"). 우선순위 랭킹엔 충분(결정론)하나 절대 복잡도 아님. `tab_width` 의존(2-space 코드 = `--tab-width 2`). churn 은 co-change 와 동일 `.git` 의존.
@@ -82,3 +89,4 @@ baseline → `methodology-spec/policies/no-simulation.md`.
 - DEC-2026-05-28-codegraph-probe-결과 §4.2 (reference-lens trust 모델 SSOT)
 - DEC-2026-06-06-analysis-exit-gate (soft gate #0)
 - `.claude/plans/research-reverse-engineering-carve.md` (3신호 적격 / 2신호 부적격 근거)
+- DEC-2026-06-18-fe-dogfood-cycle6 (cycle6 — monorepo scope-root, external hub suppress, markdown excludes, minimal grep-graph 입력, SCC confirmatory·sink app-scale 한계 정정)

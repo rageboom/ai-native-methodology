@@ -30,11 +30,14 @@ FE 의 client state + server state cache shape 추출.
    - `id` = `FSM-FE-<DOMAIN>-NNN` 패턴 / `name` / `scope` = page|component|feature|global
    - `initial` + `states`(+ transition) / `scxml_compliant`·`xstate_compatible`·`primary_source_type` 플래그
    - **전이 grounding 은 `source_ref` 로** — transition 객체(`{target,guard,actions}`)는 그 전이를 일으키는 코드 anchor 를 `source_ref`(file:line 또는 file:line-line, 예: `useChangedRouteEffect.ts:11`)로 적는다. `actions` 문자열에 `(file:line)` 을 끼워넣지 말 것 — anchor 는 queryable 한 `source_ref` 필드로 분리한다. (`machines.source_files[]` 는 머신 단위 anchor, `source_ref` 는 전이 단위.)
+   - **canvas/imperative 위젯 내부 상태 = React 외부 진실 → `imperative:true` + `widget_lib` + finding 의무** — RealGrid·AG-Grid 등 canvas 위젯은 row-lifecycle(예: RowState CREATED/DELETED/NONE)을 `dataProvider`/`gridView` 안에서 명령형으로 보유하며, 이는 React 상태가 아닌 위젯 내부 진실이다(`getRowState`/`setRowState`/`removeRow`/`getCurrent` 호출이 신호). 이런 머신은 `primary_source_type=dom_state` 로 잡되 `imperative:true` + `widget_lib`(예: `realgrid`)을 함께 표기해, `states`(SCXML atomic)로 flatten 됐을 때 React-internal 머신과 한 표현으로 뭉뚱그려져 분산-진실 신호가 사라지는 것을 막는다. canvas 위젯 내부 진실은 `_base-log-finding` 으로 finding 등재 후 (6단계) `related_findings[]` 로 링크할 의무.
+   - **RHF value-bag(getValues/setValue 만) → `primary_source_type=mixed` + form_state 머신 분리 금지** — react-hook-form 이 `register`/`handleSubmit`/`formState`/validation 없이 `getValues`/`setValue` 만 쓰여 transient 입력 버퍼로만 동작하고, 검색조건 등 진짜 진실은 client_state(Zustand/Redux store)에 `setState` 로 복사돼 query key 까지 그 store 로 구성되면, RHF 는 독립 진실이 아니다. 이 경우 흐름 머신은 `primary_source_type=mixed`(client_state+form-buffer 결합)로 잡고 별도 `form_state` 머신으로 분리하지 않는다(mixed 이므로 6단계 finding 등재 의무 그대로 적용). `form_state` source 의 `detected` 는 RHF 존재로 true 를 유지하되 진실 귀속은 client_state 임을 머신 분류로 표현한다.
 5. **Server state cache key + openapi 매핑** — `useQuery(['users', id])` cache key + 응답 shape ↔ 어느 endpoint 와 정합
 6. **`cross_links` 작성 + mixed→finding 의무** — machine ↔ 타 산출물 link: `to_artifact` = ui-spec|api|rules|domain|antipatterns|state-map|findings / `link_type` = implements|derives_from|validates|triggers|depends_on. machine 간 의존은 `to_artifact=state-map` + `to_id=FSM-FE-*`.
    - **`primary_source_type=mixed` 머신은 finding 등재 의무** — 2+ source 결합(분산 진실 위험)인 머신은 반드시 `_base-log-finding` 으로 finding(F-XXX)을 등재한다. `meta.warnings` 나 `human_review_required` side-channel 에 흘리지 말 것.
    - **finding 링크 방법 (2 경로, 둘 다 additive)** — (a) 머신에 `related_findings:["F-XXX", ...]` 직접 링크 (machine 단위 / `^F-` 패턴), 그리고/또는 (b) `cross_links` 에 `{to_artifact:"findings", to_id:"F-XXX", link_type:"depends_on"}` 등재 (cross_links grep / dep-graph 탐색용). `related_apis` + `cross_links` 의 기존 dual idiom 과 동일.
 7. **`validation_summary` + `trust_step` 기록** — drift-validator FE 실행 여부 / `scxml_export_validated`(XState SCXML import 시도 = 단계 5 진짜 도구 검증). 미실행 시 `false` + `meta.warnings` 에 정직 기록(미실행을 real 로 위장 ❌).
+   - **XState SCXML import 러너 부재 시 `scxml_export_validated=false` 고정 + 단계 4 이하** — 추출 환경에 XState 패키지/SCXML 변환 러너가 프로비저닝되지 않았으면(예: `@xstate` 미설치) `machines` 의 SCXML 호환을 실제 import 로 입증할 수 없다. 이때 `scxml_export_validated` 는 `false` 로 고정하고 `meta.warnings` 에 러너 부재를 적으며, `scxml_compliant`/`xstate_compatible` 가 수기 판단인 만큼 `trust_step` 은 단계 5(진짜 도구 검증)에 도달하지 않은 것으로 보고 단계 4 이하로 둔다. 러너 없이 `scxml_export_validated=true` 로 단계 5 를 위장하지 말 것(`no_visual_capture`/`no_a11y_runner` 의 도구-부재 정직 신호와 대칭).
 8. **state-map.json 작성** — `schemas/state-map.schema.json` (required = `meta` / `state_sources` / `machines`)
 
 ## 산출물
@@ -47,3 +50,4 @@ FE 의 client state + server state cache shape 추출.
 - 정책: `methodology-spec/workflow/ui.md`
 - schema: `schemas/state-map.schema.json`
 - ADR: ADR-FE-006 (framework-neutral IR 4계층)
+- DEC-2026-06-18-fe-dogfood-cycle6 (cycle6 — imperative dom_state widget + RHF value-bag 분류 + scxml 러너 부재 정직)

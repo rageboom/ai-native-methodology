@@ -159,8 +159,13 @@
                 "vue_defineProps_macro",
                 "angular_decorator",
                 "angular_observable",
-                "rxjs_import"
-              ]
+                "rxjs_import",
+                "mui_sx_props",
+                "mui_component_import",
+                "design_system_ref",
+                "ui_library_type"
+              ],
+              "description": "coupling 사유. react_*/vue_*/angular_*/rxjs_=core-framework coupling. mui_sx_props=MUI SxProps 참조 / mui_component_import=@mui/* 컴포넌트 타입 import / design_system_ref=wrapped UI-library 타입(@sg/ui-bo RealGridRef 등) / ui_library_type=기타 UI-library 타입 catch-all. UI-library coupling 은 core-framework 와 migration cost 가 다르므로 분리 표기."
             }
           },
           "source_file": { "type": "string" },

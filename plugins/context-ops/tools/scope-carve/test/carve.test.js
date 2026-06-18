@@ -126,6 +126,56 @@ test('hotspot computed (churn×complexity) when git + readFileFn present; mirror
 	assert.equal(withHot.co_change.file_churn, undefined);
 });
 
+test('modules[].external=true hub suppressed from hub_warning candidates', () => {
+	// MOD-HUB has high Ca (3 dependents) → would be a hub_warning; mark it external.
+	const archExt = {
+		modules: [
+			{ id: 'MOD-HUB', external: true },
+			{ id: 'MOD-X' },
+			{ id: 'MOD-Y' },
+			{ id: 'MOD-Z' },
+		],
+		dependencies: [
+			{ from: 'MOD-X', to: 'MOD-HUB' },
+			{ from: 'MOD-Y', to: 'MOD-HUB' },
+			{ from: 'MOD-Z', to: 'MOD-HUB' },
+		],
+	};
+	const r = buildCarve({
+		architectureRaw: JSON.stringify(archExt),
+		architecture: archExt,
+		architecturePath: '/tmp/architecture.json',
+		params: DEFAULT_PARAMS,
+		nowIso: '2026-06-09T00:00:00.000Z',
+	});
+	// MOD-HUB is a Martin hub but external → not surfaced as hub_warning
+	const hubWarnings = r.carve_candidates.filter((c) => c.kind === 'hub_warning');
+	assert.ok(!hubWarnings.some((c) => c.members.includes('MOD-HUB')));
+});
+
+test('scope_root auto-defaults to common path-prefix of modules[].path', () => {
+	const archPaths = {
+		modules: [
+			{ id: 'MOD-A', path: 'apps/gea/featureA/a.ts' },
+			{ id: 'MOD-B', path: 'apps/gea/featureB/b.ts' },
+		],
+		dependencies: [{ from: 'MOD-A', to: 'MOD-B' }],
+	};
+	const r = buildCarve({
+		architectureRaw: JSON.stringify(archPaths),
+		architecture: archPaths,
+		architecturePath: '/tmp/architecture.json',
+		params: DEFAULT_PARAMS,
+		nowIso: '2026-06-09T00:00:00.000Z',
+	});
+	assert.equal(r.params.co_change.scope_root, 'apps/gea');
+});
+
+test('scope_root stays null when modules have no path (repo-wide preserved)', () => {
+	const r = build();
+	assert.equal(r.params.co_change.scope_root, null);
+});
+
 test('result_hash deterministic + independent of timestamp', () => {
 	const a = build({ nowIso: '2026-06-09T00:00:00.000Z' });
 	const b = build({ nowIso: '2027-01-01T12:34:56.000Z' });

@@ -91,7 +91,11 @@
           },
           "namespace": {
             "type": "string",
-            "description": "feature / domain namespace (선택)."
+            "description": "feature / domain namespace (선택). registration_model=single_merged 일 때는 런타임 ns(예: 'translation')를 의미 — 논리 BC grouping 은 logical_namespace 로 분리 기록."
+          },
+          "logical_namespace": {
+            "type": "string",
+            "description": "논리(logical) namespace — key prefix 가 표현하는 BC grouping (예: 'gea.healium.status'). 런타임 namespace 태그(namespace 필드)와 구분되는 별도 축. registration_model=single_merged 인 도메인(여러 논리 ns 가 단일 런타임 ns 로 병합)에서 namespace='translation'(런타임 진실) 과 logical_namespace='gea.healium.status'(key 경로 BC) 를 동시에 기록할 수 있다. single_merged 가 아니면 namespace 와 동일할 수 있어 생략 가능."
           },
           "manual_pluralization": {
             "type": "boolean",
@@ -164,7 +168,13 @@
         "total_translations": {"type": "integer", "minimum": 0},
         "missing_per_locale": {
           "type": "object",
-          "additionalProperties": {"type": "integer", "minimum": 0}
+          "additionalProperties": {"type": "integer", "minimum": 0},
+          "description": "locale 별 부재(absent) key 수 — 해당 locale 카탈로그에 key 자체가 없는 경우. 값이 default 와 byte-identical 인 '미번역 placeholder' 는 key 가 존재하므로 여기에 세지 말 것(untranslated_per_locale 사용)."
+        },
+        "untranslated_per_locale": {
+          "type": "object",
+          "additionalProperties": {"type": "integer", "minimum": 0},
+          "description": "locale 별 미번역(untranslated) placeholder key 수 — key 는 존재하나 message 가 default_locale message 와 byte-identical 한 경우(번역이 채워지지 않은 채 원문 복사). missing_per_locale(부재 key) 와 구분되는 별도 신호 — key-set parity 는 통과하나 값이 미번역인 상태를 missing 으로 뭉개지 말 것."
         },
         "mf2_used": {"type": "boolean"},
         "mf1_fallback_present": {

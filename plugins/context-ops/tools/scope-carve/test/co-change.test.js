@@ -112,6 +112,49 @@ test('not_run when gitRunner missing', () => {
 	assert.equal(r.status, 'not_run');
 });
 
+test('scope_root appends `-- <path>` pathspec to git log args', () => {
+	let captured = null;
+	mineCoChange({
+		gitRunner: (args) => {
+			captured = args;
+			return fakeLog([{ sha: 'c1', files: ['apps/gea/a.js', 'apps/gea/b.js'] }]);
+		},
+		params: { ...PARAMS, scope_root: 'apps/gea' },
+	});
+	assert.ok(captured.includes('--'));
+	assert.equal(captured[captured.indexOf('--') + 1], 'apps/gea');
+});
+
+test('no pathspec appended when scope_root absent (repo-wide preserved)', () => {
+	let captured = null;
+	mineCoChange({
+		gitRunner: (args) => {
+			captured = args;
+			return fakeLog([{ sha: 'c1', files: ['a.js', 'b.js'] }]);
+		},
+		params: PARAMS,
+	});
+	assert.ok(!captured.includes('--'));
+});
+
+test('DEFAULT_PATH_EXCLUDES filters methodology markdown (docs md / .claude plans / work-log)', () => {
+	const r = mineCoChange({
+		gitRunner: runnerOf([
+			{ sha: 'c1', files: ['src/a.js', 'docs/guide.md'] },
+			{ sha: 'c2', files: ['src/a.js', '.claude/plans/plan-x.md'] },
+			{ sha: 'c3', files: ['src/a.js', 'docs/specs/EAM-1/work-log.md'] },
+			{ sha: 'c4', files: ['src/a.js', 'src/b.js'] },
+		]),
+		params: PARAMS, // path_excludes undefined → DEFAULT_PATH_EXCLUDES
+	});
+	// markdown noise excluded → churn only counts real source files
+	assert.equal(r.file_churn['docs/guide.md'], undefined);
+	assert.equal(r.file_churn['.claude/plans/plan-x.md'], undefined);
+	assert.equal(r.file_churn['docs/specs/EAM-1/work-log.md'], undefined);
+	assert.ok(r.file_churn['src/a.js'] >= 1);
+	assert.ok(r.file_churn['src/b.js'] >= 1);
+});
+
 test('deterministic — identical pairs across runs', () => {
 	const commits = [
 		{ sha: 'c1', files: ['z.js', 'a.js', 'b.js'] },

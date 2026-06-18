@@ -10,6 +10,40 @@
 
 ---
 
+## [0.60.0] — 2026-06-18 — MINOR — mis-fe-admin FE dogfood cycle 6: 3rd FE 도메인(apps/gea/healium) 신규 harvest → 38건 반영 (real a-priori 11 + design 27)
+
+cycle5 로 carry queue 청산 후 첫 **신규 harvest**. 3rd FE 도메인 = `apps/gea/healium`(react-hook-form + zustand + @sg/ui-bo/real-grid + react-i18next, 7 feature slice) — apps/common 이 thin(0 forms / 0 real grids)해 corroborate 못 하던 §8.1 carry 를 정면 exercise. Workflow(produce 9 deliverable 전부 schema-valid → 59 finding → 적대검증 59 skeptic vs dev v0.59.0): **real 11 · design 29 · false_positive 7 · stale 12** (cycle3 stale 10 / cycle4 FP 7 처럼 over-claim 필터 재현). 사용자 design 결단 = 전부 추천 채택 + 정책 4 fork 확정. **전부 optional·additive**(enum APPEND / 신규 필드 optional / 기존 valid 산출물·bundled example 무파손). SSOT: `DEC-2026-06-18-fe-dogfood-cycle6`.
+
+> **scope-carve carry #1 결판**: Tarjan SCC=0 기여는 acyclic feature-sliced FE 에서 CONFIRM(confirmatory not generative), 그러나 Martin sink→clean_seam 은 eam 단일슬라이스 "8/9 공허"였던 게 gea 앱스케일(23 sibling feature)에서 **12/12 지배 useful 신호로 INVERT(REFUTE)** — 단일도메인 과적합 재입증.
+
+### Added — schema 채널 (전부 optional·additive)
+- **type-spec**: `framework_coupling_reasons` enum 에 `mui_sx_props`/`mui_component_import`/`design_system_ref`/`ui_library_type` APPEND (core-framework vs UI-library coupling 분리).
+- **state-map**: `machines[].imperative`(bool) + `machines[].widget_lib` — RealGrid RowState 류 imperative grid dom_state FSM (carry state-map-03 CONFIRM).
+- **i18n-spec**: `summary.untranslated_per_locale` (en==ko byte-identical untranslated placeholder, missing 과 구분) + `resources[].logical_namespace` (single_merged 의 key-prefix logical ns vs runtime ns).
+- **a11y-spec**: `not_assessable[].requires_tier` enum 에 `manual_expert_audit`/`vendor_dom_mirror` APPEND (canvas grid = no automation tier).
+- **form-validation-spec**: `source_libraries.library`/`source_format` enum 에 `custom_store` APPEND + `validations[].validator_ref`(중앙 공유 validator 심볼) + `validations[].declarative_only`(bool) + `validations[].runtime_executable`(UI-lib silent constraint 구분).
+- **visual-manifest**: `deliverable_value=metadata_only` 플래그 (snapshot 캡처 도구 부재 시).
+- **scope-carve**: `params.co_change.scope_root`(optional / 산출물 emit). (input `modules[].external` honored = 아래 tool 코드 항목.)
+
+### Changed — tool 코드 (scope-carve / 신규테스트 6 + 기존 38 = carve 44/44 GREEN)
+- **`--scope-root <path>`** 신설 (`carve.js`·`cli.js`·`co-change.js`): git co-change/hotspot VCS 신호를 carve 서브트리로 scope(monorepo 1앱 carve 시 cross-app noise 71% pair / 53% hotspot 제거). architecture.json modules[].path 공통 prefix 자동 default(공유 시).
+- **`DEFAULT_PATH_EXCLUDES`** 확장: `docs/**/*.md`·`**/.claude*/plans/**`·`**/work-log.md` (AI-native repo 의 methodology markdown churn noise / carry F8 동작 confirm 위 확장).
+- **`modules[].external`** suppression: @sg/* vendor 패키지가 Martin hub_warning 에 app-owned hub 로 오염되던 것 차단.
+
+### Changed — SKILL 가이드 (FE 행동 정합)
+- **form-validation**: RHF 가 resolver 없이 import + register/control 부재면 value-bag → "Schema 추출" 무대상 → imperative guard / shared validator store / declarative config 로 pivot. numeric predicate(int/positive/…)는 Zod number chain 한정(regex 재확장 금지). UI-lib silent constraint(maxLength)는 framework_coupled + runtime_executable=false 로 기록·br_auto_extraction 제외. static_extraction 은 AST 툴 부재 시 −5%p 없이 수용. package.json 미사용 validation lib 의 detected=false phantom = adoption gap 문서화 의도.
+- **state-map**: RHF value-bag(getValues/setValue only)는 primary_source_type=mixed + form_state machine 분리 금지. scxml_export_validated 는 XState SCXML 러너 부재 시 false 고정(단계5 위장 차단).
+- **a11y**: RealGrid/canvas 는 not_assessable[] 귀속, runtime axe 도 upgrade 못 함(a11y tree≠canvas pixel). static_heuristic vocab 에 tabindex-no-positive/control-has-associated-label/anchor-is-valid 추가.
+- **i18n**: host-global empty source_files≠orphan 을 cross-BC + cross-APP(다른 MF remote) borrow 까지 확장.
+- **type-spec**: state lib(zustand) state interface 는 exported_only=false 또는 create<T> type arg 항상 capture.
+- **visual-manifest**: snapshot 도구 미감지 시 pre-flight gate. snapshots 빈 경우 cross_links N/A. 비반응형 admin 1-entry viewport_matrix 정상. token home = ui-spec.design_tokens SSOT(cycle4 A안 3rd 도메인 CONFIRMED-RESOLVED).
+- **ui-spec** (`_base-apply-template`): codegraph cross-check 는 TSX 에서 kind IN (function)+%.tsx(kind=component=arrow-fn 함정). RHF import=검증 necessary-not-sufficient. single-route CRUD user_flow self-loop→전이는 state-map FSM 귀속. producer-skill 부재 RESOLVED. token-consuming BC consistency_score = hardcoded-hex/inline-px 측정.
+- **characterization**: FE-only(BE 선행산출물 부재) degrade — 차단 대신 code-grounded BR-/AP- 합성 id + data_source_status=code_only. 소표본(<10) named_classified_ratio 미달은 ambiguous_carry 명시 시 WARN. 한국어 라벨 SATD grep noise 주의. when=string 이 FE 멀티핸들러 체인에 충분.
+
+### Notes
+- trust 불변: codegraph reference-lens / 결정적 gate inject ❌ (DEC-2026-05-28 §4.2). scope-carve = reference-lens(gate inject ❌).
+- carry(cycle7+): type-spec `extraction_completeness`(1도메인 → 2nd corroborate 후 격상) / i18n-spec-05(healium-search.json empty catalog) = 소비자 gea 코드 정리 대상.
+
 ## [0.59.0] — 2026-06-17 — MINOR — mis-fe-admin FE dogfood cycle 5: cycle4 carry queue 11건 청산 (design 9 + validator TDD 2)
 
 cycle4(v0.56/0.57)가 §8.1 2nd-도메인(apps/common)으로 한 차례 거른 carry 11건을 청산. **편집 전 dev v0.57.0 소스 재대조 + 독립 적대검증**(12-agent: 6 ground → 6 adversarial-verify) 결과 **11건 전부 real 확정 (stale 0 · false_positive 0)** — 이미 over-claim 을 거른 carry 라 정제도가 높음(cycle3 stale 10 / cycle4 FP 7 과 대조). **전부 additive-safe**(기존 valid 산출물·bundled example 무파손). 사용자 design 결단 = 전부 추천 채택. SSOT: `DEC-2026-06-17-fe-dogfood-cycle5`.

@@ -67,7 +67,8 @@
             "window": { "type": ["integer", "null"], "minimum": 1, "description": "최근 N commit 으로 제한 (null = 전체 / cold-start·이력 편향 제어)." },
             "max_transaction_size": { "type": "integer", "minimum": 2, "description": "이 파일 수 초과 commit 제외 (tangled commit 결합 inflate 회피)." },
             "since": { "type": ["string", "null"], "description": "git --since 시점 제한 (null = 무제한)." },
-            "path_excludes": { "type": "array", "items": { "type": "string" }, "description": "co-change/hotspot 입력에서 제외할 glob (lockfile/deploy/CI/build/generated). infra noise 가 support·churn 을 inflate 해 top-N 점유하는 것 방지 (F-DOGFOOD-FE-NOISE). 미지정 = 기본 제외목록 / [] = 제외 없음." }
+            "scope_root": { "type": ["string", "null"], "description": "git log 를 `-- <path>` pathspec 으로 제한할 subtree (monorepo 의 한 앱만 carve). co-change pair·churn 양쪽이 그 subtree 로 정조준 (SCC·Martin 은 architecture.json scope 라 이미 subtree / git 신호만 repo-wide 였던 비대칭 해소). null = repo-wide (미제한). 미지정 시 architecture.json modules[].path 공통 prefix 가 있으면 그 값으로 자동 default." },
+            "path_excludes": { "type": "array", "items": { "type": "string" }, "description": "co-change/hotspot 입력에서 제외할 glob (lockfile/deploy/CI/build/generated/methodology-markdown). infra·문서 noise 가 support·churn 을 inflate 해 top-N 점유하는 것 방지 (F-DOGFOOD-FE-NOISE). 미지정 = 기본 제외목록 / [] = 제외 없음. project-level 추가 제외는 cli `--exclude <glob>` (반복가능)." }
           }
         },
         "martin_thresholds": {

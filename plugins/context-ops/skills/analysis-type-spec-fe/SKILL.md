@@ -32,12 +32,14 @@ TypeScript 코드베이스의 type 정의 → type-spec.json + framework_neutral
    - `unresolved` — 해소 불가 (이름만 알고 출처 미상)
 
    > ⚠️ 외부 참조(`external_workspace` / `node_module`)는 본 scope 에서 정의·중립화할 수 없으므로, 보고하는 어떤 resolved-ratio (해소율) 산정에서도 **분모에서 제외**한다.
+
+   > ⚠️ **state 라이브러리 caveat** — zustand / redux 등의 store state interface 는 `create<T>()` / `configureStore` 의 타입 인자로만 존재하고 export 되지 않는 경우가 많다. `scope.exported_only` 기본값(true)으로 추출하면 이런 store state 타입이 조용히 누락된다. state 라이브러리가 감지되면 `scope.exported_only=false` 로 추출하거나, 적어도 `create<T>` / `configureStore` 의 type 인자는 un-exported 여도 항상 capture 한다(state-map 의 client_state 진실원과 cross-link 되는 핵심 타입이므로 누락 시 IR 공백).
 3. **Framework neutrality score 정량** — type 의 framework coupling 정도:
    - 0 = pure data (e.g., `User { id, email }`)
    - 0.5 = mild coupling (TanStack Query type 의 일부)
    - 1.0 = full coupling (React component props with hooks)
    - **분모 라벨 (`summary.framework_neutrality_basis`)** — `framework_neutrality_score` 의 정의는 그대로 유지하되, 분모를 명시하는 보조 label 을 단다. `all_types` (기본) = 전체 추출 타입 / `scope_internal_only` = 외부(external_workspace/node_module) 제외한 scope-내부 타입만. monorepo 에서 외부 참조 타입이 분모를 비대표적으로 왜곡할 때 `scope_internal_only` 로 명시하고 `summary.scope_internal_type_count` 에 representable 분모(외부 제외 타입 수)를 기록한다.
-4. **Coupling 사유 enum 분류** (`types[].framework_coupling_reasons` / `schemas/type-spec.schema.json` enum 정합 — snake_case 8종):
+4. **Coupling 사유 enum 분류** (`types[].framework_coupling_reasons` / `schemas/type-spec.schema.json` enum 정합 — snake_case). core-framework coupling (React/Vue/Angular/RxJS):
    - `react_fc_import`
    - `react_node_import`
    - `react_props_pattern`
@@ -47,7 +49,13 @@ TypeScript 코드베이스의 type 정의 → type-spec.json + framework_neutral
    - `angular_observable`
    - `rxjs_import`
 
-   > ⚠️ schema enum 은 snake_case. kebab-case(`jsx-element` 등)로 emit 하면 validation 실패. step 5 인라인 예시(`react_props_pattern`)와 동일 표기.
+   UI-library coupling (core-framework 과 migration cost 가 달라 분리 표기):
+   - `mui_sx_props` — MUI `SxProps` 참조
+   - `mui_component_import` — `@mui/*` 컴포넌트 타입 import
+   - `design_system_ref` — wrapped UI-library 타입 (예: `@sg/ui-bo` 의 `RealGridRef`)
+   - `ui_library_type` — 기타 UI-library 타입 (catch-all)
+
+   > ⚠️ schema enum 은 snake_case. kebab-case(`jsx-element` 등)로 emit 하면 validation 실패. step 5 인라인 예시(`react_props_pattern`)와 동일 표기. UI-library 종속은 React/Vue 코어 종속과 별개 사유로 기록해 신규 스택 재추출 시 migration 영향을 분리 평가한다.
 5. **type-spec.json 작성** — `schemas/type-spec.schema.json` (required = `meta` / `types` / `summary`. `framework_neutrality_score`·`framework_coupled_count`·`captured_by` 는 `summary` 하위 / `framework_coupling_reasons` 는 `types[]` 하위):
    ```json
    {
@@ -74,3 +82,4 @@ TypeScript 코드베이스의 type 정의 → type-spec.json + framework_neutral
 - 정책: methodology-spec/deliverables/15-type-spec.md
 - schema: schemas/type-spec.schema.json
 - ADR: ADR-FE-006 (framework-neutral IR 4계층)
+- DEC-2026-06-18-fe-dogfood-cycle6 (cycle6 — UI-library coupling enum 분리 + state-lib exported_only caveat)

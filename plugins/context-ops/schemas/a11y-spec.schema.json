@@ -136,8 +136,8 @@
           },
           "requires_tier": {
             "type": "string",
-            "enum": ["axe_core_real", "pa11y_real", "lighthouse_a11y_real"],
-            "description": "판정에 필요한 상위 tier (선택)."
+            "enum": ["axe_core_real", "pa11y_real", "lighthouse_a11y_real", "vendor_dom_mirror", "manual_expert_audit"],
+            "description": "판정에 필요한 상위 tier (선택). axe_core_real/pa11y_real/lighthouse_a11y_real = DOM/a11y-tree 를 읽는 자동 runtime tier (상위 자동화로 escalate). vendor_dom_mirror = 위젯 벤더가 제공하는 hidden DOM mirror/aria 표면(있을 때만) 으로만 판정 가능. manual_expert_audit = 어떤 자동 tier 도 판정 불가 — 수동 전문가 검수 필요(terminal). canvas 로 그려지는 위젯(예: RealGrid/AG-Grid 그리드 본체)은 a11y tree 가 없어 세 자동 tier 모두 영구 not_assessable 이므로 manual_expert_audit(또는 벤더 DOM mirror 가 있으면 vendor_dom_mirror)로 기록한다."
           }
         }
       }

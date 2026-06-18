@@ -41,6 +41,7 @@ function parseArgs(argv) {
 		else if (a === '--output') opts.output = argv[++i];
 		else if (a === '--stdout') opts.stdout = true;
 		else if (a === '--since') opts.co.since = argv[++i];
+		else if (a === '--scope-root') opts.co.scope_root = argv[++i];
 		else if (a === '--min-support') opts.co.min_support = Number(argv[++i]);
 		else if (a === '--min-confidence') opts.co.min_confidence = Number(argv[++i]);
 		else if (a === '--window') opts.co.window = Number(argv[++i]);
@@ -77,6 +78,9 @@ function usage() {
 		'    [--exclude <glob> (반복가능, 기본목록에 추가)] [--no-default-excludes (제외 끔)]',
 	);
 	console.error(
+		'    [--scope-root <path> (monorepo 1앱 carve 시 git log 를 -- <path> 로 제한 / 미지정 시 modules[].path 공통 prefix 자동)]',
+	);
+	console.error(
 		'  (architecture.json 부재 시 exit 3 / no-simulation — reference-lens / NOT gate-injected)',
 	);
 }
@@ -85,6 +89,7 @@ function buildReproCommand(opts) {
 	const parts = [`scope-carve --architecture ${opts.architecture}`];
 	if (opts.repo) parts.push(`--repo ${opts.repo}`);
 	if (opts.co.since) parts.push(`--since ${opts.co.since}`);
+	if (opts.co.scope_root) parts.push(`--scope-root ${opts.co.scope_root}`);
 	parts.push(`--min-support ${opts.co.min_support}`);
 	parts.push(`--min-confidence ${opts.co.min_confidence}`);
 	if (opts.co.window) parts.push(`--window ${opts.co.window}`);

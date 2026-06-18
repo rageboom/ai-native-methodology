@@ -34,10 +34,11 @@
               "class_validator",
               "ajv",
               "vest",
+              "custom_store",
               "manual",
               "unknown"
             ],
-            "description": "Zod = primary 권장 (ADR-FE-005 매개체 13). class_validator = NestJS BE+FE 양쪽 사용 가능."
+            "description": "Zod = primary 권장 (ADR-FE-005 매개체 13). class_validator = NestJS BE+FE 양쪽 사용 가능. custom_store = 중앙 공유 validation store/util (예: zustand 기반 validationCheckStore.actions.checkValues/checkDateRange) — 검증 라이브러리 미사용·앱 자체 공유 validator 가 지배 패턴인 경우."
           },
           "library_version": { "type": "string" },
           "detected": { "type": "boolean" },
@@ -123,9 +124,14 @@
               "class_validator",
               "ajv",
               "vest",
+              "custom_store",
               "manual"
             ],
-            "description": "추출 source library."
+            "description": "추출 source library. custom_store = 중앙 공유 validation store/util (예: useValidationCheckStore.actions.checkDateRange)."
+          },
+          "validator_ref": {
+            "type": "string",
+            "description": "중앙 공유 validator 심볼 참조 (예: 'useValidationCheckStore.actions.checkDateRange'). source_format=custom_store 시 일회성 inline manual 검사와 구분하기 위해 채움. dedup / per-validator 그룹핑에 사용."
           },
           "source_file": { "type": "string" },
           "source_line": { "type": "integer", "minimum": 1 },
@@ -141,7 +147,11 @@
           },
           "runtime_executable": {
             "type": "boolean",
-            "description": "runtime executable 여부 (Zod parse() / Yup validate() 등). true 시 framework-neutral 활용 가능."
+            "description": "runtime executable 여부 (Zod parse() / Yup validate() 등). true 시 framework-neutral 활용 가능. UI-library silent constraint (MUI inputProps.maxLength / RealGrid editor maxLength) 는 false."
+          },
+          "declarative_only": {
+            "type": "boolean",
+            "description": "선언적 UI marker 여부 (예: ConditionForm field config 의 isRequired:true → '*' 표시). true = 선언만 됨(실행 강제 아님). 선언 marker 와 이를 강제하는 enforcing call 은 1 row 로 합치되 source_line=enforcing call, declarative marker=note 로 기록."
           }
         }
       }

@@ -59,6 +59,13 @@ export const DEFAULT_PATH_EXCLUDES = [
 	'**/node_modules/**',
 	'**/*.generated.*',
 	'**/generated/**',
+	// methodology/planning markdown — AI-native repo 의 spec/plan/work-log churn 이
+	//   코드와 동반 변경되어 co-change·hotspot 을 inflate(F8 후속). 코드 논리결합 아닌 문서 noise.
+	//   (locale·일반 config 는 여전히 보존 — i18n↔component 진짜 결합. markdown 만 추가 배제.)
+	'docs/**/*.md',
+	'**/docs/**/*.md',
+	'**/.claude*/plans/**',
+	'**/work-log.md',
 ];
 
 // glob → RegExp (anchored). `**/` = 0+ 디렉토리 / `**` = 임의 / `*` = 슬래시 제외 임의.
@@ -100,6 +107,11 @@ export function mineCoChange({ gitRunner, params }) {
 	try {
 		const args = ['log', '--no-merges', '--name-only', `--format=${SEP}%H`];
 		if (params.since) args.push(`--since=${params.since}`);
+		// scope_root pathspec: monorepo 의 한 앱(subtree)만 carve 할 때 git log 를
+		//   `-- <path>` 로 제한 = co-change pair·churn 양쪽이 해당 subtree 로 정조준
+		//   (SCC·Martin 은 architecture.json scope 라 이미 subtree, git 신호만 repo-wide 였던 비대칭 해소).
+		//   '--' 구분자로 ref 와 pathspec 분리.
+		if (params.scope_root) args.push('--', params.scope_root);
 		out = gitRunner(args);
 	} catch (err) {
 		return {
@@ -206,6 +218,6 @@ export function mineCoChange({ gitRunner, params }) {
 		transactions_analyzed: txns.length,
 		pairs,
 		file_churn: fileChurnObj,
-		note: `git log 이력 mining (commit ${commits.length}건 중 max_tx_size<=${params.max_transaction_size} 통과 ${txns.length}건 / min_support>=${params.min_support} / min_confidence>=${params.min_confidence}${params.window ? ` / window=${params.window}` : ''}${params.since ? ` / since=${params.since}` : ''}${excludedOccurrences ? ` / path-excludes: ${excludedOccurrences} occurrence 제외(generated/infra noise)` : ''}).`,
+		note: `git log 이력 mining (commit ${commits.length}건 중 max_tx_size<=${params.max_transaction_size} 통과 ${txns.length}건 / min_support>=${params.min_support} / min_confidence>=${params.min_confidence}${params.window ? ` / window=${params.window}` : ''}${params.since ? ` / since=${params.since}` : ''}${params.scope_root ? ` / scope-root=${params.scope_root} (subtree pathspec 제한)` : ''}${excludedOccurrences ? ` / path-excludes: ${excludedOccurrences} occurrence 제외(generated/infra noise)` : ''}).`,
 	};
 }

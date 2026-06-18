@@ -21,6 +21,7 @@ export const DEFAULT_PARAMS = {
 		window: null,
 		max_transaction_size: 30,
 		since: null,
+		scope_root: null,
 		path_excludes: DEFAULT_PATH_EXCLUDES,
 	},
 	martin_thresholds: {
@@ -41,6 +42,26 @@ function sha256(s) {
 	return createHash('sha256').update(s).digest('hex');
 }
 
+// modules[].path 들의 공통 디렉토리 prefix (segment 단위). scope_root 자동 default 산출용.
+//   모든 path 가 같은 앱 subtree(예: apps/gea/*) 에 있으면 그 디렉토리(apps/gea)를 반환.
+//   path 0개 / 공통 prefix 없음 = null (repo-wide 유지 / 비대칭 미발생).
+function commonPathPrefix(paths) {
+	if (!paths || paths.length === 0) return null;
+	const split = paths.map((p) => p.replace(/\\/g, '/').split('/').filter(Boolean));
+	let prefix = split[0];
+	for (const segs of split.slice(1)) {
+		let i = 0;
+		while (i < prefix.length && i < segs.length && prefix[i] === segs[i]) i++;
+		prefix = prefix.slice(0, i);
+		if (prefix.length === 0) return null;
+	}
+	// 마지막 segment 가 파일명(확장자 보유)일 수 있으니 디렉토리 경계로 환원하지 않고
+	//   공통 디렉토리만 취함: 단일 path 면 그 파일의 디렉토리, 다중이면 공통 디렉토리 prefix.
+	if (split.length === 1) prefix = prefix.slice(0, -1); // 단일 path = 파일명 제거
+	if (prefix.length === 0) return null;
+	return prefix.join('/');
+}
+
 // 안정 직렬화 (키 정렬) — result_hash 결정성.
 function stableStringify(value) {
 	if (value === null || typeof value !== 'object') return JSON.stringify(value);
@@ -49,9 +70,10 @@ function stableStringify(value) {
 	return `{${keys.map((k) => `${JSON.stringify(k)}:${stableStringify(value[k])}`).join(',')}}`;
 }
 
-function synthesizeCandidates({ scc, martin, co, hotspot }) {
+function synthesizeCandidates({ scc, martin, co, hotspot, externalModuleIds }) {
 	const candidates = [];
 	let idx = 0;
+	const external = externalModuleIds || new Set();
 
 	// 1) atomic_unit — multi-node SCC (분할 불가 hard 제약)
 	for (const comp of scc.components) {
@@ -82,8 +104,10 @@ function synthesizeCandidates({ scc, martin, co, hotspot }) {
 	}
 
 	// 3) hub_warning — Martin hub (Ca≥임계 = shared kernel, 쪼개면 파편화)
+	//    external=true(vendor/외부 패키지)는 절대 carve 금지 대상이라 추출-회피 후보로 노출하지 않음(suppress).
 	for (const m of martin) {
 		if (m.role !== 'hub') continue;
+		if (external.has(m.module_id)) continue;
 		candidates.push({
 			index: idx++,
 			kind: 'hub_warning',
@@ -146,11 +170,36 @@ export function buildCarve({
 	durationMs = 0,
 	reproductionCommand = '',
 }) {
-	const modules = (architecture.modules || []).map((m) => m.id);
+	const moduleObjs = architecture.modules || [];
+	const modules = moduleObjs.map((m) => m.id);
 	const edges = (architecture.dependencies || []).map((d) => ({
 		from: d.from,
 		to: d.to,
 	}));
+
+	// modules[].external=true = vendor/외부 패키지(예: @sg/* workspace 의존) — app-owned hub 와
+	//   구분해 hub_warning 에서 suppress(절대 carve 금지 대상이라 추출-회피 후보로 노출 무의미).
+	//   미지정 = 전부 app-internal 취급(기존 동작 보존 / 옵션 read-only).
+	const externalModuleIds = new Set(
+		moduleObjs.filter((m) => m.external === true).map((m) => m.id),
+	);
+
+	// scope_root 기본값: monorepo 의 한 앱만 carve 하나 git 신호는 repo-wide 인 비대칭 해소.
+	//   params.co_change.scope_root 미지정 + app-internal modules[].path 가 공통 prefix 공유 시 그 prefix 로
+	//   git log 를 pathspec 제한(co-change·churn 양쪽). 공통 prefix 없으면 null(repo-wide 유지).
+	//   external 모듈 path 는 다른 트리(packages/* 등)라 prefix 를 깨므로 제외하고 계산.
+	const effectiveCoChange = { ...params.co_change };
+	if (
+		effectiveCoChange.scope_root === undefined ||
+		effectiveCoChange.scope_root === null
+	) {
+		effectiveCoChange.scope_root = commonPathPrefix(
+			moduleObjs
+				.filter((m) => m.external !== true)
+				.map((m) => m.path)
+				.filter((p) => typeof p === 'string' && p),
+		);
+	}
 
 	const scc = tarjanScc({ nodes: modules, edges });
 	scc.note =
@@ -164,7 +213,7 @@ export function buildCarve({
 
 	const co =
 		repoPath && gitRunner
-			? mineCoChange({ gitRunner, params: params.co_change })
+			? mineCoChange({ gitRunner, params: effectiveCoChange })
 			: {
 					status: 'not_run',
 					transactions_analyzed: 0,
@@ -191,6 +240,7 @@ export function buildCarve({
 		martin,
 		co,
 		hotspot,
+		externalModuleIds,
 	});
 	if (behavioral_truncated > 0) {
 		co.note += ` (carve_candidates behavioral_cluster 는 top ${BEHAVIORAL_CLUSTER_CAP} highlight — 전체 ${co.pairs.length} pair 는 co_change.pairs 참조 / ${behavioral_truncated} 추가 미표시.)`;
@@ -237,7 +287,7 @@ export function buildCarve({
 			module_count: modules.length,
 			dependency_edge_count: edges.length,
 		},
-		params,
+		params: { ...params, co_change: effectiveCoChange },
 		scc,
 		martin,
 		co_change: co,

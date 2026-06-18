@@ -20,6 +20,7 @@ baseline → `methodology-spec/policies/no-simulation.md`. (persona 시뮬 = 신
 
 - analysis output 존재 — business-rules.json (phase 4) + antipatterns.json (phase 6 / phase 4 partial)
 - **HARD guard — 선행 산출물 부재 시**: business-rules.json / antipatterns.json 부재 시 BR/AP/UC id 를 **날조 금지**. (a) 산출물을 먼저 생성하거나, (b) 부득이 진행 시 `meta_confidence.warnings` + `intent_vs_bug` 에 `self_fabricated_rule_ids: true` 명시 + 도메인 expert carry(결단 전 chain 진입 ❌). self-coined id 를 analysis SSOT 인 양 표기 ❌.
+  - **FE-only degrade (BE 선행 산출물 자연 부재)**: FE 단독 도메인 (BE business-rules/antipatterns 가 애초에 없는 화면 영역) 에선 차단하지 말고 **code-grounded soft-degrade**. 코드 grep 으로 직접 근거를 잡아 `intent_classification.rule` 을 합성 id (`BR-<DOMAIN>-*` / `AP-<DOMAIN>-*`) 로 생성하되, 각 합성 id 는 `grep_hit` 건수 + 파일경로로 **grounding 의무** (날조 ❌ — 코드가 출처). `data_source_status: "code_only"` + `meta_confidence.warnings` 에 "FE-synthesized rule ids, code-path grounded" 명시. 이 경로는 (b) 의 fabrication-flag (`self_fabricated_rule_ids`) 와 구분된다 — code 근거가 있으면 fabrication 이 아니라 정직한 합성이다.
 - (권장) formal-spec (phase 4.5 / state-machine + decision-table)
 - 도메인 expert 인터뷰 가능 OR carry 명시 의무 (ambiguous > 0 시)
 
@@ -86,6 +87,10 @@ scenarios:
 
 > **realized_in[] (선택 / 보조 multi-anchor 집합)** — rule/behavior 가 여러 파일에 걸쳐 실현될 때 그 추가 코드 anchor 를 **구조화 배열**로 열거한다. snapshot 의 `endpoint` / `controller_method` / `service_method` / `sql_id` 는 여전히 **canonical PRIMARY anchor** (진입점 / 사람이 읽는 단일값) 이고, `realized_in[]` 은 그 외 전체 anchor 집합 (machine-traversable). `service_method: "fnA (a.ts:1) + fnB (b.ts:2)"` 식 free-text '+' concat 을 중단하고, 2번째 이후 파일은 `realized_in[]` 으로 옮긴다. 항목 = `{file (필수), lines?, role?, note?}`.
 
+> **`when` 단일 STRING 비대칭은 FE 멀티핸들러 흐름에도 충분** — `given`/`then` 은 object 이나 `when` 은 단일 자유 서술 STRING (의도된 비대칭). FE 의 긴 핸들러 체인 (예: grid `commitChange` → `getStatedRows` → `mutate`, 또는 여러 `_convert*Targets()` 헬퍼) 도 화살표 압축 한 줄 (`onRowChanged → disableButtons → switch(state) → save()`) 로 서술하면 마찰 없이 수용된다. 단계가 많아 부족하게 느껴지면 `when` 을 object 로 바꾸지 말고 (breaking), cross-file 실현 anchor 는 위 `realized_in[]` 으로 분리한다.
+>
+> **RHF native imperative 검증도 `when` 으로 흡수** — react-hook-form 이 zod/yup resolver 없이 `getValues` + 커스텀 `checkValues`/`checkDateRange` (예: zustand 기반 공유 validation store) 만으로 명령형 검증하는 패턴은 유효하다 (RHF = 선언적 schema validation 가정은 강제 아님). 이때 `when` 에 RHF resolver 대신 실제 명령형 경로 (store action 호출 흐름) 를 그대로 서술하면 된다 — 자유 STRING 이라 imperative 흐름을 무마찰 수용한다. (form-validation-spec 에선 `source_format: "manual"` / `library: "manual"` 로 기록.)
+
 ### 5. coverage matrix + ratchet 정책
 
 ```yaml
@@ -119,6 +124,8 @@ ambiguous > 0 시:
 1. `ambiguous_carry` 배열에 `rule_id` + `carry_owner` (domain_expert / dba / planner / qa) + `carry_reason` 명시 의무
 2. snapshot 의 해당 scenario `behavior_likely_bug` 또는 `behavior_to_preserve` 둘 중 최소 하나 명시
 3. chain 5 (impl-spec GREEN) 진입 ❌ — 결단 전까지 차단
+
+> **소표본 (total < 10 rules) named_classified_ratio**: rule 총수 (br_total + ap_total) 가 10 미만인 작은 도메인에선 정직한 ambiguous 1건만으로도 `named_classified_ratio ≥ 0.80` 이 깨질 수 있다 (예: 9건 중 1 ambiguous = 0.778). 이때 **`ambiguous_carry` 가 명시되어 있으면** ratio 미달은 차단(hard fail)이 아니라 **WARN(medium) 으로 충족**으로 본다 — 정직한 미결단을 carry 로 드러낸 것은 신호이지 결함이 아니다. 절대비율 단독으로 차단하지 않는다 (ambiguous 회피를 유도하므로). 표본이 충분(≥ 10)하거나 carry 누락 시엔 기존 threshold 그대로.
 
 ### 8. characterization-spec.json 작성
 
@@ -178,7 +185,7 @@ phase 4.7 산출물 = chain 1 (discovery-spec) 입력 핵심:
 1. Legacy DB 환경 부재 → `data_source_status: "code_only"` + 도메인 expert carry 의무
 2. ambiguous 분류 회피 → 모든 BR/AP 를 intent/bug 양 극단 분류 시 결단 미뤄질 carry 누락
 3. scenario 수 과다 → 1 UC 당 ≤ 5 scenario 권장
-4. self_recognized grep 누락 (Legacy) → SATD 신호 손실
+4. self_recognized grep 누락 (Legacy) → SATD 신호 손실. 반대로 FE 한국어 라벨 noise 주의 — '임시 저장' 같은 UI 라벨 텍스트가 grep 토큰 ('임시' / '나중에') 에 걸려 SATD false-positive 를 만든다. grep hit 은 후보일 뿐, 코멘트 문맥을 읽어 실제 자조 부채인지 UI 문자열인지 분류 후 처분.
 5. coverage threshold 단일값 강제 → ratchet 옵션 부재 시 legacy 0.43 fail
 6. Gherkin tag 미사용 → traceability 단일축 (intent_classification.type 만)
 
@@ -194,3 +201,4 @@ phase 4.7 산출물 = chain 1 (discovery-spec) 입력 핵심:
 - 결단: DEC-2026-05-07-poc-06-종결
 - 결단: DEC-2026-05-07-poc-06-domain-결단
 - 결단: DEC-2026-05-07-poc-07-poc03-phase7-retrofit
+- DEC-2026-06-18-fe-dogfood-cycle6 (cycle6 — FE-only degrade · 소표본 ratio WARN · FE SATD/when/RHF native 정합)

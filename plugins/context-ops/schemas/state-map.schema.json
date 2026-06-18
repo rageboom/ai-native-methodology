@@ -143,6 +143,14 @@
             ],
             "description": "본 머신의 주요 진실 source. mixed=2개 이상 source 결합 (분산 위험 — finding 등록 의무)."
           },
+          "imperative": {
+            "type": "boolean",
+            "description": "true 시 이 머신의 진실이 React 상태 밖 — canvas/imperative 위젯(RealGrid·AG-Grid 등)의 내부 row-lifecycle FSM(예: RowState CREATED/DELETED/NONE) 처럼 dataProvider/gridView 가 진실을 보유. primary_source_type=dom_state 와 함께 쓰며, machines[].states(SCXML atomic) 로 flatten 됐을 때 React-internal 머신과 뭉뚱그려지지 않도록 분산-진실 신호를 보존한다. canvas 위젯 내부 진실은 finding 등록 의무 (related_findings 링크). optional (기본 false 로 간주)."
+          },
+          "widget_lib": {
+            "type": "string",
+            "description": "imperative=true 인 머신이 진실을 위탁한 위젯 라이브러리 식별자 (예: realgrid, ag-grid). 버전이 신뢰도에 영향 시 'realgrid@2.9.3' 처럼 표기 가능. optional (imperative=false 시 생략)."
+          },
           "initial": {
             "type": "string",
             "description": "초기 상태 ID."

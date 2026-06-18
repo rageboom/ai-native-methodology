@@ -26,6 +26,12 @@
       ],
       "description": "감지된 FE 프레임워크 (ui-spec.schema.json framework enum 정합)."
     },
+    "deliverable_value": {
+      "type": "string",
+      "enum": ["full", "metadata_only"],
+      "default": "full",
+      "description": "산출물 가치 수준. full=실 스냅샷 baseline 포함. metadata_only=캡처 도구 미감지로 snapshots:[] 이고 framework/viewport_matrix/cross-link 메타만 담긴 상태 — 빈 manifest 가 '완료'로 위장하는 것을 막는 정직 플래그. metadata_only 시 confidence 하향 의무."
+    },
     "viewport_matrix": {
       "type": "array",
       "description": "캡처 viewport 매트릭스. 매트릭스 정의 의무 (snapshot 일관성 진실 모델).",
