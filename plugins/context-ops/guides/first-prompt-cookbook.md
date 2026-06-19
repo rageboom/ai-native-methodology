@@ -79,6 +79,26 @@ chain 1 gate 진입 시 chain-driver 가 `br-cross-consistency-validator` Layer 
 
 **timing 분리**: `discovery-from-{analysis-output, figma, swagger, nl-md}` 4종 = **scope 진입 시** UC 추출용. 같은 figma/swagger/NL 소스를 **최초 1회 baseline 수립** 시 쓰려면 `analysis-from-{figma, swagger, prompt, plan-doc}` (analysis stage / Track=FE 등). 두 set 평행 유지 / 다른 timing+책임. `discovery-from-nl-md` = NFR 1차 채널. 자세한 paradigm = `methodology-spec/lifecycle-contract.md` §Input 어댑터 timing 분리.
 
+#### 2.1.1 discovery 가 잘 ground 하는 prompt 쓰는 법 (grounding 레버)
+
+discovery 는 당신 의도를 **실제 존재하는 것**(코드 / 분석 산출물)에 grep 으로 앵커링한다 (`source_grounded_evidence` / `grep_hit_count > 0` 의무 — AI 환각 차단). 그래서 **프로젝트가 실제 쓰는 용어**로 말할수록 기존 노드에 잘 연결되고, 신규 기능은 (없던 노드라) **고립이 아니라 기존에 연결된 새 노드로 태어난다**. 같은 의도라도 아래 6 레버를 챙기면 grounding 품질이 크게 오른다.
+
+| 레버                                       | 약한 prompt          | 강한 prompt (잘 ground)                        |
+| ------------------------------------------ | -------------------- | ---------------------------------------------- |
+| ① 프로젝트 실제 도메인 용어                | "그거 고쳐줘"        | "**주문(Order)**의 **취소(Cancel)**"           |
+| ② actor + entity + trigger (= UC 1단위)    | "취소 개선"          | "**고객이 / 주문을 / 배송 전 부분취소**할 수 있어야" |
+| ③ 비즈니스 규칙 명시                       | "잘 되게"            | "미배송 품목만 취소 / 환불은 원결제수단 원복"  |
+| ④ 기존 연결점 짚기 (cross_link seed)       | (없음)               | "기존 **전체취소(UC-ORDER-003)**와 충돌 없게"  |
+| ⑤ 신규 / 수정 구분                         | 모호                 | "**신규**" 또는 "기존 X **수정**"              |
+| ⑥ 출처 가리키기                            | (없음)               | "swagger `POST /orders/{id}/cancel`" / "기획서 3.2절" / figma 프레임 |
+
+**종합 예시**
+
+- ❌ `"취소 기능 좀 개선해줘"` — ground 단서 빈약 → 얕은 UC 1개.
+- ✅ `"고객이 배송 전 주문을 부분 취소할 수 있게 해줘(신규). 미배송 품목만 취소, 환불은 원결제수단 원복. 기존 전체취소(주문/취소 도메인)랑 충돌 없게."`
+
+**왜 효과 있나**: ② = discovery 가 UC 를 쪼개는 단위(`discovery-decompose-use-cases`: 1 actor + 1 entity + 1 trigger)와 일치 → 깔끔히 1 UC 매핑. ①④⑥ = grep 앵커 제공 → 기존 노드 cross_link 생존(고립 노드 ❌). ③ = `business_rules_intent` → 하류 AC / test 로 흐름. 신규 노드는 discovery 에서 `propose` 로 태어나 gate #1 사람 확인 후 그래프에 박히며, 이후 그 id 로 `chain-driver navigate` 의존성 조회가 가능해진다.
+
 ### 2.2 Chain 2 (spec)
 
 | 자연어 prompt                                               | 발동 skill                                                                      | 산출                                                |
@@ -143,6 +163,8 @@ chain harness gate 통과 의무 검증 (state.json + chain-driver)
 - ❌ "rules 만들어줘" — domain rules / FE rules 가 모호
 - ✅ "비즈니스 규칙 추출" → `analysis-business-rules`
 - ✅ "FE form validation 추출" → `analysis-form-validation-fe`
+
+> Tip 1 = *어떤 skill 이 발동하나* (description 매칭). discovery 가 의도를 *그래프 노드에 얼마나 잘 ground 하나* 는 별개 문제 → grounding 레버는 [§2.1.1](#211-discovery-가-잘-ground-하는-prompt-쓰는-법-grounding-레버).
 
 ### Tip 2. Skill 명시 호출
 

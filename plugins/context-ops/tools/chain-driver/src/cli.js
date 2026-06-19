@@ -88,12 +88,15 @@ import {
 	coldStartSkipAheadReason,
 	checkCascadeConformance,
 	detectGraphArtifactWrite,
+	detectSourceFileWrite,
+	markLiftCandidatePending,
 	evaluatePolicyForEdges,
 	revisitCandidateNote,
 } from './hooks-bridge.js';
 import { gitDiffNumstat, detectRevisit } from './revisit-detect.js';
 import { enrichRevisitImpact, renderRevisitPrompt } from './revisit-impact.js';
 import { analyzeImpact, EDGE_TYPE_CATALOG } from './impact-analyzer.js';
+import { buildLiftAdvisory, renderLiftAdvisory } from './lift-surface.js';
 import {
 	loadPolicy,
 	evaluatePolicy,
@@ -403,6 +406,52 @@ function loadArtifactGraphSafe(root) {
 	}
 }
 
+// Gap B surface (plan-living-graph-autowire §4 / living-sync §7) — demand 시 lift_candidate_pending drain → 천장 후보 advisory.
+//   forward-only: liftCandidates(includeForward:false) surface-only / computeSyncLoop 미호출 / 그래프 mutation ❌.
+//   surface 후 pending clear (재-surface 방지 / degraded 도 changed_paths 동봉이라 정보 손실 ❌). clear=false 면 dry-run 보존.
+//   scope/pending/manifest 부재 = null (no-op).
+function drainLiftCandidates(root, scope, { clear = true } = {}) {
+	if (!scope) return null;
+	let manifest;
+	try {
+		manifest = readManifest(root, scope);
+	} catch {
+		return null;
+	}
+	const pending = manifest?.sync_state?.lift_candidate_pending;
+	if (!Array.isArray(pending) || pending.length === 0) return null;
+	const clearPending = () => {
+		if (!clear) return;
+		try {
+			manifest.sync_state.lift_candidate_pending = [];
+			writeManifest(root, scope, null, manifest);
+		} catch {
+			/* non-fatal */
+		}
+	};
+	const graph = loadArtifactGraphSafe(root);
+	if (!graph) {
+		clearPending();
+		return {
+			degraded: true,
+			changed_paths: [...pending],
+			anchors: [],
+			unresolved: [],
+			reason:
+				'artifact-graph.json 부재 — 천장 후보 산출 불가 (graph 합성 후 chain-driver lift --changed <path> 권장)',
+		};
+	}
+	let lift;
+	try {
+		lift = liftCandidates(graph, pending);
+	} catch {
+		clearPending();
+		return null;
+	}
+	clearPending();
+	return buildLiftAdvisory(lift, pending);
+}
+
 function cmdNext(args) {
 	if (!args.project) usage(3);
 	const root = resolve(args.project);
@@ -474,6 +523,17 @@ function cmdNext(args) {
 		console.error('\n' + renderRevisitPrompt(revisitAdvisory) + '\n');
 	}
 
+	// Gap B surface (plan-living-graph-autowire §4) — lift_candidate_pending drain → 천장 후보 advisory (forward-only / auto-climb ❌).
+	let liftAdvisory = null;
+	try {
+		liftAdvisory = drainLiftCandidates(root, state.current_scope, { clear: !args.dryRun });
+	} catch {
+		/* graceful */
+	}
+	if (liftAdvisory) {
+		console.error('\n' + renderLiftAdvisory(liftAdvisory) + '\n');
+	}
+
 	if (args.dryRun) {
 		console.error(renderGateSummaryText(gateSummary));
 		process.stdout.write(
@@ -488,6 +548,7 @@ function cmdNext(args) {
 								impact: revisitAdvisory.impact,
 							}
 						: null,
+					lift: liftAdvisory,
 					dry_run: true,
 				},
 				null,
@@ -670,6 +731,7 @@ function cmdNext(args) {
 							impact: revisitAdvisory.impact,
 						}
 					: null,
+				lift: liftAdvisory,
 			},
 			null,
 			2,
@@ -1775,7 +1837,7 @@ function cmdHooksBridge(args) {
 							drift_detected: false,
 						};
 						manifest.sync_state.impact_pending = true;
-						writeManifest(root, scope, manifest);
+						writeManifest(root, scope, null, manifest);
 						markedScope = scope;
 					}
 				}
@@ -1795,6 +1857,39 @@ function cmdHooksBridge(args) {
 			process.stdout.write(JSON.stringify(out) + '\n');
 			process.stderr.write(note + '\n');
 			process.exit(0);
+		}
+		// Gap B (plan-living-graph-autowire §4 / living-sync §7) — 손수정 코드 파일 write → lift 후보 silent mark.
+		//   detect+mark only (impact·lift 실행 ❌ / per-write eager resync = Senior REJECT C5a 회피). surface 는
+		//   demand 시 chain-driver next/sync-next 가 liftCandidates 로 drain (forward-only / auto-climb ❌).
+		//   write target = current_scope manifest sync_state (impact_pending 과 동일 / state.json git-track 가정 ❌).
+		const srcWrite = detectSourceFileWrite({
+			toolName: payload.tool_name,
+			toolInput: payload.tool_input,
+		});
+		const liftOptOut = ['0', 'false', 'no', 'off'].includes(
+			String(process.env.CONTEXT_OPS_LIFT_AUTODETECT ?? '').trim().toLowerCase(),
+		);
+		if (srcWrite && !liftOptOut) {
+			const root = payload.cwd || process.cwd();
+			// current_scope 미설정(미초기화 프로젝트 / self-dev) = no-op = state.json 부재로 cheap skip.
+			if (existsSync(join(root, '.ai-context', 'state.json'))) {
+				try {
+					const state = readState(root);
+					const scope = state?.current_scope;
+					if (scope) {
+						const manifest = readManifest(root, scope);
+						if (manifest) {
+							manifest.sync_state = markLiftCandidatePending(
+								manifest.sync_state,
+								srcWrite.path,
+							);
+							writeManifest(root, scope, null, manifest);
+						}
+					}
+				} catch {
+					/* non-fatal — state/manifest 없으면 pass-through */
+				}
+			}
 		}
 	}
 	// default: pass-through suppress.
@@ -2425,6 +2520,14 @@ function cmdSyncNext(args) {
 	if (!state) {
 		console.error('[chain-driver] no state.json — run init first');
 		process.exit(3);
+	}
+
+	// Gap B surface (plan-living-graph-autowire §4) — sync-next 도 lift_candidate_pending drain (stderr advisory / forward-only).
+	try {
+		const adv = drainLiftCandidates(root, state.current_scope, { clear: !args.dryRun });
+		if (adv) console.error('\n' + renderLiftAdvisory(adv) + '\n');
+	} catch {
+		/* graceful */
 	}
 
 	const queue = state.regen_queue;

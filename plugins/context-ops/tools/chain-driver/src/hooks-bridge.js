@@ -12,6 +12,7 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { runtimeFileForRead } from '../../_shared/ai-context-layout.js';
+import { isSourcePath } from '../../_shared/source-ext.js';
 import {
 	formatHookBlockContext,
 	formatSkillSuggestion,
@@ -299,6 +300,34 @@ export function detectGraphArtifactWrite({ toolName, toolInput }) {
 		};
 	}
 	return null;
+}
+
+// Gap B (plan-living-graph-autowire §4 / living-sync §7 lift 자동트리거) — 손수정 코드 파일 write 감지.
+// detectGraphArtifactWrite 와 disjoint: 그쪽 = .ai-context 산출물(graph artifact) / 이쪽 = .ai-context 밖 source 파일.
+// 반환 { path } = lift 후보 1건. 주인 노드 anchor·의미천장 surface 는 demand 시 cli glue 가 liftCandidates 로 drain.
+// hook 은 detect+mark 만 (impact·lift 실행 ❌ / per-write eager resync = Senior REJECT 회피).
+export function detectSourceFileWrite({ toolName, toolInput }) {
+	if (!['Write', 'Edit', 'NotebookEdit'].includes(toolName)) return null;
+	const path = toolInput?.file_path || toolInput?.path || '';
+	if (!path) return null;
+	// .ai-context 산출물(graph artifact) = detectGraphArtifactWrite 소관 → 제외 (loose 매칭 = 과배제 무해 / disjoint).
+	if (path.includes('.ai-context')) return null;
+	if (!isSourcePath(path)) return null;
+	return { path };
+}
+
+// lift 후보 path 를 manifest sync_state 에 누적 (순수 / dedupe + cap / plan §7 unbounded 성장 방지).
+// forward-only 불변: 여기선 mark 만 — backward 천장 surface·forward 재전파는 demand 시 cli glue (사람 --ceiling).
+export function markLiftCandidatePending(syncState, changedPath, { cap = 50 } = {}) {
+	const s = syncState && typeof syncState === 'object' ? syncState : { drift_detected: false };
+	const seen = new Set(Array.isArray(s.lift_candidate_pending) ? s.lift_candidate_pending : []);
+	seen.delete(changedPath); // 재-add 시 최신 위치로 이동
+	seen.add(changedPath);
+	const arr = [...seen];
+	return {
+		...s,
+		lift_candidate_pending: arr.length > cap ? arr.slice(arr.length - cap) : arr,
+	};
 }
 
 // cold-start skip-ahead hard-block (DEC-2026-06-18 / ② / 결정론 = state + 파일명만 / LLM inject ❌).

@@ -14,6 +14,8 @@ import {
 	WORK_INTENT_KEYWORDS,
 	shouldBlockToolUse,
 	checkCascadeConformance,
+	detectSourceFileWrite,
+	markLiftCandidatePending,
 } from '../src/hooks-bridge.js';
 import { mkdtempSync, writeFileSync, rmSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -382,5 +384,61 @@ describe('WORK_INTENT_KEYWORDS ⊆ hooks.json matcher (③ 비대칭 회귀 차�
 				`hooks.json matcher 에 work-intent '${kw}' 누락 — discovery-default 폴백 발화 실패 위험`,
 			);
 		}
+	});
+});
+
+describe('detectSourceFileWrite — Gap B 손수정 코드 감지 (plan-living-graph-autowire §4)', () => {
+	it('source 파일 Write → { path }', () => {
+		assert.deepEqual(
+			detectSourceFileWrite({ toolName: 'Write', toolInput: { file_path: 'src/order/cancel.service.ts' } }),
+			{ path: 'src/order/cancel.service.ts' },
+		);
+	});
+	it('Edit 도 동일', () => {
+		assert.deepEqual(
+			detectSourceFileWrite({ toolName: 'Edit', toolInput: { file_path: 'app/main.py' } }),
+			{ path: 'app/main.py' },
+		);
+	});
+	it('.ai-context 산출물·하위 = null (detectGraphArtifactWrite 소관 / disjoint)', () => {
+		assert.equal(
+			detectSourceFileWrite({ toolName: 'Write', toolInput: { file_path: 'proj/.ai-context/output/behavior-spec.json' } }),
+			null,
+		);
+		assert.equal(
+			detectSourceFileWrite({ toolName: 'Write', toolInput: { file_path: 'proj/.ai-context/scratch.ts' } }),
+			null,
+		);
+	});
+	it('비-source 확장자 = null', () => {
+		assert.equal(detectSourceFileWrite({ toolName: 'Write', toolInput: { file_path: 'README.md' } }), null);
+		assert.equal(detectSourceFileWrite({ toolName: 'Write', toolInput: { file_path: 'data.json' } }), null);
+	});
+	it('비-write 도구 / path 부재 = null', () => {
+		assert.equal(detectSourceFileWrite({ toolName: 'Read', toolInput: { file_path: 'a.ts' } }), null);
+		assert.equal(detectSourceFileWrite({ toolName: 'Write', toolInput: {} }), null);
+	});
+});
+
+describe('markLiftCandidatePending — Gap B silent mark (순수)', () => {
+	it('append + dedupe (재-add 시 최신 위치) + 기존 필드 보존', () => {
+		let s = { drift_detected: false };
+		s = markLiftCandidatePending(s, 'a.ts');
+		s = markLiftCandidatePending(s, 'b.ts');
+		s = markLiftCandidatePending(s, 'a.ts');
+		assert.deepEqual(s.lift_candidate_pending, ['b.ts', 'a.ts']);
+		assert.equal(s.drift_detected, false);
+	});
+	it('undefined sync_state 안전', () => {
+		const s = markLiftCandidatePending(undefined, 'x.ts');
+		assert.deepEqual(s.lift_candidate_pending, ['x.ts']);
+		assert.equal(s.drift_detected, false);
+	});
+	it('cap 초과 시 최신 N 유지 (unbounded 성장 방지)', () => {
+		let s = { drift_detected: false };
+		for (let i = 0; i < 60; i++) s = markLiftCandidatePending(s, `f${i}.ts`, { cap: 50 });
+		assert.equal(s.lift_candidate_pending.length, 50);
+		assert.equal(s.lift_candidate_pending[49], 'f59.ts');
+		assert.equal(s.lift_candidate_pending[0], 'f10.ts');
 	});
 });

@@ -19,6 +19,12 @@ plugins/context-ops/examples/poc-03-realworld-nestjs/source/nestjs-realworld-tmp
 *.stdout.log
 *.stderr.log
 
+# codegraph index (machine-local SQLite knowledge graph — re-index per machine via codegraph)
+.codegraph/
+
+# companion-tool runtime marker dirs (codegraph-nudge / graph-context-nudge once-per-prompt markers)
+**/.static-tools/
+
 # Claude Code local settings
 .claude/settings.local.json
 .claude/worktrees/

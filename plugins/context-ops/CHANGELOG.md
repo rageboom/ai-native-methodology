@@ -10,6 +10,36 @@
 
 ---
 
+## [0.64.0] — 2026-06-19 — MINOR — living dep-graph 자동배선 (Gap A 자동주입 + Gap B 자동유지)
+
+**문제**: dep-graph(`artifact-graph.json`)는 living-graph 인프라(navigate / lift / sync-loop)는 갖췄으나 두 자동화 고리가 미배선이었다 — ① 프롬프트 시점에 관련 노드·1-hop 이웃 컨텍스트가 자동 주입되지 않음(**Gap A** — 사용자가 수동 `navigate` 해야 함) ② 손수정 코드가 anchor 노드와 어긋날 때 lift 후보가 자동 감지되지 않음(**Gap B** — 수동 `lift`만). 둘 다 이미 식별된 carry(`DEC-2026-06-02` §5 / living-sync §7). 사용자 방향 = "살아있는 그래프"(자동 주입 + 자동 유지). SSOT: `DEC-2026-06-19-living-graph-autowire`.
+
+### Added — Gap A 자동주입 (prompt-time 1-hop 컨텍스트 nudge)
+- **`scripts/graph-context-nudge.js` 신설** + `hooks.json` UserPromptSubmit sibling 배선. stdin event 의 prompt 식별자(node id / title / code_pointer 심볼·파일)가 `artifact-graph.json` 노드에 결정론 매칭(`matchPromptToNodes` / `includeTitle`) 되면, 그 노드들의 **진짜 1-hop 이웃**(incident edge만 / transitive·centrality ❌ / `≤8`) + `code_pointers` 를 `additionalContext` 로 주입.
+- **무거움 회피**(plan §3 / 적대검증 major): `navigate`(analyzeImpact 전체 transitive closure + `topKImpactRoot` centrality) 재사용 ❌ — 순수 `oneHopNeighbors`(origin 에 incident 한 edge만 / 노드수 cap). 대형 그래프도 payload bound.
+- 매칭 0(한글 산문 등 식별자 부재) = **침묵 no-op**. **NEVER blocks**(additionalContext only / exit 2·deny ❌). default-on(opt-out `CONTEXT_OPS_GRAPH_NUDGE=0` / 그래프 부재 no-op). once-per-(session, prompt) 마커(재주입 방지 / `codegraph-nudge.js` 규약 동형).
+- 주입 = **포인터 지도**(id·subkind·edge_type·코드앵커) / 본문·코드 덤프 ❌.
+
+### Added — Gap B 자동유지 (손수정 코드 lift 자동 감지)
+- **`work-unit-manifest.schema.json` `sync_state.lift_candidate_pending[]` 필드 추가** (additive optional / default `[]`).
+- **`hooks-bridge.detectSourceFileWrite`** (`.ai-context` 밖 source 파일 write 감지 / `detectGraphArtifactWrite` 와 disjoint) + **`markLiftCandidatePending`**(dedupe + cap 50 / 순수). **`_shared/source-ext.js` 신설**(`SOURCE_EXTS`/`isSourcePath` / codegraph 지원 언어 정렬).
+- **PostToolUse**(`cli.js` hooks-bridge): 손수정 코드 write → `current_scope` manifest 에 **silent mark**(detect+mark only / impact·lift 실행 ❌ = per-write eager resync Senior REJECT 회피 / opt-out `CONTEXT_OPS_LIFT_AUTODETECT=0` / `state.json` 부재 = cheap skip).
+- **`lift-surface.js` 신설**(`buildLiftAdvisory`/`renderLiftAdvisory` / 순수 — I/O·graph mutation·forward 전파 0 / `computeSyncLoop` 미import = 구조적 보장).
+- **`chain-driver next` + `sync-next`**: demand 시 `lift_candidate_pending` drain → `liftCandidates`(forward-only / surface-only) → 의미천장 후보 advisory(stderr + `--json` `lift` 필드). drain 후 clear(`--dry-run` 시 보존 / graph 부재 degraded 정직 표기). 사람이 `lift --ceiling <id>` 로 천장 확정(**auto-climb ❌**).
+
+### Fixed
+- `cli.js` hooks-bridge `impact_pending` mark 경로의 `writeManifest(root, scope, manifest)` → `writeManifest(root, scope, null, manifest)` arity 정정.
+
+### Docs
+- **`guides/first-prompt-cookbook.md` §2.1.1 신설** — discovery grounding 레버 6종(프로젝트 실제 도메인 용어 / actor+entity+trigger / BR 명시 / cross_link seed / 신규·수정 구분 / 출처 가리키기). Gap A 자동주입과 짝 — 잘 ground 된 프롬프트일수록 더 나은 1-hop nudge.
+
+### Trust 불변
+- artifact-graph = **reference-lens** / 결정적 chain gate inject ❌ / grep authoritative. `graph-context-nudge.js` 는 `scripts/`(chain-driver gate 엔진과 분리) / `additionalContext` only. (`DEC-2026-05-28` §4.2 신뢰 경계 상속.)
+
+**Deferred**: Slice 4(UserPromptSubmit drain 으로도 lift 후보 자동 surface) — "step2 입증 후"(plan §8 결정 #5).
+
+**검증**: chain-driver **632/632** · graph-context-nudge **7/7** · test:release **27/27**(A1 workspace `pnpm -r run test` 42/42 포함) / 회귀 0. **§8.1 면제**: 스키마 optional·gate matrix·release check 무변 / default-on advisory·read class only(gate 격상은 별도 ≥2 도메인 증거 후). DEC-2026-06-19-living-graph-autowire.
+
 ## [0.63.0] — 2026-06-18 — MINOR — revisit 근거 생성 + 자동 감지 (ADR-CHAIN-003 §2·§3 미배선 갭 해소)
 
 **문제**: chain revisit loop(되돌아가기)가 ADR-CHAIN-003 에서 "자동 감지 + 사용자 결단(go/무시/abort)"으로 설계됐으나 ① `detectRevisit` 가 revisit_target/LOC/changed_paths 만 산출 → ADR §3 약속(영향 stages[from→to] + 영향 trace UC/BHV/AC/TC/IMPL ID + traceability cell 수) 미산출(갭1), ② ADR §2 "Write/Edit 후 자동 호출" 미배선 — `detectRevisit` 가 수동 `chain-driver revisit-detect` 명령으로만 도달(갭2). 사용자 결단 = **하이브리드 자동 감지 / ADR 풀세트 근거**. SSOT: `DEC-2026-06-18-revisit-impact-autodetect`.

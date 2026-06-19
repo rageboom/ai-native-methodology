@@ -176,6 +176,12 @@
           "type": "boolean",
           "default": false,
           "description": "dep-graph operation.md P3 결정 5 — PostToolUse hook 이 chain/analysis artifact write 감지 시 true. 실제 영향 분석(BFS)+정책 평가는 `chain-driver impact` 또는 SessionStart preview 에서 수행. 사용자 confirm 후 false 로 clear."
+        },
+        "lift_candidate_pending": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [],
+          "description": "Gap B (plan-living-graph-autowire §4 / living-sync §7 lift 자동트리거) — PostToolUse hook 이 손수정 코드 파일(.ai-context 밖 source) write 감지 시 변경 path 누적 (detect+mark only / dedupe + cap 50). 의미천장 후보 surface 는 chain-driver next/sync-next 가 demand 시 liftCandidates 로 drain (forward-only / auto-climb ❌). drain 후 clear."
         }
       }
     },
