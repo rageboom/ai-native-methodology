@@ -292,6 +292,23 @@ export function getActiveScopeChain(state) {
 	};
 }
 
+// DEC-2026-06-19-branch-per-task — 활성 scope 의 current_task 포인터 set/clear (additive).
+//   enter-task 가 set / finish-task 가 clear. CAS 뮤테이터 안에서 호출 (caller 가 clone 된 state 전달).
+//   scope_states[scope] 부재(전역 fallback 경로) 시 no-op — task-major 는 scope 활성에서만 지원.
+export function setCurrentTask(state, scope, currentTask) {
+	if (scope && state.scope_states && Object.hasOwn(state.scope_states, scope)) {
+		state.scope_states[scope].current_task = currentTask;
+	}
+	return state;
+}
+
+export function clearCurrentTask(state, scope) {
+	if (scope && state.scope_states && Object.hasOwn(state.scope_states, scope)) {
+		delete state.scope_states[scope].current_task;
+	}
+	return state;
+}
+
 // Error types
 export class StateCorruptError extends Error {
 	constructor(msg) {

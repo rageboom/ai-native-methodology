@@ -223,7 +223,36 @@
             { "type": "null" },
             { "$ref": "#/$defs/GateRecord" }
           ]
+        },
+        "current_task": {
+          "anyOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/CurrentTask" }
+          ],
+          "description": "DEC-2026-06-19-branch-per-task — enter-task 로 set 되는 활성 Sub-task 포인터 (additive / null·부재 = scope-wide 기존 동작 보존, 가드 비발동). set 시 task-major 모드 진입."
         }
+      }
+    },
+    "CurrentTask": {
+      "type": "object",
+      "required": ["task_id", "branch", "jira_key"],
+      "additionalProperties": false,
+      "description": "DEC-2026-06-19-branch-per-task — 활성 Sub-task 의 브랜치 바인딩. enter-task 가 set / finish-task 가 clear.",
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "pattern": "^TASK-[A-Z0-9_-]+-[0-9]{3}$",
+          "description": "task-plan.tasks[].id — 현재 활성 Sub-task."
+        },
+        "branch": {
+          "type": "string",
+          "description": "이 task 의 git 브랜치명 (<type-prefix>/<Jira 키> / slug 없음)."
+        },
+        "jira_key": {
+          "type": "string",
+          "description": "Jira Sub-task 키 (브랜치명 SSOT / 무조건 jira 일치)."
+        },
+        "entered_at": { "type": "string", "format": "date-time" }
       }
     },
     "GateRecord": {

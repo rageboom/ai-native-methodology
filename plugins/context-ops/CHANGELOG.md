@@ -10,6 +10,37 @@
 
 ---
 
+## [0.65.0] — 2026-06-19 — MINOR — branch-per-task git hygiene (Sub-task별 브랜치 + Sub-task별 PR + 연결 가시화)
+
+**문제**: 티켓 기반 작업 시 (a) 전용 브랜치를 따고 (b) **잘못된 브랜치에서의 소스 작성을 결정론적으로 차단**하며 (c) 작업 완료 시 **각 Sub-task PR이 어떤 Story·Epic·형제·의존·AC에 연결됐는지 한눈에** 보이게 하는 git 위생 고리가 미배선. 사용자 최종 결정(2026-06-19) = **Sub-task별 브랜치 + Sub-task별 PR(N개) + PR 연결(linkage) 가시화**. SSOT: `DEC-2026-06-19-branch-per-task-git-hygiene` + `.claude/plans/plan-branch-per-ticket.md`.
+
+### Added — enter-task / finish-task (유일한 git mutation locus / STRONG-STOP)
+- **`_shared/git-branch.js` 신설** — git query/mutation 프리미티브(`gitAvailable`/`currentBranch`/`isUnborn`/`branchExists`/`createBranch`/`switchBranch`) + `deriveBranchPrefix`(Jira issue type→`bugfix`(버그/결함/defect)/`feature`(그외) 순수 도출). 현재 브랜치 = `symbolic-ref -q HEAD`(plain / `--short`·`rev-parse --abbrev-ref` detached 비결정성 회피 ❌). git 부재/detached/unborn = graceful null/false(no-simulation 정직).
+- **`chain-driver enter-task <project> --task <TASK-id> [--scope <slug>] [--confirm]`** — ticket-sync-evidence(`ticket-sync-plan-*.json`)에서 Jira Sub-task 키 lookup(부재 시 exit 3 = ticket-sync 선행 요구) → `<prefix>/<KEY>` 브랜치 → git preflight 6모드(noop/switch/create/detached/unborn/git부재) → `current_task` set. `--confirm` 없으면 preview(git 미접촉·state 미변경).
+- **`chain-driver finish-task <project> [--confirm]`** — implement GREEN 확인(`stage_progress.implement` complete+go / 미달 exit 1) → **linkage block 결정론 생성** → `gh pr create`(부재/실패 시 linkage+브랜치 출력 graceful 수동 안내) → `current_task` clear. `--confirm` 없으면 preview.
+- **`chain-driver clear-task <project> [--scope]`** — 활성 `current_task` 해제(브랜치 가드 비활성 / git 미접촉 / PR 미생성). task 포기·revisit 로 implement 가 GREEN 에 못 가 finish-task 가 거부될 때의 stuck 탈출구(적대검증 high-fix).
+- **`linkage-builder.js` 신설** — `buildLinkageBlock`(task-plan.tasks[id] + ticket-sync-evidence → 이 PR/Story/Epic/형제 Sub-task/의존/AC 순수 합성 / 부분 evidence graceful = 못 찾은 line 생략·날조 ❌).
+- **가드 source 범위 = `_shared/source-ext.js` `isGuardedSourcePath`** — GUARD_SOURCE_EXTS(코드 + SQL/template/build/config = `.xml`(iBATIS mapper)·`.sql`·`.jsp`·`.gradle`·`.properties`·`.yml` 등). Gap B 의 SOURCE_EXTS(codegraph 정렬)와 별 세트(불침범) — 가드는 본 방법론 PRIMARY 레거시 타깃(Spring/iBATIS)의 SQL mapper·서버템플릿까지 더 넓게 본다.
+
+### Added — PreToolUse 브랜치 가드 (deny-only / additive)
+- **`hooks-bridge.branchGuardReason`** + `cli.js` PreToolUse 배선 — task-major(`current_task` set) 모드에서 소스 파일 write 인데 현재 git 브랜치가 그 task 브랜치가 아니면 **deny(exit 2)**. **`current_task` 부재 = 즉시 allow(scope-wide 기존 동작 byte-identical 보존 = 회귀 0)**. git query(makeGitRunner→currentBranch)는 current_task 있을 때만 = hot-path latency·scope-wide 무영향. opt-out `CONTEXT_OPS_BRANCH_GUARD=0` + self-dev 면제. 결정론(state+isSourcePath+브랜치 비교 / LLM·git mutation inject ❌ / STRONG-STOP).
+
+### Schema
+- **`state.schema.json`** — `$defs.CurrentTask`(task_id/branch/jira_key/entered_at) + `ScopeChainState.current_task`(optional / null=scope-wide). additionalProperties:false 정합.
+
+### Trust 불변
+- 첫 git mutation 도구이나 mutation 은 `enter-task`/`finish-task` 명시 명령 + `--confirm` 에서만(deny-only 훅은 git 미접촉). `makeGitRunner` read-only 호출처 보존(mutation 은 `_shared/git-branch.js` 별 파일 분리). 가드·브랜치명·linkage 전부 결정론.
+
+### Adversarial hardening (5-lens / 출하 전)
+- 구현 직후 5개 독립 적대 lens(bypass/false-block/regression/det-axis/honesty)로 깨기 시도 → 실 결함 14건. **회귀 lens=0**(additive byte-identical 견고)·**det-axis·deny-only·결정론 위반 0**(STRONG-STOP 유지). 출하 전 수정: (blocker) 가드 확장자 화이트리스트가 레거시 `.xml`/`.sql`/`.jsp` 누락 → `isGuardedSourcePath` 별 세트로 확장 / (high) implement 미-GREEN 시 current_task stuck → `clear-task` 탈출구 신설 / (medium) 가드 stage 게이트 부재(revisit 오차단) → `current_chain∈{test,implement}` 게이트 / (medium) repo-membership 미검사 → repo-root containment 게이트 / (low) NotebookEdit notebook_path 미독해 + `.ai-context` substring 과대제외 → 세그먼트 매칭. 잔여 carry = DEC §6 정직 고지(GREEN floor force-ack / transient-git fail-open / PR-fail exit seam / source_root #5 미구현).
+
+### Tests
+- `test/branch-per-task.test.js` 32개(deriveBranchPrefix/buildLinkageBlock/branchGuardReason[stage-gate·xml] 순수 + enter/finish/clear-task CLI + 실 git temp repo 6모드 + PreToolUse 가드 deny/allow/stage-gate/xml/external/opt-out). chain-driver 632→664 GREEN(회귀 0).
+
+**Deferred (≥2 PoC 후 격상)**: per-task TC 단위 게이트(v1 = scope implement-GREEN floor / cmdNext 골격 무변경) · 의존 task stacked PR · bug 전용 진입 흐름 · scope-verify · hotfix prefix. release-readiness 신규 check 미추가(기존 check11 workspace-test 가 신규 32 test 게이팅 / criteria=42 불변).
+
+---
+
 ## [0.64.0] — 2026-06-19 — MINOR — living dep-graph 자동배선 (Gap A 자동주입 + Gap B 자동유지)
 
 **문제**: dep-graph(`artifact-graph.json`)는 living-graph 인프라(navigate / lift / sync-loop)는 갖췄으나 두 자동화 고리가 미배선이었다 — ① 프롬프트 시점에 관련 노드·1-hop 이웃 컨텍스트가 자동 주입되지 않음(**Gap A** — 사용자가 수동 `navigate` 해야 함) ② 손수정 코드가 anchor 노드와 어긋날 때 lift 후보가 자동 감지되지 않음(**Gap B** — 수동 `lift`만). 둘 다 이미 식별된 carry(`DEC-2026-06-02` §5 / living-sync §7). 사용자 방향 = "살아있는 그래프"(자동 주입 + 자동 유지). SSOT: `DEC-2026-06-19-living-graph-autowire`.

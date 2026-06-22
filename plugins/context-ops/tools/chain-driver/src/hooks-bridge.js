@@ -12,7 +12,7 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { runtimeFileForRead } from '../../_shared/ai-context-layout.js';
-import { isSourcePath } from '../../_shared/source-ext.js';
+import { isSourcePath, isGuardedSourcePath } from '../../_shared/source-ext.js';
 import {
 	formatHookBlockContext,
 	formatSkillSuggestion,
@@ -308,11 +308,33 @@ export function detectGraphArtifactWrite({ toolName, toolInput }) {
 // hook 은 detect+mark 만 (impact·lift 실행 ❌ / per-write eager resync = Senior REJECT 회피).
 export function detectSourceFileWrite({ toolName, toolInput }) {
 	if (!['Write', 'Edit', 'NotebookEdit'].includes(toolName)) return null;
-	const path = toolInput?.file_path || toolInput?.path || '';
+	// NotebookEdit 는 notebook_path 필드 사용 (적대검증 latent-bypass fix / matcher↔handler 필드 정합).
+	const path =
+		toolInput?.file_path || toolInput?.path || toolInput?.notebook_path || '';
 	if (!path) return null;
-	// .ai-context 산출물(graph artifact) = detectGraphArtifactWrite 소관 → 제외 (loose 매칭 = 과배제 무해 / disjoint).
-	if (path.includes('.ai-context')) return null;
+	// .ai-context 산출물(graph artifact) = detectGraphArtifactWrite 소관 → 제외.
+	//   세그먼트 경계 매칭 (적대검증 fix — `my.ai-context.app/src/foo.ts` 같은 substring 과대제외 회피).
+	if (isInAiContext(path)) return null;
 	if (!isSourcePath(path)) return null;
+	return { path };
+}
+
+// `.ai-context` 디렉토리 세그먼트 포함 여부 (substring 아닌 경로 경계 / Windows·POSIX separator 모두).
+function isInAiContext(path) {
+	return /(^|[\\/])\.ai-context([\\/]|$)/.test(path);
+}
+
+// branch-per-task 가드 전용 source write 감지 (DEC-2026-06-19 / 적대검증 blocker fix).
+//   detectSourceFileWrite(Gap B / codegraph 언어 정렬)와 달리 isGuardedSourcePath(코드+SQL/template/
+//   build/config = .xml/.sql/.jsp 등)로 더 넓게 본다 — 잘못된 브랜치에서 레거시 SQL mapper·서버템플릿
+//   작성도 가드 대상. Gap B 의 detectSourceFileWrite 는 불침범(별 함수).
+export function detectGuardedSourceWrite({ toolName, toolInput }) {
+	if (!['Write', 'Edit', 'NotebookEdit'].includes(toolName)) return null;
+	const path =
+		toolInput?.file_path || toolInput?.path || toolInput?.notebook_path || '';
+	if (!path) return null;
+	if (isInAiContext(path)) return null;
+	if (!isGuardedSourcePath(path)) return null;
 	return { path };
 }
 
@@ -352,6 +374,36 @@ export function coldStartSkipAheadReason({ toolName, toolInput, activeChain }) {
 		`cold-start skip-ahead 차단 (discovery 미진입): ${art.artifact_subkind} 산출물 ` +
 		`'${art.filename}' write 시도 — 분석 외 모든 작업은 discovery(입구·라우터)부터. ` +
 		`discovery-from-nl-md 로 진입하거나 chain-driver next 로 정식 전진하세요.`
+	);
+}
+
+// branch-per-task 하드 가드 (DEC-2026-06-19-branch-per-task / deny-only / git 미접촉).
+//   활성 task(current_task)가 set 된 task-major 모드 + 활성 stage∈{test,implement} 에서만 발동:
+//   가드 대상 소스(코드+SQL/template/build/config = isGuardedSourcePath) write 인데 현재 git 브랜치가
+//   그 task 의 브랜치가 아니면 deny. current_task 부재(=scope-wide 기존 동작) = allow (additive 보존 /
+//   회귀 0). stage 게이트 = revisit 로 spec/plan 등 upstream 복귀 시 stale current_task 가 그 stage
+//   소스 작업을 오차단하는 false-block 방지 (적대검증 fix / plan §3.4 조건 #3 정합).
+//   결정론: state.current_task + current_chain + isGuardedSourcePath + currentBranch 비교만
+//   (LLM/git mutation inject ❌ / STRONG-STOP — 브랜치 생성·전환은 enter-task 명령 소관).
+//   currentBranch=null(detached/unborn/git 부재/transient git 오류) = allow (fail-open / 정직 한계).
+//
+// @param {Object} activeChain        getActiveScopeChain(state) 결과 (current_task + current_chain 포함).
+// @param {string|null} currentBranch caller(cli)가 git-branch.currentBranch(gitRunner) 로 산출해 주입.
+// @returns {string|null}             deny reason 또는 null(allow).
+export function branchGuardReason({ toolName, toolInput, activeChain, currentBranch }) {
+	const ct = activeChain?.current_task;
+	if (!ct || !ct.branch) return null; // current_task 미설정 = scope-wide(기존 동작) = allow
+	// stage 게이트 — task-major 작업 stage(test/implement)에서만. revisit upstream 복귀 시 stale
+	//   current_task 가 그 stage 소스를 오차단하지 않도록 (false-block 방지 / plan §3.4 #3).
+	const stage = activeChain.current_chain;
+	if (stage !== 'test' && stage !== 'implement') return null;
+	if (!detectGuardedSourceWrite({ toolName, toolInput })) return null; // 가드 대상 소스 write 아님 = allow
+	if (!currentBranch) return null; // git 판정 불가(detached/unborn/부재/transient) = allow (정직 한계)
+	if (currentBranch === ct.branch) return null; // 올바른 브랜치 = allow
+	return (
+		`branch 가드: 활성 task ${ct.task_id} 는 브랜치 '${ct.branch}' 에서 작업해야 합니다 ` +
+		`(현재 '${currentBranch}'). chain-driver enter-task ${ct.task_id} 로 전환하거나, ` +
+		`다른 task 면 그 task 로 enter-task / 작업 종료면 finish-task·clear-task 하세요.`
 	);
 }
 

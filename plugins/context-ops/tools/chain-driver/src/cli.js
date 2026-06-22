@@ -20,7 +20,7 @@
 //   3 = usage-error
 //   4 = state-corrupt
 
-import { existsSync, readFileSync, appendFileSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, appendFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve, isAbsolute, relative } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -41,6 +41,8 @@ import {
 	listScopes,
 	initScopeChainState,
 	getActiveScopeChain,
+	setCurrentTask,
+	clearCurrentTask,
 } from './state-store.js';
 import { executeQuery } from './query.js';
 import { markDrift, cascade, registerCanonicalSources, diffBusinessRulesByRule, listUnbaselinedScopes } from './sync.js';
@@ -53,6 +55,7 @@ import {
 	baseDirForRead,
 	scopeFileForRead,
 	scopeDirForRead,
+	evidenceDirForRead,
 } from '../../_shared/ai-context-layout.js';
 import { planLayoutMigration, applyLayoutMigration } from './migrate-layout.js';
 
@@ -92,6 +95,7 @@ import {
 	markLiftCandidatePending,
 	evaluatePolicyForEdges,
 	revisitCandidateNote,
+	branchGuardReason,
 } from './hooks-bridge.js';
 import { gitDiffNumstat, detectRevisit } from './revisit-detect.js';
 import { enrichRevisitImpact, renderRevisitPrompt } from './revisit-impact.js';
@@ -130,6 +134,18 @@ import {
 	detectContentDrift,
 	findRelocation,
 } from '../../_shared/code-pointer-git.js';
+// branch-per-task git hygiene (DEC-2026-06-19-branch-per-task) — git query/mutation 프리미티브 +
+//   브랜치 type-prefix 결정론 도출. enter-task/finish-task 명령 + PreToolUse 브랜치 가드 배선.
+import {
+	deriveBranchPrefix,
+	gitAvailable,
+	currentBranch,
+	isUnborn,
+	branchExists,
+	createBranch,
+	switchBranch,
+} from '../../_shared/git-branch.js';
+import { buildLinkageBlock } from './linkage-builder.js';
 // Loop A / A1 (B-minimal) — graph freshness 를 SessionStart 배너에 노출 (DEC-2026-06-03 C-living-graph-autotrigger).
 //   _shared 프리미티브 (fs-only / child_process 무관 = hot-path 경량 / code-pointer-validator 와 DRY 공유).
 import { checkGraphFreshness } from '../../_shared/graph-freshness.js';
@@ -170,6 +186,9 @@ function usage(code = 3) {
 			'  migrate <project>',
 			'  migrate-layout <project> [--dry-run]   (구 .ai-context/output+최상위 scope → base/scopes/runtime 인플레이스 이주)',
 			'  revisit-detect <project> [--base <sha>] [--user-decision <go|ignore>]',
+			'  enter-task <project> --task <TASK-id> [--scope <slug>] [--confirm]   (branch-per-task — Jira 키 lookup → feature|bugfix/<KEY> 브랜치 생성/전환 + current_task set / --confirm 없으면 preview)',
+			'  finish-task <project> [--confirm]   (branch-per-task — implement GREEN 확인 → linkage block + PR(gh) / --confirm 없으면 preview / gh 부재 시 수동 안내)',
+			'  clear-task <project> [--scope <slug>]   (branch-per-task — 활성 current_task 해제 = 브랜치 가드 비활성 / git 미접촉 / task 포기·revisit 탈출구)',
 			'',
 			'exit codes: 0=ok, 1=blocked, 2=invariant-violation, 3=usage, 4=state-corrupt',
 		].join('\n'),
@@ -195,6 +214,7 @@ function parseArgs(argv) {
 		else if (a === '--base') out.baseSha = rest[++i];
 		else if (a === '--repo-root') out.repoRoot = rest[++i];
 		else if (a === '--scope') out.scope = rest[++i];
+		else if (a === '--task') out.task = rest[++i];
 		else if (a === '--out-dir') out.outDir = rest[++i];
 		else if (a === '--scenario') out.scenario = rest[++i];
 		else if (a === '--stage') out.stage = rest[++i];
@@ -227,6 +247,7 @@ function parseArgs(argv) {
 		else if (a === '--br-diff') out.brDiffRef = rest[++i];
 		else if (a === '--git') out.gitRef = rest[++i];
 		else if (a === '--br-path') out.brPath = rest[++i];
+		else if (a === '--confirm' || a === '--yes') out.confirm = true; // enter-task/finish-task: git mutation·PR 실행 confirm (미지정=preview)
 		else if (a === '--reset') out.reset = true; // sync-converge: 세션 초기화
 		else if (a === '--cap') out.cap = Number(rest[++i]); // sync-converge: iteration 상한 (기본 10)
 		else if (a === '--help' || a === '-h') usage(0);
@@ -1792,6 +1813,54 @@ function cmdHooksBridge(args) {
 					`[chain-driver] PreToolUse blocked: ${skipReason}\n`,
 				);
 				process.exit(2);
+			}
+			// branch-per-task 하드 가드 (DEC-2026-06-19-branch-per-task / deny-only / git 미접촉 = 판정만).
+			//   current_task(task-major) set 시에만 발동: 소스 파일 write 인데 현재 git 브랜치가 그 task 의
+			//   브랜치가 아니면 deny. current_task 부재 = branchGuardReason 즉시 null=allow (additive / 회귀 0).
+			//   git query(makeGitRunner→currentBranch)는 current_task 있을 때만 = hot-path latency·scope-wide 무영향.
+			//   결정론 (state.current_task + current_chain + isGuardedSourcePath + 브랜치 비교만 / LLM·git mutation inject ❌ / STRONG-STOP).
+			//   opt-out CONTEXT_OPS_BRANCH_GUARD=0.
+			if (process.env.CONTEXT_OPS_BRANCH_GUARD !== '0') {
+				const ac = getActiveScopeChain(state);
+				// repo-membership 게이트 (적대검증 fix) — write 대상이 이 repo(root) worktree 하위가 아니면
+				//   가드 비대상 (외부/형제 repo·scratch 소스 편집 오차단 방지). 상대경로는 root 기준 = 항상 하위.
+				const wPath =
+					payload.tool_input?.file_path ||
+					payload.tool_input?.path ||
+					payload.tool_input?.notebook_path ||
+					'';
+				const inRepo =
+					!wPath ||
+					(() => {
+						const rel = relative(root, resolve(root, wPath));
+						return rel === '' || (!rel.startsWith('..') && !isAbsolute(rel));
+					})();
+				if (inRepo && ac && ac.current_task && ac.current_task.branch) {
+					let curBranch = null;
+					try {
+						curBranch = currentBranch(makeGitRunner(root));
+					} catch {
+						/* git 부재/transient 오류 = null = allow (fail-open / no-simulation 정직 한계) */
+					}
+					const branchReason = branchGuardReason({
+						toolName: payload.tool_name,
+						toolInput: payload.tool_input,
+						activeChain: ac,
+						currentBranch: curBranch,
+					});
+					if (branchReason) {
+						const out = buildBlockOutput({
+							reason: branchReason,
+							sessionId: payload.session_id,
+							hookEventName: event,
+						});
+						process.stdout.write(JSON.stringify(out) + '\n');
+						process.stderr.write(
+							`[chain-driver] PreToolUse blocked: ${branchReason}\n`,
+						);
+						process.exit(2);
+					}
+				}
 			}
 		}
 		// M2 (DEC-2026-06-10-cascade-conformance) — jira_create pre-fire 준수 차단 (state 무관 / cascade-plan 존재 시).
@@ -3498,6 +3567,358 @@ function cmdResyncGraph(args) {
 	}
 }
 
+// ─── branch-per-task git hygiene (DEC-2026-06-19-branch-per-task) ───
+//   enter-task / finish-task = 유일한 git mutation locus (STRONG-STOP: 명시 명령 + --confirm).
+//   PreToolUse 브랜치 가드(cmdHooksBridge)는 deny-only(git 미접촉) — 여기서만 checkout·PR mutation 한다.
+
+// 최신 ticket-sync-evidence 로드 (.ai-context/runtime/evidence/ticket-sync-plan-*.json / 없으면 null).
+//   plan stage 단일 산출 (ticket-sync-evidence.schema.json / stage const=plan). 손상 파일은 skip → 그 다음 최신.
+function loadLatestTicketEvidence(root) {
+	let dir;
+	try {
+		dir = evidenceDirForRead(root);
+	} catch {
+		return null;
+	}
+	if (!existsSync(dir)) return null;
+	let files;
+	try {
+		files = readdirSync(dir).filter(
+			(f) => f.startsWith('ticket-sync-plan-') && f.endsWith('.json'),
+		);
+	} catch {
+		return null;
+	}
+	if (!files.length) return null;
+	files.sort(); // 파일명 suffix = ISO timestamp → lexical 정렬 = 시간순 (최신 = 마지막)
+	for (let i = files.length - 1; i >= 0; i--) {
+		try {
+			const obj = JSON.parse(readFileSync(join(dir, files[i]), 'utf-8'));
+			if (obj && obj.ticket_cascade) return obj;
+		} catch {
+			/* 손상 파일 skip */
+		}
+	}
+	return null;
+}
+
+// task_id → { jira_id, issue_type }. subtask 매칭(+jira_id 보유) + issue_type 은 mcp_invocations
+//   에서 ticket_id_created 매칭으로 해소 (없으면 null = feature default). 매칭 실패 = null.
+function lookupSubtaskJira(evidence, taskId) {
+	const cascade = (evidence && evidence.ticket_cascade) || {};
+	const subtasks = Array.isArray(cascade.subtasks) ? cascade.subtasks : [];
+	const st = subtasks.find((s) => s && s.task_id === taskId && s.jira_id);
+	if (!st) return null;
+	let issueType = null;
+	const invs = Array.isArray(evidence.mcp_invocations)
+		? evidence.mcp_invocations
+		: [];
+	const inv = invs.find(
+		(m) => m && m.ticket_id_created === st.jira_id && m.issue_type,
+	);
+	if (inv) issueType = inv.issue_type;
+	return { jira_id: st.jira_id, issue_type: issueType };
+}
+
+// task-plan.json 경로 해소 (scoped → scopes/<scope>/plan/ 우선, base/ fallback / 없으면 null).
+function resolveTaskPlanPath(root, scope) {
+	if (scope) {
+		const sp = scopeFileForRead(root, scope, 'plan', 'task-plan.json');
+		if (existsSync(sp)) return sp;
+	}
+	const bp = baseFileForRead(root, 'task-plan.json');
+	return existsSync(bp) ? bp : null;
+}
+
+// gh CLI 가용 여부 (PR 생성 채널). 부재 = graceful 수동 안내 (MCP-missing 동질 패턴).
+function ghAvailable() {
+	try {
+		execFileSync('gh', ['--version'], { stdio: 'ignore' });
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+function cmdEnterTask(args) {
+	if (!args.project) usage(3);
+	if (!args.task) {
+		console.error('[chain-driver enter-task] --task <TASK-id> 필수.');
+		process.exit(3);
+	}
+	const root = resolve(args.project);
+	let state;
+	try {
+		state = readState(root);
+	} catch (e) {
+		console.error(`[chain-driver enter-task] state read 실패: ${e.message}`);
+		process.exit(4);
+	}
+	const ac = getActiveScopeChain(state);
+	const scope = args.scope || state.current_scope;
+	if (!scope || !ac.scoped) {
+		console.error(
+			'[chain-driver enter-task] 활성 scope 필요 — init --scope <slug> 후 chain 진입 (task-major = scope 활성에서만).',
+		);
+		process.exit(3);
+	}
+	if (ac.current_chain !== 'test' && ac.current_chain !== 'implement') {
+		console.error(
+			`[chain-driver enter-task] stage 가 test|implement 여야 합니다 (현재 ${ac.current_chain}). RED→GREEN 작업 stage 에서만 enter-task.`,
+		);
+		process.exit(3);
+	}
+	const taskId = args.task;
+	// Jira 키·type lookup (무조건 Jira 정합 / 없으면 ticket-sync(plan) 선행 요구).
+	const evidence = loadLatestTicketEvidence(root);
+	const sub = evidence ? lookupSubtaskJira(evidence, taskId) : null;
+	if (!sub) {
+		console.error(
+			`[chain-driver enter-task] ${taskId} 의 Jira Sub-task 키를 ticket-sync-evidence 에서 찾지 못함. plan stage 에서 ticket-sync 를 먼저 실행하세요 (브랜치명 = Jira 키 SSOT).`,
+		);
+		process.exit(3);
+	}
+	const jiraKey = sub.jira_id;
+	const prefix = deriveBranchPrefix(sub.issue_type);
+	const branch = `${prefix}/${jiraKey}`;
+
+	// preview (--confirm 없으면 git 미접촉 + state 미변경).
+	if (!args.confirm) {
+		process.stdout.write(
+			[
+				'[chain-driver enter-task] preview (실행하려면 --confirm)',
+				`  task:   ${taskId}`,
+				`  scope:  ${scope}  (stage: ${ac.current_chain})`,
+				`  jira:   ${jiraKey}${sub.issue_type ? ` (${sub.issue_type})` : ''}`,
+				`  branch: ${branch}`,
+				'  action: --confirm 시 git 브랜치 생성/전환 + current_task set',
+				'',
+			].join('\n'),
+		);
+		process.exit(0);
+	}
+
+	// git preflight (no-simulation / exit-code 게이팅).
+	const git = makeGitRunner(root);
+	if (!gitAvailable(git)) {
+		console.error(
+			'[chain-driver enter-task] git 미사용 환경 (repo 아님/바이너리 부재) — 브랜치 생성 불가. git repo 에서 재시도 (환경 정직 신호 / carry).',
+		);
+		process.exit(3);
+	}
+	if (isUnborn(git)) {
+		console.error(
+			'[chain-driver enter-task] unborn HEAD (커밋 0개) — 최초 커밋 후 재시도 (분기 base 부재 / carry).',
+		);
+		process.exit(3);
+	}
+	const cur = currentBranch(git); // null = detached
+	const exists = branchExists(git, branch);
+	let action;
+	try {
+		if (cur === branch) {
+			action = 'noop'; // 이미 해당 브랜치 (멱등)
+		} else if (exists) {
+			switchBranch(git, branch);
+			action = 'switch';
+		} else {
+			if (cur === null) {
+				process.stderr.write(
+					'[chain-driver enter-task] ⚠️ detached HEAD — 현재 커밋 기준으로 새 브랜치를 분기합니다.\n',
+				);
+			}
+			createBranch(git, branch);
+			action = 'create';
+		}
+	} catch (e) {
+		console.error(
+			`[chain-driver enter-task] git 브랜치 ${exists ? '전환' : '생성'} 실패: ${e.message}`,
+		);
+		process.exit(1);
+	}
+
+	const enteredAt = new Date().toISOString();
+	writeStateCAS(root, (s) =>
+		setCurrentTask(s, scope, {
+			task_id: taskId,
+			branch,
+			jira_key: jiraKey,
+			entered_at: enteredAt,
+		}),
+	);
+	logIntervention(state, root, {
+		skill: 'enter-task',
+		scope,
+		task_id: taskId,
+		branch,
+		jira_key: jiraKey,
+		action,
+	});
+	process.stdout.write(
+		`[chain-driver enter-task] ✅ ${taskId} → ${branch} (${action}). 이 브랜치에서 RED→GREEN 후 finish-task.\n`,
+	);
+	process.exit(0);
+}
+
+function cmdFinishTask(args) {
+	if (!args.project) usage(3);
+	const root = resolve(args.project);
+	let state;
+	try {
+		state = readState(root);
+	} catch (e) {
+		console.error(`[chain-driver finish-task] state read 실패: ${e.message}`);
+		process.exit(4);
+	}
+	const ac = getActiveScopeChain(state);
+	const scope = ac.scope || state.current_scope;
+	const ct = ac.current_task;
+	if (!ct || !ct.task_id) {
+		console.error(
+			'[chain-driver finish-task] 활성 current_task 없음 — enter-task <TASK-id> 를 먼저 실행하세요.',
+		);
+		process.exit(3);
+	}
+	const taskId = ct.task_id;
+	const jiraKey = ct.jira_key;
+	const branch = ct.branch;
+
+	// GREEN 확인 — v1 floor: 활성 scope 의 implement gate(#5) = go (no-simulation / 실측 state 만).
+	//   per-task TC 단위 게이트는 deferred (§3.8 task-scoped 게이트 / cmdNext 골격 무변경 제약 — DEC §7).
+	const impl = ac.stage_progress && ac.stage_progress.implement;
+	const isGreen =
+		impl && impl.status === 'complete' && impl.gate_decision === 'go';
+	if (!isGreen) {
+		console.error(
+			`[chain-driver finish-task] GREEN 미달 — implement gate(#5)가 go 가 아닙니다 (현재 implement status=${impl ? impl.status : 'pending'}). chain-driver next 로 implement GREEN 통과 후 finish-task.`,
+		);
+		process.exit(1);
+	}
+
+	// linkage block 결정론 생성 (task-plan.tasks[id] + ticket-sync-evidence).
+	const tpPath = resolveTaskPlanPath(root, scope);
+	let task = null;
+	if (tpPath) {
+		try {
+			const tp = JSON.parse(readFileSync(tpPath, 'utf-8'));
+			if (tp && Array.isArray(tp.tasks))
+				task = tp.tasks.find((t) => t && t.id === taskId) || null;
+		} catch {
+			/* 손상/부재 → 최소 linkage */
+		}
+	}
+	if (!task) task = { id: taskId };
+	const evidence = loadLatestTicketEvidence(root);
+	const linkage = buildLinkageBlock({ task, evidence, jiraKey });
+	const prTitle = `${jiraKey}${task.title ? ` ${task.title}` : ''}`;
+
+	// preview (--confirm 없으면 PR 미생성 + current_task 보존).
+	if (!args.confirm) {
+		process.stdout.write(
+			[
+				'[chain-driver finish-task] preview (실행하려면 --confirm)',
+				`  task:   ${taskId}   branch: ${branch}`,
+				`  PR cmd: gh pr create --base main --head ${branch} --title "${prTitle}"`,
+				'',
+				linkage,
+			].join('\n'),
+		);
+		process.exit(0);
+	}
+
+	// PR 생성 (gh 있으면 실행 / 없거나 실패 시 graceful 수동 안내 — PR 은 체인 밖이라 차단 ❌).
+	let prResult;
+	if (ghAvailable()) {
+		try {
+			const out = execFileSync(
+				'gh',
+				[
+					'pr',
+					'create',
+					'--base',
+					'main',
+					'--head',
+					branch,
+					'--title',
+					prTitle,
+					'--body',
+					linkage,
+				],
+				{ cwd: root, encoding: 'utf-8' },
+			);
+			prResult = { created: true, url: (out || '').trim() };
+		} catch (e) {
+			process.stderr.write(
+				`[chain-driver finish-task] ⚠️ gh pr create 실패 (${(e.message || '').split('\n')[0]}) — 아래 linkage 로 수동 생성.\n`,
+			);
+			prResult = { created: false, reason: 'gh_failed' };
+		}
+	} else {
+		prResult = { created: false, reason: 'gh_missing' };
+	}
+
+	writeStateCAS(root, (s) => clearCurrentTask(s, scope));
+	logIntervention(state, root, {
+		skill: 'finish-task',
+		scope,
+		task_id: taskId,
+		branch,
+		jira_key: jiraKey,
+		pr_created: !!prResult.created,
+	});
+
+	if (prResult.created) {
+		process.stdout.write(
+			`[chain-driver finish-task] ✅ PR 생성: ${prResult.url || '(gh 출력 참조)'} / current_task clear.\n`,
+		);
+	} else {
+		process.stdout.write(
+			[
+				`[chain-driver finish-task] gh ${prResult.reason === 'gh_missing' ? '미설치' : '실패'} — 수동 PR 생성:`,
+				`  gh pr create --base main --head ${branch} --title "${prTitle}" --body <아래 linkage>`,
+				'',
+				linkage,
+				'current_task clear 됨.',
+				'',
+			].join('\n'),
+		);
+	}
+	process.exit(0);
+}
+
+// clear-task — 활성 current_task 를 해제 (git 미접촉 / GREEN 무관 / PR 미생성).
+//   적대검증 high-fix: task 포기·revisit 등으로 implement 가 GREEN 에 못 가면 finish-task(GREEN 미달
+//   exit 1)가 current_task 를 못 지워 가드가 영구 stuck → 명시 탈출구. 가드 비활성화는 사람 결단.
+function cmdClearTask(args) {
+	if (!args.project) usage(3);
+	const root = resolve(args.project);
+	let state;
+	try {
+		state = readState(root);
+	} catch (e) {
+		console.error(`[chain-driver clear-task] state read 실패: ${e.message}`);
+		process.exit(4);
+	}
+	const ac = getActiveScopeChain(state);
+	const scope = ac.scope || state.current_scope;
+	const ct = ac.current_task;
+	if (!ct || !ct.task_id) {
+		process.stdout.write('[chain-driver clear-task] 활성 current_task 없음 — no-op.\n');
+		process.exit(0);
+	}
+	writeStateCAS(root, (s) => clearCurrentTask(s, scope));
+	logIntervention(state, root, {
+		skill: 'clear-task',
+		scope,
+		task_id: ct.task_id,
+		branch: ct.branch,
+	});
+	process.stdout.write(
+		`[chain-driver clear-task] ✅ current_task(${ct.task_id} / ${ct.branch}) 해제 — 브랜치 가드 비활성. (git 미접촉 / PR 미생성 / 브랜치는 그대로 남음)\n`,
+	);
+	process.exit(0);
+}
+
 function main() {
 	const args = parseArgs(process.argv);
 	switch (args.command) {
@@ -3539,6 +3960,12 @@ function main() {
 			return cmdMigrateLayout(args);
 		case 'revisit-detect':
 			return cmdRevisitDetect(args);
+		case 'enter-task':
+			return cmdEnterTask(args);
+		case 'finish-task':
+			return cmdFinishTask(args);
+		case 'clear-task':
+			return cmdClearTask(args);
 		case '--help':
 		case '-h':
 			return usage(0);

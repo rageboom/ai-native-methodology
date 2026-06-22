@@ -20,3 +20,21 @@ export function isSourcePath(p) {
 	if (!p || typeof p !== 'string') return false;
 	return SOURCE_EXTS.has(extname(p).toLowerCase());
 }
+
+// branch-per-task 가드 전용 확장자 (DEC-2026-06-19-branch-per-task / 적대검증 blocker fix).
+//   SOURCE_EXTS(codegraph 언어 정렬 / Gap B 용)는 .xml/.sql/.jsp 등을 제외하나, 본 방법론의 PRIMARY
+//   레거시 타깃(Spring/iBATIS)은 SQL 행위가 mapper .xml·.sql 에, 서버템플릿이 .jsp 에 산다 →
+//   가드가 그것들을 못 보면 잘못된 브랜치에서 핵심 레거시 소스가 무가드로 통과. 가드는 더 넓게 본다
+//   (코드 + SQL/template/build/config). Gap B 의 SOURCE_EXTS 는 codegraph 정렬 유지(불침범).
+export const GUARD_SOURCE_EXTS = new Set([
+	...SOURCE_EXTS,
+	'.xml', '.sql', '.jsp', '.jspx', '.tag', // iBATIS/MyBatis mapper · SQL migration · JSP 서버템플릿
+	'.gradle', '.properties', '.yml', '.yaml', // build · Spring config
+	'.vm', '.ftl', '.thymeleaf', '.mustache', '.hbs', // 템플릿 엔진
+	'.html', '.htm', '.css', '.scss', '.less', // FE markup/style
+]);
+
+export function isGuardedSourcePath(p) {
+	if (!p || typeof p !== 'string') return false;
+	return GUARD_SOURCE_EXTS.has(extname(p).toLowerCase());
+}
