@@ -124,7 +124,7 @@
     }
   ],
   "cross_cutting": {
-    "validators": ["schema-validator", "br-cross-consistency-validator", "formal-spec-link-validator", "decision-table-validator", "analysis-extraction-validator", "verdict-consistency-validator", "characterization-coverage-validator (S2/S3)", "sql-inventory-validator (RDB)"],
+    "validators": ["schema-validator", "br-cross-consistency-validator", "formal-spec-link-validator", "decision-table-validator", "analysis-extraction-validator", "verdict-consistency-validator", "characterization-coverage-validator (S2/S3)", "sql-inventory-validator (RDB)", "analysis-self-consistency-validator (count-bearing artifacts)"],
     "$comment_validators": "DEC-2026-06-06-analysis-exit-gate (+ DEC-2026-06-15 verdict 승격) — analysis exit gate #0 validator 목록 (sdlc-4stage-flow gates[#0] ≡ 본 배열, conditional 제외 / check26 4중 정합 / gate-eval REQUIRED.analysis ⊆). base 6 (schema/br-cross/formal-spec-link/decision-table/analysis-extraction/verdict-consistency) + 조건부 2 (characterization-coverage[S2/S3] · sql-inventory[RDB]).",
     "findings": {
       "schema": "schemas/finding-system.schema.json",

@@ -1,6 +1,6 @@
-# tools/ — 검증 도구 npm workspace (29 패키지)
+# tools/ — 검증 도구 npm workspace (30 패키지)
 
-본 디렉토리 = npm workspace 29 도구 패키지 (`_shared` lib + `semgrep-rules` data 제외). plugin user 가 자기 산출물 검증 시 CLI 호출하는 자산. (정확한 인벤토리는 하위 폴더 + `package.json` workspaces 참조 — 본 README 는 카운트 하드코딩 최소화.)
+본 디렉토리 = npm workspace 30 도구 패키지 (`_shared` lib + `semgrep-rules` data 제외). plugin user 가 자기 산출물 검증 시 CLI 호출하는 자산. (정확한 인벤토리는 하위 폴더 + `package.json` workspaces 참조 — 본 README 는 카운트 하드코딩 최소화.)
 
 ## 자산 매핑 매트릭스 cross-link
 
@@ -84,6 +84,7 @@ release             → traceability-matrix-builder
 | [`graph-integrity-validator/`](./graph-integrity-validator/) | cross-cut | artifact dependency graph 무결성 검증 |
 | [`code-pointer-validator/`](./code-pointer-validator/) | cross-cut | 산출물 code pointer (strict_path / ast_symbol) 실재 검증 |
 | [`analysis-extraction-validator/`](./analysis-extraction-validator/) | analysis | analysis 추출 산출물 입출력 무결성 |
+| [`analysis-self-consistency-validator/`](./analysis-self-consistency-validator/) | analysis (gate#0 conditional) | 산출물 summary/count ↔ 자기 배열 정합 (count-bearing 산출물 / DEC-2026-06-22) |
 | [`greenfield-bootstrap/`](./greenfield-bootstrap/) | input | greenfield 진입 (swagger→openapi elevation / 결정적) |
 | [`db-assets-validator/`](./db-assets-validator/) | analysis·plan | DB 자산 always-on 정책 + SP 전환 결단 검증 |
 | [`adopter-evidence-packager/`](./adopter-evidence-packager/) | release | adopter corroboration evidence 패키징 |

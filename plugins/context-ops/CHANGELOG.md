@@ -10,6 +10,31 @@
 
 ---
 
+## [0.66.0] — 2026-06-22 — MINOR — analysis-self-consistency-validator (산출물 summary/count ↔ 자기 배열 정합 결정론 검사)
+
+**문제**: `DEC-2026-06-13-append-catalog-rulecount-ssot`이 "count = backing 배열의 비정규화 캐시 / 배열 = SSOT / LLM 이 손으로 적은 정수 불신" 원칙을 확립했으나, 강제(`rule_count := rule_ids.length`)가 `_shared/append-catalog.js`(BC index) **한 곳에만** 구현됨. analysis-agent 가 직접 산출하는 13 산출물의 `summary`/`count` 가 자기 배열과 drift 하는 미스카운트가 반복 재현 → 매번 비싼 LLM groundedness skeptic(~3M토큰)에서야 검출. 3맥락 재현(append-catalog 21/23 · 실사용 vac-settlement 5th fail 11 · work-system 6th `type-spec.total_types` 45 vs 배열 48). SSOT: `DEC-2026-06-22-analysis-self-consistency-validator`.
+
+### Added — analysis-self-consistency-validator (결정론 / gate#0 conditional)
+- **`tools/analysis-self-consistency-validator/` 신설** — `src/validator.js`(하드코딩 `INVARIANTS` 맵 + `detectKind`(shape 기반)/`groupByCount`/`comparePartition`/`applyFix`) + `src/cli.js`(`<file-or-dir>` 재귀 + `--json`/`--dry-run`/`--fix` / exit 0·1·2 / `write-stdout-sync` 파이프 안전) + README + test 16개. deps 0.
+- **검사 클래스 4종**: scalar(`total_X == X.length`) / partition(배열 group-by 양방향 — 키 합집합 + 0-default 비교 = 빠진키·잉여키·값불일치·명시적0 정합 판정) / filtered(`count(arr where pred)`) / custom reducer(`domain_linked_count == uniq(cross_links.from_type)` / `total_translations == Σ`). **8 count-bearing 산출물**(type-spec / static-security-spec / antipatterns / a11y-spec / form-validation-spec / i18n-spec / visual-manifest / business-rules). schema 13종 **무수정**(하드코딩 맵 = gate-eval REQUIRED·CHAIN_TO_ANALYSIS_REFS 관용).
+- **`--fix`** — 배열=SSOT 가정 하 scalar/partition-값/filtered/custom count in-place 재계산(`_shared/append-catalog.js` `detectIndent` 보존). 기본 off. partition 키 추가/삭제·derived 제외.
+
+### Changed — wiring (gate#0 conditional / check26 4중 정합)
+- `flows/sdlc-4stage-flow.json` gate#0 `conditional_validators` + `flows/analysis.phase-flow.json` `cross_cutting.validators` 등재. `tools/findings-aggregator`(cli.js `buildAnalysisArgs` case + `extraValidators` push[count-bearing dir 존재 시] / aggregator.js dispatch → `transformGeneric`). `gate-eval.js` REQUIRED **불변**(conditional / PoC failClosed 회피) + 주석 동기.
+
+### 스코프 한계 (skeptic 대체 아님)
+- **구조적 summary/count 필드만** 검사. `meta.warnings`("SIX RealGrid")·`description`("useState 16개") 등 prose-embedded 숫자는 NLP = groundedness skeptic 담당(work-system 6 fail 중 5건이 이 유형). 본 도구는 가장 비싼 구조적 drift(type-spec 류)를 LLM 앞단에서 싸게 선제 제거. false-positive 0 지향(summary+배열 둘 다 존재 시만 / discriminator 전무 N/A / derived 미등록).
+
+### 실증 (실사용 corroboration)
+- 이미 커밋된 5 도메인에 적용 → schema-validator + groundedness skeptic 통과분에서 **구조적 미스카운트 5건 신규 검출**(salary 3: i18n `total_keys` 62 vs 81 · form-validation `per_validation_type` 분포 / maternity 2: business-rules `by_category` 분포 — 전부 총합은 맞고 **partition 이 틀린** 케이스 = total-only 불가) · **오탐 0**(work-system·vacation-creation·attendance-close·vac-settlement clean).
+
+### Tests
+- `test/validator.test.js` 16개 GREEN (6th 원버그 `total_types 45 vs 48` 재현 + partition 빠진키·값·잉여키 + 중첩 countAt + presence-gated N/A + derived 제외 회귀 + 명시적0 회귀 + `--fix` round-trip + CLI exit/dry-run/dir-scan). check26 gate validator list consistency 통과(symmetric-diff ⊆ conditional allowlist).
+
+**Deferred (≥2 PoC / 실인스턴스 후 격상)**: visual-manifest `diff_status`/`captured_by` breakdown(비어있지 않은 인스턴스 부재로 enum 미검증 → total_snapshots 만) · characterization `intent_vs_bug` open object(키 불안정) · per-skill 호출(각 count-bearing SKILL 자기 산출 직후) · prose-embedded 숫자(설계상 skeptic 영구 담당). release-readiness 신규 check 미추가(check11 workspace-test 가 신규 16 test 게이팅 / criteria=42 불변).
+
+---
+
 ## [0.65.0] — 2026-06-19 — MINOR — branch-per-task git hygiene (Sub-task별 브랜치 + Sub-task별 PR + 연결 가시화)
 
 **문제**: 티켓 기반 작업 시 (a) 전용 브랜치를 따고 (b) **잘못된 브랜치에서의 소스 작성을 결정론적으로 차단**하며 (c) 작업 완료 시 **각 Sub-task PR이 어떤 Story·Epic·형제·의존·AC에 연결됐는지 한눈에** 보이게 하는 git 위생 고리가 미배선. 사용자 최종 결정(2026-06-19) = **Sub-task별 브랜치 + Sub-task별 PR(N개) + PR 연결(linkage) 가시화**. SSOT: `DEC-2026-06-19-branch-per-task-git-hygiene` + `.claude/plans/plan-branch-per-ticket.md`.

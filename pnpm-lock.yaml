@@ -34,6 +34,8 @@ importers:
 
   plugins/context-ops/tools/analysis-extraction-validator: {}
 
+  plugins/context-ops/tools/analysis-self-consistency-validator: {}
+
   plugins/context-ops/tools/bc-accumulator-rollup: {}
 
   plugins/context-ops/tools/br-cross-consistency-validator: {}

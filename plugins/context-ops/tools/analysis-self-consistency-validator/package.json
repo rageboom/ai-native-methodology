@@ -1,0 +1,12 @@
+{
+  "name": "@mis-plugins/analysis-self-consistency-validator",
+  "version": "0.66.0",
+  "description": "analysis 산출물의 summary/count 필드가 자기 backing 배열과 정합하는지 결정론 검사. DEC-2026-06-13(append-catalog rule_count SSOT)을 13 산출물로 일반화 — 구조적 count drift 를 LLM groundedness skeptic 앞단에서 싸게 선제 제거.",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": {
+    "analysis-self-consistency-validator": "./src/cli.js"
+  },
+  "scripts": { "test": "node --test test/validator.test.js" },
+  "license": "UNLICENSED"
+}

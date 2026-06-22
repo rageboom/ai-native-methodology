@@ -370,6 +370,11 @@ function buildAnalysisArgs(validatorName, projectDir, artifacts) {
 			// --enforce: fail-closed (high 유지 → gate STOP). DEC-2026-06-15 enforce 승격.
 			return ok(dir) ? ['--root', dir, '--enforce', '--json'] : null;
 		}
+		case 'analysis-self-consistency-validator': {
+			// DEC-2026-06-22 — 산출물 summary/count ↔ 자기 배열 정합. dir-scan(count-bearing 산출물만 검사, 나머지 N/A).
+			const dir = abs(artifacts['analysis-output-dir']);
+			return ok(dir) ? [dir, '--json'] : null;
+		}
 		default:
 			return null;
 	}
@@ -417,6 +422,9 @@ function main() {
 			extraValidators.push('characterization-coverage-validator');
 		if (artifacts['sql-inventory'])
 			extraValidators.push('sql-inventory-validator');
+		// DEC-2026-06-22 — count-bearing 산출물 자기정합(summary↔배열). dir 존재 시 추가(self-gating: 비-count 산출물은 N/A).
+		if (artifacts['analysis-output-dir'])
+			extraValidators.push('analysis-self-consistency-validator');
 		const runAnalysisValidator = (name, projectDir) =>
 			runValidatorAnalysis(name, projectDir, artifacts);
 		findings = aggregateForStage(

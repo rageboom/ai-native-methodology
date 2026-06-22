@@ -113,7 +113,7 @@
       "id": "#0",
       "stage": "analysis",
       "validators": ["schema-validator", "br-cross-consistency-validator", "formal-spec-link-validator", "decision-table-validator", "analysis-extraction-validator", "verdict-consistency-validator"],
-      "conditional_validators": ["characterization-coverage-validator (S2/S3)", "sql-inventory-validator (RDB)"],
+      "conditional_validators": ["characterization-coverage-validator (S2/S3)", "sql-inventory-validator (RDB)", "analysis-self-consistency-validator (count-bearing artifacts)"],
       "$comment": "DEC-2026-06-06-analysis-exit-gate — analysis→discovery exit gate (옵션 A fail-closed + soft). caller(findings-aggregator)가 결정론 validator 실행→findings→chain-driver next 가 gate #0 평가. gate-eval REQUIRED.analysis ⊆ 본 validators. 조건부는 cross_cutting.validators 등재 + conditional_validators allowlist (check26 4중 정합). drift-validator 제외 = 플러그인 구조 검사(사용자 analysis 산출물 아님).",
       "skill": "skills/_base-invoke-go-stop-gate"
     },

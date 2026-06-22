@@ -338,6 +338,9 @@ export function dispatchValidator(validatorName, output) {
 		case 'verdict-consistency-validator':
 			// { findings, summary:{critical,high,medium,low,info} } — generic summary 정합 (DEC-2026-06-15 / 이중분류·모순 = high → HARD)
 			return transformGeneric(JSON.parse(output));
+		case 'analysis-self-consistency-validator':
+			// { summary:{total_findings,high,medium}, results } — count↔배열 drift = high → HARD (DEC-2026-06-22)
+			return transformGeneric(JSON.parse(output));
 		default:
 			// generic JSON fallback (drift / spec-test-link / static-runner)
 			try {
