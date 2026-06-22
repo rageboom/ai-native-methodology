@@ -28,6 +28,9 @@ plugins/context-ops/examples/poc-03-realworld-nestjs/source/nestjs-realworld-tmp
 # Claude Code local settings
 .claude/settings.local.json
 .claude/worktrees/
+# 세션-로컬 스크래치 (매 세션 갱신 = 추적 시 churn / SSOT 아님)
+.claude/scheduled_tasks.lock
+.claude/workflows/
 
 # OS
 .DS_Store
