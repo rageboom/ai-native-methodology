@@ -10,6 +10,27 @@
 
 ---
 
+## [0.68.0] — 2026-06-23 — MINOR — gate 진입 시 plan-review-server 자동 띄움 (opt-in → 기본 동작)
+
+**문제**: v0.67.0 으로 plan-review-server 본체는 출하됐지만, gate skill(`_base-invoke-go-stop-gate`)에는 **opt-in off-ramp** 로만 걸려 있었다 — 사용자가 "브라우저로 볼게"라고 **명시 수락해야만** 띄우고, 절차도 v0.67.0 이전의 `--input` 단일 산출물 흐름이며 "spec=2종"이라 적혀 있었다(실제 3종). gate 검토 보조라는 설계 의도(`DEC-2026-06-19-plan-review-server`)대로, discovery·spec·plan gate 진입 시 **능동적으로** 띄워야 한다.
+
+### Changed — gate skill 자동 띄움으로 격상 (`skills/_base-invoke-go-stop-gate/SKILL.md`)
+- **§인터랙티브 검토 편집기 절차 재작성**: "사용자 수락 시 opt-in" → **"discovery·spec·plan gate 진입 시 기본 동작으로 자동 spawn"**(브라우저 자동 오픈 / 텍스트 prompt 병행 fallback). **Auto Mode 위임 시 skip**(브라우저 검토는 사람 결단 전제).
+- **명령을 `--phase` 한 페이지로 교체**: `--input <단일>` → `--phase <discovery|spec|plan> --project <proj> --summaries`(`${CLAUDE_PLUGIN_ROOT}/` prefix 유지). spec = **behavior·unit·ac 3종 탭**으로 정정(종전 "2종").
+- **frontmatter `allowed-tools` 에 `Bash` 추가** — 서버 background spawn 권한(종전 Read/Write/Edit 만이라 "Bash 로 spawn" 절차와 모순).
+- 호출 순서에 gate별 분기 명시(discovery·spec·plan = 자동 spawn / test·implement = 텍스트 prompt, 렌더러 carry). 구 4-stage 명칭 → System Y canonical(discovery1/spec2/plan3/test4/implement5) 정정. 인용 footer 에 `DEC-2026-06-19-plan-review-server` 추가.
+
+### Fixed — `--phase` 모드의 `--summaries` 갭 (`tools/plan-review-server/src/cli.js`)
+- phase 모드(`runPhase`)가 `--summaries` 를 파싱만 하고 createServer 경로엔 넘기지 않아, 한 페이지(탭)에서는 AI 평이 요약이 표시되지 않던 갭을 메움. phase 는 한 페이지에 여러 산출물이라 **산출물별 nesting** 구조로 받아 각 document 에 주입: `{ "<artifact-type>": { "<cardBase>": { "summary" } } }`(단일 `--input` 모드는 종전 flat). 백엔드(`server.js` loadDoc)·프론트(`kit.js` 병합)는 이미 document별 summaries 를 처리 중이라 cli 분배만 보완.
+
+### Tests
+- `test/multi.test.js`: CLI `--phase spec --summaries` 를 실제 spawn 해 nested 요약이 산출물별 document 로 정확히 분배(behavior/ac 주입 + 미제공 unit=null)되는지 end-to-end 검증 추가. plan-review-server 58 → 59 green / 회귀 0.
+
+### Trust 불변 (변경 없음)
+- 서버는 reference-lens — 평결=`chain-driver next`(결정론) / 재검증=`plan-coverage-validator`(task-plan) / 산출물 write=사람 프롬프트만 / AI 요약=표시 전용(저장·gate inject ❌). 자동 띄움은 skill Bash 의 사용자-호출 경로(hook spawn ❌)라 결정론 axis 무오염.
+
+---
+
 ## [0.67.0] — 2026-06-22 — MINOR — chain 산출물 인터랙티브 검토 편집기 (plan-review-server / discovery·spec·plan)
 
 **문제**: chain harness gate 에서 사람은 산출물 json(use_cases/behaviors/criteria/tasks/ADR/NFR…)을 통째로 읽고 머릿속으로 "어디가 틀렸나"를 판단한 뒤 자연어로 던져야 했다 — 정독 + cross-artifact ID 체계 파악의 인지 부담이 크고 수정이 어렵다. 사용자 요구 = "산출물을 브라우저에서 보고, 바꾸고 싶은 항목을 클릭해 프롬프트로 의도를 적으면 AI 가 재설계". SSOT: `DEC-2026-06-19-plan-review-server`(예정).

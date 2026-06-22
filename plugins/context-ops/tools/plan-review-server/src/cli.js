@@ -65,10 +65,11 @@ usage (단일):  plan-review-server --input <path> [--artifact <type>] [--summar
 usage (phase): plan-review-server --phase <discovery|spec|plan> --project <dir> [...]
 
   --phase       discovery|spec|plan — 한 페이즈의 산출물을 한 페이지(탭)로. spec = behavior+unit+ac 3종.
-                --project 의 .ai-context/output/ 에서 산출물 자동 수집.
+                --project 의 .ai-context/output/ 에서 산출물 자동 수집. (--summaries 는 산출물별 nesting)
   --input       (단일) 산출물 json 경로 (--task-plan 별칭). 예: .ai-context/output/discovery-spec.json
   --artifact    discovery-spec|behavior-spec|unit-spec|acceptance-criteria|task-plan (미지정 시 파일명 추론)
-  --summaries   AI 평이 요약 json ({ "<cardBase>": { summary } } / 원문 ≠ / 표시 전용)
+  --summaries   AI 평이 요약 json (원문 ≠ / 표시 전용). 단일 = { "<cardBase>": { summary } } /
+                phase = { "<artifact-type>": { "<cardBase>": { summary } } } (산출물별 nesting)
   --agent-reply 재설계 후 "뭘 바꿨다" 배너 텍스트 (닫힌 루프 / 표시 전용)
   --acceptance  (task-plan 만) 미지정 시 같은 디렉토리 acceptance-criteria.json
   --project     chain-driver state 루트 (gate 평결 위임 / 미지정 시 평결 생략)
@@ -91,6 +92,18 @@ function runPhase(args) {
 	if (!args.project) fail('✗ --phase 는 --project <dir> 필요 (.ai-context/output/ 수집)');
 	const root = resolve(args.project);
 	const outDir = join(root, '.ai-context', 'output');
+	// phase summaries 는 산출물별 nesting — 한 페이지에 여러 산출물이라 type 으로 1차 분기.
+	//   { "<artifact-type>": { "<cardBase>": { summary } } } (단일 --input 모드는 flat).
+	let phaseSummaries = null;
+	if (args.summaries) {
+		const sp = resolve(args.summaries);
+		if (!existsSync(sp)) fail(`✗ summaries 부재: ${sp}`);
+		try {
+			phaseSummaries = JSON.parse(readFileSync(sp, 'utf-8'));
+		} catch (e) {
+			fail(`✗ summaries 파싱 실패: ${e.message}`);
+		}
+	}
 	const documents = [];
 	for (const at of PHASES[phase].artifacts) {
 		const p = join(outDir, `${at}.json`);
@@ -99,7 +112,13 @@ function runPhase(args) {
 			continue;
 		}
 		const schemaPath = join(REPO, 'schemas', `${at}.schema.json`);
-		documents.push({ artifactType: at, path: p, schema: JSON.parse(readFileSync(schemaPath, 'utf-8')), label: ARTIFACTS[at].label });
+		documents.push({
+			artifactType: at,
+			path: p,
+			schema: JSON.parse(readFileSync(schemaPath, 'utf-8')),
+			label: ARTIFACTS[at].label,
+			summaries: (phaseSummaries && phaseSummaries[at]) || null,
+		});
 	}
 	if (!documents.length) fail(`✗ ${phase} 페이즈 산출물이 ${outDir} 에 없음`);
 
