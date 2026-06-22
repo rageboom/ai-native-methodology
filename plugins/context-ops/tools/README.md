@@ -24,6 +24,7 @@
 | [`schema-validator/`](./schema-validator/) | — | sub | sub | sub | sub | sub | — | gate auto (전 stage 공용) |
 | [`discovery-extraction-validator/`](./discovery-extraction-validator/) | — | **gate #1** | — | — | — | — | — | gate auto (chain-driver next) |
 | [`chain-coverage-validator/`](./chain-coverage-validator/) | — | — | **gate #2** | — | — | — | — | gate auto (+ release traceability) |
+| [`unit-spec-oracle-validator/`](./unit-spec-oracle-validator/) | — | — | gate #2 cond (soft) | — | — | — | — | gate auto (findings-aggregator spec extraValidators / DEC-2026-06-22-unit-spec-oracle-symmetry) |
 | [`plan-coverage-validator/`](./plan-coverage-validator/) | — | — | — | **gate #3** | — | — | — | gate auto (NFR allocation + SP 분류 hard gate) |
 | [`spec-test-link-validator/`](./spec-test-link-validator/) | — | — | — | — | **gate #4** | — | — | gate auto |
 | [`test-impl-pass-validator/`](./test-impl-pass-validator/) | — | — | — | — | dry-run | **gate #5** | — | gate auto (`--allow-execute` 의무) |

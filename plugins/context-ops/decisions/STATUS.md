@@ -9,6 +9,11 @@
 
 > 다음 세션 진입 = 아래 frontier 중 **사용자 선택** (방법론 원칙: 다음 의제 = 사용자 결단 / 하드코딩 ❌).
 
+### ★ 다음 세션 인계 (2026-06-22 / **v0.69.0 — unit-spec-oracle-validator (required UNIT 합격선 oracle≥1 대칭 / soft)** / DEC-2026-06-22-unit-spec-oracle-symmetry)
+
+- behavior `AC.verifiable⇒TC` 짝을 unit 에 대칭: required UNIT 이 oracle(invariant/property/characterization_snapshot)≥1 OR oracle_waiver. soft(medium-only / gate-eval REQUIRED.spec 미등재). 상세 = CHANGELOG [0.69.0] + DEC SSOT.
+- **carry(hard 격상 frontier / 사용자 결단)**: ① medium→high + gate-eval REQUIRED.spec 등재 = ≥2 도메인 oracle 보강(waiver→실 ref) 입증 후 별도 promotion DEC ② characterization_only 도 oracle 검사 포함 ③ formal-spec.invariants 본문 구조화 ④ characterization-spec.json 실수립 PoC 에서 characterization_snapshot_refs 실 ref·dead-ref 실증.
+
 ### ★ 다음 세션 인계 (2026-06-16 / **v0.50.0 — unit-spec EMIT 배선(integration gap 해소): 신규 skill `spec-derive-unit-spec`** / DEC-2026-06-16-unit-spec-emit-wiring)
 
 - unit 층 게이트(v0.40.0 HARD)는 있는데 입력 생산자(unit-spec emit)가 미배선이던 갭 해소. spec stage 에 S2(characterized_from_code) emit skill 추가. 상세 = CHANGELOG [0.50.0] + DEC SSOT.

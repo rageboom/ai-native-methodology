@@ -22,7 +22,8 @@
         "symbol": "encryptPassword"
       },
       "bc_ref": "BC-USER",
-      "unit_test_obligation": "required"
+      "unit_test_obligation": "required",
+      "oracle_waiver": "vendored OSS(express-prisma boilerplate) bcrypt 위임 빌딩블록 / formal invariant 미정의 — AS-IS 동작은 기존 OSS unit test 가 핀(meta $comment 정합 / Feathers characterization). characterization-spec.json 미수립 = characterization_snapshot_refs carry."
     },
     {
       "id": "UNIT-PICK-001",
@@ -35,7 +36,8 @@
         "symbol": "pick"
       },
       "bc_ref": "BC-POST",
-      "unit_test_obligation": "required"
+      "unit_test_obligation": "required",
+      "oracle_waiver": "vendored OSS 객체 키 선택 유틸 / 순수 매핑 · formal invariant 미정의 — AS-IS 동작은 기존 OSS unit test 가 핀. characterization-spec.json 미수립 = characterization_snapshot_refs carry."
     }
   ],
   "coverage": {

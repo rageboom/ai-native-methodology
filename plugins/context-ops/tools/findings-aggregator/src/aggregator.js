@@ -341,6 +341,9 @@ export function dispatchValidator(validatorName, output) {
 		case 'analysis-self-consistency-validator':
 			// { summary:{total_findings,high,medium}, results } — count↔배열 drift = high → HARD (DEC-2026-06-22)
 			return transformGeneric(JSON.parse(output));
+		case 'unit-spec-oracle-validator':
+			// { applicable, summary:{total_findings,high,medium}, findings } — required UNIT oracle 누락 = medium(soft / 게이트 미차단) → gate-eval validator_high 미진입 (DEC-2026-06-22-unit-spec-oracle-symmetry)
+			return transformGeneric(JSON.parse(output));
 		default:
 			// generic JSON fallback (drift / spec-test-link / static-runner)
 			try {

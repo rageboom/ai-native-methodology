@@ -1,0 +1,12 @@
+{
+  "name": "@mis-plugins/unit-spec-oracle-validator",
+  "version": "0.69.0",
+  "description": "unit-spec.json 의 unit_test_obligation=required UNIT 이 검증 oracle(invariant_refs/property_test_refs/characterization_snapshot_refs)을 ≥1 가리키는지 검사. behavior 의 acceptance-criteria verifiable⇒test_case_refs 짝 규칙을 unit 층에 대칭. 합격선 0건 = test 단계 거짓 GREEN 의 선제 medium finding(soft / 게이트 미차단).",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": {
+    "unit-spec-oracle-validator": "./src/cli.js"
+  },
+  "scripts": { "test": "node --test test/validator.test.js" },
+  "license": "UNLICENSED"
+}

@@ -127,8 +127,8 @@
       "id": "#2",
       "stage": "spec",
       "validators": ["chain-coverage-validator", "chain-coverage-validator --antipatterns (F-SIM-001 ap-coverage lane)", "drift-validator (chain mode)", "decision-table-validator", "formal-spec-link-validator (--chain-mode)", "schema-validator"],
-      "conditional_validators": ["spectral-runner (OpenAPI)"],
-      "$comment_conditional": "F-S07 (S10/S14) — spectral-runner 는 OpenAPI 존재 시만 조건부 (cross_cutting.validators 에 등재 / gate-eval REQUIRED·gate matrix 비포함 = 정당 차이). check26 conditional allowlist.",
+      "conditional_validators": ["spectral-runner (OpenAPI)", "unit-spec-oracle-validator (required UNIT oracle≥1)"],
+      "$comment_conditional": "F-S07 (S10/S14) — spectral-runner 는 OpenAPI 존재 시만 조건부 (cross_cutting.validators 에 등재 / gate-eval REQUIRED·gate matrix 비포함 = 정당 차이). unit-spec-oracle-validator (DEC-2026-06-22-unit-spec-oracle-symmetry) = unit-spec.json 존재 시만 조건부 (soft / medium-only / gate-eval REQUIRED.spec 미등재 = 정당 차이 / check26 conditional allowlist). check26 conditional allowlist.",
       "skill": "skills/_base-invoke-go-stop-gate"
     },
     {

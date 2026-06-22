@@ -265,6 +265,11 @@ export function buildValidatorArgs(validatorName, projectDir, stage, scopeCtx = 
 			return ['--target', projectDir, '--json'];
 		case 'formal-spec-link-validator':
 			return ['--target', projectDir, '--json'];
+		case 'unit-spec-oracle-validator':
+			// DEC-2026-06-22-unit-spec-oracle-symmetry — spec stage 조건부(soft). required UNIT 합격선(oracle≥1) 검사.
+			//   unit-spec 부재 PoC = validator N/A(빈 결과 exit 0) → failClosedOnNull 환경서도 evidence_missing 오탐 없음.
+			//   --characterization 미부여(현 PoC 0건) → characterization_snapshot_refs dead-ref 검증 skip / oracle 존재 검사만.
+			return [O('unit-spec.json'), '--json'];
 		// F-EVENT-CARRY-DANGLING — code_pointer strict_path 실재성 gate (implement).
 		//   positional <artifact-graph.json> + --repo-root <projectDir> 계약 (graph-integrity 의 --target 와 상이 → 명시 케이스 필수).
 		//   --strict: path_missing/glob_no_match/coverage_missing 을 high 로 격상 → transformGeneric summary.high → gate-eval validator_high(block).
@@ -441,11 +446,15 @@ function main() {
 		//   static-runner(환경 의존 semgrep) 는 정직한 evidence_missing 으로 surface.
 		// F-R2-35 — 비-analysis stage 도 state.current_scope 로 per-scope 경로 해석 (analysis loadAnalysisRefs 대칭).
 		const scopeCtx = loadScopeCtx(args.target);
+		// DEC-2026-06-22-unit-spec-oracle-symmetry — spec stage 조건부 soft validator (required UNIT oracle≥1).
+		//   medium-only / gate-eval REQUIRED.spec 미등재 + sdlc gate#2 conditional_validators 등재 = 게이트 미차단(soft).
+		//   unit-spec 부재 시 validator 가 N/A(빈 결과 exit 0) 반환 → failClosedOnNull 와 무관하게 evidence_missing 오탐 없음.
+		const extraValidators = args.stage === 'spec' ? ['unit-spec-oracle-validator'] : [];
 		findings = aggregateForStage(
 			args.stage,
 			args.target,
 			(name, dir) => runValidator(name, dir, args.stage, scopeCtx),
-			{ failClosedOnNull: true },
+			{ extraValidators, failClosedOnNull: true },
 		);
 	}
 

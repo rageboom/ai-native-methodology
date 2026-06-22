@@ -33,7 +33,8 @@
       "kind": "function",
       "code_pointer": { "path": "target/src/formatMoney.mjs", "anchor_type": "ast_symbol", "symbol": "formatMoney", "stale": false },
       "bc_ref": "BC-ALLOC",
-      "unit_test_obligation": "required"
+      "unit_test_obligation": "required",
+      "oracle_waiver": "trivial 통화 표시 포맷터 (정수 cents → 문자열 $D.CC) / 분배 보존(BR-ALLOC-CONSERVATION-001) 불변식과 무관한 표현 변환 — formal invariant 불요."
     },
     {
       "id": "UNIT-RECEIPT-DTO-001",

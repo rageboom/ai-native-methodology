@@ -36,7 +36,8 @@
       "inputs": ["domain.json", "characterization-spec.json", "behavior-spec.json"],
       "outputs": ["unit-spec.json"],
       "introduced": "v0.50.0",
-      "skills": ["spec-derive-unit-spec"]
+      "skills": ["spec-derive-unit-spec"],
+      "automated_validation": ["unit-spec-oracle-validator", "schema-validator"]
     },
     {
       "id": "cross-link-7-deliverables",
@@ -66,7 +67,7 @@
     }
   ],
   "cross_cutting": {
-    "validators": ["chain-coverage-validator", "drift-validator (chain mode)", "decision-table-validator", "formal-spec-link-validator (--chain-mode)", "schema-validator", "spectral-runner (OpenAPI)"],
+    "validators": ["chain-coverage-validator", "drift-validator (chain mode)", "decision-table-validator", "formal-spec-link-validator (--chain-mode)", "schema-validator", "spectral-runner (OpenAPI)", "unit-spec-oracle-validator (required UNIT oracle≥1)"],
     "ratchet_threshold": 0.85,
     "no_simulation": true,
     "verifiable_required": true

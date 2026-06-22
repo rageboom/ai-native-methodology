@@ -128,6 +128,8 @@ importers:
 
   plugins/context-ops/tools/traceability-matrix-builder: {}
 
+  plugins/context-ops/tools/unit-spec-oracle-validator: {}
+
   plugins/context-ops/tools/verdict-consistency-validator: {}
 
 packages:

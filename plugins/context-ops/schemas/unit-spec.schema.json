@@ -103,6 +103,17 @@
           "waiver_reason": {
             "type": "string",
             "description": "unit_test_obligation=waived 시 사유 의무 (예: 'pure data holder / no branch logic')."
+          },
+          "oracle_waiver": {
+            "type": "string",
+            "minLength": 1,
+            "description": "v0.67.0 신설 (DEC-2026-06-22-unit-spec-oracle-symmetry). unit_test_obligation=required 인데 검증 oracle(invariant_refs / property_test_refs / characterization_snapshot_refs) 0건일 때 정직 면제 사유. behavior 의 verifiable⇒test_case_refs 짝 규칙을 unit 에 대칭 — 'required 인데 합격선(oracle) 0건' = unit-spec-oracle-validator medium finding. 본 필드로 정직 면제(예: 'trivial 표시 포맷터 / 불변식 불요', 'vendored 라이브러리 위임 래퍼 / characterization snapshot 미수립 carry'). 빈 사유 차단(minLength:1). invariant 날조 금지 — 진짜 oracle 이 있으면 ref 를 채우고 본 필드를 쓰지 않는다."
+          },
+          "characterization_snapshot_refs": {
+            "type": "array",
+            "items": {"type": "string", "pattern": "^SNAP-[A-Z0-9_-]+$"},
+            "uniqueItems": true,
+            "description": "v0.67.0 신설 (DEC-2026-06-22-unit-spec-oracle-symmetry). characterization-spec.snapshots[].snapshot_id (^SNAP-) 참조 — S2 characterized_from_code UNIT 의 AS-IS oracle 채널. invariant_refs(formal 불변식 / greenfield·designed_from_spec) · property_test_refs 와 함께 'required UNIT 합격선' 3채널 중 하나. unit-spec-oracle-validator 가 required ⇒ (invariant_refs ∪ property_test_refs ∪ characterization_snapshot_refs) ≥1 검사."
           }
         },
         "allOf": [

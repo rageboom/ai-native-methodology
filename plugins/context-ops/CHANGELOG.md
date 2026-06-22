@@ -10,6 +10,28 @@
 
 ---
 
+## [0.69.0] — 2026-06-23 — MINOR — unit-spec-oracle-validator (required UNIT 합격선 oracle≥1 대칭 검사)
+
+**문제**: spec 단계 behavior 스레드엔 `AC.verifiable=true ⇒ test_case_refs≥1`(`acceptance-criteria.schema.json` if/then **하드게이트**)가 있으나, unit 스레드엔 짝 규칙이 없어 `unit_test_obligation=required` UNIT 이 검증 oracle(`invariant_refs`/`property_test_refs`) **0건으로 통과 가능** → test 단계에서 합격선을 발명하는 거짓 GREEN 위험(unit-spec 이 막으려던 "mock=검증 안 된 가정" 의 사촌). 실측 baseline: unit-spec.json 2개 / required UNIT 4개 중 oracle-0건 3개. SSOT: `DEC-2026-06-22-unit-spec-oracle-symmetry`.
+
+### Added — unit-spec-oracle-validator (soft / medium-only / gate#2 conditional)
+- **`tools/unit-spec-oracle-validator/` 신설** — `validateUnitOracle(unitSpec, charObj)`: `unit_test_obligation=required` UNIT 이 (`invariant_refs` ∪ `property_test_refs` ∪ `characterization_snapshot_refs`) ≥1 OR `oracle_waiver` 충족하는지 검사. 위반 = `unit.oracle.missing`(medium). charObj 제공 시 snapshot dead-ref(`unit.oracle.dangling_snapshot_ref`). cli `--json`/`--dry-run`/`--characterization` + `write-stdout-sync` 파이프 안전. deps 0.
+- **soft 이중 가드**: 모든 finding `severity=medium` 고정 + `gate-eval REQUIRED_VALIDATORS_PER_STAGE.spec` 미등재. high 경로는 `ORACLE_MISSING_SEVERITY` 상수로만 존재(emit 0) → hard 격상 1-edit. unit-spec 부재 = N/A(빈 결과 exit 0 / behavior-only mode / `failClosedOnNull` evidence_missing 오탐 차단). 스코프 = required 만(waived·characterization_only 제외 / 보수).
+
+### Changed — schema additive + wiring (spec gate#2 conditional / check26 4중 정합)
+- `schemas/unit-spec.schema.json` units[].items 에 `oracle_waiver`(string·minLength:1 정직마커) + `characterization_snapshot_refs`(string[]·`^SNAP-`) additive. **`required⇒oracle` if/then 은 schema 미삽입**(validator 담당 / schema 강제 = hard 가 되므로).
+- `flows/spec.phase-flow.json`(unit-spec-derive phase `automated_validation` + `cross_cutting.validators`) + `flows/sdlc-4stage-flow.json` gate#2 `conditional_validators` 등재 + `tools/findings-aggregator`(cli.js spec 분기 `extraValidators` + `buildValidatorArgs` case / aggregator.js dispatch → `transformGeneric`). `gate-eval.js` REQUIRED **불변**(soft / conditional).
+
+### 실증 (라운드트립 dogfood / 2 PoC spectrum-cross)
+- BEFORE(git HEAD): poc-18 2 medium(`UNIT-ENCRYPTION-001`·`UNIT-PICK-001` / characterized_from_code) + poc-21 1 medium(`UNIT-FORMAT-001` / designed_from_spec) = **3 medium** → 두 PoC `oracle_waiver` 정직 부착(invariant 날조 ❌) → AFTER **0 finding** / 둘 다 exit 0(soft). legacy-S2 + greenfield paradigm 양쪽 작동.
+
+### Tests
+- `tools/unit-spec-oracle-validator/test/validator.test.js` 19 GREEN(oracle 3채널 / oracle_waiver / 빈 사유 거부 / waived·characterization_only skip / soft 불변 high=0 / snapshot dead-ref / 혼합 카운트 / CLI 파일부재 N/A·baseline·--json). findings-aggregator 68 test 무회귀. check26 gate_validator_list_consistency PASS.
+
+**§8.1 면제**(additive·conditional·soft / schema optional 필드만 / gate matrix·gate-eval REQUIRED·release criteria(=42) 무변). **hard 격상**(medium→high + REQUIRED.spec 등재) = 별도 promotion DEC + ≥2 도메인 oracle 보강(waiver→실 ref) 입증 후. deferred: characterization_only oracle 검사 포함 / formal-spec.invariants 본문 구조화 / characterization_snapshot_refs 실 ref dead-ref 실증.
+
+---
+
 ## [0.68.0] — 2026-06-23 — MINOR — gate 진입 시 plan-review-server 자동 띄움 (opt-in → 기본 동작)
 
 **문제**: v0.67.0 으로 plan-review-server 본체는 출하됐지만, gate skill(`_base-invoke-go-stop-gate`)에는 **opt-in off-ramp** 로만 걸려 있었다 — 사용자가 "브라우저로 볼게"라고 **명시 수락해야만** 띄우고, 절차도 v0.67.0 이전의 `--input` 단일 산출물 흐름이며 "spec=2종"이라 적혀 있었다(실제 3종). gate 검토 보조라는 설계 의도(`DEC-2026-06-19-plan-review-server`)대로, discovery·spec·plan gate 진입 시 **능동적으로** 띄워야 한다.
