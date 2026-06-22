@@ -10,6 +10,58 @@
 
 ---
 
+## [0.67.0] — 2026-06-22 — MINOR — chain 산출물 인터랙티브 검토 편집기 (plan-review-server / discovery·spec·plan)
+
+**문제**: chain harness gate 에서 사람은 산출물 json(use_cases/behaviors/criteria/tasks/ADR/NFR…)을 통째로 읽고 머릿속으로 "어디가 틀렸나"를 판단한 뒤 자연어로 던져야 했다 — 정독 + cross-artifact ID 체계 파악의 인지 부담이 크고 수정이 어렵다. 사용자 요구 = "산출물을 브라우저에서 보고, 바꾸고 싶은 항목을 클릭해 프롬프트로 의도를 적으면 AI 가 재설계". SSOT: `DEC-2026-06-19-plan-review-server`(예정).
+
+### Architecture — 공유 키트 + 스키마별 렌더러 (프론트 재구성 / 사용자 결정)
+- **`assets/kit.js`(공유 인터랙션·위젯)** + **`assets/renderers/<artifactType>.js`(스키마별 배치)** 로 분리. "generic 코어에 끼우기" → "**렌더러가 주인, 키트를 가져다 씀**" 으로 뒤집음(3종 스키마가 근본적으로 다르고 미래 확장·bespoke 위함). 키트 = 팝오버/프롬프트스토어/패널/채팅/apply/라이브리로드/gate/헤더 + 위젯(chip/roVal/prose/tokenize/field/card/section) + 일반 배치 엔진(`arrange`, `renderCardBody` 훅) + LABELS + 카드제목 휴리스틱. 백엔드 generic `view-model.js`/registry 섹션·라벨 → 브라우저 이관, **`view-model.js` 은퇴**. `artifact-registry.js` = 슬림(knownArtifact/VALIDATORS/label).
+- **(bespoke) AC 렌더러 Gherkin**: `gherkin:{given[],when,then[],tags}` 를 평면 필드가 아니라 **Given/When/Then 시나리오 스텝**으로(각 스텝 텍스트는 클릭→프롬프트 공유 인터랙션). 나머지 산출물은 키트 배치 위임(파일만 마련 → 향후 bespoke 자리).
+- **CLI 일반화**: `--input <path>`(+`--task-plan` 별칭) + `--artifact`(파일명 자동 추론) + `--summaries` + `--agent-reply`. validator/acceptance 는 task-plan 만, 나머지는 프롬프트만 → 항상 replan. revision 파일 = `<artifact>-revisions.json`. stdout 마커에 `artifact_type` 포함.
+- **수정 불가 잠금 일반 적용**: `isLocked` predicate(id/`*_ref(s)`/cross_links/외부ID/계약/provenance)가 4종 모두에 그대로 — discovery/spec 의 식별자·추적링크도 자동 잠금.
+
+### Added — phase 단위 한 페이지(멀티 문서 / 탭)
+- **`--phase <discovery|spec|plan> --project <dir>`**: 한 페이즈 산출물을 **한 페이지(탭)** 로. **spec = behavior-spec + unit-spec + acceptance-criteria 3종**(composite/unit/ac — `spec.phase-flow` 정합 / unit-spec 누락 교정). `.ai-context/output/` 에서 자동 수집. 인터랙션(팝오버/패널/apply/잠금/요약)은 전 탭 공유 / 렌더링만 산출물별.
+- **렌더러 레지스트리화**: `var Renderer` → `RENDERERS['<type>']` 맵 (한 페이지에 여러 렌더러 공존). `assets/renderers/unit-spec.js` 추가(units/coverage). emit `buildHtmlMulti` + server `documents[]` 멀티 모드.
+- **apply 라우팅**: 멀티 페이지 apply 는 코멘트를 top-level key→artifact 로 그룹핑(behaviors→behavior-spec / units·coverage→unit-spec / criteria→acceptance-criteria / 전역=`_global`) → `<phase>-revisions.json` 에 그룹 기록 + 잠금 belt. 닫힌 루프 동일(에이전트가 해당 산출물 재설계 → 라이브 리로드).
+
+### Added — ★ 닫힌 루프 (이 도구의 본질)
+- 사람 프롬프트 apply → `PLAN_REVIEW_APPLY` stdout 마커 + 화면 "AI 재설계 중…" → 에이전트가 해당 stage agent 재dispatch → **재설계된 산출물을 서빙 경로에 덮어씀** → `/version`(산출물 mtime) 변화 → 브라우저 **라이브 리로드(스크롤 보존)** + **`--agent-reply` 배너("뭘 바꿨다")** → 재검토 반복.
+- **(lavish 차용) agent-reply** = AI→사람 채널(표시 전용 / 저장·gate ❌). **큐 sessionStorage 유지** = 리로드 넘어 미전송 프롬프트 보존. `/version` 은 **산출물만** 추적(revision ❌) — apply 직후 조기 리로드 방지(재설계 후에만 갱신).
+- lavish 대조 결론: 레이아웃 감사 커튼·native 인터랙티브 요소·playbooks 는 우리 구조(통제된 렌더러)가 대체 → 불필요. 전용 `poll` 명령은 stdout 마커+Monitor 가 동등 → 보류.
+
+### Added — AI 평이 요약 (읽힘 ↑ / 의도 적기 쉽게 / trust-bounded)
+- **`--summaries <path>`** (`{ "<cardBase>": { "summary" } }`): 메인 에이전트가 검토 시 각 카드에 사람말 1–2줄 생성 → 원문 옆에 **"🤖 AI 요약 · 원문 아님"** 라벨로 표시. **산출물 저장 ❌**(dual-rep/Adzic 회피) / **gate inject ❌** / revisions 미포함 = 순수 읽기 보조. (P 표현-손보기만으론 압축 어휘 한계 → AI 요약으로 해소.)
+
+### Added — 큐레이션 (덜 보여주기)
+- 카드 내 **잠긴 구조·링크 필드는 "🔒 구조·링크 N개" 토글**(기본 접힘) 안으로 — 리뷰어 시야엔 내용(제목·설명·결정·enum)만 전면. cross_links 등 provenance 섹션도 기본 접힘.
+
+### Added — `tools/plan-review-server/` 핵심 (dep-graph-viz 형제 / ephemeral 로컬 HTTP / lavish-axi 협업 루프 차용 — A/B/C/D/E)
+- **클릭→프롬프트 상호작용** (`assets/app.js`): 값 직접 편집 ❌ — 항목 클릭 시 팝오버에 "어떻게 바꿀지" 자연어 프롬프트 입력 → 우측 패널에 누적 → apply 시 전부 AI 재설계로 전달. 사람은 의도만, 구조 재정합은 AI (첫 비전 "문구 클릭→질의→재설계" 정합).
+- **(A) poll 핸드오프** (`src/server.js` onApply + `src/cli.js`): apply 시 서버가 `PLAN_REVIEW_APPLY <json>` 를 stdout 한 줄로 emit → 에이전트가 Monitor 로 watch 해 즉시 plan-agent 재dispatch. 수동 "파일 읽어" 단계 제거 (durable 채널 = `plan-revisions.json` 병행).
+- **(B 하이브리드) 부분문자열 anchor** (`assets/app.js`): 값 안 텍스트를 드래그 후 클릭하면 필드 경로 + `selected_text` 를 코멘트에 동봉 — 경로 정확도 유지 + "콕 집는" 느낌. (완전 freeform 은 anchor 흐려져 재정합 손실 → 미채택.)
+- **(C) 전역 채팅 컴포저** (`assets/template.html` + `app.js`): 특정 항목에 안 묶인 plan 전체 의견 입력 (anchor=null). apply payload 에 함께 전달.
+- **(D-lite) 라이브 리로드** (`src/server.js` `GET /version` + `app.js` 폴링): task-plan/revisions mtime 변하면 스크롤 보존 reload — 재설계 후 서버 재기동 불필요. (lavish "레이아웃 감사 커튼" 은 self-생성 HTML 이라 불필요 → 제외.)
+- **(E) 비주얼 폴리시** (`assets/style.css`): 2-컬럼(좌 plan / 우 프롬프트 패널) + 카드/팝오버/컴포저 refined 테마. self-contained 원칙상 DaisyUI/Tailwind CDN ❌ → 인라인 직접.
+- **CLI 클릭 링크 + 브라우저 자동 오픈** (`src/cli.js`): 기동 시 bold/underline URL 출력 + 플랫폼별 자동 오픈(`open`/`xdg-open`/`start` / `--no-open` opt-out / `openBrowserCommand` 단위 테스트). import-guard 로 직접 실행 시에만 server 기동.
+- **사람이 읽는 의미 카드** (`src/view-model.js` + `field-classify.js`): task-plan.schema 분류(①text/②enum/③link·구조/readonly)를 표시 레이어가 섹션(📋작업/🏛ADR/⚠️위험/📐NFR)→카드(헤더=항목 제목, 부제=id·layer)→블록(한글 라벨 / `ac_refs`→"연결 인수기준" / ADR alternatives=group / consequences=subobject)으로 재구성. meta·derivation_source 는 접어서 뒤로. (raw json 덤프 → 문서형 가독성)
+- **(P) 가독성 렌더링** (`view-model.js` prose 플래그 + `app.js`): 긴 자유텍스트(설명/결정/완화 ≥60자)는 칩이 아니라 **산문 문단**(줄간격·전체폭) / 제목은 첫 `—`·`:` 기준 **핵심(굵게)+보조(연하게)** 위계 / 본문 속 ID 참조·HTTP 코드는 **작은 monospace 배지**(`.tok`)로 분리. **내용 불변(reference-lens)** — 표시만 디컴프레션, LLM rephrase ❌ / dual-representation(Adzic) 회피. (task-plan 자체는 LLM 운영 컨텍스트로 단일 소스 유지.)
+- **수정 불가 잠금** (`field-classify.js` `isLocked` + `app.js` `ro-val` + `apply.js` belt): "기계가 소유한 것"은 클릭/코멘트/edit 전부 ❌ (AI 전담) — **A** provenance(`meta.*`·`derivation_source.*`) / **B** 식별자·순서·의존(`id`·`execution_order`·`dependencies`) / **C** 추적링크(`*_ref(s)`·`cross_links.to_*` / `industry_case_refs` URL 예외=열림) / **D** 외부ID(`jira_id`·`op_task_id`·`sp_id`) + 계약 바인딩(`path`·`operationId`·`method`). **내용은 열림**(제목·설명·결정·완화 등 자유텍스트 + 설계 enum `layer`·`status`·`severity` 등) = 사람 리뷰 대상. 이중화: UI 비클릭(`ro-val`) + 서버 belt(locked 경로 edit/comment 진입 시 drop → `rejected_locked`). "엉뚱한 링크" 리뷰는 **카드 전체 코멘트**로 보존.
+- **apply 분기** (`src/apply.js`): 프롬프트(comments) 동반 → `plan-revisions.json`(`next_action:"replan"` + comments[{anchor,label,text,selected_text}]) 기록 → plan-agent 재dispatch. (백엔드는 직접 편집[edits]+validator 재검증 cheap-write 경로도 보유 — 현 UI 는 프롬프트 모델만 사용 / 변조 edit 도착 시 fail-safe replan.)
+- **self-contained HTML** (`src/emit.js` + `assets/`): dep-graph-viz `buildHtml`/`inject`/`scriptSafe` 자산-인라인 패턴 포팅 — 외부 네트워크 0, `</script>` 안전 이스케이프.
+- **HTTP 서버** (`src/server.js`): `GET /`(폼) · `GET /summary`(평결) · `GET /version`(라이브 리로드) · `POST /apply`(분기 + onApply emit). gate #3 진입 시 spawn → 검토 → 종료.
+
+### Trust 불변
+- 서버는 **판정을 만들지 않는다** (reference-lens): 평결(verdict/headline/blocking/review)=`chain-driver next --dry-run --json` 위임(byte-identical / state 무변경) · 재검증=`plan-coverage-validator`(결정론) · 산출물 write=**사람 입력(프롬프트)만**(LLM inject ❌). dep-graph-viz 가 view-time reference-lens 인 것과 동질 — 결정론 chain gate 무오염.
+
+### Connected
+- `skills/_base-invoke-go-stop-gate/SKILL.md` — stage=plan opt-in 분기 안내(텍스트 prompt = fallback 유지). `${CLAUDE_PLUGIN_ROOT}/tools/...` 경로 규약 정합.
+
+### Scope
+- **discovery·spec·plan stage** (§8.1 — test/implement stage 렌더러 및 generic-any-HTML[lavish F] = 별도 / 진짜 generic 필요 시 lavish-axi[MIT] 채택 고려). 도구 디렉토리명 `plan-review-server` 유지(이제 chain 산출물 일반 서빙 / 리네임은 churn 보류). 58/58 신규 테스트 green(field-classify·artifact-registry[슬림]·apply[validator skip+plan]·emit[렌더러 선택]·http[닫힌루프·agent-reply·/version]·cli·dom-render[kit+렌더러 실행: 4종 렌더·AC Gherkin·잠금·큐레이션·요약·agent-reply]). 회귀 0(release-readiness 42/42 / workspace `\d+/\d+ pass / 0 fail`).
+
+---
+
 ## [0.66.0] — 2026-06-22 — MINOR — analysis-self-consistency-validator (산출물 summary/count ↔ 자기 배열 정합 결정론 검사)
 
 **문제**: `DEC-2026-06-13-append-catalog-rulecount-ssot`이 "count = backing 배열의 비정규화 캐시 / 배열 = SSOT / LLM 이 손으로 적은 정수 불신" 원칙을 확립했으나, 강제(`rule_count := rule_ids.length`)가 `_shared/append-catalog.js`(BC index) **한 곳에만** 구현됨. analysis-agent 가 직접 산출하는 13 산출물의 `summary`/`count` 가 자기 배열과 drift 하는 미스카운트가 반복 재현 → 매번 비싼 LLM groundedness skeptic(~3M토큰)에서야 검출. 3맥락 재현(append-catalog 21/23 · 실사용 vac-settlement 5th fail 11 · work-system 6th `type-spec.total_types` 45 vs 배열 48). SSOT: `DEC-2026-06-22-analysis-self-consistency-validator`.
@@ -63,6 +115,9 @@
 - `test/branch-per-task.test.js` 32개(deriveBranchPrefix/buildLinkageBlock/branchGuardReason[stage-gate·xml] 순수 + enter/finish/clear-task CLI + 실 git temp repo 6모드 + PreToolUse 가드 deny/allow/stage-gate/xml/external/opt-out). chain-driver 632→664 GREEN(회귀 0).
 
 **Deferred (≥2 PoC 후 격상)**: per-task TC 단위 게이트(v1 = scope implement-GREEN floor / cmdNext 골격 무변경) · 의존 task stacked PR · bug 전용 진입 흐름 · scope-verify · hotfix prefix. release-readiness 신규 check 미추가(기존 check11 workspace-test 가 신규 32 test 게이팅 / criteria=42 불변).
+
+---
+
 
 ---
 

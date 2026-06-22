@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>plan review</title>
+<!--
+  AI-Native 방법론 plan stage(gate #3) 검토 편집기.
+  내용을 클릭 → 팝오버에 바꾸고 싶은 점을 프롬프트로 입력 → 우측 패널에 누적 → apply 시 AI 재설계.
+  서버는 판정/재설계하지 않는다 — 평결=chain-driver / 재검증=plan-coverage-validator /
+  프롬프트 수집=사람 입력만 (reference-lens / 결정론 axis 무오염).
+-->
+<style>__STYLE__</style>
+</head>
+<body>
+<header>
+  <h1><span id="artifact-title">산출물</span> 검토 <span id="verdict-badge"></span></h1>
+  <div id="headline" class="headline"></div>
+  <div id="meta" class="meta"></div>
+</header>
+
+<!-- agent-reply 배너 — AI 가 "뭘 바꿨다" (닫힌 루프 / 표시 전용) -->
+<div id="agent-reply" class="agent-reply" hidden>
+  <span class="ar-tag">🤖 AI 가 반영함</span>
+  <span class="ar-text"></span>
+</div>
+
+<main>
+  <div id="layout">
+    <div id="left">
+      <p class="howto">
+        바꾸고 싶은 항목을 <b>클릭</b>하면 작은 입력창이 떠요. 거기에
+        <b>어떻게 바꾸고 싶은지 프롬프트로</b> 적으세요 (값을 직접 고치는 게 아니라,
+        의도를 적으면 AI 가 plan 을 다시 설계합니다). 다 적었으면 우측 <b>apply</b>.
+      </p>
+      <section id="gate-summary"></section>
+      <section id="form"></section>
+    </div>
+
+    <aside id="prompt-panel">
+      <div class="pp-head">내 프롬프트 <span id="pcount" class="pcount">0</span></div>
+      <div id="prompt-list" class="prompt-list">
+        <div class="pp-empty">항목을 클릭하거나, 아래에 전체 의견을 적어보세요.</div>
+      </div>
+      <div class="composer">
+        <textarea id="chat-input" rows="2"
+          placeholder="plan 전체에 대한 의견 (예: 보안 작업을 먼저 / 전체 추정이 낙관적)"></textarea>
+        <button id="chat-add" type="button" title="전역 프롬프트 추가">＋ 추가</button>
+      </div>
+      <button id="btn-apply" type="button" disabled>apply — AI 에 전달</button>
+      <div id="result" class="result"></div>
+    </aside>
+  </div>
+</main>
+
+<!-- 클릭 시 뜨는 프롬프트 입력 팝오버 -->
+<div id="popover" class="popover" hidden>
+  <div class="pop-anchor" id="pop-anchor"></div>
+  <div class="pop-cur" id="pop-cur"></div>
+  <div class="pop-sel" id="pop-sel" hidden></div>
+  <textarea id="pop-input" placeholder="이 항목을 어떻게 바꾸고 싶은지 적어주세요 (예: 이 작업을 둘로 쪼개줘 / 이 NFR 근거가 약함)"></textarea>
+  <div class="pop-btns">
+    <button id="pop-save" type="button" class="primary">저장</button>
+    <button id="pop-del" type="button" class="danger" hidden>삭제</button>
+    <button id="pop-cancel" type="button">취소</button>
+  </div>
+</div>
+
+<script type="application/json" id="documents">__DOCUMENTS__</script>
+<script type="application/json" id="artifact-data">__DATA__</script>
+<script type="application/json" id="field-model">__FIELD_MODEL__</script>
+<script type="application/json" id="gate-summary-data">__SUMMARY__</script>
+<script type="application/json" id="meta-data">__META__</script>
+<script type="application/json" id="ai-summaries">__SUMMARIES__</script>
+<script>__SCRIPTS__</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "name": "@mis-plugins/plan-review-server",
+  "version": "0.1.0",
+  "description": "plan stage(gate #3) 검토용 인터랙티브 HTML 편집기 — task-plan.json 을 브라우저 폼으로 펼쳐 ①자유텍스트/②enum 직접 편집 + ③link·구조 코멘트. apply 시 변경 종류로 분기(싼=validator만 / 비싼=plan-agent 재정합). 서버는 판정 안 만듦 — chain-driver next(평결)·plan-coverage-validator(재검증)·사람 입력(write)에 위임. 결정론 axis 무오염(reference-lens).",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": {
+    "plan-review-server": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "license": "UNLICENSED"
+}

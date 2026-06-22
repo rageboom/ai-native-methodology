@@ -85,6 +85,8 @@ importers:
 
   plugins/context-ops/tools/plan-coverage-validator: {}
 
+  plugins/context-ops/tools/plan-review-server: {}
+
   plugins/context-ops/tools/schema-validator:
     dependencies:
       ajv:

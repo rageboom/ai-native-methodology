@@ -84,6 +84,29 @@ chain harness 의 **gate UX skill**. 매 chain stage (1=planning / 2=spec / 3=te
 
 5. **traceability-matrix 갱신** — `_base-build-traceability-matrix` skill 호출 (gate 종결 의무 / forward_coverage 갱신).
 
+## discovery·spec·plan stage — 인터랙티브 검토 편집기 (opt-in)
+
+discovery/spec/plan gate 에서, json 을 통째로 읽기 어려운 사용자를 위해 `plan-review-server` 로 **브라우저 검토**를 제안할 수 있다 (기본은 위 텍스트 prompt — fallback 유지 / 서버는 opt-in). 대상 산출물: `discovery-spec` / `behavior-spec` / `acceptance-criteria` / `task-plan` (spec stage 는 behavior-spec·acceptance-criteria 2종 → 순차 검토).
+
+절차 (사용자가 "브라우저로 볼게" 류로 수락 시):
+
+1. **AI 평이 요약 생성** (읽기 쉽게 — 의도 적기 쉽게): 각 카드(`tasks[i]`/`use_cases[i]`/`behaviors[i]`/`criteria[i]`)에 "이게 뭐다"를 사람말 1–2줄로 작성 → `summaries.json`:
+   `{ "<cardBase>": { "summary": "…" } }` (예: `{"use_cases[0]":{"summary":"사용자가 이메일로 가입하는 흐름"}}`). **산출물에 저장 ❌**(원문 ≠ 요약 / dual-rep 회피) — 검토용 일회성 파일.
+2. Bash 로 서버 spawn — 기동 시 클릭 가능한 URL 출력 + 브라우저 자동 오픈(`--no-open` 으로 끔):
+   ```
+   node ${CLAUDE_PLUGIN_ROOT}/tools/plan-review-server/src/cli.js \
+     --input <proj>/.ai-context/output/<artifact>.json \
+     --summaries <summaries.json> \
+     --project <proj>            # (task-plan 만) gate 평결 위임 (chain-driver next --dry-run)
+   ```
+   (`--artifact` 는 파일명에서 자동 추론. task-plan 은 acceptance-criteria.json 동일 디렉토리 자동 탐지.)
+3. 사용자는 산출물을 의미 카드로 읽고(각 카드에 AI 요약 표시 / 잠긴 구조·링크는 토글로 접힘), **바꾸고 싶은 항목을 클릭(또는 값 안 텍스트 드래그 후 클릭) → 팝오버에 프롬프트(의도)를 입력** → 우측 패널에 누적. 전체 의견은 하단 **채팅 컴포저**로. 다 적으면 **apply**. 값 직접 편집이 아니라 모든 변경 = 자연어 프롬프트. (수정 불가 잠금: provenance·id·순서·의존·추적링크·외부ID·계약 = 클릭/코멘트 ❌ / 내용=제목·설명·결정·enum 만 가능.)
+4. **poll 핸드오프** — 서버를 background 로 띄웠으면 그 stdout 을 Monitor 로 watch: apply 시 서버가 `PLAN_REVIEW_APPLY <json>` 한 줄을 emit → 즉시 페이로드(`artifact_type` + comments[{anchor,label,text,selected_text}] / anchor=null=전역)를 입력으로 **해당 stage agent 재dispatch**(discovery→discovery-agent / spec→spec-agent / plan→plan-agent)(revisit). 수동 "파일 읽어" 단계 없음. (durable 채널 = `<artifact>-revisions.json` / `next_action:"replan"`.)
+   - Monitor 예: `tail -f <server.log> | grep --line-buffered PLAN_REVIEW_APPLY`
+5. 재설계된 새 산출물을 디스크에 쓰면 서버가 **라이브 리로드**(스크롤 보존)로 반영 — 재기동 불필요. 수렴까지 반복. 서버 종료(Ctrl+C) 후 intervention_log 기록은 동일.
+
+**불변**: 서버는 reference-lens — 평결=chain-driver / 재검증=plan-coverage-validator(task-plan 만) / 산출물 write=사람 입력(프롬프트)만 / AI 요약=표시 전용(저장·gate inject ❌). 결정론 gate 에 LLM inject ❌ (본문 §gate 입력 수집과 동일 원칙).
+
 ## Auto Mode 호환
 
 사용자가 "Auto Mode" 위임 시 (예: "전부 알아서 진행해줘"):
