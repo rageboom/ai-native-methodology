@@ -1,0 +1,3 @@
+{
+  "description": "TODO: __PLUGIN_NAME__ 카탈로그(marketplace.json) blurb — 사용자가 설치 전 보는 한 단락 설명. (versionRange / registry 는 선택 — 미지정 시 plugin.json major + meta.readRegistry)"
+}

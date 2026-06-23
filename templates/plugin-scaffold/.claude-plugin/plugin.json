@@ -1,0 +1,15 @@
+{
+  "name": "__PLUGIN_NAME__",
+  "version": "0.1.0",
+  "description": "TODO: __PLUGIN_NAME__ 플러그인 한 줄 설명 (Claude Code marketplace 노출용).",
+  "author": {
+    "name": "MIS",
+    "email": "sangcl@smilegate.com"
+  },
+  "homepage": "https://github.smilegate.net/SGH-ISD/ai-native-methodology",
+  "license": "UNLICENSED",
+  "keywords": [
+    "claude-code",
+    "mis-plugins"
+  ]
+}

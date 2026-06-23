@@ -16,6 +16,7 @@
   },
   "packageManager": "pnpm@11.5.2",
   "scripts": {
+    "plugin:new": "node scripts/new-plugin.js",
     "build": "node scripts/build-plugin.js",
     "build:check": "node scripts/build-plugin.js --check",
     "build:all": "node scripts/build-plugin.js --all",

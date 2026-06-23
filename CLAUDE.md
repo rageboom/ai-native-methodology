@@ -1,11 +1,21 @@
-# AI-Native 개발 방법론 — 작업 컨텍스트
+# mis-plugins 마켓플레이스 모노레포 — 작업 컨텍스트
 
-본 레포는 사내 표준 AI-Native 개발 방법론. 다음 세션에서 작업 재개 시 본 파일이 컨텍스트.
+본 레포 = `@mis-plugins/monorepo` — Claude Code 플러그인 **마켓플레이스 모노레포**. `plugins/*` 아래 여러 플러그인을 호스팅하며, 각 플러그인은 독립 semver + Nexus(npm-hosted) 배포를 갖는다. 빌드·카탈로그·검증·배포 툴링은 레포 루트 `scripts/` 가 공유하고, 카탈로그(`.claude-plugin/marketplace.json`)는 `plugins/*` 에서 자동 생성된다(손편집 ❌). 다음 세션 재개 시 본 파일이 레포 전체 컨텍스트.
 
-> **식별자 ≠ 개념명**: 플러그인/패키지 식별자 = `context-ops` (npm `@mis-plugins/context-ops` / 마켓플레이스 `mis-plugins`) · 방법론 **개념명** = "AI-Native 개발 방법론" (불변). 디렉토리 = `plugins/context-ops/`.
+> **현재 플러그인**: `context-ops` (flagship = AI-Native 개발 방법론) — 본 파일 §"context-ops 플러그인" 이하 대부분이 이 플러그인의 컨텍스트. · 모바일 확장팩 = `plugins/context-ops/extensions/mobile-native/`.
+> **새 플러그인 추가** → [`docs/add-a-plugin.md`](docs/add-a-plugin.md) (`pnpm plugin:new <name>`).
+> **마켓플레이스-레벨 결정** → [`docs/decisions/INDEX.md`](docs/decisions/INDEX.md) (정체성 = [`DEC-2026-06-23-marketplace-monorepo-identity`](docs/decisions/DEC-2026-06-23-marketplace-monorepo-identity.md)).
+
+> **식별자 ≠ 개념명**: 마켓플레이스 = `mis-plugins` / npm 네임스페이스 = `@mis-plugins/*` / flagship 플러그인 식별자 = `context-ops` (디렉토리 `plugins/context-ops/`) · 방법론 **개념명** = "AI-Native 개발 방법론" (불변).
+
+---
+
+## context-ops 플러그인 (= AI-Native 개발 방법론)
+
+본 레포의 flagship 플러그인 = 사내 표준 AI-Native 개발 방법론. 아래 모든 절(절대 우선순위 ~ 참고)은 **context-ops 플러그인의 컨텍스트**다 (마켓플레이스-레벨은 위 §0).
 
 > **휘발성 진행 상태** (PoC 통계 / 묶음 진행률 / 누적 finding) → [`decisions/STATUS.md`](plugins/context-ops/decisions/STATUS.md)
-> **결정 이력** → [`decisions/INDEX.md`](plugins/context-ops/decisions/INDEX.md)
+> **결정 이력 (context-ops 국소)** → [`decisions/INDEX.md`](plugins/context-ops/decisions/INDEX.md)
 
 ## 절대 우선순위
 
