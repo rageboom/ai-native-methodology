@@ -24,12 +24,47 @@ function scriptSafe(s) {
 	return s.replace(/<\/(script)/gi, '<\\/$1');
 }
 
+// HTML 속성/텍스트 escape (도메인 id 는 보통 안전하지만 방어적).
+function escHtml(s) {
+	return String(s)
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&quot;');
+}
+
+// 도메인 목록 → 가족(prefix) optgroup <select> 옵션 HTML. domains 없으면 '' (app.js 가 select 숨김).
+//   가족 = 첫 '-' 앞 토큰(biztrip/resv/req/cal/issue/…), 단일 토큰은 '기타'로 묶음.
+function buildDomainOptions(domains, currentScope) {
+	if (!Array.isArray(domains) || !domains.length) return '';
+	const fams = new Map();
+	for (const id of [...domains].sort()) {
+		const fam = id.includes('-') ? id.slice(0, id.indexOf('-')) : '기타';
+		(fams.get(fam) ?? fams.set(fam, []).get(fam)).push(id);
+	}
+	const groups = [...fams.keys()].sort((a, b) =>
+		a === '기타' ? 1 : b === '기타' ? -1 : a.localeCompare(b),
+	);
+	const parts = [];
+	for (const fam of groups) {
+		parts.push(`<optgroup label="${escHtml(fam)}">`);
+		for (const id of fams.get(fam)) {
+			const sel = id === currentScope ? ' selected' : '';
+			parts.push(`<option value="${escHtml(id)}"${sel}>${escHtml(id)}</option>`);
+		}
+		parts.push('</optgroup>');
+	}
+	return parts.join('');
+}
+
 /**
  * 단독 HTML 문자열 생성.
  * @param {Object} graph      보강(augment)된 그래프
  * @param {Object} freshness  checkGraphFreshness 결과 (stale/synthesized_at/stale_sources)
  * @param {Object} [opts]
  * @param {string} [opts.graphName]
+ * @param {string[]} [opts.domains]      전체 도메인(scope) id 목록 — 있으면 툴바 드롭다운 채움
+ * @param {string} [opts.currentScope]   현재 페이지의 scope id (드롭다운 selected)
  * @returns {string} HTML
  */
 export function buildHtml(graph, freshness, opts = {}) {
@@ -57,5 +92,10 @@ export function buildHtml(graph, freshness, opts = {}) {
 	html = inject(html, '__APP_JS__', scriptSafe(app));
 	html = inject(html, '__GRAPH_JSON__', graphJson);
 	html = inject(html, '__FRESHNESS__', freshJson);
+	html = inject(
+		html,
+		'__DOMAIN_OPTIONS__',
+		buildDomainOptions(opts.domains, opts.currentScope),
+	);
 	return html;
 }

@@ -59,6 +59,8 @@ body { display: flex; flex-direction: column; height: 100vh; color: #1f2937; bac
 .node.online circle { stroke: #eab308; stroke-width: 2.5px; }
 /* 선택(origin) — expandable/online 뒤에 둬서 선택 시 우선 적용 (진한 노랑/호박 굵은 링) */
 .node.origin circle { stroke: #a16207; stroke-width: 4px; }
+/* ego 포커스 중심 — 호박색 굵은 링 + 큰 반지름 */
+.node.ego-center circle { stroke: #f59e0b; stroke-width: 4px; r: 11px; }
 .edge { fill: none; stroke: #c7cdd6; stroke-width: 1.2px; }
 .edge.soft { stroke-dasharray: 4 3; }
 .edge.dim { opacity: .06; }

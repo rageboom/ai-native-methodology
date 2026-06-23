@@ -124,12 +124,14 @@ for (const n of nodes) {
 
 // === 탐색(드릴다운) 모드 — UC 부터 클릭으로 단계별 펼침 ===
 //   체인을 한꺼번에 다 깔면 갭·교차가 커서 가독성이 나쁨 → 펼친 가지만 그리고 매 토글 압축 재배치.
-//   forward 부모/자식 (이전 컬럼→다음 컬럼). 심볼(contains/calls)은 드릴다운 대상 아님(표시 전용).
+//   forward 부모/자식 (이전 컬럼→다음 컬럼). contains(파일 col6→심볼 col8)는 드릴다운에 포함 →
+//   코드 파일을 펼치면 그 파일의 함수·메서드까지 체인이 이어진다. calls(심볼↔심볼, 동일 컬럼)는
+//   chainRelations 가 cs===ct 로 어차피 무시 + 명시 제외(트리화 무순환 보존 / 호출 연결은 심볼 클릭 강조로 노출).
 const { childrenOf, parentsOf } = chainRelations(
 	edges,
 	(id) => meta.get(id)?.column ?? null,
 	(x) => nodeOf(x).id,
-	(e) => e.edge_type === 'contains' || e.edge_type === 'calls',
+	(e) => e.edge_type === 'calls',
 );
 let exploreMode = true; // 기본 = 드릴다운 (UC 부터 시작)
 let direction = 'forward'; // forward: UC→코드(childrenOf) / reverse: 코드→UC(parentsOf)
@@ -161,18 +163,21 @@ function computeExploreVisible() {
 }
 
 // 클릭 노드 아래(rel 방향) 전체 서브트리(연결된 모든 자손)를 한 번에 펼침/접기.
+// 단 심볼(함수·메서드)은 자동 펼침 대상에서 제외 — 코드 '파일'까지만 한꺼번에 펼치고,
+// 파일의 메서드는 그 파일을 직접 클릭할 때 한 단계만 펼친다(progressive disclosure / hairball 방지).
 function subtreeIds(id) {
 	const set = new Set();
 	const stack = [id];
 	while (stack.length) {
 		for (const c of rel().get(stack.pop()) || []) {
+			if (byId.get(c)?.artifact_kind === 'symbol') continue;
 			if (!set.has(c)) {
 				set.add(c);
 				stack.push(c);
 			}
 		}
 	}
-	return set; // 자손(id 제외)
+	return set; // 자손(id 제외, 심볼 제외)
 }
 function expandSubtree(id) {
 	expanded.add(id);
@@ -236,6 +241,12 @@ const nodeSel = nodeLayer
 	.join('g')
 	.attr('class', (d) => nodeClass(d))
 	.on('click', (_, d) => {
+		if (egoMode) {
+			// ego 포커스 — 클릭 노드 중심으로 2홉 이웃을 모음(펼침/접기 대신)
+			focusEgo(d.id);
+			showPanel(byId.get(d.id), null);
+			return;
+		}
 		if (exploreMode) {
 			if (hasKids(d.id)) {
 				// 한 번 클릭 = 연결된 전체 서브트리 펼침 / 다시 = 전체 접기
@@ -451,67 +462,125 @@ function centerOn(id) {
 		);
 }
 
-// === force 토글 ===
-let sim = null;
-let forceOn = false;
-function toggleForce() {
-	forceOn = !forceOn;
-	d3.select('#btn-force').classed('active', forceOn);
-	if (forceOn) {
-		sim = d3
-			.forceSimulation(nodes)
-			.force(
-				'link',
-				d3
-					.forceLink(edges)
-					.id((d) => d.id)
-					.distance(70)
-					.strength(0.4),
-			)
-			.force('charge', d3.forceManyBody().strength(-220))
-			.force('collide', d3.forceCollide(22))
-			.force('x', d3.forceX((d) => d.lx).strength(0.06))
-			.force('y', d3.forceY((d) => d.ly).strength(0.06))
-			.on('tick', renderPositions);
-		nodeSel.call(
-			d3
-				.drag()
-				.on('start', (ev, d) => {
-					if (!ev.active) sim.alphaTarget(0.3).restart();
-					d.fx = d.x;
-					d.fy = d.y;
-				})
-				.on('drag', (ev, d) => {
-					d.fx = ev.x;
-					d.fy = ev.y;
-				})
-				.on('end', (ev, d) => {
-					if (!ev.active) sim.alphaTarget(0);
-					d.fx = null;
-					d.fy = null;
-				}),
+// === ego 포커스 — 선택 노드를 viewport 중앙에 두고 2홉 이웃을 "단계별 가로 흐름" 으로 정렬(나머지 숨김) ===
+//   "고정 격자에 라인만 연결" → "선택 모듈 기준으로 그래프가 일렬로 모임" 으로 전환.
+let egoMode = false;
+let egoCenter = null;
+let egoSet = null; // 현재 포커스 이웃 집합 — applyVisibility 게이트가 참조
+const EGO_HOPS = 2;
+const EGO_MAX = 300; // 허브 폭발 방지 캡(가까운 노드 우선 절단)
+const EGO_COL_GAP = 200; // chain 컬럼(단계) 1칸당 가로 간격(px)
+const EGO_ROW_GAP = 34; // 같은 단계 세로 스택 간격(px)
+
+// 무방향 인접 (edges 불변 → 1회 구축 후 캐시).
+let _adj = null;
+function adjacency() {
+	if (_adj) return _adj;
+	_adj = new Map();
+	const add = (a, b) => (_adj.get(a) ?? _adj.set(a, new Set()).get(a)).add(b);
+	for (const e of edges) {
+		const s = nodeOf(e.source).id;
+		const t = nodeOf(e.target).id;
+		add(s, t);
+		add(t, s);
+	}
+	return _adj;
+}
+
+// centerId 부터 hops 홉 무방향 BFS → {set, hop}. EGO_MAX 초과 시 가까운 노드 우선으로 절단.
+function egoNeighborhood(centerId, hops) {
+	const adj = adjacency();
+	const hop = new Map([[centerId, 0]]);
+	let frontier = [centerId];
+	for (let d = 1; d <= hops && hop.size < EGO_MAX; d++) {
+		const next = [];
+		for (const id of frontier) {
+			for (const nb of adj.get(id) || []) {
+				if (!hop.has(nb)) {
+					hop.set(nb, d);
+					next.push(nb);
+				}
+			}
+		}
+		if (hop.size > EGO_MAX) break;
+		frontier = next;
+	}
+	return { set: new Set(hop.keys()), hop };
+}
+
+// 선택 노드 중심으로 2홉 이웃을 "단계별 가로 흐름" 으로 정렬(결정론적 — force 없음).
+//   x = chain 컬럼 차이(상류 UC쪽=왼쪽 / 하류 코드쪽=오른쪽), 같은 단계는 세로로 쌓음.
+//   다시 다른 노드를 포커스하면 거기로 재정렬.
+function focusEgo(centerId) {
+	const { set, hop } = egoNeighborhood(centerId, EGO_HOPS);
+	egoCenter = centerId;
+	egoSet = set;
+
+	// 중심 = 현재 viewport 중앙(그래프 좌표).
+	const t = d3.zoomTransform(svg.node());
+	const w = container.node().clientWidth || 800;
+	const h = container.node().clientHeight || 600;
+	const cx = (w / 2 - t.x) / t.k;
+	const cy = (h / 2 - t.y) / t.k;
+	const centerCol = meta.get(centerId)?.column ?? 0;
+
+	// 컬럼 차이별 버킷(=x 위치). 같은 버킷은 세로 스택.
+	const buckets = new Map();
+	for (const id of set) {
+		const dc = (meta.get(id)?.column ?? centerCol) - centerCol;
+		(buckets.get(dc) ?? buckets.set(dc, []).get(dc)).push(id);
+	}
+	for (const [dc, ids] of buckets) {
+		// 중심 컬럼(dc=0) 버킷은 중심을 가운데로 와서 정확히 cy 에 놓이게.
+		ids.sort(
+			(a, b) => (hop.get(a) - hop.get(b)) || String(a).localeCompare(b),
 		);
-	} else {
-		if (sim) sim.stop();
-		nodeSel.on('.drag', null);
-		nodes.forEach((n) => {
-			n.x = n.lx;
-			n.y = n.ly;
-			n.fx = null;
-			n.fy = null;
+		if (dc === 0) {
+			const ci = ids.indexOf(centerId);
+			if (ci > 0) ids.splice(Math.floor((ids.length - 1) / 2), 0, ids.splice(ci, 1)[0]);
+		}
+		const x = cx + dc * EGO_COL_GAP;
+		const n = ids.length;
+		ids.forEach((id, i) => {
+			const node = byId.get(id);
+			node.x = x;
+			node.y = cy + (i - (n - 1) / 2) * EGO_ROW_GAP;
+			node.fx = null;
+			node.fy = null;
 		});
-		nodeSel
-			.transition()
-			.duration(450)
-			.attr('transform', (d) => `translate(${d.x},${d.y})`)
-			.on('end', renderPositions);
-		edgeSel
-			.transition()
-			.duration(450)
-			.attr('x1', (e) => nodeOf(e.source).lx)
-			.attr('y1', (e) => nodeOf(e.source).ly)
-			.attr('x2', (e) => nodeOf(e.target).lx)
-			.attr('y2', (e) => nodeOf(e.target).ly);
+	}
+
+	applyVisibility(); // egoSet 만 표시(나머지 숨김)
+	// 새 좌표로 "모이는" 전환 애니메이션.
+	nodeSel
+		.transition()
+		.duration(500)
+		.attr('transform', (d) => `translate(${d.x},${d.y})`)
+		.on('end', renderPositions);
+	applyEdgePos(edgeSel.transition().duration(500));
+	highlightSelected(centerId); // 중심 + 연결 라인 강조 유지
+	nodeSel.classed('ego-center', (d) => d.id === centerId);
+}
+
+function exitEgo() {
+	egoCenter = null;
+	egoSet = null;
+	nodes.forEach((n) => {
+		n.fx = null;
+		n.fy = null;
+	});
+	nodeSel.classed('ego-center', false);
+	relayout(); // explore/컬럼 배치 + applyVisibility 복원
+}
+
+function toggleEgo() {
+	egoMode = !egoMode;
+	d3.select('#btn-ego').classed('active', egoMode);
+	if (egoMode) {
+		// 이미 선택된 노드가 있으면 바로 포커스, 없으면 다음 클릭 대기.
+		if (selectedId && byId.has(selectedId)) focusEgo(selectedId);
+	} else {
+		exitEgo();
 	}
 }
 
@@ -704,9 +773,10 @@ function runSearch(q) {
 }
 
 // === 가시성 (state 필터 + 함수/메서드 토글 통합) ===
-// 기본 숨김 — 메서드 레이어(codegraph 함수·메서드)가 너무 빽빽해 artifact 구조 가독성을 해침.
-//   '함수/메서드' 버튼으로 전체 on, 또는 코드 파일 클릭 시 그 파일 메서드만 노출(focusedFileSyms / progressive disclosure).
-let showSymbols = false;
+// 기본 표시 — 코드 파일을 드릴다운으로 펼치면 그 파일의 함수·메서드까지 이어져 보이게 (코드 연결 가시화).
+//   단 explore 모드에선 exploreVisible 게이트가 함께 걸려, 펼친 코드 파일의 메서드만 실제 노출(기본 hairball 아님).
+//   '함수/메서드' 버튼으로 전체 off 가능. (컬럼형 전체 모드에선 on=전체 심볼 / off=숨김.)
+let showSymbols = true;
 let focusedFileSyms = new Set();
 function applyVisibility() {
 	const hiddenStates = new Set();
@@ -714,13 +784,15 @@ function applyVisibility() {
 		if (!cb.checked) hiddenStates.add(cb.value);
 	});
 	const vis = (d) =>
-		(exploreVisible === null || exploreVisible.has(d.id)) &&
-		!hiddenStates.has(d.state || 'active') &&
-		!(
-			d.artifact_kind === 'symbol' &&
-			!showSymbols &&
-			!focusedFileSyms.has(d.id)
-		);
+		egoMode && egoSet
+			? egoSet.has(d.id) // ego 포커스: 이웃 집합만 표시(나머지 숨김)
+			: (exploreVisible === null || exploreVisible.has(d.id)) &&
+				!hiddenStates.has(d.state || 'active') &&
+				!(
+					d.artifact_kind === 'symbol' &&
+					!showSymbols &&
+					!focusedFileSyms.has(d.id)
+				);
 	nodeSel.style('display', (d) => (vis(d) ? null : 'none'));
 	edgeSel.style('display', (e) =>
 		vis(nodeOf(e.source)) && vis(nodeOf(e.target)) ? null : 'none',
@@ -733,7 +805,20 @@ function toggleSymbols() {
 }
 
 // === 컨트롤 배선 ===
-document.getElementById('btn-force').addEventListener('click', toggleForce);
+// 도메인 드롭다운 — 옵션이 채워졌으면(멀티 도메인 빌드) 선택 시 형제 <scope>.html 로 이동, 아니면 숨김.
+const domainSel = document.getElementById('domain-select');
+if (domainSel) {
+	if (domainSel.options.length > 0) {
+		domainSel.addEventListener('change', (e) => {
+			const v = e.target.value;
+			if (v) window.location.href = `${v}.html`;
+		});
+	} else {
+		domainSel.style.display = 'none';
+	}
+}
+
+document.getElementById('btn-ego').addEventListener('click', toggleEgo);
 document.getElementById('btn-fit').addEventListener('click', fitView);
 document.getElementById('btn-clear').addEventListener('click', () => {
 	clearImpact();
@@ -764,8 +849,8 @@ document.querySelectorAll('#state-filters input').forEach((cb) =>
 const hasSymbols = nodes.some((n) => n.artifact_kind === 'symbol');
 const btnSym = document.getElementById('btn-symbols');
 if (hasSymbols) {
-	btnSym.classList.toggle('active', showSymbols); // 기본 off 반영
-	btnSym.title = '전체 함수/메서드 표시 토글 (기본: 파일 클릭 시 해당 메서드만)';
+	btnSym.classList.toggle('active', showSymbols); // 기본 on 반영
+	btnSym.title = '전체 함수/메서드 표시 토글 (기본 on — 코드 파일 펼치면 메서드까지 이어짐)';
 	btnSym.addEventListener('click', toggleSymbols);
 	applyVisibility(); // 초기 심볼 숨김 반영
 } else {
@@ -773,18 +858,6 @@ if (hasSymbols) {
 }
 
 // 탐색(드릴다운) 모드 토글 — 기본 ON. UC 부터 시작, 노드 클릭으로 자식 단계 펼침/접기.
-const btnExp = document.getElementById('btn-explore');
-if (btnExp) {
-	btnExp.title = 'UC 부터 클릭으로 단계별 펼치기 (off = 전체 펼친 컬럼형)';
-	btnExp.classList.toggle('active', exploreMode);
-	btnExp.addEventListener('click', () => {
-		exploreMode = !exploreMode;
-		btnExp.classList.toggle('active', exploreMode);
-		if (!exploreMode) expanded.clear();
-		relayout(false);
-		fitView();
-	});
-}
 // 방향 토글 — forward(UC→코드) ↔ reverse(코드→UC). 전환 시 펼침 초기화 후 재배치.
 const btnDir = document.getElementById('btn-direction');
 if (btnDir) {

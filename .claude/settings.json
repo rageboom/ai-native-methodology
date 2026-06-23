@@ -1,5 +1,6 @@
 {
   "enabledPlugins": {
-    "context-ops@mis-plugins": true
+    "context-ops@mis-plugins": true,
+    "figma@claude-plugins-official": false
   }
 }
