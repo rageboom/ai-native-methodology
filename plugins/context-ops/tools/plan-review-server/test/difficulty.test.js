@@ -17,10 +17,13 @@ test('bucketFor — S/M/L 경계', () => {
 	assert.equal(bucketFor(DIFFICULTY_THRESHOLDS.M_MAX + 1), 'L'); // 10
 });
 
-test('bucketFor — MUST 밀집 가중(정량)', () => {
-	assert.equal(bucketFor(2, 4), 'S'); // must<5 가중 없음 → 2 = S
-	assert.equal(bucketFor(2, 5), 'M'); // 2+5=7 → M
-	assert.equal(bucketFor(5, 5), 'L'); // 5+5=10 → L
+test('bucketFor — MUST_DENSE_BONUS 제거: impact 단독 결정 (보너스 인자 무시)', () => {
+	// ep-be-gea 35 BC corroboration — 보너스(+5)가 full-chain 그래프에서 355/356(100%) 발동 =
+	//   상수가 되어 전부 L 포화(변별 상실). 제거 후 impact 단독으로 버킷 결정.
+	assert.equal(bucketFor(2), 'S');
+	assert.equal(bucketFor(7), 'M'); // 구 로직(must≥5)이면 7+5=12=L 였음 → 이제 M
+	assert.equal(bucketFor(9), 'M'); // 경계
+	assert.equal(bucketFor(10), 'L');
 });
 
 // === fixture: backward derived_from 체인 (모두 hard/MUST) ===
@@ -96,14 +99,27 @@ test('scoreUseCases — 빈 노드 그래프도 degraded', () => {
 	assert.equal(scored.degraded, true);
 });
 
-// === difficultyReviewItems — L 만 review[] 검토권장 (비차단) ===
-test('difficultyReviewItems — L 만 노출, 결정성 정렬', () => {
+// === difficultyReviewItems — scope-상대 outlier(상위 분위수) ∩ L 만 review[] 검토권장 (비차단) ===
+test('difficultyReviewItems — outlier ∩ L 노출, 결정성 정렬', () => {
 	const scored = scoreUseCases(SPEC, buildGraph());
 	const items = difficultyReviewItems(scored);
 	assert.equal(items.length, 1);
-	assert.equal(items[0].id, 'UC-BIG-001');
+	assert.equal(items[0].id, 'UC-BIG-001'); // 최상위 impact + L
 	assert.equal(items[0].kind, 'difficulty');
-	assert.match(items[0].text, /난이도 L/);
+	assert.match(items[0].text, /영향 규모 상위/);
+});
+
+test('difficultyReviewItems — scope-상대 outlier: L 여러 개 중 상위 분위수만 (noise 해소)', () => {
+	// ep-be-gea 35 BC corroboration — 구 로직은 L 전부(355개) 도배 → scope 내 impact 상위 OUTLIER_TOP_RATIO(20%) 만.
+	const mk = (impact) => ({ degraded: false, bucket: 'L', impact_count: impact, must_count: 0, should_count: 0, fyi_count: 0 });
+	const scored = {
+		degraded: false,
+		use_cases: { 'UC-1': mk(20), 'UC-2': mk(15), 'UC-3': mk(13), 'UC-4': mk(12), 'UC-5': mk(11) },
+	};
+	// n=5, topN=ceil(5*0.2)=1 → impact 최상위(UC-1)만 / 나머지 4개는 L 이어도 제외
+	const items = difficultyReviewItems(scored);
+	assert.equal(items.length, 1);
+	assert.equal(items[0].id, 'UC-1');
 });
 
 test('difficultyReviewItems — degraded 면 빈 배열', () => {

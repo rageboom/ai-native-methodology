@@ -10,6 +10,21 @@
 
 ---
 
+## [0.71.1] — 2026-06-24 — PATCH — S1 난이도 변별력 회복 (MUST_DENSE_BONUS 제거 + advisory scope-상대 outlier)
+
+**문제**: ep-be-gea **35 BC 전수 corroboration**에서 S1 난이도(`difficulty.js`)가 356 UC 중 **355개 L 포화**(변별력 상실) + review advisory **355개** 도배. 원인 = `MUST_DENSE_BONUS(+5)`가 full-chain 그래프(하방 체인 전부 MUST)에서 **355/356(100%) 발동** = 가중이 아니라 상수. dep-consult shared_ref / graph_impact 와 **동형 패턴**(얕은 PoC poc-16 튜닝이 깊은 위상에서 깨짐 — 세 번째 동형 발견). SSOT: `DEC-2026-06-24-discovery-enhance-mis373` §S1 난이도 처분.
+
+### Fixed (A안 / reference-lens soft)
+- `bucketFor()` — `MUST_DENSE_BONUS`/`MUST_DENSE_THRESHOLD` 제거, `impact_count` 단독 버킷. `must_count` 출력 보존. → 35 BC **M255/L101** 변별 회복.
+- `difficultyReviewItems()` — 'L 전부' → **scope-상대 outlier**(상위 `OUTLIER_TOP_RATIO`=20%) ∩ L. advisory **355→68**. verdict ❌ / 비차단 불변(STRONG-STOP).
+
+### Corroboration (≥2 위상)
+- 깊은 ep-be-gea 35 BC: M255/L101 / advisory 68. 얕은 poc-16: M9/L1 / advisory 1.
+- difficulty 테스트 갱신(보너스 제거 + outlier 회귀) + plan-review-server 31/31 무회귀. finding `F-POC15-DF-001`.
+
+### deferred (B안 / §8.1)
+- 버킷 절대임계 → 분위수 전면 reframe + `난이도(difficulty)`→`영향 규모` 네이밍(스키마/렌더/skill 파급) = 얕은+깊은 ≥2 위상 corroboration 후 별도 격상.
+
 ## [0.71.0] — 2026-06-24 — MINOR — discovery 강화 본체 격상(MIS-373 S1~S5) + dep-consult shared_ref 실포맷 정합
 
 **문제**: MIS-373 discovery 강화 5슬라이스(S1 난이도 reference-lens / S2 스키마 additive / S3 멀티입력 수렴 / S4 UC 의존성 dep-consult / S5 clarify 패스)는 코드가 main 에 머지됐으나 자체 release·CHANGELOG·DEC 없이 0.70.0(MIS-371)에 무임승차한 상태였다. 본체 격상의 전제 게이트 = **≥2 PoC corroboration**. 실측하니 S1(난이도)은 실 자산에서 작동했으나 S4(dep-consult `shared_ref`)는 실 산출물에서 **0건** — `refSet()` 이 스키마에 없는 `br_refs`/`api_refs` + `#` 포함 evidence 만 인식했는데 모든 실 PoC 는 베어 `BR-…`/콜론 `sqlmap:…` 포맷이라 구조적 누락. SSOT: `DEC-2026-06-24-discovery-enhance-mis373`.
