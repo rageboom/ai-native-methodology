@@ -12,25 +12,25 @@
 
 import { analyzeImpact } from '../../chain-driver/src/impact-analyzer.js';
 
-// 버킷 임계 (영향 노드 수 = 노력 proxy). reference-lens 라 임계는 advisory.
+// 버킷 임계 (영향 노드 수 = 노력 proxy). reference-lens 라 임계는 advisory / 표시용 라벨.
 //   S: 0..3 / M: 4..9 / L: 10+
 export const DIFFICULTY_THRESHOLDS = Object.freeze({ S_MAX: 3, M_MAX: 9 });
 
-// MUST(hard sync 강제) 밀집 가중 — 정량 규칙(verdict 아님): MUST 영향 ≥5 면 score +5.
-export const MUST_DENSE_THRESHOLD = 5;
-export const MUST_DENSE_BONUS = 5;
+// scope-상대 outlier 비율 — difficultyReviewItems advisory 대상 (상위 20%). verdict 아님.
+export const OUTLIER_TOP_RATIO = 0.2;
 
 /**
- * 영향 정량 → S/M/L 버킷 (결정론 / verdict 아님).
+ * 영향 정량 → S/M/L 버킷 (결정론 / verdict 아님 / 표시용 라벨).
+ * NOTE: MUST_DENSE_BONUS(+5) 제거 — ep-be-gea 35 BC corroboration: full-chain 그래프는
+ *   하방 체인이 전부 MUST 라 보너스가 355/356(100%) 발동 = 상수가 되어 전부 L 포화(변별 상실).
+ *   보너스 제거 시 M255/L101 로 변별 회복. 행동 유발(검토권장)은 difficultyReviewItems 의
+ *   scope-상대 outlier 로 분리. 버킷 절대 임계의 위상 민감성은 B안(분위수 reframe / ≥2 위상 후 격상) 영역.
  * @param {number} impactCount  merged_count (forward+backward 영향 노드 수)
- * @param {number} mustCount    by_grade_count.MUST (hard sync 강제 영향 수)
  * @returns {'S'|'M'|'L'}
  */
-export function bucketFor(impactCount, mustCount = 0) {
-	let score = impactCount;
-	if (mustCount >= MUST_DENSE_THRESHOLD) score += MUST_DENSE_BONUS;
-	if (score <= DIFFICULTY_THRESHOLDS.S_MAX) return 'S';
-	if (score <= DIFFICULTY_THRESHOLDS.M_MAX) return 'M';
+export function bucketFor(impactCount) {
+	if (impactCount <= DIFFICULTY_THRESHOLDS.S_MAX) return 'S';
+	if (impactCount <= DIFFICULTY_THRESHOLDS.M_MAX) return 'M';
 	return 'L';
 }
 
@@ -61,7 +61,7 @@ export function scoreUseCases(discoverySpec, graph) {
 			const g = impact.stats.by_grade_count;
 			out[id] = {
 				degraded: false,
-				bucket: bucketFor(impactCount, g.MUST),
+				bucket: bucketFor(impactCount),
 				impact_count: impactCount,
 				must_count: g.MUST,
 				should_count: g.SHOULD,
@@ -79,17 +79,28 @@ export function scoreUseCases(discoverySpec, graph) {
 	return { degraded: false, use_cases: out };
 }
 
-// review[] 검토권장 advisory 생성 — 난이도 高(L) UC 만. blocking[] ❌ (D3 / 비차단).
-//   gate summary 의 review[] 에 병합 (chain-driver verdict 무오염 / 표시 axis).
+// review[] 검토권장 advisory 생성 — scope-상대 outlier(상위 OUTLIER_TOP_RATIO) ∩ 절대 L 급만.
+//   blocking[] ❌ (D3 / 비차단) / gate summary review[] 병합 (chain-driver verdict 무오염 / 표시 axis).
+// NOTE: 구 로직(L 전부)은 full-chain 그래프에서 355개 도배(noise) — ep-be-gea 35 BC corroboration.
+//   "이 scope 에서 유독 영향 큰 UC" 만 짚도록 scope-상대 상위 분위수로 축소. verdict ❌ (정량 advisory).
 export function difficultyReviewItems(scored) {
 	if (!scored || scored.degraded) return [];
+	const entries = Object.entries(scored.use_cases).filter(
+		([, d]) => !d.degraded && typeof d.impact_count === 'number',
+	);
+	if (!entries.length) return [];
+	// scope-상대 outlier 임계 — impact_count 내림차순 상위 ceil(n * ratio) 번째 값 (최소 1 / 동률 포함).
+	const sorted = [...entries].sort((a, b) => b[1].impact_count - a[1].impact_count);
+	const topN = Math.max(1, Math.ceil(sorted.length * OUTLIER_TOP_RATIO));
+	const outlierThreshold = sorted[topN - 1][1].impact_count;
 	const items = [];
-	for (const [id, d] of Object.entries(scored.use_cases)) {
-		if (d.degraded || d.bucket !== 'L') continue;
+	for (const [id, d] of entries) {
+		// scope 상대 상위(outlier) AND 절대 L 급 — 둘 다 충족 시만 검토권장 (noise 최소화).
+		if (d.impact_count < outlierThreshold || d.bucket !== 'L') continue;
 		items.push({
 			id,
 			kind: 'difficulty',
-			text: `${id} 난이도 L — 의존 영향 ${d.impact_count}노드(MUST ${d.must_count}). 분해/순서 검토 권장.`,
+			text: `${id} 영향 규모 상위 (${d.impact_count}노드 / MUST ${d.must_count}) — 분해/순서 검토 권장.`,
 		});
 	}
 	// 결정성 — id 정렬

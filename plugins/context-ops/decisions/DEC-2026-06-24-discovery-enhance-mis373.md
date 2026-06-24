@@ -52,6 +52,18 @@ ep-be-gea **35 BC 전수 corroboration**(사내 / 마스킹 집계 / commit ❌)
 → `F-POC15-DC-002` **deferred → rejected** (현 artifact-graph 위상 모델 한정 / 영구 폐기 ❌). graph_impact 코드는 무변경(다른 위상 그래프 입력 시 동작 / `degraded` 마커 정상).
 - **재검토 단서**: graph-synthesizer 가 UC↔UC 의존 엣지(예: UC 가 다른 UC output 소비)를 도입하는 위상 변경이 생기면 그 위상 ≥2 PoC corroboration 후 재평가.
 
+## S1 난이도 처분 (A안 / 2026-06-24 추가)
+
+동일 ep-be-gea 35 BC corroboration 이 **S1 난이도**(`difficulty.js`)의 변별력 상실도 폭로:
+- 356 UC 중 **355개 L 포화**(S=0). 원인 = `MUST_DENSE_BONUS(+5)` 가 full-chain 그래프(하방 체인 전부 MUST)에서 **355/356(100%) 발동** = 가중이 아니라 상수 → 전부 L. review advisory **355개** 도배. impact median 7(poc-16과 유사)인데 must_count≥5 가 흔해 보너스 상시 발동이 주범.
+
+→ **A안 시행(closed)** — `difficulty.js` 한 파일: (1) `MUST_DENSE_BONUS` 제거(impact 단독 버킷 → **M255/L101** 변별 회복) (2) `difficultyReviewItems` 를 'L 전부' → **scope-상대 outlier(상위 20%) ∩ L**(advisory **355→68**). 스키마·네이밍·렌더 무변경.
+- 검증 ≥2 위상: ep-be-gea(깊은 / M255·L101·advisory68) + poc-16(얕은 / M9·L1·advisory1). finding `F-POC15-DF-001`.
+
+→ **B안 deferred** — 버킷 절대임계 → 분위수 전면 reframe + `난이도(difficulty)`→`영향 규모` 네이밍(스키마/렌더/skill 파급) = ≥2 위상 corroboration 후 별도 격상(§8.1).
+
+**세 번째 동형 발견**(dep-consult shared_ref / graph_impact / 난이도) → 교훈: "그래프 파생 신호는 얕은 PoC 튜닝이 깊은 위상에서 깨진다". 신규 그래프 파생 신호는 처음부터 **얕은+깊은 ≥2 위상 corroboration 의무**.
+
 ## Relates
 
 `project_mis373_discovery_enhance`(설계 SSOT) · `DEC-2026-06-24-complexity-tier-fastpath`(0.70.0 sibling / discovery 입구 강화) · `feedback_self_recorded_fact_validation`(fixture drift) · `feedback_chain_driver_deterministic_axis`(STRONG-STOP) · `DEC-2026-05-28-codegraph-probe-결과` §4.2(reference-lens trust 모델) · `feedback_diagnose_before_design_check_existing`(갭 액면 수용 금지).
