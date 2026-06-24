@@ -1,0 +1,22 @@
+{
+  "name": "mis-backend-spring",
+  "version": "0.1.0",
+  "description": "MIS 백엔드(TLM/EAM/GEA Java · OBSERVER Kotlin) 코드리뷰·테스트·품질 표준. OO/DDD 설계 리뷰, 쿼리 안티패턴·core 추출·의존성 업그레이드 분석 agent, 테스트 골격 생성, 테스트 전략 라우팅(TDD/특성화/인수), 커밋 전 품질 게이트.",
+  "author": {
+    "name": "MIS",
+    "email": "sangcl@smilegate.com"
+  },
+  "homepage": "https://github.smilegate.net/SGH-ISD/ai-native-methodology",
+  "license": "UNLICENSED",
+  "keywords": [
+    "claude-code",
+    "mis-plugins",
+    "backend",
+    "spring",
+    "java",
+    "kotlin",
+    "code-review",
+    "testing",
+    "ddd"
+  ]
+}

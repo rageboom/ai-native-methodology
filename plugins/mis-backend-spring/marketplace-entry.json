@@ -1,0 +1,3 @@
+{
+  "description": "MIS 백엔드(TLM/EAM/GEA Java · OBSERVER Kotlin) 코드리뷰·테스트·품질을 표준화하는 플러그인. OO/DDD 설계 리뷰, JPA/MyBatis/QueryDSL 쿼리 안티패턴 탐지, core 추출·의존성 업그레이드 분석 sub-agent, 계층별(단위/슬라이스/인수) 테스트 골격 생성, 테스트 전략 라우팅(신규=TDD / 레거시=특성화 / 기능완료=인수), 커밋 전 spotless·ktlint·compile 품질 게이트(hook)를 제공한다."
+}

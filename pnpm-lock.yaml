@@ -132,6 +132,12 @@ importers:
 
   plugins/context-ops/tools/verdict-consistency-validator: {}
 
+  plugins/mis-backend-spring: {}
+
+  plugins/pm: {}
+
+  plugins/ux-plan: {}
+
 packages:
 
   '@asyncapi/specs@6.11.1':
