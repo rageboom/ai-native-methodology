@@ -289,6 +289,25 @@
         }
       }
     },
+    "open_questions": {
+      "type": "array",
+      "description": "S5 (MIS-373) — clarify 패스가 누적한 미해결 질문([NEEDS CLARIFICATION] 마커 / Spec Kit 패턴 A·B). **비블로킹 기본** (blocking=true 만 gate stop / Auto Mode 안전) — gate#1 HTML 에서 일괄 Q&A(plan-review-server prompt→revisions 루프)로 답한다. 답하면 status=answered + answer, 결정 사안이면 decisions[]/pending_decisions 로 승격. optional·backward-compat.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "question", "category"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^Q-[0-9]{3}$" },
+          "question": { "type": "string", "description": "사용자에게 물을 질문 (1줄)" },
+          "category": { "type": "string", "enum": ["ambiguity", "edge-case", "missing-info", "conflict-resolution", "assumption"], "description": "질문 유형 (커버리지 기반 분류 / 패턴 B)" },
+          "status": { "type": "string", "enum": ["open", "answered", "deferred"], "default": "open" },
+          "blocking": { "type": "boolean", "default": false, "description": "true 면 gate#1 stop 의무(D4 승격). 기본 false (비블로킹 / Auto Mode 안전)." },
+          "answer": { "type": "string", "description": "answered 시 사용자 답변" },
+          "promoted_ref": { "type": "string", "description": "결정 사안 승격 시 decisions[].topic / pending_decisions[].id" },
+          "source": { "type": "string", "description": "질문이 도출된 근거 (UC id / conflict id / nfr 누락 등)" }
+        }
+      }
+    },
     "nfr": {
       "type": "array",
       "description": "비기능 요구 (swagger/figma/nl-md 어댑터 1차 추출). D3 / INSPECTION-2026-05-31 — schema 정의로 gate#1 schema-validator 검증 표면 확보 (이전 additionalProperties silent pass).",
@@ -332,9 +351,11 @@
         "properties": {
           "from_uc": {"type": "string", "pattern": "^UC-[A-Z0-9_-]+-[0-9]{3}$", "description": "의존 출발 UC id"},
           "to_uc": {"type": "string", "description": "영향받는 노드 id (UC/BHV/AC 등 artifact-graph 노드)"},
-          "grade": {"type": "string", "enum": ["MUST", "SHOULD", "FYI"], "description": "analyzeImpact 영향 등급 (감쇠 적용)"},
-          "edge_type": {"type": "string", "description": "artifact-graph edge_type (derived_from/depends_on/implements 등)"},
-          "direction": {"type": "string", "enum": ["forward", "backward", "both"], "description": "origin 기준 방향"}
+          "signal": {"type": "string", "enum": ["shared_ref", "graph_impact"], "description": "S4 하이브리드 신호 출처 — shared_ref(UC 간 br/api/source 공유 / 그래프 무관 / discovery 즉시) | graph_impact(artifact-graph analyzeImpact 보강)"},
+          "grade": {"type": "string", "enum": ["MUST", "SHOULD", "FYI"], "description": "영향 등급. graph_impact=analyzeImpact 감쇠 / shared_ref=br·api 공유 SHOULD·source-only FYI"},
+          "edge_type": {"type": "string", "description": "graph_impact 시 artifact-graph edge_type (derived_from/depends_on/implements 등)"},
+          "direction": {"type": "string", "enum": ["forward", "backward", "both"], "description": "origin 기준 방향 (shared_ref=both)"},
+          "shared": {"type": "array", "items": {"type": "string"}, "description": "shared_ref 시 공유된 참조 키 목록 (br:/api:/src: prefix)"}
         }
       }
     },
