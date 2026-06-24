@@ -48,6 +48,8 @@
 
 > **시행**: 본 불변식의 진입-라우팅 last-mile 이 결선돼 있다(진입 stage 선택은 결정론 state machine 이 아니라 LLM skill-description 매칭[System B]이라, 강제는 **하이브리드**다) — (advisory) `hooks-bridge.routeEntry` 가 stage 미지정 변경요청을 `discovery-from-nl-md` 로 폴백하고(비-작업 prompt 는 침묵 보존), (deterministic) `coldStartSkipAheadReason` 가 discovery 미진입(`stage_progress.discovery='pending'`) 상태에서 later-stage chain 산출물 write 를 PreToolUse 에서 차단한다(orphan 방지 / state+파일명만 = LLM inject ❌ / discovery-spec 자신은 허용). advisory 는 100% 보장이 아니라 70~80% 패러다임 정합 nudge — 결정론 강제는 cold-start orphan 단 하나. (출처 = ## 인용)
 
+> **복잡도 tier — fast-path**: 진입은 강제하되(우회 0) **깊이**는 변경 복잡도에 비례시킨다. 3 tier(`trivial`/`standard`/`deep`) — `trivial` 은 풀 체인(spec/plan/test/implement 스킬 팬아웃)을 생략하고 thin `change-record`(`schemas/change-record.schema.json`)로 경량 진행. tier 판정은 결정론 도구에 넣지 않는다(STRONG-STOP): 신호=`chain-driver triage`(raw 그래프 count — 보수적 술어 `count==1 ∧ !net_new ∧ layer_span==1 ∧ subkind∉{BR,UC}`) / 제안=`discovery-from-nl-md`(LLM / change_kind=advisory) / 확정=사람 gate#1. **⑥영향도·⑦Jira·최소검증은 tier 무관 공통 의무** — `chain-driver fastpath-gate`(fail-closed / exit 1)가 강제하므로 fast-path 라도 면제되지 않는다("경량"이지 "생략" 아님). (출처 = ## 인용)
+
 **예외(손수정 코드)의 lift**: 코드 파일은 그래프 노드가 아니므로(leaf) 루트할 노드가 없다. ① 변경 파일을 code_pointer 역인덱스로 직접 주인 노드(보통 IMPL)에 anchor → ② 그 변경이 실제로 의미를 바꾼 **가장 높은 노드("의미 천장": 리팩터=IMPL · 동작변경=BHV/AC · 룰변경=BR)까지 사람이 확인하며 상향** → ③ 천장 노드부터 정상 forward. 항상 최상위 root 로 끌어올리지 않는다(없는 상위 의도 날조 회피). 천장 노드 갱신은 reconcile 모드 — 관측 사실(앵커·시그니처)은 코드에서 결정론 재추출·자동 갱신, 사람 작성 의도와 충돌하면 자동 덮어쓰기 없이 propose 로 사람에게 넘긴다. lift 의 완전성은 code_pointer 커버리지 비율을 상한으로 한다(앵커 없는 코드는 의도적으로 추적 밖).
 
 ## 5. Node Granularity 원칙
@@ -91,6 +93,7 @@
 - 결단: DEC-2026-06-08-living-sync-adopter-git-hygiene (§8 git 위생 — init .gitignore 스캐폴드 + --git 도구 파생물 skip)
 - 결단: DEC-2026-06-10-subset-slicing-corollary-supersede (subsetAnalysisRefs prefix 슬라이스 retire — 실 슬라이싱 = drift BC-hash·validation scope-token / merge-back obviation 동형)
 - 결단: DEC-2026-06-18-discovery-universal-entry-router (§4 진입-라우터 시행 — advisory `routeEntry` 폴백 + cold-start `coldStartSkipAheadReason` hard-block / hooks-bridge·cli 결선 / 동사 통일·matcher work-verb 확장)
+- 결단: DEC-2026-06-24-complexity-tier-fastpath (§4 복잡도 tier — discovery 입구 유지 + trivial fast-path / triage 신호 + fastpath-gate fail-closed / ⑥⑦·최소검증 공통 의무)
 - spec: `methodology-spec/baseline-delta-operating-model.md` (재분석 cadence — 자매 문서)
 - spec: `methodology-spec/use-scenario-taxonomy.md` (4 시나리오 → AX 운영 수렴)
 - spec: `methodology-spec/lifecycle-contract.md` (stage × asset / gate)

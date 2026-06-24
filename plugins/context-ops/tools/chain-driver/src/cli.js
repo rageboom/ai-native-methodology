@@ -58,6 +58,8 @@ import {
 	evidenceDirForRead,
 } from '../../_shared/ai-context-layout.js';
 import { planLayoutMigration, applyLayoutMigration } from './migrate-layout.js';
+import { computeTriageSignals } from './triage.js';
+import { evaluateFastPathRecord } from './fastpath-gate.js';
 
 const MANIFEST_STAGES = ['discovery', 'spec', 'plan', 'test', 'impl'];
 function stageToManifestStage(stage) {
@@ -186,6 +188,8 @@ function usage(code = 3) {
 			'  migrate <project>',
 			'  migrate-layout <project> [--dry-run]   (구 .ai-context/output+최상위 scope → base/scopes/runtime 인플레이스 이주)',
 			'  revisit-detect <project> [--base <sha>] [--user-decision <go|ignore>]',
+			'  triage --graph <artifact-graph.json> --refs <id>[,<id>...] [--json]   (fast-path 복잡도 결정론 신호 / tier 판정 ❌ / DEC-2026-06-24)',
+			'  fastpath-gate --record <change-record.json> [--json]   (trivial 종결 fail-closed 검증 — ⑥impact+⑦ticket+최소검증 / exit 1=blocked)',
 			'  enter-task <project> --task <TASK-id> [--scope <slug>] [--confirm]   (branch-per-task — Jira 키 lookup → feature|bugfix/<KEY> 브랜치 생성/전환 + current_task set / --confirm 없으면 preview)',
 			'  finish-task <project> [--confirm]   (branch-per-task — implement GREEN 확인 → linkage block + PR(gh) / --confirm 없으면 preview / gh 부재 시 수동 안내)',
 			'  clear-task <project> [--scope <slug>]   (branch-per-task — 활성 current_task 해제 = 브랜치 가드 비활성 / git 미접촉 / task 포기·revisit 탈출구)',
@@ -239,6 +243,15 @@ function parseArgs(argv) {
 		else if (a === '--change-kind') out.changeKind = rest[++i];
 		else if (a === '--policy') out.policyPath = rest[++i];
 		else if (a === '--out-jsonl') out.outJsonl = rest[++i];
+		else if (a === '--refs')
+			// triage: 닿는 노드 id 콤마구분 (또는 --refs 반복).
+			out.refs = (out.refs ?? []).concat(
+				String(rest[++i] ?? '')
+					.split(',')
+					.map((s) => s.trim())
+					.filter(Boolean),
+			);
+		else if (a === '--record') out.recordPath = rest[++i];
 		else if (a === '--code-pointer-only') out.codePointerOnly = true;
 		else if (a === '--with-spec') out.withSpec = true;
 		else if (a === '--what-if') out.whatIf = rest[++i];
@@ -807,6 +820,81 @@ function cmdQuery(args) {
 	});
 	process.stdout.write(JSON.stringify(result, null, 2) + '\n');
 	process.exit(0);
+}
+
+// triage — fast-path 복잡도 결정론 신호 (DEC-2026-06-24). raw count 만 / tier 판정 ❌ (skill+사람 gate 소관).
+//   usage: chain-driver triage --graph <artifact-graph.json> --refs <id>[,<id>...] [--json]
+function cmdTriage(args) {
+	if (!args.graphPath || !existsSync(args.graphPath)) {
+		console.error(
+			`[chain-driver] triage --graph: graph not found: ${args.graphPath ?? '(미지정)'}`,
+		);
+		process.exit(3);
+	}
+	if (!args.refs || args.refs.length === 0) {
+		console.error('[chain-driver] triage: --refs <node-id>[,<id>...] 필요');
+		process.exit(3);
+	}
+	let graph;
+	try {
+		graph = JSON.parse(readFileSync(args.graphPath, 'utf-8'));
+	} catch (e) {
+		console.error(`[chain-driver] triage --graph parse error: ${e.message}`);
+		process.exit(3);
+	}
+	const signals = computeTriageSignals(graph, args.refs);
+	if (args.json) {
+		process.stdout.write(JSON.stringify(signals, null, 2) + '\n');
+	} else {
+		process.stderr.write(
+			`[chain-driver] triage 신호 (결정론 / tier 판정은 skill+gate 소관):\n` +
+				`  touched_node_count=${signals.touched_node_count} net_new=${signals.net_new} ` +
+				`layer_span=${signals.layer_span} subkinds=[${signals.touched_subkinds.join(',')}]\n` +
+				`  predicate_satisfied=${signals.predicate_satisfied} ` +
+				`(trivial 적격 필요조건 — true 라도 standard/deep 가능 / false 면 trivial 불가)\n`,
+		);
+	}
+	process.exit(0); // 신호 도구 — gate 아님 (항상 0).
+}
+
+// fastpath-gate — trivial change-record 종결 fail-closed 검증 (DEC-2026-06-24 / Senior Q2+Q5).
+//   usage: chain-driver fastpath-gate --record <change-record.json> [--json]
+//   exit: 0 = ok(또는 tier 비-trivial N/A) / 1 = blocked-by-gate(violations).
+function cmdFastPathGate(args) {
+	if (!args.recordPath || !existsSync(args.recordPath)) {
+		console.error(
+			`[chain-driver] fastpath-gate --record: not found: ${args.recordPath ?? '(미지정)'}`,
+		);
+		process.exit(3);
+	}
+	let record;
+	try {
+		record = JSON.parse(readFileSync(args.recordPath, 'utf-8'));
+	} catch (e) {
+		console.error(`[chain-driver] fastpath-gate --record parse error: ${e.message}`);
+		process.exit(3);
+	}
+	const res = evaluateFastPathRecord(record);
+	if (args.json) {
+		process.stdout.write(JSON.stringify(res, null, 2) + '\n');
+	} else if (!res.applicable) {
+		process.stderr.write(
+			'[chain-driver] fastpath-gate: tier 비-trivial — 본 gate 비적용 (N/A / 풀 체인 gate 소관).\n',
+		);
+	} else if (res.ok) {
+		process.stderr.write(
+			'[chain-driver] fastpath-gate: ✅ trivial 종결 적격 (⑥ impact + ⑦ ticket + 최소검증 + 술어 충족).\n',
+		);
+	} else {
+		process.stderr.write(
+			'[chain-driver] fastpath-gate: ❌ 종결 거부 (fail-closed):\n' +
+				res.violations
+					.map((v) => `  - [${v.severity}] ${v.code}: ${v.message}`)
+					.join('\n') +
+				'\n',
+		);
+	}
+	process.exit(res.ok ? 0 : 1);
 }
 
 // F3 (Loop B / 소비 루프) — stage → artifact_subkind 매핑 (각 단계 일괄 조회용).
@@ -1748,7 +1836,8 @@ function cmdHooksBridge(args) {
 		let routeNote = null;
 		if (route.source === 'discovery-default') {
 			routeNote =
-				'진입 라우터: stage 미지정 자연어 변경요청 — 분석 외 모든 작업은 discovery(입구·라우터)부터 ground 후 진행. rule 변경이면 discovery 가 analysis 로 상향 라우팅.';
+				'진입 라우터: stage 미지정 자연어 변경요청 — 분석 외 모든 작업은 discovery(입구·라우터)부터 ground 후 진행. rule 변경이면 discovery 가 analysis 로 상향 라우팅. ' +
+				'복잡도 tier(DEC-2026-06-24): discovery 에서 닿는 노드를 식별해 `chain-driver triage --graph <artifact-graph.json> --refs <id,...>` 로 결정론 신호를 받고, predicate_satisfied=true 면서 trivial 로 판단되면 fast-path(thin change-record + impact + 경량 단일-OP 티켓)로 경량 진행 — 단 ⑥영향도·⑦Jira·최소검증은 `chain-driver fastpath-gate` 로 강제(면제 ❌). predicate_satisfied=false 거나 standard/deep 이면 기존 풀 체인.';
 		} else if (route.source === 'stage' && isLaterStageSkill(route.skillId)) {
 			try {
 				const st = readState(payload.cwd || process.cwd());
@@ -3960,6 +4049,10 @@ function main() {
 			return cmdMigrateLayout(args);
 		case 'revisit-detect':
 			return cmdRevisitDetect(args);
+		case 'triage':
+			return cmdTriage(args);
+		case 'fastpath-gate':
+			return cmdFastPathGate(args);
 		case 'enter-task':
 			return cmdEnterTask(args);
 		case 'finish-task':

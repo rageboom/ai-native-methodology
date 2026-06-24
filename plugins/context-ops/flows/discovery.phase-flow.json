@@ -51,7 +51,16 @@
   "cross_cutting": {
     "validators": ["discovery-extraction-validator", "schema-validator", "formal-spec-link-validator (--chain-mode)", "br-cross-consistency-validator"],
     "no_simulation": true,
-    "source_grounded_required": true
+    "source_grounded_required": true,
+    "fast_path": {
+      "$comment": "DEC-2026-06-24-complexity-tier-fastpath — discovery=보편 입구(우회 0), tier 가 깊이만 조절. trivial = 본 fast-path / standard·deep = 위 phases 풀 경로. tier 판정은 도구 아닌 skill 제안 + 사람 gate#1 (STRONG-STOP / feedback_chain_driver_deterministic_axis).",
+      "tiers": ["trivial", "standard", "deep"],
+      "signal_tool": "chain-driver triage --graph <artifact-graph.json> --refs <id,...>",
+      "trivial_predicate": "touched_node_count==1 AND net_new==false AND layer_span==1 AND subkind NOT IN {BR,UC} AND no business_rule_id",
+      "trivial_artifact": "change-record.json (schemas/change-record.schema.json / thin / standard·deep 미사용)",
+      "common_obligations": ["impact (chain-driver impact --origin)", "jira (ticket-sync 경량 단일-OP)", "min_verification (characterization_snapshot_refs>=1 OR oracle_waiver)"],
+      "exit_gate": "chain-driver fastpath-gate --record <change-record.json> (fail-closed / exit 1 = blocked / 면제 ❌)"
+    }
   },
   "next_chain": {
     "id": "spec",

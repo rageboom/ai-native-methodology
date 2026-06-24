@@ -53,6 +53,26 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) NL prompt 또는 ma
 9. **discovery-spec.json append/merge** → discovery-agent 가 다른 어댑터 산출과 통합.
 10. **`discovery-extraction-validator` 통과** 자격 = 모든 entry source_grounded / NL 안 실 문장 검증 (grep_hit_count > 0).
 
+## 복잡도 tier 분기 — fast-path
+
+discovery 는 **분석 외 모든 변경의 보편 입구**다(우회 0). 단 변경이 trivial 이면 풀 체인(spec/plan/test/implement 스킬 팬아웃 + multi-agent dispatch)을 다 태우는 건 토큰 낭비 → tier 로 **깊이만** 조절한다(진입 여부 아님). tier 는 3단: `trivial` / `standard` / `deep`.
+
+**분업 (STRONG-STOP / §3.4 경계)**: 신호=결정론 도구 / tier 제안=본 skill(LLM) / 확정=사람 gate#1. 본 skill 은 tier 를 **제안**할 뿐, 도구(`triage`)에 LLM 판정을 주입하지 않는다.
+
+1. **닿는 노드 식별**: UC/BR 추출 결과 + route 로 변경이 닿는 artifact-graph 노드 id 집합(`touched_node_refs`)을 잡는다.
+2. **결정론 신호 수집**: `chain-driver triage --graph <artifact-graph.json> --refs <id,...> --json` → `{touched_node_count, net_new, layer_span, touched_subkinds, predicate_satisfied}`. **`predicate_satisfied=false` 면 trivial 절대 불가** (BR/UC touch·다중 노드·net-new·다중 레이어 = 하드 가드). `change_kind`(본 skill 의 LLM 선언값)는 advisory tie-breaker 만 — 단독으로 trivial 충분조건 ❌.
+3. **tier 제안**: `predicate_satisfied=true` 이고 의미상 사소(표시 문자열/포맷/오타/단일 item 가감)하면 `trivial` 제안. 의미가 크면(설계·신규 동작·다수 영향) `standard`/`deep`.
+4. **사람 gate #1 확정** (Auto Mode 시 일괄 go).
+5. **trivial 확정 시 fast-path**:
+   - `change-record.json` 작성 (`schemas/change-record.schema.json` / tier="trivial" / touched_node_refs / triage_signals 스냅샷 / intent / change_kind).
+   - **⑥ 영향도**: `chain-driver impact --graph … --origin <touched_node_refs> --out-jsonl <path>` 실행 → `impact_closure_ref` 기입.
+   - **최소검증**: 닿는 노드의 AS-IS 동작 보존 — `characterization_snapshot_refs`(`^SNAP-`) ≥1, 또는 동작 불변(cosmetic)이면 `oracle_waiver` 사유 기입. **둘 다 없으면 면제(거짓 GREEN)** ❌.
+   - **⑦ Jira**: `ticket-sync` 경량 단일-OP 모드로 OP 티켓 1건 발급(confirmation gate 보존) → `ticket_ref` 기입.
+   - **종결 게이트**: `chain-driver fastpath-gate --record <change-record.json>` → exit 0 이어야 GREEN. `exit 1`(violations) 이면 빠진 의무(⑥/⑦/검증/술어) 보강 후 재실행. 풀 spec/plan/test/implement 스킬 팬아웃은 **생략**.
+6. **standard/deep 확정 시**: 본 change-record 미사용 → 기존 discovery-spec 풀 경로로 진행.
+
+> ⑥영향도·⑦Jira·최소검증은 **tier 무관 공통 의무** — fast-path 는 "경량"이지 "생략"이 아니다. 강제는 스킬 양심이 아니라 `fastpath-gate`(fail-closed)가 한다.
+
 ## 70~80% 한계 명시
 
 원칙 + 두 axis → `methodology-spec/policies/automation-boundary.md`.
@@ -69,3 +89,4 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) NL prompt 또는 ma
 - `skills/analysis-from-prompt/SKILL.md` + `skills/analysis-from-plan-doc/SKILL.md` (baseline 채널)
 - `skills/discovery-from-analysis-output/SKILL.md` (pattern reference)
 - `schemas/discovery-spec.schema.json` (산출 schema)
+- DEC-2026-06-24-complexity-tier-fastpath (복잡도 tier 분기 — fast-path SSOT / `schemas/change-record.schema.json` + `chain-driver triage`·`fastpath-gate`)
