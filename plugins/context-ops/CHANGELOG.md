@@ -10,6 +10,21 @@
 
 ---
 
+## [0.75.1] — 2026-06-24 — PATCH — dead-on-install 진짜 채널(npm `files`) 정정 + 가드 양채널 확장
+
+**문제 (v0.75.0 fix 가 잘못된 채널을 고침 / publish dry-run + tarball 실측으로 발견)**: v0.75.0 은 `build-plugin.js` INCLUDE(= **git-subdir dist 채널**)만 고쳤으나, marketplace.json `source: npm` 의 **실제 설치 경로는 package.json `files`**(별개 allow-list). `pnpm pack` tarball 실측 결과 `files` 에서 5종 누락 → npm 설치 시 **여전히 dead-on-install**:
+
+- `scripts/graph-context-nudge.js` (living-graph Gap A — npm 채널 dead 지속)
+- `scripts/token-roi-{bench,tasks.json,ledger-hook,summary}` (**v0.73.0 token-roi 도 `files` 미반영 → npm 채널 dead 였음**)
+
+### Fixed
+- `package.json` `files` 에 위 5종 등재. `pnpm pack` tarball 실측으로 7개 스크립트 전부 포함 확인.
+
+### Changed
+- **check #43 `hook_script_shipped` 양채널 확장** — 기존 build-plugin INCLUDE 단일 검증 → **npm(`package.json files`, AUTHORITATIVE) ∩ dist(`INCLUDE`) 양 채널** 멤버십 검증. 누락 시 채널명(`npm:files`/`dist:INCLUDE`)+referrer `file:line` 지목. ancestor-aware. 음성+양성 재검증. (한 allow-list 만 보면 재발 — v0.75.0 자체가 그 사례.)
+
+---
+
 ## [0.75.0] — 2026-06-24 — MINOR — 출하 누락 hook 스크립트 3종 복구(dead-on-install 수정) + 재발방지 가드 + living-graph carry 정리
 
 **문제 (P1 출하 결함 / dogfood 발견)**: `build-plugin.js` 의 `scripts/` 는 wholesale 출하가 아니라 allow-list(INCLUDE) 방식인데, hooks.json 이 호출하는 런타임 스크립트 **3종이 INCLUDE 미등재**라 설치 패키지에서 누락 → 런타임 `Cannot find module` = 기능 **dead-on-install**. clean rebuild(v0.74.0) `dist/scripts/` 실측으로 확인.

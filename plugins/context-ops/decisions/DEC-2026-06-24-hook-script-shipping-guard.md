@@ -2,7 +2,9 @@
 
 **출하 누락 hook 런타임 스크립트 3종 복구(dead-on-install) + release-readiness 재발방지 가드 신설 (v0.75.0 MINOR)**
 
-**상태**: 승인·시행 (plugin.json 0.74.0 → 0.75.0)
+**상태**: 승인·시행 (plugin.json 0.74.0 → 0.75.0 → **0.75.1**)
+
+> **v0.75.1 정정 (publish dry-run + tarball 실측 발견)**: v0.75.0 이 고친 `build-plugin.js` INCLUDE 는 **git-subdir dist 채널**이고, marketplace.json `source: npm` 의 **실제 설치 경로는 `package.json files`**(별개 allow-list)였다. `pnpm pack` tarball 실측 결과 `files` 에서 `graph-context-nudge.js` + token-roi 4종 누락 → **npm 설치 시 여전히 dead-on-install**(token-roi 는 v0.73.0 이래 npm 채널에서 죽어 있었음 — v0.73.0 도 INCLUDE 만 고치고 `files` 미반영). **정정**: ① `package.json files` 에 5종 등재(tarball 실측 검증) ② **check #43 양채널 확장** — npm(`files`, AUTHORITATIVE) ∩ dist(`INCLUDE`) 둘 다 멤버십 검증 / 누락 채널명+referrer 지목 / ancestor-aware. **교훈 심화**: 출하 채널이 2개면 가드도 2개 다 봐야 한다 — 한 allow-list 만 검증한 v0.75.0 자체가 재발 사례.
 
 ## 맥락 (dogfood 발견)
 

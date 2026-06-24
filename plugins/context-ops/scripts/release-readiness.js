@@ -3195,10 +3195,14 @@ function check42_artifactSecretLeak() {
 
 // check43 (v0.75.0 / hooks→script 출하정합 / DEC-2026-06-24-hook-script-shipping-guard) —
 //   출하 런타임 자산(hooks/commands/skills/agents)이 호출하는 모든 `${CLAUDE_PLUGIN_ROOT}/scripts/<x>` 가
-//   build-plugin.js INCLUDE allow-list 에 등재됐는지 결정론 대조. scripts/ 는 wholesale 출하 ❌(allow-list 방식)이라
+//   **양 출하 채널 모두**에 등재됐는지 결정론 대조. scripts/ 는 wholesale 출하 ❌(allow-list 방식)이라
 //   훅이 참조하나 미등재된 스크립트는 설치 패키지에 부재 → 런타임 "Cannot find module" = 기능 dead-on-install.
-//   v0.71.0 token-roi + v0.64.0/DEC-2026-06-15 nudge 3종이 정확히 이 클래스로 깨졌던 회귀 가드(메모리 교훈의 gate화).
-//   결정론 only / file-presence 가 아니라 INCLUDE 멤버십 검증(소스는 존재하나 미출하가 본 버그의 본질).
+//   ★ 채널 2개 (둘 다 별개 allow-list / 둘 다 검증 의무):
+//     ① npm (source:npm marketplace 설치 채널 / AUTHORITATIVE) = package.json `files`
+//     ② dist (build-plugin.js INCLUDE / git-subdir Claude 아티팩트 채널 / 부차)
+//   v0.75.0 가 INCLUDE 만 보고 `files`(실 설치 경로)를 놓쳐 graph-context-nudge + token-roi 가 npm 채널에서
+//   여전히 dead 였던 것을 v0.75.1 에서 잡음 → 가드를 양 채널로 확장(한 allow-list 만 보면 재발).
+//   결정론 only / file-presence 아닌 멤버십(소스는 존재하나 미출하가 본 버그의 본질).
 function check43_hookScriptShipped() {
 	try {
 		const SCAN_DIRS = ['hooks', 'commands', 'skills', 'agents'];
@@ -3231,42 +3235,64 @@ function check43_hookScriptShipped() {
 				}
 			}
 		}
-		// build-plugin.js INCLUDE allow-list 의 scripts/ 엔트리 추출 (REPO_ROOT/scripts/build-plugin.js).
+		// ancestor-aware 멤버십 — 정확 경로 ∈ list 거나 조상 dir(예: 'scripts')이 list 에 있으면 covered.
+		const coveredBy = (rel, set) => {
+			if (set.has(rel)) return true;
+			const parts = rel.split('/');
+			for (let i = 1; i < parts.length; i++) {
+				const anc = parts.slice(0, i).join('/');
+				if (set.has(anc) || set.has(anc + '/')) return true;
+			}
+			return false;
+		};
+
+		// 채널 ① npm (AUTHORITATIVE / source:npm 설치) = package.json `files` 의 scripts/ 양성 엔트리.
+		const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf-8'));
+		const npmFiles = new Set(
+			(pkg.files ?? []).filter((f) => typeof f === 'string' && !f.startsWith('!')),
+		);
+
+		// 채널 ② dist (build-plugin.js INCLUDE / git-subdir Claude 아티팩트 채널).
 		const buildPluginPath = join(REPO_ROOT, 'scripts', 'build-plugin.js');
-		if (!existsSync(buildPluginPath))
-			return {
-				id: 'hook_script_shipped',
-				pass: false,
-				detail: `build-plugin.js 부재 (${buildPluginPath}) — INCLUDE allow-list 대조 불가`,
-				delegated_to: 'scripts/build-plugin.js INCLUDE',
-			};
-		const bpText = readFileSync(buildPluginPath, 'utf-8');
-		const incMatch = bpText.match(/const INCLUDE\s*=\s*\[([\s\S]*?)\];/);
 		const included = new Set();
-		if (incMatch) {
-			for (const m of incMatch[1].matchAll(/['"](scripts\/[^'"]+)['"]/g))
-				included.add(m[1]);
+		if (existsSync(buildPluginPath)) {
+			const bpText = readFileSync(buildPluginPath, 'utf-8');
+			const incMatch = bpText.match(/const INCLUDE\s*=\s*\[([\s\S]*?)\];/);
+			if (incMatch)
+				for (const m of incMatch[1].matchAll(/['"](scripts\/[^'"]+)['"]/g))
+					included.add(m[1]);
 		}
-		const missing = [...referenced.entries()].filter(([rel]) => !included.has(rel));
+
+		// 미출하 = 어느 한 채널에서라도 빠지면 dead-on-install.
+		const gaps = [];
+		for (const [rel, ref] of referenced) {
+			const inNpm = coveredBy(rel, npmFiles);
+			const inDist = coveredBy(rel, included);
+			if (!inNpm || !inDist) {
+				const ch = [!inNpm && 'npm:files', !inDist && 'dist:INCLUDE']
+					.filter(Boolean)
+					.join('+');
+				gaps.push(`${rel}(←${ref} / 누락채널:${ch})`);
+			}
+		}
 		return {
 			id: 'hook_script_shipped',
-			pass: missing.length === 0,
+			pass: gaps.length === 0,
 			detail:
-				missing.length === 0
-					? `출하 hooks/commands/skills/agents 가 참조하는 \${CLAUDE_PLUGIN_ROOT}/scripts/* ${referenced.size}개 전부 build-plugin INCLUDE 등재 — dead-on-install 차단 (scripts/ allow-list / v0.71.0·nudge 회귀 가드 / 결정론)`
-					: `INCLUDE 미등재 ${missing.length}건 (참조하나 미출하 → dead-on-install): ${missing
-							.map(([rel, ref]) => `${rel}(←${ref})`)
+				gaps.length === 0
+					? `출하 hooks/commands/skills/agents 가 참조하는 \${CLAUDE_PLUGIN_ROOT}/scripts/* ${referenced.size}개 전부 양 채널(npm package.json files + dist build-plugin INCLUDE) 등재 — dead-on-install 차단 (v0.71.0·nudge 회귀 가드 / 결정론)`
+					: `dead-on-install ${gaps.length}건 (참조하나 미출하): ${gaps
 							.slice(0, 8)
-							.join(', ')}${missing.length > 8 ? ' …' : ''} — build-plugin.js INCLUDE 에 추가`,
+							.join(', ')}${gaps.length > 8 ? ' …' : ''} — package.json files / build-plugin.js INCLUDE 에 추가`,
 			delegated_to:
-				'hooks/ commands/ skills/ agents/ (${CLAUDE_PLUGIN_ROOT}/scripts ref) ⊆ scripts/build-plugin.js INCLUDE (DEC-2026-06-24-hook-script-shipping-guard)',
+				'hooks/ commands/ skills/ agents/ (${CLAUDE_PLUGIN_ROOT}/scripts ref) ⊆ package.json files ∩ build-plugin.js INCLUDE (DEC-2026-06-24-hook-script-shipping-guard)',
 		};
 	} catch (e) {
 		return {
 			id: 'hook_script_shipped',
 			pass: false,
 			detail: `error: ${e.message}`,
-			delegated_to: 'hooks/ → build-plugin INCLUDE',
+			delegated_to: 'hooks/ → npm files ∩ build-plugin INCLUDE',
 		};
 	}
 }
