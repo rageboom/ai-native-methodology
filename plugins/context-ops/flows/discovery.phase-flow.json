@@ -35,7 +35,7 @@
       "depends_on": ["use-cases-decompose", "br-intent-extract"],
       "inputs": ["use_cases", "business_rules_intent", "business_intent"],
       "outputs": ["discovery-spec.json"],
-      "skills": ["discovery-converge-inputs", "discovery-from-analysis-output"],
+      "skills": ["discovery-converge-inputs", "discovery-dep-consult", "discovery-from-analysis-output"],
       "automated_validation": ["discovery-extraction-validator", "schema-validator"]
     },
     {

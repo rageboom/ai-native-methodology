@@ -332,9 +332,11 @@
         "properties": {
           "from_uc": {"type": "string", "pattern": "^UC-[A-Z0-9_-]+-[0-9]{3}$", "description": "의존 출발 UC id"},
           "to_uc": {"type": "string", "description": "영향받는 노드 id (UC/BHV/AC 등 artifact-graph 노드)"},
-          "grade": {"type": "string", "enum": ["MUST", "SHOULD", "FYI"], "description": "analyzeImpact 영향 등급 (감쇠 적용)"},
-          "edge_type": {"type": "string", "description": "artifact-graph edge_type (derived_from/depends_on/implements 등)"},
-          "direction": {"type": "string", "enum": ["forward", "backward", "both"], "description": "origin 기준 방향"}
+          "signal": {"type": "string", "enum": ["shared_ref", "graph_impact"], "description": "S4 하이브리드 신호 출처 — shared_ref(UC 간 br/api/source 공유 / 그래프 무관 / discovery 즉시) | graph_impact(artifact-graph analyzeImpact 보강)"},
+          "grade": {"type": "string", "enum": ["MUST", "SHOULD", "FYI"], "description": "영향 등급. graph_impact=analyzeImpact 감쇠 / shared_ref=br·api 공유 SHOULD·source-only FYI"},
+          "edge_type": {"type": "string", "description": "graph_impact 시 artifact-graph edge_type (derived_from/depends_on/implements 등)"},
+          "direction": {"type": "string", "enum": ["forward", "backward", "both"], "description": "origin 기준 방향 (shared_ref=both)"},
+          "shared": {"type": "array", "items": {"type": "string"}, "description": "shared_ref 시 공유된 참조 키 목록 (br:/api:/src: prefix)"}
         }
       }
     },
