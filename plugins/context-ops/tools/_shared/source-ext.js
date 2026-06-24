@@ -3,9 +3,9 @@
 // 용도: Gap B(living-graph 자동배선 / plan-living-graph-autowire) — PostToolUse 가 손수정 *코드* 파일
 //   write 를 감지할 때 산출물(.ai-context JSON)이 아닌 source 파일인지 분류.
 //
-// 참고: scripts/codegraph-nudge.js 에 동형 사본(SOURCE_EXTS/isSourcePath)이 존재한다 — 그 hook 은
-//   plugin-root scripts/ 에서 단독 실행되어 안정성 우선 미이관(추후 본 모듈 import 로 통합 = drift 제거 carry).
-//   둘은 동일 목록을 유지해야 한다(divergence 시 본 모듈이 canonical).
+// SSOT: 이 모듈이 SOURCE_EXTS 의 canonical 정의다. scripts/codegraph-nudge.js + scripts/graph-context-nudge.js
+//   (PostToolUse/PreToolUse/UserPromptSubmit hook) 모두 ../tools/_shared 에서 import 한다 — scripts/ 와 tools/_shared/
+//   가 함께 출하되어(build-plugin INCLUDE) plugin-root 상대경로 해소 OK. (구 codegraph-nudge 동형 사본은 v0.75.0 에서 통합.)
 
 import { extname } from 'node:path';
 

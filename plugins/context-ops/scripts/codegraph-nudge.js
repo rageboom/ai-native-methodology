@@ -25,6 +25,7 @@ import { existsSync, mkdirSync, writeFileSync, readFileSync } from 'node:fs';
 import { join, extname, resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createHash } from 'node:crypto';
+import { SOURCE_EXTS } from '../tools/_shared/source-ext.js';
 
 const IS_WINDOWS = process.platform === 'win32';
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
@@ -32,11 +33,10 @@ const PLUGIN_ROOT = process.env.CLAUDE_PLUGIN_ROOT || resolve(SCRIPT_DIR, '..');
 const MARKER_DIR = join(PLUGIN_ROOT, '.static-tools'); // reuse companion/static marker dir (gitignored)
 
 // Source extensions aligned with codegraph's supported languages (see `codegraph status` Languages).
-export const SOURCE_EXTS = new Set([
-	'.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs', '.java', '.py', '.go', '.rb', '.php',
-	'.cs', '.kt', '.kts', '.swift', '.scala', '.sc', '.rs', '.vue',
-	'.c', '.h', '.cc', '.cpp', '.hpp', '.hh',
-]);
+//   SSOT = tools/_shared/source-ext.js (이전엔 동형 사본을 여기 중복 정의했으나 drift 위험 → import 로 통합.
+//   sibling hook graph-context-nudge.js 가 동일 ../tools/_shared import 패턴을 이미 출하·검증 — 경로 해소 OK).
+//   re-export 로 기존 public surface(SOURCE_EXTS) 보존.
+export { SOURCE_EXTS };
 
 const ANSI = /\x1b\[[0-9;]*m/g;
 const LENS = '(codegraph reference-lens · grep authoritative · gate-inject ❌)';

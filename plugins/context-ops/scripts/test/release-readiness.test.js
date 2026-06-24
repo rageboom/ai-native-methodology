@@ -38,12 +38,12 @@ function runScript(args, env = {}, timeout = 60000) {
 const SKIP_WS = ['--skip-workspace-test'];
 
 describe('release-readiness — Senior F3 흡수 (content-aware criterion / file presence ❌) + v3.6.7 11/11 + v7.1.0 12/12 + v8.1.0 13/13 격상', () => {
-	it('happy path — 41/42 pass for v2.5.0 (A1 skip via --skip-workspace-test / check12 staleness + check13 citation pass / 본격 spawn 회피 cadence)', () => {
-		// skip 시 check11(workspace_test) = pass=false / total 41/42 (나머지 전부 pass). release 본격 시행 시 본 flag ❌ 의무.
+	it('happy path — 42/43 pass for v2.5.0 (A1 skip via --skip-workspace-test / check12 staleness + check13 citation pass / 본격 spawn 회피 cadence)', () => {
+		// skip 시 check11(workspace_test) = pass=false / total 42/43 (나머지 전부 pass). release 본격 시행 시 본 flag ❌ 의무.
 		const r = runScript(['--target', 'v2.5.0', '--json', ...SKIP_WS]);
 		const out = JSON.parse(r.stdout);
-		assert.equal(out.criteria_total, 42);
-		assert.equal(out.criteria_passed, 41);
+		assert.equal(out.criteria_total, 43);
+		assert.equal(out.criteria_passed, 42);
 		const ws = out.results.find((x) => x.id === 'workspace_test_pass');
 		assert.ok(
 			ws.detail.includes('skipped via --skip-workspace-test'),
@@ -61,7 +61,7 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 		);
 	});
 
-	it('all 42 criterion ids are present in output (no skipped)', () => {
+	it('all 43 criterion ids are present in output (no skipped)', () => {
 		const r = runScript(['--target', 'v2.5.0', '--json', ...SKIP_WS]);
 		const out = JSON.parse(r.stdout);
 		const ids = out.results.map((x) => x.id).sort();
@@ -89,6 +89,7 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 			'gate_enum_consistency',
 			'gate_validator_list_consistency',
 			'graph_integrity',
+			'hook_script_shipped',
 			'layer_2_consistency',
 			'legacy_4_stage_expression_absent',
 			'marketplace_stage_sync',
@@ -305,11 +306,11 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 		assert.ok(ev.pass_count > 0);
 	});
 
-	it('non-existent target version still runs all 42 checks (target is metadata)', () => {
+	it('non-existent target version still runs all 43 checks (target is metadata)', () => {
 		const r = runScript(['--target', 'v99.99.99', '--json', ...SKIP_WS]);
 		// even with bogus target, should still evaluate all checks against current artifacts.
 		const out = JSON.parse(r.stdout);
-		assert.equal(out.criteria_total, 42);
+		assert.equal(out.criteria_total, 43);
 	});
 
 	// check41 discrimination — 카탈로그 범위 ⊇ plugin.json 버전 (install ETARGET 회귀 가드).
@@ -681,6 +682,19 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 		);
 	});
 
+	it('hook_script_shipped (check43) — 출하 hooks/commands/skills/agents 의 ${CLAUDE_PLUGIN_ROOT}/scripts 참조 ⊆ build-plugin INCLUDE (dead-on-install 회귀 가드 / DEC-2026-06-24)', () => {
+		const r = runScript(['--target', 'v0.75.0', '--json', ...SKIP_WS]);
+		const out = JSON.parse(r.stdout);
+		const c = out.results.find((x) => x.id === 'hook_script_shipped');
+		assert.ok(c, 'check43 hook_script_shipped criterion must exist');
+		assert.ok(
+			c.pass,
+			`check43 must pass (참조 scripts 전부 INCLUDE 등재) — detail: ${c.detail}`,
+		);
+		// 본 가드가 잡는 버그 클래스 = v0.71.0 token-roi + nudge 3종 dead-on-install. 결정론 / INCLUDE 멤버십.
+		assert.ok(c.delegated_to.includes('INCLUDE'), 'build-plugin INCLUDE allow-list 대조');
+	});
+
 	it('scanSecrets — TP(실 secret) hit / FP(test-data·타입설명·placeholder) clean (release-block low-FP 의무)', async () => {
 		const { scanSecrets } = await import('../../tools/_shared/pii-patterns.js');
 		// TP — 진짜 secret 은 hit
@@ -728,8 +742,8 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 			`workspace_test_pass must pass — full detail: ${ws.detail} | r.status=${r.status} | stderr=${r.stderr.slice(0, 300)}`,
 		);
 		assert.match(ws.detail, /\d+\/\d+ pass \/ 0 fail/);
-		assert.equal(out.criteria_total, 42);
-		assert.equal(out.criteria_passed, 42);
+		assert.equal(out.criteria_total, 43);
+		assert.equal(out.criteria_passed, 43);
 		assert.equal(out.ready, true);
 		assert.equal(r.status, 0);
 	});

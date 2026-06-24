@@ -84,6 +84,19 @@ describe('matchPromptToNodes (_shared / 결정론)', () => {
 			[],
 		);
 	});
+
+	it('순수 숫자 id-part(001)는 매칭 노이즈 → 스킵 (DEC-2026-06-24 §carry-b)', () => {
+		// "001" 은 모든 도메인의 *-001 에 우연 매칭되던 시퀀스 서수 → 이제 빈 결과.
+		assert.deepEqual(matchPromptToNodes('이슈 001 수정', NODES), []);
+	});
+
+	it('비-숫자 도메인 id-part(user)는 여전히 매칭 (+1 / refine 이 정상 토큰은 안 죽임)', () => {
+		const r = matchPromptToNodes('user 권한 작업', NODES);
+		const ids = r.map((x) => x.node_id).sort();
+		// id 에 'user' 포함 노드 전부(ARTICLE 제외) / 점수 1 / 'uc'·'001' 은 제외돼도 'user' 로 진입.
+		assert.deepEqual(ids, ['AC-USER-001', 'BHV-USER-001', 'TASK-USER-002', 'UC-USER-001']);
+		assert.ok(r.every((x) => x.score === 1 && x.matched.includes('id-part:user')));
+	});
 });
 
 describe('isConfidentTop (tie/약매칭 degrade / Senior must-fix #1)', () => {

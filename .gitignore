@@ -25,6 +25,10 @@ plugins/context-ops/examples/poc-03-realworld-nestjs/source/nestjs-realworld-tmp
 # companion-tool runtime marker dirs (codegraph-nudge / graph-context-nudge once-per-prompt markers)
 **/.static-tools/
 
+# repo-root dogfood session-handoff working context (session-handoff skill writes .ai-context/HANDOFF.md).
+# 루트 한정(leading /) — examples/poc-*/.ai-context/ 의 커밋된 산출물 SSOT 167건은 보호(블랭킷 ❌).
+/.ai-context/
+
 # Claude Code local settings
 .claude/settings.local.json
 .claude/worktrees/

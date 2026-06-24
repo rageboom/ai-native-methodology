@@ -43,6 +43,9 @@ const INCLUDE = [
 	// dev tooling (release-readiness/build/publish/version-check/test) 은 workspace-only.
 	'scripts/install-static-tools.js', // hooks.json SessionStart (cross-platform)
 	'scripts/install-static-tools.sh', // retained for direct POSIX use
+	'scripts/install-companion-tools.js', // hooks.json SessionStart (codegraph/headroom companion 설치)
+	'scripts/graph-context-nudge.js', // hooks.json UserPromptSubmit (living-graph Gap A 자동주입 / DEC-2026-06-19)
+	'scripts/codegraph-nudge.js', // hooks.json PreToolUse (codegraph 토큰절감 nudge / DEC-2026-06-15)
 	'scripts/token-roi-bench.js', // skill token-roi (A/B 하니스)
 	'scripts/token-roi-tasks.json', // bench 표본 task (고정)
 	'scripts/token-roi-ledger-hook.js', // hooks.json PostToolUse(codegraph)

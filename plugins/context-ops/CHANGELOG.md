@@ -10,6 +10,29 @@
 
 ---
 
+## [0.75.0] — 2026-06-24 — MINOR — 출하 누락 hook 스크립트 3종 복구(dead-on-install 수정) + 재발방지 가드 + living-graph carry 정리
+
+**문제 (P1 출하 결함 / dogfood 발견)**: `build-plugin.js` 의 `scripts/` 는 wholesale 출하가 아니라 allow-list(INCLUDE) 방식인데, hooks.json 이 호출하는 런타임 스크립트 **3종이 INCLUDE 미등재**라 설치 패키지에서 누락 → 런타임 `Cannot find module` = 기능 **dead-on-install**. clean rebuild(v0.74.0) `dist/scripts/` 실측으로 확인.
+
+- `scripts/install-companion-tools.js` (SessionStart / codegraph·headroom companion 설치)
+- `scripts/graph-context-nudge.js` (UserPromptSubmit / living-graph Gap A 자동주입 — v0.64.0 이래 dead)
+- `scripts/codegraph-nudge.js` (PreToolUse / codegraph 토큰절감 nudge — DEC-2026-06-15 이래 dead)
+
+**근본 원인**: v0.71.0 token-roi 패키징 결함과 동일 클래스. 당시 교훈("새 런타임 스크립트는 INCLUDE 등재 의무")이 **메모리에만 있고 gate 화 안 됨** → nudge 3종에 미적용 재발.
+
+### Fixed
+- `scripts/build-plugin.js` INCLUDE 에 위 3 스크립트 등재. rebuild 후 dist/scripts/ 출하 + 런타임 import(`../tools/_shared/*`) 해소 + node --check + no-op 스모크 검증.
+
+### Added
+- **release-readiness check #43 `hook_script_shipped`** (criteria 42→43) — 출하 hooks/commands/skills/agents 가 호출하는 모든 `${CLAUDE_PLUGIN_ROOT}/scripts/*` 가 build-plugin INCLUDE allow-list 에 등재됐는지 결정론 대조. 미등재 시 referrer `file:line` 지목 fail-closed. dead-on-install 클래스 영구 회귀 가드(메모리 교훈의 gate 화). 음성검증(INCLUDE 1개 제거→fail) + 양성검증 완료. DEC-2026-06-24-hook-script-shipping-guard.
+
+### Changed (living-graph carry 정리)
+- **carry b** — `tools/_shared/prompt-node-match.js` id-part 매칭에서 순수 숫자 토큰(`001` 등 시퀀스 서수) 제외. cross-domain 우연 매칭 노이즈 차단(정밀도). 회귀 test 2건 추가.
+- **carry c** — `scripts/codegraph-nudge.js` 의 `SOURCE_EXTS` 동형 사본 제거 → `tools/_shared/source-ext.js` import 통합(drift SSOT 단일화). sibling `graph-context-nudge.js` 의 동일 import 패턴이 경로 해소 입증. re-export 로 public surface 보존.
+- **carry a** — `.gitignore` 에 루트 한정 `/.ai-context/` 추가(dogfood HANDOFF 위생). 블랭킷 ❌ — `examples/poc-*/.ai-context/` 커밋 산출물 167건 보호.
+
+---
+
 ## [0.74.0] — 2026-06-24 — MINOR — 죽은 `/aimd-*` 슬래시 명령 → `/chain-next`·`/chain-stage` 리네임 + 실제 명령 격상
 
 **문제**: hook 출력(`hooks-bridge` additionalContext)·chain-driver 소스/문서에 `/aimd-next`·`/aimd-stage <name>` 안내가 잔존. `DEC-2026-06-08-aimd-rename-ai-context`(`.aimd`→`.ai-context`) 이후 `aimd` 는 죽은 토큰인데 정정 누락. **근본 원인** = 부모 sweep 정규식 `/\.aimd(?!-install)/g` 의 **앞 점(`\.`) 앵커**가 디렉토리 `.aimd` 만 잡고 **슬래시 prefix `/aimd-*`** 를 놓침. 추가 발견: `/aimd-next`·`/aimd-stage` 는 **실제 등록 슬래시 명령이 아닌 안내 텍스트**(command 정의 부재) — 안내↔동작 불일치. SSOT: `DEC-2026-06-24-chain-slash-command-rename`. (0.73.0 = token-roi 와 버전 충돌 → 0.74.0 으로 상향.)

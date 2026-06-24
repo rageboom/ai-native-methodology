@@ -18,6 +18,7 @@ import { basename, extname } from 'node:path';
 
 // 점수 가중 (확정): id-full 5 / id-part 1 / title 2 / symbol 3 / file 2.
 //   title=2 (symbol=3 보다 낮음 / Senior should_consider — 흔한 2글자 한글 title 우연 substring noise 완화).
+//   id-part 는 길이≥3 AND 비-순수숫자 (001 등 시퀀스 서수 = cross-domain 노이즈 → 제외 / DEC-2026-06-24).
 const W_ID_FULL = 5;
 const W_ID_PART = 1;
 const W_TITLE = 2;
@@ -43,7 +44,11 @@ export function matchPromptToNodes(
 			score += W_ID_FULL;
 			matched.push(`id:${node.id}`);
 		} else {
-			for (const part of idLc.split(/[-_./]/).filter((x) => x.length >= 3)) {
+			// id-part = 도메인 토큰(notes/user/car…)만. 순수 숫자(001/002 = 시퀀스 서수)는
+			// 모든 도메인의 *-001 에 우연 매칭되는 노이즈라 스킵 (정밀도 / DEC-2026-06-24 §carry-b).
+			for (const part of idLc
+				.split(/[-_./]/)
+				.filter((x) => x.length >= 3 && !/^\d+$/.test(x))) {
 				if (p.includes(part)) {
 					score += W_ID_PART;
 					matched.push(`id-part:${part}`);
