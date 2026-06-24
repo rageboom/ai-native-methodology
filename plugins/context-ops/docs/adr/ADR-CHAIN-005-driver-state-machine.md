@@ -80,9 +80,9 @@ trio 모두 동작해야 enforcement 진짜 — 1개라도 누락 시 양심 의
 - stderr 만 사용자 콘솔 노출 (LLM context 주입 ❌)
 - `hookSpecificOutput.additionalContext` 에 차단 문구 동봉:
   ```
-  "LLM SHALL NOT auto-invoke this skill. User explicit decision REQUIRED via /aimd-next or /aimd-stage <name>."
+  "LLM SHALL NOT auto-invoke this skill. User explicit decision REQUIRED via /chain-next or /chain-stage <name>."
   ```
-- skill 진입 = 사용자 slash command (`/aimd-next` / `/aimd-stage <name>`) 또는 사용자 명시 prompt 만
+- skill 진입 = 사용자 slash command (`/chain-next` / `/chain-stage <name>`) 또는 사용자 명시 prompt 만
 - driver 권고 = stderr only — LLM 컨텍스트 격리
 
 ### 5. Chain-revisit-detector = path whitelist + LOC confidence ( Senior F4)

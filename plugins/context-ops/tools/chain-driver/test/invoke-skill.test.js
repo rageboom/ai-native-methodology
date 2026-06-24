@@ -50,6 +50,6 @@ describe('invoke-skill', () => {
   it('formatHookBlockContext includes blocking sentence', () => {
     const ctx = formatHookBlockContext('spec/y', { name: 'y' });
     assert.match(ctx, /SHALL NOT auto-invoke/);
-    assert.match(ctx, /\/aimd-next/);
+    assert.match(ctx, /\/chain-next/);
   });
 });

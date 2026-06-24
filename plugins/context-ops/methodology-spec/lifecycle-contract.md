@@ -486,3 +486,4 @@ master plan `~/.claude/plans/a-stateful-gadget.md` §H sequencing 정합:
 - 외부 권위: DTCG 2025.10 (W3C Design Tokens) / WCAG 2.2 / React 19 / Vue 3
 - BC verdict 분류·write_ops 판별축·cross-cutting home·tier·명시-tier 근거: DEC-2026-06-15-bc-verdict-classification (`../decisions/DEC-2026-06-15-bc-verdict-classification.md`) — verdict REQUIRED(`schemas/domain.schema.json#bounded_contexts[].items.required`) + verdict-consistency-validator (VC1 미등록 / VC2 verdict↔write_ops 모순 / VC3 이중분류 / VC4 stale concern) analysis gate#0 강제
 - 이중분류·read-only 누수 reframe 근거: DEC-2026-06-15-analysis-zone-orphan-propose / DEC-2026-06-12-sql-embedded-static-residual-reframe
+- FE 워크스페이스(JS/TS 모노레포) 앱별 `.ai-context/` 배치 sub-case 근거: DEC-2026-06-24-fe-workspace-monorepo-per-app-ai-context (`../decisions/DEC-2026-06-24-fe-workspace-monorepo-per-app-ai-context.md`)

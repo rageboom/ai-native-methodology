@@ -71,7 +71,7 @@ export function formatSkillSuggestion(skillId, meta) {
 		`  path: skills/${skillId}/SKILL.md`,
 		`  description: ${desc}`,
 		`  LLM SHALL NOT auto-invoke. User explicit decision REQUIRED.`,
-		`  Run via /aimd-next or /aimd-stage <name>.`,
+		`  Run via /chain-next or /chain-stage <name>.`,
 	].join('\n');
 }
 
@@ -84,7 +84,7 @@ export function formatHookBlockContext(skillId, meta, agentId) {
 			? `v4.0 paradigm: dispatch agent '${agentId}' via Task tool (multi-agent / DEC-2026-05-17-v4-multi-agent-paradigm-채택). `
 			: '') +
 		`LLM SHALL NOT auto-invoke this skill. ` +
-		`User explicit decision REQUIRED via /aimd-next or /aimd-stage <name>.`
+		`User explicit decision REQUIRED via /chain-next or /chain-stage <name>.`
 	);
 }
 

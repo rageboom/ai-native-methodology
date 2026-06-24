@@ -10,6 +10,25 @@
 
 ---
 
+## [0.74.0] — 2026-06-24 — MINOR — 죽은 `/aimd-*` 슬래시 명령 → `/chain-next`·`/chain-stage` 리네임 + 실제 명령 격상
+
+**문제**: hook 출력(`hooks-bridge` additionalContext)·chain-driver 소스/문서에 `/aimd-next`·`/aimd-stage <name>` 안내가 잔존. `DEC-2026-06-08-aimd-rename-ai-context`(`.aimd`→`.ai-context`) 이후 `aimd` 는 죽은 토큰인데 정정 누락. **근본 원인** = 부모 sweep 정규식 `/\.aimd(?!-install)/g` 의 **앞 점(`\.`) 앵커**가 디렉토리 `.aimd` 만 잡고 **슬래시 prefix `/aimd-*`** 를 놓침. 추가 발견: `/aimd-next`·`/aimd-stage` 는 **실제 등록 슬래시 명령이 아닌 안내 텍스트**(command 정의 부재) — 안내↔동작 불일치. SSOT: `DEC-2026-06-24-chain-slash-command-rename`. (0.73.0 = token-roi 와 버전 충돌 → 0.74.0 으로 상향.)
+
+### Changed
+- 죽은 토큰 → **`/chain-next`·`/chain-stage`**(실제 메커니즘 chain harness 정합): `tools/chain-driver/src/invoke-skill.js`(2) · `hooks-bridge.js`(1) · `cli.js`(2) live 코드 + lockstep test `invoke-skill.test.js:53`(`/chain-next` 단언).
+- 문서: `docs/MIGRATION-v1-to-v2.md`(7) · `docs/adr/ADR-CHAIN-005-driver-state-machine.md`(2).
+
+### Added
+- `commands/chain-next.md` — forward 진입(`chain-driver next <project> --user-decision go|stop --json` 게이트 평가 + exit 0 시 stage sub-agent dispatch / ADR-CHAIN-005 D21' 사용자 명시 결단 entry).
+- `commands/chain-stage.md` — 명시 stage 진입/복귀(종결 stage = `--user-decision revisit:<stage>` backward + intervention_log 기록 + sub-agent dispatch).
+- 안내↔동작 lockstep 격상(dangling reference 해소 / commands 자동 발견 — plugin.json 선언 불요).
+
+### 보존
+- 시점 사실(부모 DEC "역사 기록 보존" 규칙): `CHANGELOG-HISTORY.md` · `decisions/*-HISTORY.md` · 과거 DEC 항목. `decisions/*` 의 `/tmp/aimd-clean-clone.*` = 슬래시 명령 아닌 과거 tmp 경로 = 무접촉.
+
+### 교훈
+- prefix-bound 정규식 sweep 은 동일 토큰의 타 prefix(`\.` vs `/`)를 놓친다 → 리네임 후 prefix-agnostic bare-token grep 전수 확인.
+
 ## [0.73.0] — 2026-06-24 — MINOR — token-roi 토큰절감 측정 하니스 + 라이브 ledger + `/context-ops:roi` 커맨드
 
 **문제**: "우리 토큰 절감 수단(codegraph/headroom/서브에이전트 격리)이 실제로 얼마나 효율 있나"를 정직한 실측으로 보고할 도구가 없었다. SSOT: `plan-token-roi.md`. (개발 라인에서 v0.71.0/v0.72.0 로 진행했으나 main 이 동일 번호를 다른 기능에 부여 → v0.73.0 단일 MINOR 로 통합 재버전.)
@@ -43,8 +62,6 @@
 - **corroboration = 1 PoC(FE 첫)**: mis-fe-admin apps/tlm(BC-TLM-* 21) + apps/eam(integration-authority) 앱별 분리 적용.
 - **§8.1 면제**: additive·doc-clarification(신규 mechanism·schema·gate ❌).
 - SSOT: `DEC-2026-06-24-fe-workspace-monorepo-per-app-ai-context`.
-
----
 
 ## [0.71.1] — 2026-06-24 — PATCH — S1 난이도 변별력 회복 (MUST_DENSE_BONUS 제거 + advisory scope-상대 outlier)
 

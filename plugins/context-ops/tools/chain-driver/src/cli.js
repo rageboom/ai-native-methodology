@@ -287,7 +287,7 @@ function blockedExit(state, projectRoot) {
 	const reasonLabel = REASON_LABELS[reason]?.label;
 	console.error(
 		`[chain-driver] ⛔ 진행 불가 (BLOCKED) — ${reasonLabel ? `${reasonLabel} ` : ''}(block_reason=${reason}). ` +
-			`해결 후 /aimd-next 또는 /aimd-stage <name> 로 재개. (mechanical trio (ii))`,
+			`해결 후 /chain-next 또는 /chain-stage <name> 로 재개. (mechanical trio (ii))`,
 	);
 	logIntervention(state, projectRoot, {
 		event_type: 'trio_block',
@@ -1624,7 +1624,7 @@ function cmdSuggestSkill(args) {
 	if (!args.prompt) usage(3);
 	const skillId = suggestSkillForPrompt(args.prompt);
 	if (!skillId) {
-		process.stderr.write('[chain-driver] no skill matched. Use /aimd-next.\n');
+		process.stderr.write('[chain-driver] no skill matched. Use /chain-next.\n');
 		process.exit(0);
 	}
 	// Try to load skill meta from repo root (caller responsibility — we use cwd as repoRoot).

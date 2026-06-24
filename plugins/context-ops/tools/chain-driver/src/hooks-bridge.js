@@ -74,7 +74,7 @@ export function buildBlockOutput({
 		hookSpecificOutput: {
 			hookEventName,
 			permissionDecision: 'deny',
-			additionalContext: `chain-driver mechanical gate blocked: ${reason}. User must resolve via /aimd-next or /aimd-stage <name>.`,
+			additionalContext: `chain-driver mechanical gate blocked: ${reason}. User must resolve via /chain-next or /chain-stage <name>.`,
 		},
 		continue: false,
 	};
