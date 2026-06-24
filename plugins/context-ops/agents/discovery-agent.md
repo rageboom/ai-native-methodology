@@ -12,6 +12,7 @@ skills:
     discovery-identify-business-intent,
     discovery-converge-inputs,
     discovery-dep-consult,
+    discovery-clarify,
     _base-build-traceability-matrix,
     _base-apply-template,
     _base-log-finding,
@@ -66,6 +67,7 @@ model: opus
 3. **공통 sub-skill 호출** — `discovery-decompose-use-cases` + `discovery-identify-business-intent` 로 어댑터 결과 정규화
 4. **Merge + 충돌 해소** — `discovery-converge-inputs` 호출(S3). 어댑터 간 동일 UC 병합 + Intent 통합 + 충돌 4분류(`conflicts[]`) 표면화 → 미해소 충돌은 `pending_decisions[]` 로 사용자 결단 묶음 gate. 임의 해소 ❌(출처 합집합 보존 / no-simulation).
 4b. **UC 의존성 consult** — `discovery-dep-consult` 호출(S4). 결정론 도구(dep-consult-cli)로 `uc_dependencies[]` 산출(shared_ref + 그래프 있으면 graph_impact 보강). reference-lens / verdict ❌ / 그래프 부재 = degraded 정직.
+4c. **clarify** — `discovery-clarify` 호출(S5). 커버리지 갭(모호/엣지/누락/미해소충돌/가정) → `open_questions[]` 누적. 비블로킹 기본 → gate#1 HTML 일괄 Q&A. blocking=true 만 pending_decisions 승격.
 5. **discovery-spec.{json,md} 산출** — `schemas/discovery-spec.schema.json` 의무
 6. **gate 진입** — `_base-invoke-go-stop-gate` 호출 / 사용자 결단 cluster + intervention-log 등재
 7. **종결 보고** — discovery-spec path + traceability backward link 상태 + spec stage 진입 권고 → `spec-agent` dispatch
