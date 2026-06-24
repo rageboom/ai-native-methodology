@@ -26,7 +26,7 @@
     "catalog:build:check": "node scripts/build-catalog.js --check",
     "test": "pnpm -r --workspace-concurrency=1 --if-present run test",
     "test:tools": "pnpm -r --workspace-concurrency=1 --if-present run test",
-    "test:release": "node --test plugins/context-ops/scripts/test/release-readiness.test.js",
+    "test:release": "pnpm -r --workspace-concurrency=1 --if-present run test:release",
     "release:check": "node scripts/release-check.js",
     "publish:plugin": "node scripts/publish.js",
     "publish:plugin:dry": "node scripts/publish.js --dry-run",

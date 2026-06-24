@@ -1,0 +1,12 @@
+{
+  "name": "ux-plan",
+  "version": "0.1.0",
+  "description": "Smilegate UX/UI팀이 기획서를 Confluence 위키 페이지로 작성하도록 돕는 Claude Code 플러그인 — AI가 직접 읽고 쓸 수 있도록 텍스트·표 중심, Figma는 링크 참조 (mis-plugins 마켓플레이스).",
+  "author": {
+    "name": "MIS",
+    "email": "sangcl@smilegate.com"
+  },
+  "homepage": "https://github.smilegate.net/SGH-ISD/ai-native-methodology",
+  "license": "UNLICENSED",
+  "keywords": ["claude-code", "mis-plugins", "ux", "planning", "confluence", "wiki", "figma"]
+}

@@ -1,0 +1,38 @@
+{
+  "name": "@mis-plugins/pm",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "description": "PM팀/개발팀 요구사항 정의서(PRD) 작성 + Jira 변환 Claude Code 플러그인 — npm 배포 페이로드(source:npm).",
+  "license": "UNLICENSED",
+  "homepage": "https://github.smilegate.net/SGH-ISD/ai-native-methodology",
+  "author": {
+    "name": "MIS",
+    "email": "sangcl@smilegate.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.smilegate.net/SGH-ISD/ai-native-methodology.git",
+    "directory": "plugins/pm"
+  },
+  "files": [
+    ".claude-plugin",
+    "skills",
+    "CHANGELOG.md",
+    "README.md",
+    "!**/test",
+    "!**/tests",
+    "!**/__tests__",
+    "!**/*.test.js",
+    "!**/node_modules"
+  ],
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "release:check": "node ../../scripts/version-check.js --plugin pm"
+  },
+  "publishConfig": {
+    "registry": "https://repo.smiledev.net/repository/npm-hosted/"
+  }
+}
