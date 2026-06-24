@@ -677,3 +677,35 @@
   - 산출물 일람: \_manifest.yml + input.json + html-template-extract.json + inventory.json + tree.md + stack-detection.md + stats.json + schema.json + erd.mermaid + db-schema-consistency-report.md + architecture.json + architecture.mermaid + architecture.md + dependency-graph.mermaid + circular-dependencies.md + domain.json + domain.mermaid + domain.md + business-rules.json + rules.md + antipatterns-partial.json + formal-spec.json + Car-CostAccept FSM + UC-CAR-COST-001 sequence + BR-CAR-MGT-006 DT + characterization-spec.json + UC-CAR-COST-001 snapshot + UC-CAR-MGT-001 snapshot + intent-vs-bug.md + coverage.json + sql-inventory.json + sql-inventory.md + raw-grep.txt + openapi.yaml + api-extension.json + error-mapping-spec.json + api.md + ui-spec.json + ui-spec.md + ui-spec.mermaid + state-map.json + visual-manifest.json + type-spec.json + antipatterns.json + avoid-list.md + migration-cautions.md
   - 외부 도구 실 실행 = PMD JSP + cloc + Spectral + schema-validator + sql-inventory-validator + characterization-coverage-validator
   - 다음: Step 3 (chain 1 discovery stage) 진입 ready
+
+---
+
+## Phase: `dep-consult-corroboration` (2026-06-24 / MIS-373 본체 격상 ≥2 PoC)
+
+본 PoC 자산(discovery-spec.json + artifact-graph.json)을 MIS-373 S4 dep-consult reference-lens 의 corroboration 대상으로 사용. 별개 코드베이스 poc-18(express-prisma modern) 과 함께 ≥2 PoC 게이트 충족.
+
+### F-POC15-DC-001 (medium / dep-consult shared_ref 입력 포맷 갭 — closed)
+
+- **type**: tool-input-format-gap
+- **severity**: medium
+- **summary**: `dep-consult.js` `refSet()` 이 `br_refs`/`api_refs` 필드 + `source_grounded_evidence` 중 `#` 포함 토큰만 결합 신호로 인식 → 실 산출물(베어 `BR-…`/콜론 `sqlmap:…`)에서 shared_ref **0건** (실제 공유 3쌍 누락)
+- **detail**:
+  - poc-16 실측: UC-CAR-MGT 3쌍이 공통 BR 공유 — `001∩003: BR-CAR-MGT-006` / `001∩004: BR-CAR-MGT-005` / `004∩005: BR-CAR-MGT-002`. 구 도구는 전부 0건 (false negative).
+  - 원인: 스키마에 없는 `br_refs`/`api_refs` 를 1차 신호로 기대 + evidence 는 `#` 포함만 인식. 모든 실 PoC(poc-03/08/11/16)는 `br_refs` 미사용 + `#` 전무.
+  - fixture drift 동반: `dep-consult.test.js` 가 도구 기대 포맷(`br_refs`, `domain.json#User`)으로 작성돼 4/4 통과하면서 실전 0건을 못 잡음 (`feedback_self_recorded_fact_validation`).
+- **resolution**:
+  - status: **closed** — `refSet()` 수정(베어 `BR-*`→`br:` 정규화 SHOULD / 콜론 식별자 / `#` ref / 정확일치). `#` 제약 제거. 하위호환(`br_refs`/`api_refs`) 보존.
+  - 회귀 고정: `dep-consult.test.js` 실 산출물 포맷 케이스 추가 (베어 BR 공유 1쌍 SHOULD 단언).
+  - 재실측: poc-16 shared_ref **3건** SHOULD ✅ / poc-18 modern **0건**(실제 0쌍 — precision 유지) ✅.
+
+### F-POC15-DC-002 (low / graph_impact 위상 한계 — deferred / 옵션 A)
+
+- **type**: graph-signal-topology-limit
+- **severity**: low
+- **summary**: `graph_impact` 신호가 현행 artifact-graph 위상(`UC→BHV→AC` 독립 체인)에서 UC↔UC 직접 영향이 구조적으로 0 → 그래프 기반 UC 의존 산출 불가
+- **detail**:
+  - poc-16 엣지 분포: `UC→BHV:10` / `BHV→AC:10` / `analysis→{UC,BHV,AC}`. UC 간 직접 엣지 0 → `analyzeImpact(UC-X)` 가 다른 UC 미도달.
+  - 그래프 기반 UC 결합(공유 analysis 조상)은 shared_ref(공유 evidence)와 의미 중복 → 별도 그래프 신호 보강 보류 (사용자 결정 옵션 A / §8.1 과적합 회피).
+  - `degraded` 마커는 정상 동작(graph=null → `degraded:true` 정직 신호). 다른 위상 그래프(UC↔UC 직접 엣지)에선 동작.
+- **resolution**:
+  - status: **deferred** — shared_ref 로 UC 결합 커버. graph_impact 코드 무변경. 본체 격상 DEC-2026-06-24-discovery-enhance-mis373 에 위상 한계 기록.

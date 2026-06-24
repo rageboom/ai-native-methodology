@@ -551,7 +551,9 @@ function check10_claudeMdVersionSync() {
 	// 검증 대상: CLAUDE.md 안 "plugin.json vX.Y.Z" 표기 (핵심 컨텍스트 자산 안 plugin 진화 정합 표기).
 	// drift 발생 시 다음 session 의 plan + research 부정확 risk → release 차단 의무.
 	const pluginJsonPath = join(ROOT, '.claude-plugin/plugin.json');
-	const claudeMdPath = resolve(REPO_ROOT, 'CLAUDE.md');
+	// 모노레포 전환 후 REPO_ROOT/CLAUDE.md = 마켓플레이스 루트(plugin 버전 표기 없음) → plugin CLAUDE.md(ROOT) 로 정정.
+	// pluginJsonPath 와 동일 ROOT 기준 = plugin 진화 표기 ↔ 그 plugin 의 plugin.json sync 검증 (DEC-2026-06-24-discovery-enhance-mis373 부수).
+	const claudeMdPath = resolve(ROOT, 'CLAUDE.md');
 	if (!existsSync(pluginJsonPath)) {
 		return {
 			id: 'claude_md_version_sync',

@@ -66,3 +66,24 @@ test('빈 use_cases = 빈 결과 (방어)', () => {
 	assert.equal(r.counts.total, 0);
 	assert.deepEqual(r.uc_dependencies, []);
 });
+
+// 회귀 — 실 산출물(discovery-from-* skill) 포맷: br_refs 미사용 + source_grounded_evidence 에
+// 베어 "BR-X" / 콜론 "sqlmap:foo". 구 refSet 은 # 포함 토큰만 봐서 이 공유를 0건으로 놓쳤다
+// (poc-16 실측: 실제 3쌍 BR 공유를 전부 누락). 이 케이스가 그 drift 를 회귀로 고정한다.
+test('shared_ref — 실 산출물 포맷(베어 BR-/콜론, br_refs 미사용) 회귀', () => {
+	const realSpec = {
+		use_cases: [
+			{ id: 'UC-R-001', source_grounded_evidence: ['BR-CAR-001', 'sqlmap:insertCar'] },
+			{ id: 'UC-R-002', source_grounded_evidence: ['BR-CAR-001', 'sqlmap:updateCar'] }, // BR-CAR-001 공유
+			{ id: 'UC-R-003', source_grounded_evidence: ['sqlmap:deleteCar'] }, // 무관
+		],
+	};
+	const r = computeUcDependencies(realSpec, null);
+	const sr = r.uc_dependencies.filter((d) => d.signal === 'shared_ref');
+	assert.equal(sr.length, 1); // R1-R2 만 (BR-CAR-001 공유) / R3 무관
+	const dep = sr[0];
+	assert.equal(dep.from_uc, 'UC-R-001');
+	assert.equal(dep.to_uc, 'UC-R-002');
+	assert.equal(dep.grade, 'SHOULD'); // 베어 BR-* → br: 정규화 → SHOULD
+	assert.deepEqual(dep.shared, ['br:BR-CAR-001']);
+});

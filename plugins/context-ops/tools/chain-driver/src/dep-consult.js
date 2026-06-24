@@ -11,14 +11,21 @@
 
 import { analyzeImpact } from './impact-analyzer.js';
 
-// UC 의 참조 집합 (br_refs ∪ api_refs ∪ analysis-artifact source id). shared_ref 결합 판정용.
+// UC 의 참조 집합 (br_refs ∪ api_refs ∪ source_grounded_evidence 토큰). shared_ref 결합 판정용.
+// 실 산출물(discovery-from-* skill) 은 br_refs/api_refs 필드를 쓰지 않고 source_grounded_evidence 에
+// 베어 "BR-X" / 콜론 "sqlmap:foo" / "domain.json#User" 등을 담는다. 토큰 전체를 정확일치 공유 신호로
+// 보되, 식별자성(BR-*/api*) 은 br:/api: 로 정규화해 sharedGrade SHOULD 로 승격한다.
 function refSet(uc) {
 	const s = new Set();
-	for (const r of uc.br_refs || []) s.add('br:' + r);
-	for (const r of uc.api_refs || []) s.add('api:' + r);
+	for (const r of uc.br_refs || []) s.add('br:' + r); // 하위호환 (필드 사용 시)
+	for (const r of uc.api_refs || []) s.add('api:' + r); // 하위호환 (필드 사용 시)
 	for (const e of uc.source_grounded_evidence || []) {
-		// "business-rules.json#BR-X" / "domain.json#User" 같은 analysis artifact ref 만 결합 신호로.
-		if (typeof e === 'string' && e.includes('#')) s.add('src:' + e);
+		if (typeof e !== 'string') continue;
+		const t = e.trim();
+		if (!t) continue;
+		if (/^BR-/.test(t)) s.add('br:' + t); // 베어 BR 토큰 → 의미 결합 SHOULD
+		else if (/^(api|openapi):/.test(t)) s.add('api:' + t); // API 식별자 → SHOULD
+		else s.add('src:' + t); // 그 외(콜론 식별자/파일/메서드/# ref) → FYI / 정확 일치만
 	}
 	return s;
 }
