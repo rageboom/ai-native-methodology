@@ -10,6 +10,27 @@
 
 ---
 
+## [0.73.0] — 2026-06-24 — MINOR — token-roi 토큰절감 측정 하니스 + 라이브 ledger + `/context-ops:roi` 커맨드
+
+**문제**: "우리 토큰 절감 수단(codegraph/headroom/서브에이전트 격리)이 실제로 얼마나 효율 있나"를 정직한 실측으로 보고할 도구가 없었다. SSOT: `plan-token-roi.md`. (개발 라인에서 v0.71.0/v0.72.0 로 진행했으나 main 이 동일 번호를 다른 기능에 부여 → v0.73.0 단일 MINOR 로 통합 재버전.)
+
+### Added — A/B 측정 하니스 + skill
+- **`scripts/token-roi-bench.js` + `token-roi-tasks.json` + `test/token-roi-bench.test.js`(5 test)** — 결정론 byte/token A/B 회계. 같은 정보 요구를 codegraph context vs grep+read baseline / sub-agent 격리 / headroom 으로 비교. 토크나이저 = count_tokens 자동감지 + chars/4 fallback("estimate ±20%" 라벨). 비율%는 토크나이저 견고.
+- **`skills/token-roi/SKILL.md`** — `/context-ops:token-roi` 진입 + 정직성 규칙(비율% 우선 / 캐시≠우리절감 / codegraph 미가용 시 날조 ❌ / 모델버전 고정).
+
+### Added — 라이브 ledger 훅 (플러그인 기본 always-on)
+- **`scripts/token-roi-ledger-hook.js` + `hooks/hooks.json` PostToolUse(matcher=codegraph)** — codegraph 호출 출력 토큰을 `~/.claude/token-roi/ledger-<session>.jsonl` 에 실측 적재. **env 게이트 없음**(뷰어 커맨드 동반 출하로 opt-in "orphan ledger" 우려 해소). 로컬 전용/외부 전송 ❌/항상 exit 0(비차단).
+- **`commands/roi.md`(→ `/context-ops:roi`) + `scripts/token-roi-summary.js`** — headroom + codegraph 절감을 on-demand 요약 출력. Node 구현(크로스플랫폼 / jq·awk 의존 없음).
+
+### Fixed — 패키징 (출하 차단)
+- **`scripts/build-plugin.js` INCLUDE 에 `scripts/token-roi-{bench.js,tasks.json,ledger-hook.js,summary.js}` + `commands` 등록** — 런타임 자산이 allow-list 누락으로 설치 패키지에서 빠지던 결함(v12.13.1 "scripts/ 패키징 누락" 동류) 차단. `commands` 는 없는 플러그인엔 existsSync 가드로 skip.
+
+### 정직성 결론 (작업 산물)
+- **headroom** = 유일한 라이브 **실측 $ 절감**(`proxy_savings.json` compression line, 캐시 합산 ❌). 단 headroom 프록시는 개인 설정(`ANTHROPIC_BASE_URL`)이라 플러그인 미주입 → 미사용 시 "데이터 없음"(정직 표기).
+- **codegraph** = 절감이 반사실(안 한 grep+read) → 실측 불가, 추정만(×1.8 vs grep+read = A/B 64.5% 유래 / estimate 라벨).
+- **sub-agent 격리** = 절감 아님(diverted) + 별도 기법 아님(=서브에이전트 사용) → 미표시.
+- 전부 reference-lens / 결정적 chain gate inject ❌(DEC-2026-05-28 §4.2).
+
 ## [0.72.0] — 2026-06-24 — MINOR — FE 워크스페이스 모노레포 앱별 `.ai-context/` 배치 규칙
 
 **문제**: 멀티모듈 repo 배치 규칙(`methodology-spec/lifecycle-contract.md`)은 이미 있었으나 판별축이 전적으로 **BE 프레이밍**("독립 배포 + 독립 도메인 / 모듈마다 자기 DB / shared-core+entrypoints")이라, pnpm/npm/yarn workspaces·nx·turbo 같은 **FE 워크스페이스 모노레포**(각 `apps/<app>` 가 자체 vite/tsconfig 로 독립 SPA 번들 생성)가 legible 하지 않았다. 특히 "멀티 entrypoint 가 한 core(`apps/common`) 공유 → repo 루트" 가 **false match**(공유 lib 은 런타임 코어가 아니라 빌드타임 소스 의존성)를 일으켜 잘못된 루트-단일 결론으로 유도. 실측 = 소비 repo `mis-fe-admin` 루트 `.ai-context/` 가 apps/tlm + apps/eam 혼재 + codegraph 노이즈.
