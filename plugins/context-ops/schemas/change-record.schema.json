@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-native-methodology/schemas/change-record.schema.json",
+  "title": "Change Record (discovery fast-path / trivial tier 산출물)",
+  "description": "DEC-2026-06-24-complexity-tier-fastpath — discovery 보편 입구·라우터의 trivial tier 경량 산출물. 풀 discovery-spec(use_cases 분해 + spec/plan/test/implement 스킬 팬아웃)을 생략하되, 체인 강제 진입(우회 0)·영향도(⑥)·Jira(⑦)·최소검증은 보존하는 최소치. tier=standard|deep 은 본 산출물 ❌ → 기존 discovery-spec.schema.json 풀 경로. trivial 적격 = 보수적 conjunctive 술어(touched_node_count==1 ∧ net_new==false ∧ layer_span==1 ∧ subkind∉{BR,UC}) — triage.js 결정론 신호로 검증, change_kind(LLM 선언값)는 advisory tie-breaker 만. ID 컨벤션: methodology-spec/id-conventions.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["meta", "tier", "intent", "change_kind", "touched_node_refs", "triage_signals", "verification", "impact_closure_ref", "ticket_ref"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "generated_by", "do_not_edit_manually", "generated_at"],
+      "properties": {
+        "schema": { "const": "change-record.schema.json" },
+        "generated_by": { "const": "discovery-fast-path" },
+        "do_not_edit_manually": { "const": true },
+        "generated_at": { "type": "string", "format": "date-time" },
+        "source_prompt_digest": { "type": ["string", "null"], "description": "변경 요청 자연어의 요약/해시 (감사 추적용 / 선택)." }
+      }
+    },
+    "tier": {
+      "const": "trivial",
+      "description": "본 산출물은 trivial tier 전용. standard|deep 은 풀 discovery-spec 경로 (본 schema 부적용)."
+    },
+    "intent": {
+      "type": "string",
+      "minLength": 1,
+      "description": "변경 의도 한 줄 (LLM 추출 / discovery-from-nl-md)."
+    },
+    "change_kind": {
+      "enum": ["typo", "item_add", "item_remove", "semantic_change"],
+      "description": "policy-evaluator 4종 정합. ⚠️ LLM 선언값(결정론 측정 아님) — trivial 적격의 advisory tie-breaker 만, 단독 충분조건 ❌ (Senior Q1). semantic_change = 통상 trivial 부적격 신호."
+    },
+    "touched_node_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "description": "route-discovery origins → artifact-graph 노드 id." },
+      "description": "변경이 닿는 그래프 노드(=영향 origin). trivial 적격은 정확히 1개 (술어). impact 호출의 --origin 입력."
+    },
+    "triage_signals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["touched_node_count", "net_new", "layer_span", "touched_subkinds", "predicate_satisfied"],
+      "description": "triage.js 가 emit 한 결정론 raw 신호 스냅샷 (감사/재현). tier 판정은 본 도구가 아니라 gate/skill 소관 — 여기엔 신호와 술어 평가 결과만 (reference-lens 정신).",
+      "properties": {
+        "touched_node_count": { "type": "integer", "minimum": 0, "description": "닿는 그래프 노드 수 (route-discovery origins 크기)." },
+        "net_new": { "type": "boolean", "description": "신규 노드 생성 요청 여부. true = trivial 부적격." },
+        "layer_span": { "type": "integer", "minimum": 0, "description": "변경이 가로지르는 레이어 수. >1 = trivial 부적격." },
+        "touched_subkinds": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "닿는 노드 subkind 집합. BR/business_rule 또는 UC 포함 시 deny-list 발동 = trivial 절대 부적격 (Senior Q1)."
+        },
+        "predicate_satisfied": {
+          "type": "boolean",
+          "description": "보수적 conjunctive 술어 충족 여부 (count==1 ∧ !net_new ∧ layer_span==1 ∧ subkind∉{BR,UC}). false 인데 tier=trivial 산출 = 가드 위반."
+        }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["characterization_snapshot_refs", "oracle_waiver"],
+      "description": "trivial 최소 검증 = 결정론 하드게이트 (Senior Q2 / unit-spec-oracle 거짓 GREEN 함정 회피). 풀 test-spec 생성은 생략하되 검증 흔적은 의무 — characterization_snapshot_refs ≥1 OR oracle_waiver 비어있지 않음. 둘 다 부재 = GREEN 거부.",
+      "properties": {
+        "characterization_snapshot_refs": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^SNAP-[A-Z0-9_-]+$" },
+          "description": "characterization-spec.snapshots[].snapshot_id (^SNAP-) 참조 — 닿는 노드의 AS-IS 동작 보존 증거. v0.69.0 필드 재사용."
+        },
+        "oracle_waiver": {
+          "type": ["string", "null"],
+          "minLength": 1,
+          "description": "snapshot 미수립 시 정직 면제 사유 (예: 'cosmetic typo / 동작 불변 / snapshot 불요'). 빈 문자열 차단(minLength:1) — null = 미면제(이 경우 characterization_snapshot_refs ≥1 의무). 날조 금지: 진짜 동작 변경이면 snapshot 을 채우고 본 필드를 쓰지 않는다."
+        }
+      }
+    },
+    "impact_closure_ref": {
+      "type": ["string", "null"],
+      "description": "⑥ — `chain-driver impact --origin <touched_node_refs>` 영향 closure 기록 참조 (JSONL line id / 파일 경로). fast-path exit gate 는 non-null 을 요구 (null = GREEN 거부 / fail-closed). 작성 중 임시 null 허용."
+    },
+    "ticket_ref": {
+      "type": ["string", "null"],
+      "description": "⑦ — trivial 경량 단일-OP Jira 티켓 키 (예: 'MIS-372'). fast-path exit gate 는 non-null 을 요구 (null = GREEN 거부 / fail-closed). 작성 중 임시 null 허용."
+    }
+  }
+}
