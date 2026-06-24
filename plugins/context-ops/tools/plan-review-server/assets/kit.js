@@ -601,7 +601,7 @@ var Kit = (function () {
 			panels.appendChild(panel);
 			var R = pickRenderer(d.artifactType);
 			if (R && typeof R.render === 'function') {
-				R.render(panel, { data: d.data || {}, summaries: d.summaries || {} });
+				R.render(panel, { data: d.data || {}, summaries: d.summaries || {}, difficulty: d.difficulty || null });
 			}
 			btn.addEventListener('click', function () {
 				btns.forEach(function (b) { b.classList.remove('active'); });
@@ -616,6 +616,22 @@ var Kit = (function () {
 	// 렌더 완료 후 호출 — 칩 강조 갱신(복원된 큐 반영).
 	function afterRender() { markChips(); }
 
+	// 난이도 뱃지 (S1 reference-lens / 표시 전용 / verdict 아님). d = use_cases[ucId] 항목.
+	var DIFF_NAME = { S: '낮음', M: '중간', L: '높음' };
+	function difficultyBadge(d) {
+		var b = document.createElement('div');
+		b.className = 'diff-badge';
+		if (!d || d.degraded) {
+			b.className += ' diff-na';
+			b.textContent = '난이도 — (그래프 미합성)';
+			return b;
+		}
+		b.className += ' diff-' + d.bucket;
+		b.textContent = '난이도 ' + d.bucket + ' (' + (DIFF_NAME[d.bucket] || '') + ') · 영향 '
+			+ d.impact_count + '노드 · MUST ' + d.must_count;
+		return b;
+	}
+
 	// 전 artifact 공통 — 접어서 뒤로 보내는 provenance/구조 섹션.
 	var COLLAPSED = [
 		{ key: 'meta', title: '메타정보', icon: 'ℹ️' },
@@ -628,6 +644,7 @@ var Kit = (function () {
 		section: section, card: card, toBlocks: toBlocks, blockify: blockify, renderBlock: renderBlock,
 		chip: chip, roVal: roVal, prose: proseEl, field: fieldRow, tokenizeInto: tokenizeInto,
 		isLocked: isLocked, kindOf: kindOf, label: label, cardTitle: cardTitle, cardSub: cardSub,
+		difficultyBadge: difficultyBadge,
 		LABELS: LABELS, COLLAPSED: COLLAPSED,
 	};
 })();

@@ -238,3 +238,18 @@ details.sec[open] > summary.sec-head { color: var(--ink); }
   #layout { flex-direction: column; }
   #prompt-panel { position: static; flex-basis: auto; width: 100%; max-height: none; }
 }
+
+/* ── 난이도 뱃지 (S1 reference-lens / 표시 전용 / verdict 아님) ── */
+.diff-badge {
+  display: inline-block; font-size: 11px; font-weight: 700; line-height: 1.4;
+  padding: 3px 9px; border-radius: 7px; margin: 0 0 8px;
+  border: 1px solid transparent; letter-spacing: .01em;
+}
+.diff-S { background: #dcfce7; color: var(--go); border-color: #bbf7d0; }
+.diff-M { background: #fef3c7; color: var(--review); border-color: #fde68a; }
+.diff-L { background: #fee2e2; color: var(--stop); border-color: #fecaca; }
+.diff-na { background: #f1f3f7; color: var(--muted); border-color: var(--line); }
+.diff-banner {
+  background: #f1f3f7; color: var(--muted); border: 1px dashed var(--line);
+  border-radius: var(--radius); padding: 9px 14px; font-size: 12.5px; margin: 0 0 16px;
+}

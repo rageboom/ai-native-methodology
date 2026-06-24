@@ -14,6 +14,24 @@ RENDERERS['discovery-spec'] = {
 		{ key: 'excluded_antipatterns', title: '제외 안티패턴', icon: '🛑' },
 	],
 	render: function (root, ctx) {
-		Kit.arrange(root, ctx.data || {}, this.sections, { collapsedDefs: Kit.COLLAPSED });
+		var diff = ctx.difficulty || null;
+		// greenfield/미합성 = 전역 degraded → 배너 1회 (카드별 뱃지 생략).
+		if (diff && diff.degraded) {
+			var banner = document.createElement('div');
+			banner.className = 'diff-banner';
+			banner.textContent = '🧭 UC 난이도: artifact-graph 부재 — greenfield 또는 그래프 미합성 (degraded · 미산출)';
+			root.appendChild(banner);
+		}
+		var ucDiff = (diff && !diff.degraded && diff.use_cases) || {};
+		Kit.arrange(root, ctx.data || {}, this.sections, {
+			collapsedDefs: Kit.COLLAPSED,
+			renderCardBody: function (cardApi, item, base) {
+				// use_cases 카드에만 난이도 뱃지 선두 삽입 (다른 섹션은 기본 배치).
+				if (base.indexOf('use_cases[') === 0 && item && item.id && ucDiff[item.id]) {
+					cardApi.addNode(Kit.difficultyBadge(ucDiff[item.id]));
+				}
+				cardApi.addObject(item, base);
+			},
+		});
 	},
 };
