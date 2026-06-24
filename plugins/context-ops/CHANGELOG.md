@@ -10,6 +10,21 @@
 
 ---
 
+## [0.76.0] — 2026-06-24 — MINOR — chain stage 상시 인지 (statusLine 세그먼트 + `/chain-status`)
+
+**문제 (사용자 발화)**: chain harness 진행 중 "지금 무슨 chain stage 인지" 알 방법이 사실상 없음. SSOT(`.ai-context/state.json`)는 있으나 노출이 pull-only(`chain-driver state` 직접 실행) → ambient(상시) 채널 부재.
+
+### Added
+- **`scripts/chain-statusline.js`** — Claude Code statusLine 세그먼트. **self-contained**(플러그인 의존 0 / statusLine 실행엔 `${CLAUDE_PLUGIN_ROOT}` 미보장이라 stdin 세션 JSON 의 cwd 에서 `.ai-context/state.json` 직접 read). 렌더 `📍 spec 2/5 · BC-FOO`(chain) / `📍 analysis · scope`(gate#0=N/5 생략) / `📍 chain idle` / 침묵(state.json 없음). blocked=`⛔` 접두. blank-on-error(throw ❌). 비-gating display·reference-lens(deterministic-axis / gate inject ❌).
+- **`scripts/chain-statusline-setup.js`** — statusLine 1회 설정(사용자 하드 편집 회피). `${CLAUDE_PLUGIN_ROOT}` 로 chain-statusline.js 절대경로 resolve → `.claude/settings.local.json`(로컬·gitignore) 에 `statusLine` merge-write. idempotent + clobber-guard(기존 statusLine 보존 / `--force` 필요) + 타 키 무손실 + env 부재 exit3(정직 fallback). hot-reload(재시작 불요).
+- **`commands/chain-status.md`** — `/chain-status` 슬래시 커맨드. 기본=현재 stage/scope/phase/blocked/gate 조회(`chain-driver state` wrap / gate#N 환산). `--setup-statusline`=위 setup 위임.
+
+### 정합
+- 플러그인은 statusLine 자동주입 불가(Claude Code 사양: 플러그인 settings = agent/subagentStatusLine 만) → `/chain-status --setup-statusline` 1회 실행 패턴. check #43 이 `commands/chain-status.md` 의 `${CLAUDE_PLUGIN_ROOT}/scripts/chain-statusline*.js` ref 로 양채널 출하 자동 강제. DEC-2026-06-24-chain-stage-awareness.
+- 테스트: chain-statusline 12 + chain-statusline-setup 7. deterministic-axis(state.json 결정론 read / LLM 판단 0). §8.1 — UX additive / 신규 gate 없음(criteria 43 불변).
+
+---
+
 ## [0.75.1] — 2026-06-24 — PATCH — dead-on-install 진짜 채널(npm `files`) 정정 + 가드 양채널 확장
 
 **문제 (v0.75.0 fix 가 잘못된 채널을 고침 / publish dry-run + tarball 실측으로 발견)**: v0.75.0 은 `build-plugin.js` INCLUDE(= **git-subdir dist 채널**)만 고쳤으나, marketplace.json `source: npm` 의 **실제 설치 경로는 package.json `files`**(별개 allow-list). `pnpm pack` tarball 실측 결과 `files` 에서 5종 누락 → npm 설치 시 **여전히 dead-on-install**:
