@@ -1,6 +1,6 @@
 # 설치 가이드 — 아무것도 안 깔린 PC 기준
 
-AI-Native 개발 방법론 플러그인(Claude Code)을 **처음부터** 설치하는 최단 절차입니다.
+`mis-plugins` 마켓플레이스의 Claude Code 플러그인(`context-ops` / `pm` / `ux-plan`)을 **처음부터** 설치하는 최단 절차입니다.
 Windows / macOS 둘 다 다룹니다. 순서대로 따라오면 됩니다.
 
 > **전제**: 사내 GHE(`github.smilegate.net`)의 본 repo **read 권한**만 있으면 됩니다.
@@ -61,17 +61,19 @@ claude                 # 첫 실행 시 안내에 따라 계정 로그인
 
 ---
 
-## 4. 플러그인 설치
+## 4. 마켓플레이스 추가 + 플러그인 설치
 
-Claude Code 세션 안에서(`claude` 실행 후 프롬프트에) 아래 3줄을 입력합니다:
+Claude Code 세션 안에서(`claude` 실행 후 프롬프트에) 마켓플레이스를 추가하고, 필요한 플러그인을 골라 설치합니다:
 
 ```text
 /plugin marketplace add https://github.smilegate.net/SGH-ISD/ai-native-methodology.git
-/plugin install context-ops@mis-plugins
+/plugin install context-ops@mis-plugins     # AI-Native 개발 방법론 (SDLC chain harness)
+/plugin install pm@mis-plugins               # 요구사항 정의서(PRD) 작성 + Jira 변환
+/plugin install ux-plan@mis-plugins          # Confluence 위키 기획서 작성
 /reload-plugins
 ```
 
-> pin 없는 기본 브랜치(`main`)가 **최신 안정 버전**입니다.
+> 세 플러그인 중 **필요한 것만** 설치하면 됩니다. pin 없는 기본 브랜치(`main`)가 **최신 안정 버전**입니다.
 
 ---
 
@@ -80,7 +82,7 @@ Claude Code 세션 안에서(`claude` 실행 후 프롬프트에) 아래 3줄을
 ```text
 /plugin
 ```
-대화형 매니저의 **Installed** 탭에서 `context-ops`가 보이면 완료입니다.
+대화형 매니저의 **Installed** 탭에서 설치한 플러그인(`context-ops` / `pm` / `ux-plan`)이 보이면 완료입니다.
 
 ---
 
@@ -93,4 +95,4 @@ Claude Code 세션 안에서(`claude` 실행 후 프롬프트에) 아래 3줄을
 | 도구 실행 오류 | Node 버전 확인(`node -v` ≥ 22) |
 | (Windows·한국어 + Semgrep 사용 시) 인코딩 깨짐 | 환경변수 `PYTHONUTF8=1` 설정 |
 
-자세한 사용법은 플러그인 본체의 [`ai-native-methodology/README.md`](ai-native-methodology/README.md)를 참고하세요.
+자세한 사용법은 각 플러그인의 README(`plugins/<name>/README.md` — 예: [`plugins/context-ops/README.md`](plugins/context-ops/README.md))를 참고하세요.
