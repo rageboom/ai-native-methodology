@@ -10,6 +10,21 @@
 
 ---
 
+## [0.72.0] — 2026-06-24 — MINOR — FE 워크스페이스 모노레포 앱별 `.ai-context/` 배치 규칙
+
+**문제**: 멀티모듈 repo 배치 규칙(`methodology-spec/lifecycle-contract.md`)은 이미 있었으나 판별축이 전적으로 **BE 프레이밍**("독립 배포 + 독립 도메인 / 모듈마다 자기 DB / shared-core+entrypoints")이라, pnpm/npm/yarn workspaces·nx·turbo 같은 **FE 워크스페이스 모노레포**(각 `apps/<app>` 가 자체 vite/tsconfig 로 독립 SPA 번들 생성)가 legible 하지 않았다. 특히 "멀티 entrypoint 가 한 core(`apps/common`) 공유 → repo 루트" 가 **false match**(공유 lib 은 런타임 코어가 아니라 빌드타임 소스 의존성)를 일으켜 잘못된 루트-단일 결론으로 유도. 실측 = 소비 repo `mis-fe-admin` 루트 `.ai-context/` 가 apps/tlm + apps/eam 혼재 + codegraph 노이즈.
+
+### Added
+- `lifecycle-contract.md` "멀티모듈 repo 배치 규칙" 에 **JS/TS 워크스페이스(FE) 모노레포 sub-case** additive 보강 — 판별축 = **"독립 빌드·배포 아티팩트"**(BE "자기 DB" 대응물). 자체 번들러 설정 → 별도 SPA 번들이면 **예외 → 앱별 `apps/<app>/.ai-context/`**(co-located / 루트 단일 ❌). 공유 워크스페이스 lib(`apps/common`/`packages/*`)=빌드타임 소스 → 레이아웃 루트로 안 끌어내림. 참조 altitude = 앱-내부 `src/...`(self-contained / gea 단일-repo 동형) / 외부·공유 lib repo-상대 보존. 기존 `analysis-scope-carve --scope-root apps/<app>` 정합.
+
+### Notes
+- **trust 불변**: 문서 가이드(reference)만 — 결정론 도구·gate·스키마·release criteria(42) 무변경. 회귀 0.
+- **corroboration = 1 PoC(FE 첫)**: mis-fe-admin apps/tlm(BC-TLM-* 21) + apps/eam(integration-authority) 앱별 분리 적용.
+- **§8.1 면제**: additive·doc-clarification(신규 mechanism·schema·gate ❌).
+- SSOT: `DEC-2026-06-24-fe-workspace-monorepo-per-app-ai-context`.
+
+---
+
 ## [0.71.0] — 2026-06-24 — MINOR — discovery 강화 본체 격상(MIS-373 S1~S5) + dep-consult shared_ref 실포맷 정합
 
 **문제**: MIS-373 discovery 강화 5슬라이스(S1 난이도 reference-lens / S2 스키마 additive / S3 멀티입력 수렴 / S4 UC 의존성 dep-consult / S5 clarify 패스)는 코드가 main 에 머지됐으나 자체 release·CHANGELOG·DEC 없이 0.70.0(MIS-371)에 무임승차한 상태였다. 본체 격상의 전제 게이트 = **≥2 PoC corroboration**. 실측하니 S1(난이도)은 실 자산에서 작동했으나 S4(dep-consult `shared_ref`)는 실 산출물에서 **0건** — `refSet()` 이 스키마에 없는 `br_refs`/`api_refs` + `#` 포함 evidence 만 인식했는데 모든 실 PoC 는 베어 `BR-…`/콜론 `sqlmap:…` 포맷이라 구조적 누락. SSOT: `DEC-2026-06-24-discovery-enhance-mis373`.
