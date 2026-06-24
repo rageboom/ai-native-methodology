@@ -38,10 +38,15 @@ const INCLUDE = [
 	'methodology-spec',
 	'schemas',
 	'guides', // cleanup round 2-C — 사용자 journey 자산
-	// SessionStart hook runtime deps — only these two scripts ship; dev tooling
-	// (release-readiness/build/publish/version-check/test) stays workspace-only.
+	'commands', // slash 커맨드 (없는 플러그인은 existsSync 가드로 skip)
+	// 런타임 hook/skill/command 가 ${CLAUDE_PLUGIN_ROOT}/scripts/ 로 호출하는 스크립트만 ship.
+	// dev tooling (release-readiness/build/publish/version-check/test) 은 workspace-only.
 	'scripts/install-static-tools.js', // hooks.json SessionStart (cross-platform)
 	'scripts/install-static-tools.sh', // retained for direct POSIX use
+	'scripts/token-roi-bench.js', // skill token-roi (A/B 하니스)
+	'scripts/token-roi-tasks.json', // bench 표본 task (고정)
+	'scripts/token-roi-ledger-hook.js', // hooks.json PostToolUse(codegraph)
+	'scripts/token-roi-summary.js', // command /context-ops:roi (on-demand 요약 / Node 크로스플랫폼)
 	'CHANGELOG.md',
 	'CHANGELOG-HISTORY.md',
 	'README.md',

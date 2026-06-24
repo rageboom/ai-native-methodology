@@ -1,0 +1,38 @@
+{
+  "$schema_note": "token-roi 하니스 표본 task 세트. 재현성 위해 고정. 각 task = 하나의 '정보 요구'.",
+  "target_label": "poc-18-express-prisma-modern-ts (modern Express+Prisma TS — codegraph 강세 스택)",
+  "scope_dir": "plugins/context-ops/examples/poc-18-express-prisma-modern-ts/target/src",
+  "rationale": "codegraph 가 강한 Node/TS 스택 선택 (memory: iBATIS2/Java cover 약함 → 불공정). examples/ committed PoC = codegraph dogfood 정합.",
+  "tasks": [
+    {
+      "id": "T1-login-auth-flow",
+      "question": "how does the login authentication flow work",
+      "grep_terms": ["login", "loginUserWithEmailAndPassword"],
+      "intent": "auth.controller.login → auth.service → token.service → auth.repository 흐름 파악 (멀티파일 cross-module)"
+    },
+    {
+      "id": "T2-token-lifecycle",
+      "question": "how are auth tokens generated, stored and validated",
+      "grep_terms": ["generateAuthToken", "findValidToken", "TokenType"],
+      "intent": "token.service + auth.repository 토큰 수명주기"
+    },
+    {
+      "id": "T3-rbac-roles",
+      "question": "how does role based access control and permission checking work",
+      "grep_terms": ["role", "permission", "rbac"],
+      "intent": "config/roles + types/rbac + shared/middlewares/auth RBAC"
+    },
+    {
+      "id": "T4-post-create-to-db",
+      "question": "how does creating a post reach the database through the repository layer",
+      "grep_terms": ["createPost", "post.repository", "base.repository"],
+      "intent": "post.controller → post.service → post.repository → base.repository persistence"
+    },
+    {
+      "id": "T5-error-handling",
+      "question": "how does error handling middleware and ApiError work",
+      "grep_terms": ["ApiError", "errorConverter", "catchAsync"],
+      "intent": "shared/middlewares/error + utils/api-error + catch-async 에러 파이프라인"
+    }
+  ]
+}

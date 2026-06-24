@@ -74,6 +74,16 @@
             "$comment": "dep-graph P3 (operation.md 결정 5) — chain/analysis/aspect artifact (.ai-context/*.json) write 감지 시 scope manifest 의 sync_state.impact_pending=true 마킹 + stderr 안내. per-node 영향 분석(BFS)+정책 평가는 사용자가 `chain-driver impact --graph <path> --origin <node-id>` 로 실행 (기계적 정직성 — 한 파일 = 다수 노드이므로 hook 은 detect+mark 만). graph artifact 아니면 pass-through."
           }
         ]
+      },
+      {
+        "matcher": "codegraph",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/token-roi-ledger-hook.js",
+            "$comment": "token-roi 절감 ledger (플러그인 기본 always-on / v0.73.0 — env 게이트 없음). codegraph 호출의 출력 토큰을 ~/.claude/token-roi/ledger-<session>.jsonl 에 실측 적재 → 커맨드 /context-ops:roi(scripts/token-roi-summary.js)가 cg 절감(추정 ×1.8 vs grep+read / A/B 64.5% 유래)을 on-demand 표시. 뷰어 커맨드도 함께 출하되어 옛 opt-in orphan-ledger 우려 해소. 로컬 전용/외부 전송 ❌. codegraph 절감=반사실(안 한 grep+read)→실측 불가/추정만(estimate 라벨). reference-lens / 결정적 chain gate inject ❌ (DEC-2026-05-28 §4.2). 항상 exit 0 (PostToolUse 비차단). skills/token-roi/SKILL.md 'on-demand 요약' 참조."
+          }
+        ]
       }
     ]
   }
