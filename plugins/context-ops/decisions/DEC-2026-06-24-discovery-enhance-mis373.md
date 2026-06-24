@@ -17,6 +17,7 @@ MIS-373 S1~S5 는 `feat(...)` 커밋으로 main 에 머지됐으나 **자체 rel
 | **S4 graph_impact** | poc-16 0건 (UC↔UC 직접 엣지 부재 위상) | △ 위상 한계 |
 | greenfield degrade (graph=null) | `degraded:true` 정직 마커 + shared_ref 산출 | ✅ degrade 경로 |
 | modern poc-18 (별개 코드베이스) | shared_ref 0건 (실제 evidence 공유 0쌍) | ✅ precision 유지 |
+| **ep-be-gea 35 BC** (사내 / 마스킹 집계) | shared_ref **368건**(33/35 scope 산출) / graph_impact **0** / UC↔UC 직접엣지 **0**(5천+ 엣지 전수 / 위상 체인형 `UC→BHV→AC→TASK→TC→IMPL`) | shared_ref 대규모 recall ✅ / graph_impact 위상 부재 **확정** |
 
 **S4 shared_ref 근본 원인**: `refSet()` 이 스키마에 없는 `br_refs`/`api_refs` 필드 + `source_grounded_evidence` 중 `#` 포함 토큰만 결합 신호로 인식. 그런데 모든 실 PoC(poc-03/08/11/16)는 `br_refs` 미사용 + 베어 `BR-…`/콜론 `sqlmap:…` 포맷(`#` 전무). `dep-consult.test.js` fixture 가 도구 기대 포맷으로 작성돼 4/4 통과하면서 실전 0건을 못 잡은 drift(`feedback_self_recorded_fact_validation`).
 
@@ -41,9 +42,15 @@ MIS-373 S1~S5 는 `feat(...)` 커밋으로 main 에 머지됐으나 **자체 rel
 - 실측: poc-16 shared_ref 3 / poc-18 0 / greenfield degrade `degraded:true`.
 - release gate: `version-check --plugin context-ops`(3-way) + `test:release` 무회귀 + `build:diff-check` drift 0.
 
-## deferred
+## graph_impact 처분 (rejected / 2026-06-24 추가)
 
-- `graph_impact` 보강(공유 조상 또는 UC↔UC 직접 엣지 위상) = 그런 위상을 갖는 그래프 ≥2 PoC corroboration 후 별도 promotion DEC. 현행은 shared_ref 가 UC 결합을 커버.
+ep-be-gea **35 BC 전수 corroboration**(사내 / 마스킹 집계 / commit ❌)이 graph_impact 잉여를 확정:
+- UC↔UC 직접 엣지 = **0** (35 scope · 5천+ 엣지 전수). 위상은 전 scope 동일 체인형(`UC→BHV→AC→TASK→TC→IMPL` + `analysis→*` backward + `TASK→contract:openapi`).
+- 즉 graph_impact 는 본 방법론 graph-synthesizer 가 산출하는 artifact-graph 위상에서 **구조적으로 영구 0** — 살릴 신호가 그래프 모델에 부재.
+- 동일 35 BC 에서 shared_ref **368건**(33/35 scope) 추출 = UC 결합 표면화 목적을 shared_ref 단독으로 완전 달성.
+
+→ `F-POC15-DC-002` **deferred → rejected** (현 artifact-graph 위상 모델 한정 / 영구 폐기 ❌). graph_impact 코드는 무변경(다른 위상 그래프 입력 시 동작 / `degraded` 마커 정상).
+- **재검토 단서**: graph-synthesizer 가 UC↔UC 의존 엣지(예: UC 가 다른 UC output 소비)를 도입하는 위상 변경이 생기면 그 위상 ≥2 PoC corroboration 후 재평가.
 
 ## Relates
 
