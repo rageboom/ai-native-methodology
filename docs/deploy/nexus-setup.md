@@ -51,6 +51,8 @@ pnpm run publish:plugin          # publishConfig.registry(npm-hosted)로 publish
 
 ## 4. 검증 (실 Nexus end-to-end)
 
+아래는 `context-ops` 예시 — `pm` / `ux-plan` 등 어느 플러그인이든 패키지명만 바꿔 동일하게 검증한다.
+
 ```bash
 # group repo 에서 받아지는지 (익명)
 pnpm view @mis-plugins/context-ops --registry https://repo.smiledev.net/repository/npm-public/
