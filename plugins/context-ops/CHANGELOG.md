@@ -10,6 +10,27 @@
 
 ---
 
+## [0.71.0] — 2026-06-24 — MINOR — discovery 강화 본체 격상(MIS-373 S1~S5) + dep-consult shared_ref 실포맷 정합
+
+**문제**: MIS-373 discovery 강화 5슬라이스(S1 난이도 reference-lens / S2 스키마 additive / S3 멀티입력 수렴 / S4 UC 의존성 dep-consult / S5 clarify 패스)는 코드가 main 에 머지됐으나 자체 release·CHANGELOG·DEC 없이 0.70.0(MIS-371)에 무임승차한 상태였다. 본체 격상의 전제 게이트 = **≥2 PoC corroboration**. 실측하니 S1(난이도)은 실 자산에서 작동했으나 S4(dep-consult `shared_ref`)는 실 산출물에서 **0건** — `refSet()` 이 스키마에 없는 `br_refs`/`api_refs` + `#` 포함 evidence 만 인식했는데 모든 실 PoC 는 베어 `BR-…`/콜론 `sqlmap:…` 포맷이라 구조적 누락. SSOT: `DEC-2026-06-24-discovery-enhance-mis373`.
+
+### Fixed — dep-consult shared_ref 입력 포맷 정합
+- `tools/chain-driver/src/dep-consult.js` `refSet()` — `source_grounded_evidence` 토큰 전체를 정확일치 공유 신호로 인식. 베어 `BR-*`→`br:` 정규화(SHOULD 승격) / `api|openapi:`→`api:` / 그 외→`src:`. `#` 제약 제거. 하위호환(`br_refs`/`api_refs`) 보존. reference-lens 불변(verdict ❌ / STRONG-STOP).
+- fixture drift 교정 — `tools/chain-driver/test/dep-consult.test.js` 에 실 산출물 포맷(베어 BR-/콜론, `br_refs` 미사용) 회귀 케이스 추가. 구 fixture 가 도구 기대 포맷이라 4/4 통과하면서 실전 0건을 못 잡던 drift 고정(`feedback_self_recorded_fact_validation`).
+
+### Corroboration (≥2 PoC / 본체 격상 게이트)
+- **legacy poc-16**(Spring/iBATIS): `shared_ref` **3건** SHOULD(`BR-CAR-MGT-006/005/002`) — 수정 전 0 → recall 회복.
+- **modern poc-18**(express-prisma): **0건**(실제 evidence 공유 0쌍) — precision 유지(과추출 없음).
+- **greenfield degrade**(graph=null): `degraded:true` 정직 마커 + `shared_ref` 그래프 무관 산출.
+- **S1 난이도 무회귀**(`plan-review-server/src/difficulty.js`): poc-16 10 UC bucket `{M:9,L:1}` + L review item 1.
+
+### finding
+- **F-POC15-DC-001**(medium / **closed**) `shared_ref` 포맷 갭 — 수정 완료.
+- **F-POC15-DC-002**(low / **deferred** / 옵션 A) `graph_impact` 위상 한계 — 현행 artifact-graph(`UC→BHV→AC` 독립 체인)에서 UC↔UC 직접 엣지 0 → 그래프 기반 UC 의존 산출 불가. `shared_ref` 로 커버 / `graph_impact` 코드 무변경.
+
+### §8.1
+- S1~S5 코드는 기존 머지분. 본 릴리스 = corroboration 완료 + S4 갭 수정 + 문서 격상. `graph_impact` 보강은 UC↔UC 직접 엣지를 갖는 다른 위상 그래프 ≥2 PoC 후 별도 promotion(deferred). gate evaluator·스키마 무변경.
+
 ## [0.70.0] — 2026-06-24 — MINOR — discovery 강제 진입 + 복잡도 3-tier fast-path
 
 **문제**: 분석 외 변경은 discovery 가 보편 입구·라우터(`DEC-2026-06-18`)인데, 질의가 너무 쉬우면 ⓐ체인을 아예 안 타거나(거버넌스/추적성 drift) ⓑ강제로 풀 체인(spec/plan/test/implement 스킬 팬아웃 + multi-agent dispatch)을 태워 trivial 변경에 토큰을 낭비. 진입은 강제하되 깊이를 복잡도에 비례시켜야 하고, 어느 경로든 영향도·Jira·검증은 보존돼야 한다. SSOT: `DEC-2026-06-24-complexity-tier-fastpath` (MIS-371 / OP-CHAINROUTE-001).
