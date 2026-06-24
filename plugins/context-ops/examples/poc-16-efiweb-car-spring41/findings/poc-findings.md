@@ -698,7 +698,7 @@
   - 회귀 고정: `dep-consult.test.js` 실 산출물 포맷 케이스 추가 (베어 BR 공유 1쌍 SHOULD 단언).
   - 재실측: poc-16 shared_ref **3건** SHOULD ✅ / poc-18 modern **0건**(실제 0쌍 — precision 유지) ✅.
 
-### F-POC15-DC-002 (low / graph_impact 위상 한계 — deferred / 옵션 A)
+### F-POC15-DC-002 (low / graph_impact 위상 한계 — rejected / 옵션 A + 35 BC corroboration)
 
 - **type**: graph-signal-topology-limit
 - **severity**: low
@@ -708,4 +708,5 @@
   - 그래프 기반 UC 결합(공유 analysis 조상)은 shared_ref(공유 evidence)와 의미 중복 → 별도 그래프 신호 보강 보류 (사용자 결정 옵션 A / §8.1 과적합 회피).
   - `degraded` 마커는 정상 동작(graph=null → `degraded:true` 정직 신호). 다른 위상 그래프(UC↔UC 직접 엣지)에선 동작.
 - **resolution**:
-  - status: **deferred** — shared_ref 로 UC 결합 커버. graph_impact 코드 무변경. 본체 격상 DEC-2026-06-24-discovery-enhance-mis373 에 위상 한계 기록.
+  - status: **rejected** — ep-be-gea **35 BC 전수 corroboration**(사내 / 마스킹 집계): UC↔UC 직접 엣지 **0**(5천+ 엣지 전수) = graph_impact 가 현 artifact-graph 위상(graph-synthesizer 산출 체인형 `UC→BHV→AC→TASK→TC→IMPL`)에서 **구조적 부적용** 확정. 동일 35 BC 에서 shared_ref **368건** 추출 = UC 결합 표면화 목적 완전 대체. graph_impact 코드 무변경.
+  - 재검토 단서: graph-synthesizer 가 UC↔UC 의존 엣지를 도입하는 위상 변경 시 (영구 폐기 ❌ / 현 모델 한정 reject).
