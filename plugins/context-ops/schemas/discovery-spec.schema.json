@@ -270,6 +270,25 @@
         }
       }
     },
+    "conflicts": {
+      "type": "array",
+      "description": "S3 (MIS-373) — 멀티 입력(어댑터 4종 출력) 수렴 시 표면화한 충돌·중복. Conflict Surface 4분류(research 패턴 D). **non-gating reference** — 해소는 decisions[]/pending_decisions 로 backward link (해소 자체는 사람 결정). 단일 입력이면 빈 배열. optional·backward-compat.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "topic", "classification", "sources"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^CONFLICT-[0-9]{3}$" },
+          "topic": { "type": "string", "description": "충돌 주제 (1줄)" },
+          "classification": { "type": "string", "enum": ["common-theme", "requirement-conflict", "political-vs-real", "technical-tradeoff"], "description": "4분류 (패턴 D): 공통테마 / 요구충돌 / 정치적포지션-vs-실제우려 / 기술트레이드오프" },
+          "sources": { "type": "array", "minItems": 1, "items": { "type": "string" }, "description": "충돌하는 입력 출처 (어댑터 채널 또는 문서 ref). source_grounded 의무." },
+          "description": { "type": "string" },
+          "resolution_candidate": { "type": "string", "description": "다수 만족 가능 타협 후보 (사람 결정 전제 / AI 단독 확정 ❌)" },
+          "resolved": { "type": "boolean", "default": false },
+          "resolution_ref": { "type": "string", "description": "해소 시 decisions[].topic 또는 DEC ref (backward link)" }
+        }
+      }
+    },
     "nfr": {
       "type": "array",
       "description": "비기능 요구 (swagger/figma/nl-md 어댑터 1차 추출). D3 / INSPECTION-2026-05-31 — schema 정의로 gate#1 schema-validator 검증 표면 확보 (이전 additionalProperties silent pass).",

@@ -1,0 +1,12 @@
+{
+  "name": "pm",
+  "version": "0.1.0",
+  "description": "PM팀/개발팀 요구사항 정의서(PRD) 작성 → Confluence 위키 업로드 → Jira 이슈 변환·등록을 하나의 흐름으로 돕는 Claude Code 플러그인 (mis-plugins 마켓플레이스).",
+  "author": {
+    "name": "MIS",
+    "email": "sangcl@smilegate.com"
+  },
+  "homepage": "https://github.smilegate.net/SGH-ISD/ai-native-methodology",
+  "license": "UNLICENSED",
+  "keywords": ["claude-code", "mis-plugins", "pm", "prd", "requirements", "jira", "confluence"]
+}
