@@ -10,6 +10,7 @@ skills:
     discovery-from-nl-md,
     discovery-decompose-use-cases,
     discovery-identify-business-intent,
+    discovery-converge-inputs,
     _base-build-traceability-matrix,
     _base-apply-template,
     _base-log-finding,
@@ -62,7 +63,7 @@ model: opus
 1. **입력 분류** — 입력 유형 자동 추정 (파일 확장자 / URL / MCP context) → 사용자 confirm 1회
 2. **어댑터 병렬 dispatch** — 입력 유형별 skill 호출 (analysis-output / swagger / figma / nl-md)
 3. **공통 sub-skill 호출** — `discovery-decompose-use-cases` + `discovery-identify-business-intent` 로 어댑터 결과 정규화
-4. **Merge + 충돌 해소** — 어댑터 간 동일 UC / Intent 충돌 / 중복 detection 결과 사용자 결단 묶음 gate
+4. **Merge + 충돌 해소** — `discovery-converge-inputs` 호출(S3). 어댑터 간 동일 UC 병합 + Intent 통합 + 충돌 4분류(`conflicts[]`) 표면화 → 미해소 충돌은 `pending_decisions[]` 로 사용자 결단 묶음 gate. 임의 해소 ❌(출처 합집합 보존 / no-simulation).
 5. **discovery-spec.{json,md} 산출** — `schemas/discovery-spec.schema.json` 의무
 6. **gate 진입** — `_base-invoke-go-stop-gate` 호출 / 사용자 결단 cluster + intervention-log 등재
 7. **종결 보고** — discovery-spec path + traceability backward link 상태 + spec stage 진입 권고 → `spec-agent` dispatch
