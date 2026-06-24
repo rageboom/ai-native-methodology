@@ -15,6 +15,7 @@ import { buildHtml, buildHtmlMulti } from './emit.js';
 import { apply } from './apply.js';
 import { atomicWrite } from '../../chain-driver/src/state-store.js';
 import { ARTIFACTS } from './artifact-registry.js';
+import { scoreUseCases, difficultyReviewItems } from './difficulty.js';
 
 // anchor 의 최상위 토큰 (예: "behaviors[0].name" → "behaviors", "criteria[1]" → "criteria").
 function topKey(anchor) {
@@ -196,7 +197,18 @@ function createMultiServer(opts) {
 	function loadDoc(d) {
 		const data = JSON.parse(readFileSync(d.path, 'utf-8'));
 		const fieldModel = buildFieldModel(data, d.schema);
-		return { artifactType: d.artifactType, label: d.label || d.artifactType, path: d.path, data, fieldModel, summaries: d.summaries || null };
+		const doc = { artifactType: d.artifactType, label: d.label || d.artifactType, path: d.path, data, fieldModel, summaries: d.summaries || null };
+		// discovery-spec 난이도 reference-lens (S1) — artifact-graph 있으면 UC별 영향 정량 → S/M/L.
+		//   부재(greenfield/미합성) = degraded (정직 / LLM 추론 ❌). 표시·review[] 전용 / verdict ❌.
+		if (d.artifactType === 'discovery-spec') {
+			const graphPath = join(dirname(d.path), 'artifact-graph.json');
+			let graph = null;
+			if (existsSync(graphPath)) {
+				try { graph = JSON.parse(readFileSync(graphPath, 'utf-8')); } catch { graph = null; }
+			}
+			doc.difficulty = scoreUseCases(data, graph);
+		}
+		return doc;
 	}
 	// anchor 최상위 key → 어느 문서(artifactType) 소유인지. (content key 는 산출물마다 고유)
 	function keyArtifactMap(docs) {
@@ -227,8 +239,15 @@ function createMultiServer(opts) {
 			if (req.method === 'GET' && (url === '/' || url === '/index.html')) {
 				const docs = documents.map(loadDoc);
 				const summary = fetchGateSummary({ chainDriverCli, projectRoot, findingsPath });
+				// 난이도 高(L) UC → gate review[](검토권장·비차단) 표시 계층 병합.
+				//   chain-driver verdict·blocking 은 무오염 (정량 advisory 만 / D3 / STRONG-STOP 준수).
+				const discDoc = docs.find((d) => d.artifactType === 'discovery-spec' && d.difficulty);
+				if (summary && summary.verdict && discDoc) {
+					const items = difficultyReviewItems(discDoc.difficulty).map((it) => ({ code: it.id, label: it.text }));
+					if (items.length) summary.review = [...(summary.review || []), ...items];
+				}
 				const html = buildHtmlMulti({
-					documents: docs.map((d) => ({ artifactType: d.artifactType, label: d.label, data: d.data, fieldModel: d.fieldModel, summaries: d.summaries })),
+					documents: docs.map((d) => ({ artifactType: d.artifactType, label: d.label, data: d.data, fieldModel: d.fieldModel, summaries: d.summaries, difficulty: d.difficulty || null })),
 					summary,
 					meta: { phase, label: phaseLabel, agentReply, taskPlanPath: docs[0] && docs[0].path },
 				});

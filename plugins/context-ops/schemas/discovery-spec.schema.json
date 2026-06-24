@@ -123,6 +123,20 @@
                 "title": {"type": "string", "description": "참조 title (선택 / 사람 확인용)"}
               }
             }
+          },
+          "difficulty": {
+            "type": "object",
+            "description": "S1 (MIS-373) — UC 난이도 reference-lens 스냅샷. artifact-graph 의존성 영향 정량(analyzeImpact merged_count). **결정론 정량만 / verdict ❌ / non-gating** — gate blocking[] inject 금지 (STRONG-STOP / feedback_chain_driver_deterministic_axis). 표시(HTML 뱃지)+검토권장(review[]) 전용. 부재/greenfield/UC 미합성 = degraded:true (정직 신호 / no-simulation). optional (backward-compat) — plan-review-server 가 렌더 시점 산출(미persist)하거나 skill 이 스냅샷 기록 시 본 필드.",
+            "additionalProperties": false,
+            "properties": {
+              "bucket": {"type": ["string", "null"], "enum": ["S", "M", "L", null], "description": "영향 노드 수 버킷 (S 0..3 / M 4..9 / L 10+). degraded 시 null. verdict 아님(정량 분류)."},
+              "impact_count": {"type": "integer", "minimum": 0, "description": "merged_count (forward+backward 영향 노드 수)"},
+              "must_count": {"type": "integer", "minimum": 0, "description": "MUST(hard sync 강제) 영향 수"},
+              "should_count": {"type": "integer", "minimum": 0},
+              "fyi_count": {"type": "integer", "minimum": 0},
+              "degraded": {"type": "boolean", "default": false, "description": "그래프 부재/UC 미합성 = 미산출 정직 신호"},
+              "reason": {"type": "string", "description": "degraded 사유 (선택)"}
+            }
           }
         }
       },
@@ -288,6 +302,22 @@
     "intent_summary": {
       "type": "string",
       "description": "도메인 의도 요약 (nl-md 어댑터). business_intent.domain_purpose 와 중복 시 후자 우선 (D3 / INSPECTION-2026-05-31)."
+    },
+    "uc_dependencies": {
+      "type": "array",
+      "description": "S4 (MIS-373) — UC 간 의존성 reference-lens (artifact-graph analyzeImpact 파생). **non-gating / verdict ❌** (STRONG-STOP) — UC 분해·순서 검토 보조일 뿐 chain-coverage 강제 ❌. greenfield/그래프 부재 = 빈 배열(미산출). optional (backward-compat).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["from_uc", "to_uc"],
+        "properties": {
+          "from_uc": {"type": "string", "pattern": "^UC-[A-Z0-9_-]+-[0-9]{3}$", "description": "의존 출발 UC id"},
+          "to_uc": {"type": "string", "description": "영향받는 노드 id (UC/BHV/AC 등 artifact-graph 노드)"},
+          "grade": {"type": "string", "enum": ["MUST", "SHOULD", "FYI"], "description": "analyzeImpact 영향 등급 (감쇠 적용)"},
+          "edge_type": {"type": "string", "description": "artifact-graph edge_type (derived_from/depends_on/implements 등)"},
+          "direction": {"type": "string", "enum": ["forward", "backward", "both"], "description": "origin 기준 방향"}
+        }
+      }
     },
     "cross_links": {
       "type": "object",
