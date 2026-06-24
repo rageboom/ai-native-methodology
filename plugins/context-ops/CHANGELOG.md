@@ -10,6 +10,36 @@
 
 ---
 
+## [0.70.0] — 2026-06-24 — MINOR — discovery 강제 진입 + 복잡도 3-tier fast-path
+
+**문제**: 분석 외 변경은 discovery 가 보편 입구·라우터(`DEC-2026-06-18`)인데, 질의가 너무 쉬우면 ⓐ체인을 아예 안 타거나(거버넌스/추적성 drift) ⓑ강제로 풀 체인(spec/plan/test/implement 스킬 팬아웃 + multi-agent dispatch)을 태워 trivial 변경에 토큰을 낭비. 진입은 강제하되 깊이를 복잡도에 비례시켜야 하고, 어느 경로든 영향도·Jira·검증은 보존돼야 한다. SSOT: `DEC-2026-06-24-complexity-tier-fastpath` (MIS-371 / OP-CHAINROUTE-001).
+
+### Added — change-record schema + triage/fastpath-gate 결정론 도구
+- **`schemas/change-record.schema.json` 신설** (strict additive) — trivial fast-path thin 산출물. `tier=const "trivial"` + `touched_node_refs`(minItems1) + `triage_signals`{count/net_new/layer_span/subkinds/predicate_satisfied} + `verification`{`characterization_snapshot_refs`(`^SNAP-`)/`oracle_waiver`} + `impact_closure_ref` + `ticket_ref`. standard/deep 은 본 schema 미사용(기존 discovery-spec 풀 경로).
+- **`tools/chain-driver/src/triage.js` 신설** — `computeTriageSignals(graph, refs)` 순수 결정론. **raw 그래프 count 신호만 / tier 판정 ❌**(STRONG-STOP / `feedback_chain_driver_deterministic_axis`). 보수적 conjunctive 술어 `count==1 ∧ !net_new ∧ layer_span==1 ∧ subkind∉{BR,UC}` + `business_rule_id` 보유 노드 deny → "1노드 高의미 BR" 누수 차단.
+- **`tools/chain-driver/src/fastpath-gate.js` 신설** — `evaluateFastPathRecord(record)` 순수 fail-closed. trivial 종결 전 4 의무 전수: predicate_satisfied + 최소검증(snapshot≥1 OR `oracle_waiver` / 거짓 GREEN 함정 회피) + `impact_closure_ref` + `ticket_ref`. 위반 = violations(high) → cli exit 1. 비-trivial = N/A(exit 0).
+- **cli** `triage --graph --refs [--json]` + `fastpath-gate --record [--json]` 서브커맨드 + usage.
+
+### Changed — 라우터/스킬/플로우/스펙 wiring (advisory / additive)
+- `tools/chain-driver/src/cli.js` routeEntry discovery-default advisory 메시지에 tier triage/fast-path 사용법 동봉(로직 분기 아님 — 안내).
+- `skills/discovery-from-nl-md/SKILL.md` "복잡도 tier 분기" 절 추가 — 닿는 노드 식별 → `triage` 신호 → tier 제안 → 사람 gate#1 → trivial 시 fast-path(change-record + impact + 경량 ticket + fastpath-gate). ⑥⑦·최소검증 = tier 무관 공통 의무.
+- `flows/discovery.phase-flow.json` `cross_cutting.fast_path` 메타(phases 배열 무변경 / drift 짝 보존) + `methodology-spec/living-sync-operating-model.md §4` tier 노트.
+
+### 분업 (STRONG-STOP / §3.4 경계)
+- 신호 = `triage`(결정론 도구) / tier 제안 = `discovery-from-nl-md`(LLM / `change_kind`=advisory tie-breaker) / 확정 = 사람 gate#1. tier 판정이 결정론 도구에 스미지 않음.
+
+### research (가벼운 3-에이전트 / 2026-06-24)
+- F-015 교차검증(`change_kind`=CLI 선언값 / ticket-sync plan 단일 확인) + 산업선례(Google small-CL·SRE·Rust RFC·DORA / "노드 수" 위상신호 단독 선례 0건 → 의미축 deny-list 와 conjunctive 결합) + Senior REVISE 4건(Q1 보수적 술어+deny-list / Q2 최소검증 하드게이트 / Q3 도구 raw count만 / Q5 fail-closed exit gate) 전부 반영.
+
+### Tests
+- 신규 20 GREEN — `triage-fastpath.test.js` 16(triage 8: 단일 IMPL 적격 / **적대 negative** BR·UC·business_rule_id deny / 다중노드 / net-new / dedupe / 순수방어 + fastpath-gate 8: ok / snapshot-only / 4 violation 개별+동시 / N/A) + `fastpath-e2e.test.js` 4(CLI E2E 3 시나리오 + N/A).
+- chain-driver **684/684** + hooks 65/65 + schema-validator 113/113 + drift-validator 49/49 + skill-citation 0 stale 무회귀.
+- **fan-out 구조 실측**(추정 ❌): 풀체인 32 phase / 5 stage-agent → fast-path 1 LLM skill / 0 추가 agent(spec+plan+test+implement 27 phase 생략).
+
+### §8.1 / carry
+- 면제(additive·soft / schema strict 신규·도구 신규 / gate matrix·release criteria 무변경). hard 격상(강제 강도 상향 / 코드 write 하드블록 / REQUIRED 등재)은 ≥2 PoC corroboration 후 별도 promotion DEC.
+- carry: 라이브 세션 실토큰 before/after 측정 + committed example 첫 dogfood 적용.
+
 ## [0.69.0] — 2026-06-23 — MINOR — unit-spec-oracle-validator (required UNIT 합격선 oracle≥1 대칭 검사)
 
 **문제**: spec 단계 behavior 스레드엔 `AC.verifiable=true ⇒ test_case_refs≥1`(`acceptance-criteria.schema.json` if/then **하드게이트**)가 있으나, unit 스레드엔 짝 규칙이 없어 `unit_test_obligation=required` UNIT 이 검증 oracle(`invariant_refs`/`property_test_refs`) **0건으로 통과 가능** → test 단계에서 합격선을 발명하는 거짓 GREEN 위험(unit-spec 이 막으려던 "mock=검증 안 된 가정" 의 사촌). 실측 baseline: unit-spec.json 2개 / required UNIT 4개 중 oracle-0건 3개. SSOT: `DEC-2026-06-22-unit-spec-oracle-symmetry`.
