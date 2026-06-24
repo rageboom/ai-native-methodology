@@ -710,3 +710,16 @@
 - **resolution**:
   - status: **rejected** — ep-be-gea **35 BC 전수 corroboration**(사내 / 마스킹 집계): UC↔UC 직접 엣지 **0**(5천+ 엣지 전수) = graph_impact 가 현 artifact-graph 위상(graph-synthesizer 산출 체인형 `UC→BHV→AC→TASK→TC→IMPL`)에서 **구조적 부적용** 확정. 동일 35 BC 에서 shared_ref **368건** 추출 = UC 결합 표면화 목적 완전 대체. graph_impact 코드 무변경.
   - 재검토 단서: graph-synthesizer 가 UC↔UC 의존 엣지를 도입하는 위상 변경 시 (영구 폐기 ❌ / 현 모델 한정 reject).
+
+### F-POC15-DF-001 (medium / S1 난이도 변별력 상실 — A안 closed / B안 deferred)
+
+- **type**: signal-discrimination-loss (위상 민감 튜닝)
+- **severity**: medium
+- **summary**: `difficulty.js` `MUST_DENSE_BONUS(+5)` 가 full-chain 그래프에서 **355/356(100%)** 발동 → 전 UC **L 포화**(변별력 상실) + review advisory **355개** 도배
+- **detail**:
+  - ep-be-gea 35 BC: impact median 7(poc-16과 유사)인데 `must_count≥5` 가 100% → +5 → score>9=L. 보너스 제거 시 **M255/L101** 변별 회복.
+  - dep-consult shared_ref / graph_impact 와 **동형 패턴**(얕은 PoC poc-16 튜닝이 깊은 위상에서 깨짐) — 세 번째 동형 발견.
+- **resolution**:
+  - status: **A안 closed** — (1) `MUST_DENSE_BONUS` 제거(버그 / impact 단독 버킷) (2) `difficultyReviewItems` 를 'L 전부' → **scope-상대 outlier(상위 20%) ∩ L** (advisory 355→68).
+  - 검증(≥2 위상): ep-be-gea M255/L101·advisory 68 / poc-16 M9/L1·advisory 1. difficulty 테스트 갱신(보너스 제거 + outlier 회귀).
+  - **B안 deferred**: 버킷 절대임계 → 분위수 전면 reframe + `난이도(difficulty)`→`영향 규모` 네이밍(스키마/렌더/skill 파급) = ≥2 위상 corroboration 후 본체 격상(§8.1 단일 코퍼스 과적합 회피).
