@@ -167,6 +167,19 @@ export function interventionLogPathForRead(root, stateConfigured) {
 	return candidates.find(existsSync) ?? join(root, INTERVENTION_LOG_REL);
 }
 
+// ── gate-review-passage (Phase 1 / DEC-2026-06-25-gate-review-bypass-guard) ──
+//   plan-review-server 가 discovery/spec/plan phase 검토 spawn 시 "presented" 마커를 쓰고,
+//   chain-driver next 가 actor provenance(user vs llm_assumed) 도출에 read 한다.
+//   advisory only (Phase 1 / deny ❌). LLM 이 직접 쓸 수 있는 파일 = speedbump (정직 한계).
+//   위조 불가 신호는 plan-review-server(서버 프로세스 기록)가 spawn 됐을 때만 = "브라우저 검토가 실제로 떴다"의 증거.
+export const GATE_REVIEW_PASSAGE_FILE = 'gate-review-passage.json';
+export function gateReviewPassagePath(root) {
+	return join(root, AIMD, SEG.runtime, GATE_REVIEW_PASSAGE_FILE);
+}
+export function gateReviewPassageForRead(root) {
+	return runtimeFileForRead(root, GATE_REVIEW_PASSAGE_FILE);
+}
+
 // ── 디렉토리 보장 (3-버킷 골격) ─────────────────────────────────────────
 //   호출부(state-store.ensureAimdDir)가 mkdirSync 를 주입 — 본 모듈은 경로만 제공.
 export function bucketDirs(root) {

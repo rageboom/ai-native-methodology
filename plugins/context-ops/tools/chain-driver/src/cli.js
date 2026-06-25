@@ -57,6 +57,7 @@ import {
 	scopeDirForRead,
 	evidenceDirForRead,
 } from '../../_shared/ai-context-layout.js';
+import { deriveGateActor } from './gate-provenance.js';
 import { planLayoutMigration, applyLayoutMigration } from './migrate-layout.js';
 import { computeTriageSignals } from './triage.js';
 import { evaluateFastPathRecord } from './fastpath-gate.js';
@@ -215,6 +216,7 @@ function parseArgs(argv) {
 		else if (a === '--prompt') out.prompt = rest[++i];
 		else if (a === '--findings') out.findingsPath = rest[++i];
 		else if (a === '--user-decision') out.userDecision = rest[++i];
+		else if (a === '--auto-mode') out.autoMode = true;
 		else if (a === '--base') out.baseSha = rest[++i];
 		else if (a === '--repo-root') out.repoRoot = rest[++i];
 		else if (a === '--scope') out.scope = rest[++i];
@@ -716,9 +718,21 @@ function cmdNext(args) {
 			console.error(`[chain-driver] manifest sync warn: ${e.message}`);
 		}
 	}
+	// Phase 1 (DEC-2026-06-25-gate-review-bypass-guard) — actor provenance 정직 도출.
+	// go 가 사람 검토 경유(user) / Auto Mode 위임(user_auto) / 증거 부재(llm_assumed) 중 무엇인지 기록.
+	const gateActor = deriveGateActor(args, root, stage, activeChain);
+	if (gateActor === 'llm_assumed') {
+		// advisory / 비차단 (Phase 1) — soft go 가 검토 UX 경유 증거 없이 통과. 우회를 loud 화.
+		process.stderr.write(
+			`[chain-driver] ⚠ gate 검토 UX 경유 미확인 — '${stage}' gate 를 사람이 검토(_base-invoke-go-stop-gate / ` +
+				`discovery·spec·plan 은 브라우저 검토)했다는 증거(gate-review-passage)가 없습니다. ` +
+				`사람이 직접 go 를 결단했으면 무시하세요. Auto Mode 위임이면 --auto-mode 로 표기하세요. ` +
+				`(advisory / 비차단 / intervention-log actor=llm_assumed 로 기록)\n`,
+		);
+	}
 	logIntervention(state, root, {
 		event_type: 'gate_decision',
-		actor: args.userDecision ? 'user' : 'driver',
+		actor: gateActor,
 		stage,
 		decision: finalDecision.decision,
 		exit_code: 0,

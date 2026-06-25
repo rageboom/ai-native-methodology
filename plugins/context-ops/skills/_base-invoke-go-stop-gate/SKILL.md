@@ -112,6 +112,8 @@ discovery/spec/plan gate 에서는 json 통독 대신 `plan-review-server` 를 *
 
 **불변**: 서버는 reference-lens — 평결=chain-driver / 재검증=plan-coverage-validator(task-plan 만) / 산출물 write=사람 입력(프롬프트)만 / AI 요약=표시 전용(저장·gate inject ❌). 결정론 gate 에 LLM inject ❌ (본문 §gate 입력 수집과 동일 원칙).
 
+**검토 경유 증거 (Phase 1)**: plan-review-server 가 spawn 되면 `.ai-context/runtime/gate-review-passage.json`(`{stage, presented_at, via}`)을 기록한다 = "브라우저 검토가 실제로 떴다"의 증거. 이후 `/chain-next go` 시 chain-driver 가 이 마커를 read 하여 intervention-log actor 를 `user`(검토 경유) vs `llm_assumed`(증거 부재 / 우회 추정)로 정직 도출한다. **advisory only — 차단 ❌**(Phase 1). 마커는 LLM 이 직접 쓸 수도 있는 파일이라 "벽"이 아니라 speedbump(정직 한계) — 위조 불가 신호는 서버가 실제 spawn 됐을 때뿐. Auto Mode(서버 spawn skip)는 `/chain-next` 의 `auto` 인자(`--auto-mode`)로 `user_auto` 표기.
+
 ## Auto Mode 호환
 
 사용자가 "Auto Mode" 위임 시 (예: "전부 알아서 진행해줘"):
@@ -135,3 +137,4 @@ gate 마찰 (cognitive load) 완화. 5~6 cluster 의무:
 - ADR: ADR-CHAIN-003 (revisit loop)
 - 결단: DEC-2026-05-06-round-trip-부분-허용
 - 결단: DEC-2026-06-19-plan-review-server (인터랙티브 검토 편집기 / reference-lens)
+- 결단: DEC-2026-06-25-gate-review-bypass-guard (검토 경유 증거 마커 + actor provenance / Phase 1)

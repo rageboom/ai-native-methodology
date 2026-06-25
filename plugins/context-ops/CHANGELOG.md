@@ -10,6 +10,28 @@
 
 ---
 
+## [0.77.0] — 2026-06-25 — MINOR — gate 검토 UX 우회 actor provenance 정직화 (Phase 1)
+
+**문제 (v0.76.0 dogfood)**: go/stop/revisit 검토 UX(프롬프트 + discovery/spec/plan 의 plan-review-server 브라우저 검토)는 `_base-invoke-go-stop-gate` 스킬에만 있고 stage sub-agent 마지막 단계에서만 호출되는데, 실제 전진 CLI `chain-driver next --user-decision go` 는 검토 경유 여부를 확인하지 않음 → 오케스트레이터가 sub-agent dispatch 를 건너뛰고 CLI 직접 호출 시 프롬프트·브라우저 누락 + 자동 통과. intervention-log 는 `go`만 있으면 무조건 `actor:'user'` 로 **거짓 기록**.
+
+**근본 원인**: 나쁜 게이트 차단(state.blocked / exit 2 trio)은 기계 강제되나 "검토 프롬프트를 띄우는 행위" 자체는 convention 의존 — CLI 는 프롬프트가 떴는지 모름. 4원칙 §2 3-agent 수렴: 위조 불가 신호는 plan-review-server 서버 기록뿐 / provenance 정직화가 최소·최고 ROI·회귀 0 / hard deny 격상은 §8.1상 ≥2 PoC 후(Phase 2 carry).
+
+### Added
+- **`tools/chain-driver/src/gate-provenance.js`** — actor provenance 결정론 도출 순수모듈. `deriveGateActor`/`reviewPassageFresh`. `driver`(결단 없음) / `user`(stop·revisit 또는 go+검토마커 fresh) / `user_auto`(go+`--auto-mode`) / `llm_assumed`(go인데 마커·플래그 부재=우회 추정). LLM-writable 마커 한계 정직 인정(speedbump / 벽 ❌).
+- **`chain-driver next --auto-mode`** 플래그 — Auto Mode 명시 위임 → actor=`user_auto`. `/chain-next` 의 `auto` 인자 경로.
+- **gate-review-passage 마커** — `plan-review-server` 가 spawn 시 `.ai-context/runtime/gate-review-passage.json`(`{stage, presented_at, via}`) 기록(=브라우저 검토 실제 spawn 증거). 경로 SSOT = `_shared/ai-context-layout.js` `gateReviewPassagePath`/`gateReviewPassageForRead`.
+- **`gate-provenance.test.js`** 16 test (3-값 + 마커 freshness + 디스크 read 정합).
+
+### Changed
+- **`chain-driver next` advance 경로** — actor 를 `args.userDecision ? 'user' : 'driver'` → `deriveGateActor(...)` 로 교체. `llm_assumed` 시 **stderr 1줄 비차단 advisory nudge**("검토 UX 경유 미확인"). (`sync_next_gate` 핸들러는 별개 흐름 = 무변경.)
+- **`intervention-log.schema.json`** `actor` enum += `user_auto`·`llm_assumed`.
+- 문서: `commands/chain-next.md`(`auto`/`--auto-mode` + provenance advisory) · `skills/_base-invoke-go-stop-gate/SKILL.md`(마커 메커니즘).
+
+### Scope-out (Phase 2 carry / DEC §)
+- PreToolUse Bash matcher **deny 가드** = ≥2 PoC corroboration 후 별도 DEC. discovery/spec/plan 만 hard(서버 토큰) / test·implement 는 advisory 영구(speedbump 를 벽으로 사칭 ❌). 신규 exit code ❌(exit 2 재사용).
+
+**검증**: chain-driver 707/707(신규 16 포함) GREEN. E2E 실측 — `next go`(마커·플래그 없음)→exit 0+nudge+actor=`llm_assumed` / `--auto-mode`→`user_auto`·nudge 0 / plan-review-server 실 spawn→마커 기록+read→`user`·nudge 0. §8.1 면제(additive·advisory / release 강제 check·gate matrix·deny 무 / criteria 무변). DEC-2026-06-25-gate-review-bypass-guard.
+
 ## [0.76.0] — 2026-06-24 — MINOR — chain stage 상시 인지 (statusLine 세그먼트 + `/chain-status`)
 
 **문제 (사용자 발화)**: chain harness 진행 중 "지금 무슨 chain stage 인지" 알 방법이 사실상 없음. SSOT(`.ai-context/state.json`)는 있으나 노출이 pull-only(`chain-driver state` 직접 실행) → ambient(상시) 채널 부재.

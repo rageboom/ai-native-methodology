@@ -6,7 +6,7 @@
 //                             [--project <dir>] [--findings <path>] [--port 0] [--no-open]
 
 import { resolve, dirname, join, basename } from 'node:path';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
 import { createServer } from './server.js';
@@ -137,6 +137,24 @@ function runPhase(args) {
 	server.listen(args.port, '127.0.0.1', () => {
 		const { port } = server.address();
 		const url = `http://127.0.0.1:${port}/`;
+		// gate-review-passage 마커 — 검토 서버가 실제로 떴다는 증거. chain-driver next 가 actor
+		// provenance(user vs llm_assumed) 도출에 read. advisory only (Phase 1 / DEC-2026-06-25-gate-review-bypass-guard).
+		// phase(discovery|spec|plan) == stage 명. SSOT: _shared/ai-context-layout.js gateReviewPassagePath(root).
+		try {
+			const runtimeDir = join(root, '.ai-context', 'runtime');
+			mkdirSync(runtimeDir, { recursive: true });
+			writeFileSync(
+				join(runtimeDir, 'gate-review-passage.json'),
+				JSON.stringify(
+					{ stage: phase, presented_at: new Date().toISOString(), via: 'plan_review_server', pid: process.pid },
+					null,
+					2,
+				) + '\n',
+				'utf-8',
+			);
+		} catch {
+			/* 마커 기록 실패는 비치명 (advisory) */
+		}
 		console.error(`\n  📋 ${PHASES[phase].label} 검토 (${documents.map((d) => d.artifactType).join(' / ')}) — 브라우저에서 열기:`);
 		console.error(`  \x1b[1;4;36m${url}\x1b[0m\n`);
 		console.error(`  (project: ${root})`);

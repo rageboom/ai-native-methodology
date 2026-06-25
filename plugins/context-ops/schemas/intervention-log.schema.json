@@ -26,7 +26,8 @@
     },
     "actor": {
       "type": "string",
-      "enum": ["user", "driver", "llm", "validator", "hook"]
+      "enum": ["user", "user_auto", "llm_assumed", "driver", "llm", "validator", "hook"],
+      "description": "결정 주체 provenance. user=사람 검토 경유(gate-review-passage 마커 fresh) / user_auto=Auto Mode 명시 위임(--auto-mode) / llm_assumed=go 인데 검토 증거·위임 플래그 부재(우회 추정 / advisory) / driver=결정론 driver / llm / validator / hook. user_auto·llm_assumed = Phase 1 (DEC-2026-06-25-gate-review-bypass-guard)."
     },
     "stage": {
       "type": "string",
