@@ -18,7 +18,6 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import {
 	initState,
 	writeStateCAS,
-	initScopeChainState,
 	readState,
 } from '../src/state-store.js';
 import { deriveBranchPrefix } from '../../_shared/git-branch.js';
@@ -97,18 +96,17 @@ function setupProject(name, { stage = 'implement', implGreen = false, currentTas
 	const root = join(tmp, name);
 	initState(root, name);
 	writeStateCAS(root, (s) => {
-		initScopeChainState(s, SCOPE);
+		// v2.0 전역 단일 — current_scope 커서 + 전역 chain/stage_progress (scope_states 제거).
 		s.current_scope = SCOPE;
-		const sc = s.scope_states[SCOPE];
-		sc.current_chain = stage;
+		s.current_chain = stage;
 		if (implGreen) {
-			sc.stage_progress.implement = {
+			s.stage_progress.implement = {
 				status: 'complete',
 				gate_decision: 'go',
 				completed_at: '2026-06-19T00:00:00.000Z',
 			};
 		}
-		if (currentTask) sc.current_task = currentTask;
+		if (currentTask) s.current_task = currentTask;
 		return s;
 	});
 	const evDir = join(root, '.ai-context', 'runtime', 'evidence');
@@ -244,7 +242,7 @@ describe('enter-task — 입력 검증 + preview (git 미접촉)', () => {
 		assert.equal(r.status, 0);
 		assert.match(r.stdout, /branch: feature\/DWPD-1473/);
 		const st = readState(root);
-		assert.equal(st.scope_states[SCOPE].current_task ?? null, null, 'preview 는 state 미변경');
+		assert.equal(st.current_task ?? null, null, 'preview 는 state 미변경');
 	});
 	it('Bug issue_type → bugfix/<KEY> prefix 도출 (preview)', () => {
 		const root = setupProject('et-bug');
@@ -264,9 +262,9 @@ describe('enter-task --confirm (실 git temp repo / 6모드)', () => {
 		assert.equal(cur, 'feature/DWPD-1473');
 		// state current_task set
 		const st = readState(root);
-		assert.equal(st.scope_states[SCOPE].current_task.task_id, 'TASK-RES-001');
-		assert.equal(st.scope_states[SCOPE].current_task.branch, 'feature/DWPD-1473');
-		assert.equal(st.scope_states[SCOPE].current_task.jira_key, 'DWPD-1473');
+		assert.equal(st.current_task.task_id, 'TASK-RES-001');
+		assert.equal(st.current_task.branch, 'feature/DWPD-1473');
+		assert.equal(st.current_task.jira_key, 'DWPD-1473');
 		// 멱등 — 같은 브랜치에서 재진입 = noop 성공
 		const r2 = run(['enter-task', root, '--task', 'TASK-RES-001', '--confirm']);
 		assert.equal(r2.status, 0);
@@ -312,7 +310,7 @@ describe('finish-task — GREEN gate + linkage + graceful PR', () => {
 		assert.match(r.stdout, /Story: DWPD-1450/);
 		assert.match(r.stdout, /gh pr create --base main --head feature\/DWPD-1474/);
 		const st = readState(root);
-		assert.equal(st.scope_states[SCOPE].current_task.task_id, 'TASK-RES-002', 'preview 는 current_task 보존');
+		assert.equal(st.current_task.task_id, 'TASK-RES-002', 'preview 는 current_task 보존');
 	});
 	it('--confirm + gh 무효(원격 부재) → graceful exit 0 + current_task clear', () => {
 		const root = setupProject('ft-confirm', {
@@ -322,7 +320,7 @@ describe('finish-task — GREEN gate + linkage + graceful PR', () => {
 		const r = run(['finish-task', root, '--confirm']);
 		assert.equal(r.status, 0, r.stderr);
 		const st = readState(root);
-		assert.equal(st.scope_states[SCOPE].current_task ?? null, null, 'finish-task --confirm → current_task clear');
+		assert.equal(st.current_task ?? null, null, 'finish-task --confirm → current_task clear');
 	});
 });
 
@@ -413,7 +411,7 @@ describe('clear-task — current_task 해제 (git 미접촉 / GREEN 무관)', ()
 		const r = run(['clear-task', root]);
 		assert.equal(r.status, 0, r.stderr);
 		const st = readState(root);
-		assert.equal(st.scope_states[SCOPE].current_task ?? null, null, 'clear-task → current_task 해제');
+		assert.equal(st.current_task ?? null, null, 'clear-task → current_task 해제');
 	});
 	it('current_task 부재 → no-op (exit 0)', () => {
 		const root = setupProject('clr-noop');

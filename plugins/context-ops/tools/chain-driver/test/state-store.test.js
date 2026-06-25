@@ -72,9 +72,24 @@ describe('state-store', () => {
     assert.equal(out.version, '1.5');
   });
 
-  it('migrate across major bump requires registered migration', () => {
-    const state = { version: '1.0', project_id: 'x' };
-    assert.throws(() => migrate(state, '2.0'), MigrationRequiredError);
+  it('migrate 1.0 → 2.0 absorbs active scope_states into global + drops dead fields', () => {
+    const state = {
+      version: '1.0', project_id: 'x', current_scope: 'feat-a',
+      current_chain: 'analysis',
+      stage_progress: { analysis: { status: 'complete', git_baseline_sha: 'abc1234' } },
+      scope_states: { 'feat-a': { current_chain: 'implement', stage_progress: { analysis: { status: 'complete' } }, last_gate: { id: '#5', decision: 'go' }, current_task: { task_id: 'T1' } } },
+    };
+    const out = migrate(state, '2.0');
+    assert.equal(out.version, '2.0');
+    assert.equal(out.scope_states, undefined);
+    assert.equal(out.current_chain, 'implement');
+    assert.equal(out.current_task.task_id, 'T1');
+    assert.ok(!('git_baseline_sha' in out.stage_progress.analysis));
+  });
+
+  it('migrate across unregistered major bump requires registered migration', () => {
+    const state = { version: '4.0', project_id: 'x' };
+    assert.throws(() => migrate(state, '9.0'), MigrationRequiredError);
   });
 
   it('migrate uses registered migration when present', () => {

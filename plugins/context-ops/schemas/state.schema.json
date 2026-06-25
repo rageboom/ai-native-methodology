@@ -177,14 +177,12 @@
             "description": "프로젝트별 intervention log 경로. 기본 = .ai-context/runtime/intervention-log.jsonl (구 .ai-context/output/ read-alias / DEC-2026-06-16)",
       "default": ".ai-context/runtime/intervention-log.jsonl"
     },
-    "scope_states": {
-      "type": "object",
-      "description": "scope 별 chain 진행 상태 맵 (key = scope slug). current_scope 가 설정된 경우 cmdNext 는 전역 current_chain/stage_progress 대신 여기에 read/write 한다. backward-compat: 필드 부재 = scope 없는 기존 프로젝트 (전역 필드만 사용).",
-      "propertyNames": { "pattern": "^[a-z0-9][a-z0-9-]{1,63}$" },
-      "additionalProperties": {
-        "$ref": "#/$defs/ScopeChainState"
-      },
-      "default": {}
+    "current_task": {
+      "anyOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/CurrentTask" }
+      ],
+      "description": "v2.0 (scope_states 제거 / DEC-2026-06-25-state-model-simplify) — 전역 단일 활성 Sub-task 포인터. enter-task set / finish-task clear. 동시 작업 격리는 git 워크트리·피처브랜치(in-state 멀티플렉싱 제거 / 진행위치 SSOT=manifest)."
     },
     "block_scope": {
       "anyOf": [
@@ -195,44 +193,6 @@
     }
   },
   "$defs": {
-    "ScopeChainState": {
-      "type": "object",
-      "description": "scope 단위 chain 진행 상태. state.json 전역 current_chain/stage_progress 와 구조 동형.",
-      "required": ["current_chain", "stage_progress"],
-      "additionalProperties": false,
-      "properties": {
-        "current_chain": {
-          "type": "string",
-          "enum": ["analysis", "discovery", "spec", "plan", "test", "implement", "revisit_pending"]
-        },
-        "stage_progress": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["analysis", "discovery", "spec", "plan", "test", "implement"],
-          "properties": {
-            "analysis": { "$ref": "#/$defs/StageRecord" },
-            "discovery": { "$ref": "#/$defs/StageRecord" },
-            "spec": { "$ref": "#/$defs/StageRecord" },
-            "plan": { "$ref": "#/$defs/StageRecord" },
-            "test": { "$ref": "#/$defs/StageRecord" },
-            "implement": { "$ref": "#/$defs/StageRecord" }
-          }
-        },
-        "last_gate": {
-          "anyOf": [
-            { "type": "null" },
-            { "$ref": "#/$defs/GateRecord" }
-          ]
-        },
-        "current_task": {
-          "anyOf": [
-            { "type": "null" },
-            { "$ref": "#/$defs/CurrentTask" }
-          ],
-          "description": "DEC-2026-06-19-branch-per-task — enter-task 로 set 되는 활성 Sub-task 포인터 (additive / null·부재 = scope-wide 기존 동작 보존, 가드 비발동). set 시 task-major 모드 진입."
-        }
-      }
-    },
     "CurrentTask": {
       "type": "object",
       "required": ["task_id", "branch", "jira_key"],
@@ -309,11 +269,6 @@
         "gate_decision": {
           "type": "string",
           "enum": ["go", "stop", "revisit"]
-        },
-        "git_baseline_sha": {
-          "type": "string",
-          "pattern": "^[0-9a-f]{7,40}$",
-          "description": "Senior F4 — chain stage 진입 시 git HEAD SHA 기록. revisit-detect 가 baseline..HEAD diff 산출 시 deterministic source."
         }
       }
     }

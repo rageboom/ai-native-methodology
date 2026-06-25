@@ -397,14 +397,11 @@ function cmdState(args) {
 			`pending_revisit: ${state.pending_revisit ? state.pending_revisit.target_stage : '-'}`,
 			`regen_queue    : ${regenQueueSummary(state.regen_queue)}`,
 		];
-		// 다중 scope 요약: 2개 이상이면 모든 scope 의 chain 단계 표시
-		const scopeEntries = Object.entries(state.scope_states ?? {});
-		if (scopeEntries.length > 1) {
-			lines.push('scope progress :');
-			for (const [slug, sc] of scopeEntries) {
-				const marker = slug === state.current_scope ? ' *' : '';
-				lines.push(`  ${slug}${marker}: chain=${sc.current_chain}`);
-			}
+		// v2.0 — 전역 단일 (scope_states 제거 / DEC-2026-06-25). 활성 task 포인터 표시.
+		if (state.current_task) {
+			lines.push(
+				`current_task   : ${state.current_task.task_id ?? '-'} (${state.current_task.branch ?? '-'})`,
+			);
 		}
 		process.stdout.write(lines.join('\n') + '\n');
 	}
@@ -639,41 +636,21 @@ function cmdNext(args) {
 			intervention_log_path: s.intervention_log_path || INTERVENTION_LOG_REL,
 		};
 
-		// scope 활성 시 scope_states 에 기록 / 미활성 시 전역 필드 (backward-compat).
-		const scopeSlug = s.current_scope;
-		if (scopeSlug && s.scope_states && Object.hasOwn(s.scope_states, scopeSlug)) {
-			const sc = s.scope_states[scopeSlug];
-			sc.last_gate = gateRecord;
-			sc.stage_progress[stage] = {
-				...(sc.stage_progress[stage] || {}),
-				status: 'complete',
-				completed_at: nowIso,
-				gate_decision: decision === 'stop' ? 'stop' : 'go',
+		// v2.0 — 전역 단일 chain 상태 기록 (scope_states 제거 / DEC-2026-06-25). 진행위치 SSOT=manifest.
+		s.last_gate = gateRecord;
+		s.stage_progress[stage] = {
+			...(s.stage_progress[stage] || {}),
+			status: 'complete',
+			completed_at: nowIso,
+			gate_decision: decision === 'stop' ? 'stop' : 'go',
+		};
+		if (next) {
+			s.current_chain = next;
+			s.stage_progress[next] = {
+				...(s.stage_progress[next] || {}),
+				status: 'in_progress',
+				started_at: nowIso,
 			};
-			if (next) {
-				sc.current_chain = next;
-				sc.stage_progress[next] = {
-					...(sc.stage_progress[next] || {}),
-					status: 'in_progress',
-					started_at: nowIso,
-				};
-			}
-		} else {
-			s.last_gate = gateRecord;
-			s.stage_progress[stage] = {
-				...(s.stage_progress[stage] || {}),
-				status: 'complete',
-				completed_at: nowIso,
-				gate_decision: decision === 'stop' ? 'stop' : 'go',
-			};
-			if (next) {
-				s.current_chain = next;
-				s.stage_progress[next] = {
-					...(s.stage_progress[next] || {}),
-					status: 'in_progress',
-					started_at: nowIso,
-				};
-			}
 		}
 		// cross-scope block clear 방지: block 을 설정한 scope 와 현재 scope 가 같을 때만 해제.
 		// scope A가 block 됐을 때 scope B의 next 성공이 A의 block 을 지우지 않도록 한다.

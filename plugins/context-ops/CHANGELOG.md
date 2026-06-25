@@ -10,6 +10,23 @@
 
 ---
 
+## [0.78.0] — 2026-06-25 — MINOR — chain 상태 모델 단순화 (scope_states 제거 + analysis 분리 + manifest SSOT / MIS-427)
+
+**논의 (사용자)**: `state.json` 이 scope 마다 chain 상태를 들고 있을 필요가 있나. 팀 워크플로(develop→피처브랜치 / 동시작업=워크트리)에서 동시 격리는 git 이, 진행위치 보존은 git-tracked manifest 가 이미 커버 → `scope_states` 는 중복.
+
+### Changed (breaking — state schema 2.0)
+- **`scope_states` 제거** → 전역 단일 chain 상태(`current_chain`/`stage_progress`/`last_gate`) + `current_scope` 커서. 동시 작업 격리 = git 워크트리/피처브랜치(in-state 멀티플렉싱 대체). 진행위치 SSOT = git-tracked manifest.
+- **`current_task` 전역화** (scope_states 내부 → top-level).
+- **analysis 시작점 분리**: 새 scope 진입 = `discovery` 리셋 / 전역 init = `analysis`(프로젝트 1회). `current_chain` enum·flow revisit edge·gate#0 유지(완전 제거 ❌ — revisit 의미론 보존).
+- **state schema 2.0**: `scope_states`+`ScopeChainState`+`git_baseline_sha`(dead field) 제거. `CURRENT_STATE_VERSION` 1.0→2.0 + migration `1.0->2.0`(활성 scope 전역 흡수 + git_baseline_sha drop / 비활성 scope `current_task` 손실=정직).
+
+### 검증
+- state-store 16/16 + chain-driver 703/703(v0.77.0 위 rebase 실측) + statusline 12/12 + init round-trip(analysis/discovery). 회귀 0(gate/sync/navigate/impact/lift/revisit/gate-provenance 무영향).
+
+### 결정
+- DEC-2026-06-25-state-model-simplify. §2 Senior REVISE(`git_baseline_sha` dead / "손실0" 거짓 / 역매퍼 부재) + 산업선례(Git·Terraform·LSP "영속 SSOT + 휘발 커서").
+- carry: GateRecord 고아 def(미참조 ajv 무해) / manifest 완전유도+C1 reconcile+역매퍼(워크트리 워크플로상 §8.1 생략) / ADR-CHAIN-005 보강.
+
 ## [0.77.0] — 2026-06-25 — MINOR — gate 검토 UX 우회 actor provenance 정직화 (Phase 1)
 
 **문제 (v0.76.0 dogfood)**: go/stop/revisit 검토 UX(프롬프트 + discovery/spec/plan 의 plan-review-server 브라우저 검토)는 `_base-invoke-go-stop-gate` 스킬에만 있고 stage sub-agent 마지막 단계에서만 호출되는데, 실제 전진 CLI `chain-driver next --user-decision go` 는 검토 경유 여부를 확인하지 않음 → 오케스트레이터가 sub-agent dispatch 를 건너뛰고 CLI 직접 호출 시 프롬프트·브라우저 누락 + 자동 통과. intervention-log 는 `go`만 있으면 무조건 `actor:'user'` 로 **거짓 기록**.

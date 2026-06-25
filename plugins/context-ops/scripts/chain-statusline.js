@@ -24,13 +24,9 @@ export const CHAIN_ORDER = ['discovery', 'spec', 'plan', 'test', 'implement'];
 // state.json 에서 활성 (scope, chain, blocked) 추출. chain-driver cmdState 의 getActiveScopeChain 최소 재현.
 export function activeChain(state) {
 	if (!state || typeof state !== 'object') return null;
+	// v2.0 — 전역 단일 chain 커서 (scope_states 제거 / DEC-2026-06-25). scope = current_scope 표시용.
 	const scope = state.current_scope ?? null;
-	let chain = null;
-	if (scope && state.scope_states && state.scope_states[scope]) {
-		chain = state.scope_states[scope].current_chain ?? null;
-	} else if (state.current_chain) {
-		chain = state.current_chain; // 비-scoped(global) 진행
-	}
+	const chain = state.current_chain ?? null;
 	return { scope, chain, blocked: !!state.blocked };
 }
 
