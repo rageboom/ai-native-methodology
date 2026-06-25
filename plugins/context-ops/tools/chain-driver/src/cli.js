@@ -510,7 +510,7 @@ function cmdNext(args) {
 	if (state.blocked && !args.userDecision) blockedExit(state, root);
 
 	// DEC-2026-06-06-analysis-exit-gate — analysis 자체 gate(#0) 평가.
-	// scope 활성 시 scope_states[scope].current_chain 사용 (전역 current_chain 과 분리).
+	// v2.0 — getActiveScopeChain: scope 활성 시 scope/stage manifest 에서 유도, 런타임 3종(blocked/gate/baseline)은 전역 (scope_states 제거 / DEC-2026-06-25).
 	const activeChain = getActiveScopeChain(state);
 	const stage = activeChain.current_chain;
 	const findings = loadFindings(args.findingsPath);
