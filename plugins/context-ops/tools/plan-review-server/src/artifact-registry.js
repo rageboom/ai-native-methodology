@@ -23,6 +23,9 @@ export function knownArtifact(type) {
 
 // chain stage(phase) → 산출물 묶음. spec 은 3종(composite=behavior / unit / ac)을 한 페이지로.
 export const PHASES = {
+	// 'discovery-draft' = 게이트①(DEC-2026-06-25-discovery-2-gate) — discovery-spec 와 같은 파일을 읽되
+	// renderer 만 다르게(PRD 산문 + 영향 도식 + 범위/충돌/질문 선택). createMultiServer 가 phase 로 renderAs 결정.
+	'discovery-draft': { label: 'discovery (방향 확인 / draft)', artifacts: ['discovery-spec'], renderAs: 'discovery-draft' },
 	discovery: { label: 'discovery (발견)', artifacts: ['discovery-spec'] },
 	spec: { label: 'spec (명세)', artifacts: ['behavior-spec', 'unit-spec', 'acceptance-criteria'] },
 	plan: { label: 'plan (계획)', artifacts: ['task-plan'] },

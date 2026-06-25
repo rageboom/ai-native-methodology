@@ -133,6 +133,10 @@ function runPhase(args) {
 		onApply: (result) => {
 			process.stdout.write('PLAN_REVIEW_APPLY ' + JSON.stringify({ phase, branch: result.branch, written: result.written, groups: result.groups }) + '\n');
 		},
+		onConfirm: (result) => {
+			// 게이트①(discovery-draft) 범위 확정 → 메인 에이전트가 Monitor 로 감지 → detail-fill 재진입(재설계 ❌).
+			process.stdout.write('PLAN_REVIEW_CONFIRM ' + JSON.stringify({ phase, written: result.written, finalization_status: result.finalization_status, touched: result.touched }) + '\n');
+		},
 	});
 	server.listen(args.port, '127.0.0.1', () => {
 		const { port } = server.address();
@@ -155,6 +159,8 @@ function runPhase(args) {
 		} catch {
 			/* 마커 기록 실패는 비치명 (advisory) */
 		}
+		// 결정론 URL 마커(stdout) — gate skill 이 읽어 사용자에게 클릭 링크를 항상 제시(브라우저 자동오픈 성공 여부 무관).
+		process.stdout.write('PLAN_REVIEW_URL ' + url + '\n');
 		console.error(`\n  📋 ${PHASES[phase].label} 검토 (${documents.map((d) => d.artifactType).join(' / ')}) — 브라우저에서 열기:`);
 		console.error(`  \x1b[1;4;36m${url}\x1b[0m\n`);
 		console.error(`  (project: ${root})`);
@@ -249,6 +255,8 @@ function main() {
 	server.listen(args.port, '127.0.0.1', () => {
 		const { port } = server.address();
 		const url = `http://127.0.0.1:${port}/`;
+		// 결정론 URL 마커(stdout) — gate skill 이 읽어 사용자에게 클릭 링크를 항상 제시(브라우저 자동오픈 성공 여부 무관).
+		process.stdout.write('PLAN_REVIEW_URL ' + url + '\n');
 		console.error('');
 		console.error(`  📋 ${label} 검토 — 브라우저에서 열기:`);
 		console.error(`  \x1b[1;4;36m${url}\x1b[0m`); // bold underline cyan = 클릭 가능 링크

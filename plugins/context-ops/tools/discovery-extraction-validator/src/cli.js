@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // discovery-extraction-validator CLI (v11.0.0 / renamed from planning-extraction-validator)
-// usage: discovery-extraction-validator --discovery <path> [--rules <path>] [--domain <path>] [--dry-run] [--json]
+// usage: discovery-extraction-validator --discovery <path> [--rules <path>] [--domain <path>] [--draft|--final] [--dry-run] [--json]
+//   --draft / --final = 2-게이트 모드 override (DEC-2026-06-25-discovery-2-gate). 미지정 시 finalization_status 로 추론.
 
 import { validateDiscoveryExtraction, loadJson } from './validator.js';
 import { writeStdoutSync } from '../../_shared/write-stdout-sync.js';
@@ -15,8 +16,10 @@ function parseArgs(argv) {
     else if (a === '--domain') out.domain = argv[++i];
     else if (a === '--dry-run') out.dryRun = true;
     else if (a === '--json') out.json = true;
+    else if (a === '--draft') out.mode = 'draft';
+    else if (a === '--final') out.mode = 'final';
     else if (a === '--help' || a === '-h') {
-      console.log(`usage: discovery-extraction-validator --discovery <path> [--rules <path>] [--domain <path>] [--dry-run] [--json]`);
+      console.log(`usage: discovery-extraction-validator --discovery <path> [--rules <path>] [--domain <path>] [--draft|--final] [--dry-run] [--json]`);
       process.exit(0);
     }
   }
@@ -43,7 +46,7 @@ const analysis = {
   domain: args.domain ? loadJson(args.domain) : null,
 };
 
-const result = validateDiscoveryExtraction(discovery, analysis);
+const result = validateDiscoveryExtraction(discovery, analysis, { mode: args.mode });
 
 if (args.json) {
   writeStdoutSync(JSON.stringify(result, null, 2));

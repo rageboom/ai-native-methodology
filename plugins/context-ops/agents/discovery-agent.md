@@ -67,10 +67,12 @@ model: opus
 3. **공통 sub-skill 호출** — `discovery-decompose-use-cases` + `discovery-identify-business-intent` 로 어댑터 결과 정규화
 4. **Merge + 충돌 해소** — `discovery-converge-inputs` 호출(S3). 어댑터 간 동일 UC 병합 + Intent 통합 + 충돌 4분류(`conflicts[]`) 표면화 → 미해소 충돌은 `pending_decisions[]` 로 사용자 결단 묶음 gate. 임의 해소 ❌(출처 합집합 보존 / no-simulation).
 4b. **UC 의존성 consult** — `discovery-dep-consult` 호출(S4). 결정론 도구(dep-consult-cli)로 `uc_dependencies[]` 산출(shared_ref + 그래프 있으면 graph_impact 보강). reference-lens / verdict ❌ / 그래프 부재 = degraded 정직.
-4c. **clarify** — `discovery-clarify` 호출(S5). 커버리지 갭(모호/엣지/누락/미해소충돌/가정) → `open_questions[]` 누적. 비블로킹 기본 → gate#1 HTML 일괄 Q&A. blocking=true 만 pending_decisions 승격.
-5. **discovery-spec.{json,md} 산출** — `schemas/discovery-spec.schema.json` 의무
-6. **gate 진입** — `_base-invoke-go-stop-gate` 호출 / 사용자 결단 cluster + intervention-log 등재
-7. **종결 보고** — discovery-spec path + traceability backward link 상태 + spec stage 진입 권고 → `spec-agent` dispatch
+4c. **clarify** — `discovery-clarify` 호출(S5). 커버리지 갭(모호/엣지/누락/미해소충돌/가정) → `open_questions[]` 누적. 비블로킹 기본 → 게이트① HTML 일괄 Q&A. blocking=true 만 pending_decisions 승격.
+5. **draft 산출** — discovery-spec.json 을 **`finalization_status:"draft"`** 로 산출. UC(id+name+1줄 description) + business_intent + uc_dependencies + conflicts + open_questions 만. **디테일(preconditions/postconditions/acceptance_criteria_refs/exhaustive source_grounded_evidence/nfr) 은 아직 채우지 않는다**(함정① draft-churn 회피).
+6. **게이트① (방향·범위 확정)** — `_base-invoke-go-stop-gate` (`--phase discovery-draft`). PRD 산문 + 영향 도식 + 범위/충돌/질문 선택. 사용자 `POST /confirm-scope` → `finalization_status:"confirmed"`. `PLAN_REVIEW_CONFIRM` poll → 다음 단계. `scope_confirm` intervention-log 등재. (chain-driver gate 아님 / Auto Mode skip.)
+7. **detail-fill** — `discovery-from-analysis-output` 재호출 등으로 **`in_scope!==false` UC 만** 디테일 채움 → `finalization_status:"final"`.
+8. **게이트② (최종 검토)** — `_base-invoke-go-stop-gate` (`--phase discovery` = chain-driver `#1`). 완성본 go/stop cluster + intervention-log(`gate_decision`) 등재.
+9. **종결 보고** — discovery-spec path + traceability backward link 상태 + spec stage 진입 권고 → `spec-agent` dispatch
 
 ## 산출 자산
 

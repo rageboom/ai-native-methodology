@@ -105,6 +105,7 @@ discovery/spec/plan gate 에서는 json 통독 대신 `plan-review-server` 를 *
      --summaries <summaries.json>
    ```
    (`--project` 의 `.ai-context/output/` 에서 해당 phase 산출물 자동 수집. plan phase 는 task-plan gate 평결을 `--project` 로 chain-driver next --dry-run 에 위임. 브라우저 자동 오픈을 끄려면 `--no-open`.)
+2-1. **URL 제시 의무** — spawn 직후 background 출력에서 `PLAN_REVIEW_URL <url>`(stdout 결정론 마커)을 읽어 **사용자에게 클릭 가능한 링크로 항상 제시**한다. 브라우저 자동 오픈은 보조일 뿐(headless·명령 부재 시 조용히 실패 / `child.on('error')` 무시) — 링크 제시는 그것과 무관하게 의무. (사용자가 직접 못 여는 상황 방지.)
 3. 사용자는 산출물을 의미 카드로 읽고(각 카드에 AI 요약 표시 / 잠긴 구조·링크는 토글로 접힘 / spec 은 탭 전환), **바꾸고 싶은 항목을 클릭(또는 값 안 텍스트 드래그 후 클릭) → 팝오버에 프롬프트(의도)를 입력** → 우측 패널에 누적. 전체 의견은 하단 **채팅 컴포저**로. 다 적으면 **apply**. 값 직접 편집이 아니라 모든 변경 = 자연어 프롬프트. (수정 불가 잠금: provenance·id·순서·의존·추적링크·외부ID·계약 = 클릭/코멘트 ❌ / 내용=제목·설명·결정·enum 만 가능.)
 4. **poll 핸드오프** — background stdout 을 Monitor 로 watch: apply 시 서버가 `PLAN_REVIEW_APPLY <json>` 한 줄을 emit → 즉시 페이로드(`phase` + `branch` + `written` + `groups`(산출물별 코멘트 그룹))를 입력으로 **해당 stage agent 재dispatch**(discovery→discovery-agent / spec→spec-agent / plan→plan-agent)(revisit). 수동 "파일 읽어" 단계 없음. (durable 채널 = `<phase>-revisions.json` / `next_action:"replan"`.)
    - Monitor 예: `tail -f <server.log> | grep --line-buffered PLAN_REVIEW_APPLY`
@@ -113,6 +114,26 @@ discovery/spec/plan gate 에서는 json 통독 대신 `plan-review-server` 를 *
 **불변**: 서버는 reference-lens — 평결=chain-driver / 재검증=plan-coverage-validator(task-plan 만) / 산출물 write=사람 입력(프롬프트)만 / AI 요약=표시 전용(저장·gate inject ❌). 결정론 gate 에 LLM inject ❌ (본문 §gate 입력 수집과 동일 원칙).
 
 **검토 경유 증거 (Phase 1)**: plan-review-server 가 spawn 되면 `.ai-context/runtime/gate-review-passage.json`(`{stage, presented_at, via}`)을 기록한다 = "브라우저 검토가 실제로 떴다"의 증거. 이후 `/chain-next go` 시 chain-driver 가 이 마커를 read 하여 intervention-log actor 를 `user`(검토 경유) vs `llm_assumed`(증거 부재 / 우회 추정)로 정직 도출한다. **advisory only — 차단 ❌**(Phase 1). 마커는 LLM 이 직접 쓸 수도 있는 파일이라 "벽"이 아니라 speedbump(정직 한계) — 위조 불가 신호는 서버가 실제 spawn 됐을 때뿐. Auto Mode(서버 spawn skip)는 `/chain-next` 의 `auto` 인자(`--auto-mode`)로 `user_auto` 표기.
+
+## discovery 2-게이트
+
+discovery 만 브라우저를 **2번** 띄운다 — 가벼운 draft 로 방향·범위·영향도를 먼저 확정하고, 디테일을 채운 뒤 최종 검토. 재작업 최소화(방향 틀리면 디테일 통째 버리는 것을 막음 / 업계 정석 — Spec Kit `/clarify`·Amazon PR-FAQ·Shape Up).
+
+**게이트①** `discovery-spec-draft` phase 직후 (chain-driver gate **아님** — stage 내부 soft 체크포인트 / `chain-driver next` 호출 ❌):
+```
+node ${CLAUDE_PLUGIN_ROOT}/tools/plan-review-server/src/cli.js \
+  --phase discovery-draft --project <proj> --summaries <summaries.json>
+```
+- discovery-spec(finalization_status=draft)를 **PRD 산문 + 영향 도식(UC 의존성·난이도) + 범위/충돌/질문 선택 UI** 로 렌더(raw 필드 나열 ❌).
+- 사용자가 **범위(UC in_scope) 체크 · 충돌 해소 · open_questions 답변** → **apply 가 아니라 "✓ 확정"** 버튼이 `POST /confirm-scope`. 서버는 **사람 소유 필드만**(in_scope / conflicts.resolved+resolution_ref / open_questions.status+answer) + `finalization_status=confirmed` 를 직접 write(화이트리스트 / LLM inject ❌).
+- **poll 핸드오프**: 서버가 `PLAN_REVIEW_CONFIRM <json>` 을 emit → Monitor watch → **detail-fill 재진입**(재설계 ❌ / `discovery-spec-detail` phase: in_scope!==false UC 만 preconditions·postconditions·acceptance_criteria_refs·source_grounded_evidence·nfr 채움 → finalization_status=final).
+  - Monitor 예: `tail -f <server.log> | grep --line-buffered PLAN_REVIEW_CONFIRM`
+- **intervention_log 기록**(본 skill 담당 / Write): `{ "event_type":"scope_confirm", "actor":"user", "stage":"discovery", "decision":"confirmed", "message":"in_scope N/M · conflicts X/Y · open_questions A/B" }`. `gate_decision`(chain-driver #N 평결)과 구분 — last_gate 오염 ❌.
+- 자유 의견(클릭→프롬프트→`/apply`) 채널도 그대로 병행.
+
+**게이트②** `discovery-spec-detail` phase 직후 = 기존 `--phase discovery`(chain-driver `#1` 의 단일 stage 전환 gate). 완성본 최종 검토 → go/stop. 동작 무변경.
+
+**Auto Mode**: 게이트① skip — 전 UC `in_scope:true`, 미해소 충돌·질문은 carry, `finalization_status=confirmed` 만 세팅 후 detail-fill 진행(브라우저 ❌). 게이트② 는 기존 HARD_BLOCK 유지(critical 은 Auto 에서도 차단).
 
 ## Auto Mode 호환
 
@@ -138,3 +159,4 @@ gate 마찰 (cognitive load) 완화. 5~6 cluster 의무:
 - 결단: DEC-2026-05-06-round-trip-부분-허용
 - 결단: DEC-2026-06-19-plan-review-server (인터랙티브 검토 편집기 / reference-lens)
 - 결단: DEC-2026-06-25-gate-review-bypass-guard (검토 경유 증거 마커 + actor provenance / Phase 1)
+- 결단: DEC-2026-06-25-discovery-2-gate (discovery 2-게이트 / draft→게이트①(soft 체크포인트)→detail→게이트② / `--phase discovery-draft` + `/confirm-scope`)

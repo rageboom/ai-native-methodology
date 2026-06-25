@@ -191,13 +191,72 @@ function createMultiServer(opts) {
 		chainDriverCli = null,
 		findingsPath = null,
 		onApply = null,
+		onConfirm = null,
 		agentReply = null,
 	} = opts;
+
+	// /confirm-scope 화이트리스트 — 사람 소유 필드만 직접 write (LLM inject ❌ / 결정론 axis 무오염).
+	//   discovery 게이트①(DEC-2026-06-25-discovery-2-gate): 범위·충돌·질문·확정 마커만.
+	const OQ_STATUS = ['open', 'answered', 'deferred', 'resolved'];
+	function applyScopeConfirm(spec, payload) {
+		const touched = { scope: 0, conflicts: 0, open_questions: 0 };
+		const byId = (arr, id) => (Array.isArray(arr) ? arr.find((x) => x && x.id === id) : null);
+		for (const s of payload.scope || []) {
+			const uc = byId(spec.use_cases, s.uc_id);
+			if (uc) { uc.in_scope = !!s.in_scope; touched.scope++; }
+		}
+		for (const c of payload.conflicts || []) {
+			const cf = byId(spec.conflicts, c.id);
+			if (cf) { cf.resolved = !!c.resolved; if (typeof c.resolution_ref === 'string') cf.resolution_ref = c.resolution_ref; touched.conflicts++; }
+		}
+		for (const q of payload.open_questions || []) {
+			const oq = byId(spec.open_questions, q.id);
+			if (oq) {
+				if (typeof q.answer === 'string') oq.answer = q.answer;
+				if (typeof q.status === 'string' && OQ_STATUS.indexOf(q.status) >= 0) oq.status = q.status;
+				touched.open_questions++;
+			}
+		}
+		spec.finalization_status = 'confirmed';
+		return touched;
+	}
+
+	// 게이트① 신규 UC 추가 — 사람이 화면에서 입력한 name/description 만 받아 직접 write.
+	//   id 는 결정론 생성(기존 UC prefix + 다음 번호), change_type='new'(근거 면제 / detail-fill 생성), in_scope=true.
+	//   LLM 단독 추가 ❌ — 내용은 사람 입력, id 는 기계 생성.
+	function addNewUseCases(spec, added) {
+		if (!Array.isArray(added) || !added.length) return 0;
+		spec.use_cases = Array.isArray(spec.use_cases) ? spec.use_cases : [];
+		let prefix = 'UC-NEW-', maxN = 0;
+		for (const u of spec.use_cases) {
+			const m = /^(UC-[A-Z0-9_-]+-)(\d{3})$/.exec((u && u.id) || '');
+			if (m) { if (prefix === 'UC-NEW-') prefix = m[1]; if (m[1] === prefix) maxN = Math.max(maxN, parseInt(m[2], 10)); }
+		}
+		let count = 0;
+		for (const a of added) {
+			if (!a || typeof a.name !== 'string' || !a.name.trim()) continue;
+			maxN++;
+			spec.use_cases.push({
+				id: prefix + String(maxN).padStart(3, '0'),
+				name: a.name.trim(),
+				description: typeof a.description === 'string' ? a.description.trim() : '',
+				change_type: 'new',
+				in_scope: true,
+				source_grounded_evidence: [],
+				code_pointers_na: true,
+			});
+			count++;
+		}
+		return count;
+	}
 
 	function loadDoc(d) {
 		const data = JSON.parse(readFileSync(d.path, 'utf-8'));
 		const fieldModel = buildFieldModel(data, d.schema);
-		const doc = { artifactType: d.artifactType, label: d.label || d.artifactType, path: d.path, data, fieldModel, summaries: d.summaries || null };
+		// renderAs = 같은 산출물 파일을 다른 뷰로 (게이트① / DEC-2026-06-25-discovery-2-gate).
+		//   discovery-draft phase 의 discovery-spec → PRD 산문 + 영향 도식 + 범위/충돌/질문 선택 뷰.
+		const renderAs = phase === 'discovery-draft' && d.artifactType === 'discovery-spec' ? 'discovery-draft' : d.renderAs || null;
+		const doc = { artifactType: d.artifactType, renderAs, label: d.label || d.artifactType, path: d.path, data, fieldModel, summaries: d.summaries || null };
 		// discovery-spec 난이도 reference-lens (S1) — artifact-graph 있으면 UC별 영향 정량 → S/M/L.
 		//   부재(greenfield/미합성) = degraded (정직 / LLM 추론 ❌). 표시·review[] 전용 / verdict ❌.
 		if (d.artifactType === 'discovery-spec') {
@@ -247,7 +306,7 @@ function createMultiServer(opts) {
 					if (items.length) summary.review = [...(summary.review || []), ...items];
 				}
 				const html = buildHtmlMulti({
-					documents: docs.map((d) => ({ artifactType: d.artifactType, label: d.label, data: d.data, fieldModel: d.fieldModel, summaries: d.summaries, difficulty: d.difficulty || null })),
+					documents: docs.map((d) => ({ artifactType: d.artifactType, renderAs: d.renderAs || null, label: d.label, data: d.data, fieldModel: d.fieldModel, summaries: d.summaries, difficulty: d.difficulty || null })),
 					summary,
 					meta: { phase, label: phaseLabel, agentReply, taskPlanPath: docs[0] && docs[0].path },
 				});
@@ -289,6 +348,31 @@ function createMultiServer(opts) {
 
 				const result = { branch: 'expensive', written: revPath, groups, rejected_locked: rejectedLocked };
 				if (typeof onApply === 'function') { try { onApply(result, parsed); } catch { /* non-fatal */ } }
+				res.writeHead(200, { 'content-type': 'application/json' });
+				res.end(JSON.stringify(result));
+				return;
+			}
+
+			// POST /confirm-scope — 게이트①(DEC-2026-06-25-discovery-2-gate) 구조적 선택 직접 write.
+			//   사람 소유 필드(in_scope / conflicts.resolved+resolution_ref / open_questions.status+answer)
+			//   + finalization_status='confirmed' 만 (화이트리스트 / LLM inject ❌). intervention-log 기록은 게이트 skill.
+			if (req.method === 'POST' && url === '/confirm-scope') {
+				let body = '';
+				req.on('data', (c) => { body += c; if (body.length > 5_000_000) req.destroy(); });
+				await new Promise((r) => req.on('end', r));
+				let payload; try { payload = JSON.parse(body || '{}'); } catch { payload = {}; }
+				const target = documents.find((d) => d.artifactType === 'discovery-spec');
+				if (!target) {
+					res.writeHead(409, { 'content-type': 'application/json' });
+					res.end(JSON.stringify({ error: 'discovery-spec 문서 없음 — /confirm-scope 는 discovery 게이트 전용' }));
+					return;
+				}
+				const spec = JSON.parse(readFileSync(target.path, 'utf-8'));
+				const touched = applyScopeConfirm(spec, payload);
+				touched.added = addNewUseCases(spec, payload.added_use_cases);
+				atomicWrite(target.path, JSON.stringify(spec, null, 2) + '\n');
+				const result = { written: target.path, finalization_status: 'confirmed', touched };
+				if (typeof onConfirm === 'function') { try { onConfirm(result, payload); } catch { /* non-fatal */ } }
 				res.writeHead(200, { 'content-type': 'application/json' });
 				res.end(JSON.stringify(result));
 				return;

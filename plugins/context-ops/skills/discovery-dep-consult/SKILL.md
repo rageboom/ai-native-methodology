@@ -12,7 +12,7 @@ discovery-spec 의 UC 간 의존성을 **결정론 도구**로 산출해 `uc_dep
 
 ## 언제 사용
 
-- discovery-spec-compose phase 에서 use_cases 합성 직후 자동 호출.
+- discovery-spec-draft phase 에서 use_cases 합성 직후 자동 호출 (게이트① 영향 도식의 입력).
 - 사용자 직접 호출 (의존성 검토 시).
 
 ## 동작 (LLM 추론 ❌ — 도구 실행)

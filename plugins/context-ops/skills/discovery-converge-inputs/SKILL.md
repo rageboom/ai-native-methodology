@@ -12,7 +12,7 @@ allowed-tools: Read, Glob, Grep
 
 ## 언제 사용
 
-- 입력이 **2종 이상**일 때 (어댑터 병렬 dispatch 후 use-cases-decompose·br-intent-extract 정규화 다음, discovery-spec-compose phase).
+- 입력이 **2종 이상**일 때 (어댑터 병렬 dispatch 후 use-cases-decompose·br-intent-extract 정규화 다음, discovery-spec-draft phase / 게이트① 전).
 - 입력이 1종이어도 호출 가능 (이 경우 `conflicts` = 빈 배열 / 단순 pass-through).
 
 ## 입력

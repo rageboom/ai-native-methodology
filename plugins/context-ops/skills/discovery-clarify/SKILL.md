@@ -12,7 +12,7 @@ discovery-spec 를 훑어 **사용자에게 물어야 할 미해결 질문**을 
 
 ## 언제 사용
 
-- discovery-spec-compose + dep-consult 직후, gate#1 직전 (질문 누적 마지막 단계).
+- discovery-spec-draft + dep-consult 직후, 게이트①(gate-1-draft) 직전 (질문 누적 마지막 단계 → /confirm-scope 에서 답).
 - 사용자 직접 호출 (검토 전 "빠진 것" 점검).
 
 ## 커버리지 기반 질문 생성 (패턴 A/B — 자유 질의 ❌)

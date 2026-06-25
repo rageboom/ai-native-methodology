@@ -9,20 +9,32 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { normalizeAnalysisBusinessRules } from '../../_shared/load-business-rules.js';
 
-export function validateDiscoveryExtraction(discoverySpec, analysis) {
+export function validateDiscoveryExtraction(discoverySpec, analysis, opts = {}) {
   const findings = [];
 
-  // 1. source-grounded coverage
+  // v0.77.0 (DEC-2026-06-25-discovery-2-gate): 2-게이트 모드.
+  //   draft(게이트①) = 디테일 미충전 → 디테일 의존 finding(source-grounded / UC coverage) skip,
+  //     pending_decisions 도 비-critical(게이트①에서 사용자가 /confirm-scope 로 해소 예정).
+  //   final(게이트②) = 디테일 강제 + in_scope!==false UC 만 coverage 분자.
+  //   mode 미지정 시 finalization_status 로 추론(부재=final / backward-compat).
+  const mode = opts.mode || (discoverySpec?.finalization_status === 'draft' ? 'draft' : 'final');
+  const isDraft = mode === 'draft';
+
+  // 1. source-grounded coverage (draft 에선 skip — 디테일은 detail-fill 단계 / in_scope=false UC 면제)
   const useCases = discoverySpec?.use_cases ?? [];
-  for (const uc of useCases) {
-    const evidence = uc.source_grounded_evidence ?? [];
-    if (evidence.length === 0) {
-      findings.push({
-        kind: 'discovery.source_grounded.missing',
-        severity: 'high',
-        uc_id: uc.id,
-        message: `UC ${uc.id} has no source_grounded_evidence (no-simulation violation risk)`
-      });
+  if (!isDraft) {
+    for (const uc of useCases) {
+      if (uc.in_scope === false) continue; // 범위 외 UC 는 디테일 의무 면제
+      if (uc.change_type === 'new') continue; // 신규(사용자 추가) UC 는 레거시 코드 부재 → 근거 면제 (DEC-2026-06-25)
+      const evidence = uc.source_grounded_evidence ?? [];
+      if (evidence.length === 0) {
+        findings.push({
+          kind: 'discovery.source_grounded.missing',
+          severity: 'high',
+          uc_id: uc.id,
+          message: `UC ${uc.id} has no source_grounded_evidence (no-simulation violation risk)`
+        });
+      }
     }
   }
 
@@ -102,8 +114,9 @@ export function validateDiscoveryExtraction(discoverySpec, analysis) {
   };
   collectIds(analysis?.domain?.use_cases, analysisUCs);
   for (const bc of scopedBCs) collectIds(bc?.use_cases, analysisUCs);
-  if (analysisUCs.size > 0) {
-    const discoveryUCIds = new Set(useCases.map(u => u.id));
+  if (!isDraft && analysisUCs.size > 0) {
+    // in_scope=false UC 는 이번 iteration 의도적 제외 → covered 로 세지 않음 (게이트① 확정 반영 / DEC-2026-06-25).
+    const discoveryUCIds = new Set(useCases.filter(u => u.in_scope !== false).map(u => u.id));
     let coveredCount = 0;
     for (const ucId of analysisUCs) {
       if (discoveryUCIds.has(ucId)) coveredCount++;
@@ -204,11 +217,15 @@ export function validateDiscoveryExtraction(discoverySpec, analysis) {
   // (b) pending_decisions[] non-empty → critical (gate stop). gate#1 에서 user-explicit 전환 의무.
   const pending = discoverySpec?.pending_decisions ?? [];
   if (Array.isArray(pending) && pending.length > 0) {
+    // draft(게이트①) = 미해결이 정상(사용자가 /confirm-scope 로 해소 예정) → advisory.
+    // final(게이트②) = 해소됐어야 함 → critical(gate stop). (DEC-2026-06-25-discovery-2-gate)
     findings.push({
       kind: 'discovery.pending-decisions-not-resolved',
-      severity: 'critical',
+      severity: isDraft ? 'low' : 'critical',
       pending_count: pending.length,
-      message: `pending_decisions[] ${pending.length}건 미해결 — gate#1 에서 user-explicit 전환 의무 (보류 시 gate stop / SKILL §v8.7.5 b)`
+      message: isDraft
+        ? `pending_decisions[] ${pending.length}건 — 게이트①(draft)에서 /confirm-scope 로 해소하세요 (advisory)`
+        : `pending_decisions[] ${pending.length}건 미해결 — gate#1 에서 user-explicit 전환 의무 (보류 시 gate stop / SKILL §v8.7.5 b)`
     });
   }
 

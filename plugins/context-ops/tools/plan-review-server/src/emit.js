@@ -62,9 +62,10 @@ export function buildHtml({ fieldModel, taskPlan, summary = null, meta = {}, art
 	});
 }
 
-// 멀티(phase) 문서 — documents: [{ artifactType, label, data, fieldModel, summaries }].
+// 멀티(phase) 문서 — documents: [{ artifactType, renderAs?, label, data, fieldModel, summaries }].
+//   renderAs(있으면) 가 렌더러 선택 키 — 같은 산출물 파일을 다른 뷰로(예: discovery-spec → discovery-draft).
 export function buildHtmlMulti({ documents, summary = null, meta = {} }) {
-	const types = documents.map((d) => d.artifactType);
+	const types = documents.map((d) => d.renderAs || d.artifactType);
 	return baseHtml({
 		scripts: assembleScripts(types),
 		documents, // 각 문서가 자기 data/fieldModel/summaries 보유 (kit.initMulti 가 병합)

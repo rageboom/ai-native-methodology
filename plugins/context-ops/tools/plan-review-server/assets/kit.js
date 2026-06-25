@@ -599,7 +599,7 @@ var Kit = (function () {
 			btn.textContent = d.label || d.artifactType;
 			var panel = document.createElement('div'); panel.className = 'doc-panel'; panel.hidden = i !== 0;
 			panels.appendChild(panel);
-			var R = pickRenderer(d.artifactType);
+			var R = pickRenderer(d.renderAs || d.artifactType);
 			if (R && typeof R.render === 'function') {
 				R.render(panel, { data: d.data || {}, summaries: d.summaries || {}, difficulty: d.difficulty || null });
 			}

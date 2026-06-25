@@ -474,4 +474,41 @@ describe('discovery-extraction-validator', () => {
       assert.ok(r.findings.some((x) => x.kind === 'discovery.uc.under_decomposition'), 'nested entities now counted');
     });
   });
+
+  // ── 2-게이트 draft/final 모드 (DEC-2026-06-25-discovery-2-gate) ──
+  describe('2-gate mode (draft vs final)', () => {
+    it('draft: 디테일 finding(source-grounded) skip + pending_decisions 는 advisory(low)', () => {
+      const discovery = {
+        finalization_status: 'draft',
+        use_cases: [{ id: 'UC-USER-001' }], // 근거 없음 — draft 에선 의도된 상태
+        pending_decisions: [{ id: 'PD-1', topic: '인증 방식' }],
+        cross_links: { to_analysis_artifacts: ['business-rules.json'] },
+      };
+      const r = validateDiscoveryExtraction(discovery, { domain: { use_cases: [{ id: 'UC-USER-001' }] } });
+      assert.ok(!r.findings.some((x) => x.kind === 'discovery.source_grounded.missing'), 'draft 는 source-grounded 강제 안 함');
+      assert.equal(r.summary.critical, 0, 'draft pending_decisions 는 critical 아님');
+      const pd = r.findings.find((x) => x.kind === 'discovery.pending-decisions-not-resolved');
+      assert.ok(pd && pd.severity === 'low', 'draft pending_decisions = advisory(low)');
+    });
+
+    it('final(추론): 근거 없는 in_scope UC 는 source-grounded high', () => {
+      const discovery = { use_cases: [{ id: 'UC-USER-001' }], cross_links: { to_analysis_artifacts: ['x'] } };
+      const r = validateDiscoveryExtraction(discovery, { domain: { use_cases: [{ id: 'UC-USER-001' }] } });
+      assert.ok(r.findings.some((x) => x.kind === 'discovery.source_grounded.missing'), 'final 은 근거 강제');
+    });
+
+    it('final: in_scope=false UC 는 디테일 면제 + coverage 분자 제외', () => {
+      const discovery = {
+        finalization_status: 'final',
+        use_cases: [
+          { id: 'UC-A-001', in_scope: false }, // 범위 외 — 근거 없어도 finding ❌, covered 로도 세지 않음
+          { id: 'UC-B-001', source_grounded_evidence: ['src/b.js:1'] },
+        ],
+        cross_links: { to_analysis_artifacts: ['x'] },
+      };
+      const r = validateDiscoveryExtraction(discovery, { domain: { use_cases: [{ id: 'UC-A-001' }, { id: 'UC-B-001' }] } });
+      assert.ok(!r.findings.some((x) => x.uc_id === 'UC-A-001' && x.kind === 'discovery.source_grounded.missing'), 'in_scope=false 는 근거 면제');
+      assert.equal(r.coverage.use_case, 0.5, 'in_scope=false UC 는 covered 분자 제외 (1/2)');
+    });
+  });
 });

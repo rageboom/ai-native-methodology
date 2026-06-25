@@ -10,6 +10,24 @@
 
 ---
 
+## [0.79.0] — 2026-06-25 — MINOR — discovery 2-게이트 (PRD 산문 + 공유 묶음 뷰 + 범위 선택 / draft-first)
+
+**문제 (사용자 발화)**: discovery 게이트의 브라우저 검토 화면(`plan-review-server`)이 (1) JSON을 그대로 옮겨 압축 언어로 보여줘 "PRD가 아니라 JSON 인스펙터" — 말을 풀어 쓰고 이해를 돕는 도식이 필요, (2) 사용자가 방향/범위를 **선택**할 수 없음, (3) spec을 다 만든 뒤 보여주니 늦음 — 가벼운 draft를 **먼저** 보여주고 확정되면 디테일을 채워야(재작업 최소화).
+
+**해결**: discovery 를 **2-게이트**로 분할 (DEC-2026-06-25-discovery-2-gate). 업계 정석(Spec Kit `/clarify`·Amazon PR-FAQ·Google Design Doc·Shape Up — "싼 draft 로 방향 확정 → 디테일") 정합.
+
+- **흐름** (`flows/discovery.phase-flow.json` v3.2.0): `discovery-spec-compose` → `discovery-spec-draft`(디테일 미충전 / finalization_status=draft) → **`gate-1-draft`(게이트① / stage 내부 soft 체크포인트 / chain-driver gate 아님)** → `discovery-spec-detail`(in_scope UC 디테일 / final) → `gate-1`(게이트② / chain-driver `#1` 무변경).
+- **결정론 axis 무변경**: chain-driver `next` 는 stage 단위(게이트 1개/stage). 게이트①은 intra-stage 사람 체크포인트라 상태머신·gate-eval 미접촉(STRONG-STOP 보존).
+- **가독성** (`plan-review-server`): 신규 `--phase discovery-draft` + `assets/renderers/discovery-draft.js` — 같은 discovery-spec.json 을 **PRD 산문 + "공유 묶음 뷰"** 로 렌더(raw 필드 나열 ❌). 공유 묶음 = `uc_dependencies`(shared_ref) 를 연결요소로 클러스터링해 "같은 규칙·API·코드를 쓰는 UC" 를 한 묶음으로 + 난이도 랭킹 + "공유 참조(검토 보조 / 인과 아님)" 명시. 산문·묶음 persist ❌ (json 단독 SSOT / ADR-011 / render-time / 그래프 라이브러리 불요). (1차 시도 = D3 force 그래프였으나 "연결 안 된 노드 다수 + 인과 오해" 로 사용자 검토 후 묶음 리스트로 전환.)
+- **사용자 선택/편집**: `POST /confirm-scope` — 사람 소유 필드만 화이트리스트 직접 write (`use_cases[].in_scope` / `conflicts[].resolved`+`resolution_ref` / `open_questions[].status`+`answer` + `finalization_status=confirmed`). LLM inject ❌. `PLAN_REVIEW_CONFIRM` 마커 → detail-fill 재진입. 자유 의견 `/apply` 채널 병행. **신규 UC 추가**: 게이트① 화면에서 새 유스케이스(이름+설명) 직접 추가 → `added_use_cases` → 서버가 **id 결정론 생성**(기존 prefix+다음 번호) + `change_type=new` + `in_scope=true` write(내용=사람 입력 / id=기계 / AI 단독 추가 ❌). detail-fill 에서 생성(greenfield-style).
+- **schema**: `discovery-spec` 에 `finalization_status`(draft/confirmed/final) + `use_cases[].in_scope`(default true) + `use_cases[].change_type`(existing/new/modify / 부재=existing) 추가, `acceptance_criteria_refs` required 완화(draft UC). `intervention-log` `event_type` 에 `scope_confirm` + `stage` enum 에 `discovery`/`plan` 추가.
+- **validator**: `discovery-extraction-validator --draft|--final`(또는 finalization_status 추론) — draft 는 디테일 finding(source-grounded/UC coverage) skip + pending_decisions advisory, final 은 `in_scope!==false` UC 만 coverage 분자. `change_type=new`(사용자 추가) UC 는 레거시 근거 면제.
+- **gate skill / agent**: `_base-invoke-go-stop-gate` 에 discovery 2-spawn 절, `discovery-agent` 절차(draft → 게이트① → detail-fill → 게이트②) 갱신.
+- **URL 결정론 제시**: `plan-review-server` cli 가 기동 시 `PLAN_REVIEW_URL <url>` 를 stdout 마커로 emit(기존 stderr 사람용 링크 + 병행). gate skill 이 spawn 직후 이 마커를 읽어 **사용자에게 클릭 링크를 항상 제시**(브라우저 자동오픈은 보조 — headless·명령 부재 시 조용히 실패하므로 링크 제시를 그것과 분리). 모든 검토 게이트(discovery·spec·plan) 공통.
+- **tests**: `plan-review-server/test/discovery-draft.test.js`(8 / 공유 묶음 렌더·`/confirm-scope` 화이트리스트·신규 추가 `change_type=new`·CLI spawn 마커) + `discovery-extraction-validator` 2-gate(3). 전 기존 테스트 회귀 0.
+
+> rebase 메모: 이 항목은 작성 당시 v0.77.0 으로 라벨됐으나 main 이 v0.77.0(gate provenance)·v0.78.0(state 모델 단순화)을 먼저 출하 → 충돌 회피 위해 **v0.79.0** 으로 rebump (DEC 날짜·내용 동일).
+
 ## [0.78.0] — 2026-06-25 — MINOR — chain 상태 모델 단순화 (scope_states 제거 + analysis 분리 + manifest SSOT / MIS-427)
 
 **논의 (사용자)**: `state.json` 이 scope 마다 chain 상태를 들고 있을 필요가 있나. 팀 워크플로(develop→피처브랜치 / 동시작업=워크트리)에서 동시 격리는 git 이, 진행위치 보존은 git-tracked manifest 가 이미 커버 → `scope_states` 는 중복.
@@ -48,7 +66,6 @@
 - PreToolUse Bash matcher **deny 가드** = ≥2 PoC corroboration 후 별도 DEC. discovery/spec/plan 만 hard(서버 토큰) / test·implement 는 advisory 영구(speedbump 를 벽으로 사칭 ❌). 신규 exit code ❌(exit 2 재사용).
 
 **검증**: chain-driver 707/707(신규 16 포함) GREEN. E2E 실측 — `next go`(마커·플래그 없음)→exit 0+nudge+actor=`llm_assumed` / `--auto-mode`→`user_auto`·nudge 0 / plan-review-server 실 spawn→마커 기록+read→`user`·nudge 0. §8.1 면제(additive·advisory / release 강제 check·gate matrix·deny 무 / criteria 무변). DEC-2026-06-25-gate-review-bypass-guard.
-
 ## [0.76.0] — 2026-06-24 — MINOR — chain stage 상시 인지 (statusLine 세그먼트 + `/chain-status`)
 
 **문제 (사용자 발화)**: chain harness 진행 중 "지금 무슨 chain stage 인지" 알 방법이 사실상 없음. SSOT(`.ai-context/state.json`)는 있으나 노출이 pull-only(`chain-driver state` 직접 실행) → ambient(상시) 채널 부재.

@@ -15,6 +15,7 @@
       "type": "string",
       "enum": [
         "gate_decision",
+        "scope_confirm",
         "trio_block",
         "revisit_detect",
         "revisit_decision",
@@ -22,7 +23,8 @@
         "state_recovery",
         "skill_invoke",
         "validator_run"
-      ]
+      ],
+      "$comment_scope_confirm": "v0.77.0 (DEC-2026-06-25-discovery-2-gate) — scope_confirm = discovery 게이트①(stage 내부 soft 체크포인트 / chain-driver gate 아님)에서 사용자가 범위·충돌·질문을 확정한 기록. gate_decision(chain-driver #N stage 전환 평결)과 구분 — last_gate 오염 ❌."
     },
     "actor": {
       "type": "string",
@@ -31,7 +33,7 @@
     },
     "stage": {
       "type": "string",
-      "enum": ["analysis", "planning", "spec", "test", "implement", "revisit_pending"]
+      "enum": ["analysis", "discovery", "planning", "spec", "plan", "test", "implement", "revisit_pending"]
     },
     "decision": {
       "type": "string",
