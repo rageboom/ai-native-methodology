@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ai-native-methodology/schemas/architecture.schema.json",
   "title": "아키텍처/의존성 (Architecture)",
-  "description": "시스템의 모듈 구조, 계층, 의존성을 표현. 7대 산출물 중 #1.",
+  "description": "시스템의 모듈 구조, 계층, 의존성을 표현. 산출물 중 #1.",
   "type": "object",
   "additionalProperties": false,
   "required": ["meta", "modules", "dependencies"],

@@ -46,7 +46,7 @@
 | coverage (3 metric)                  | runner + chain-coverage               | 결정적                   | 100%                                  |
 | human_review.gate_4_intervention_pct | 사용자 명시 결단 trace                | 결정적                   | 100%                                  |
 
-**입력**: test-spec.json + behavior-spec.json + 7대 산출물.
+**입력**: test-spec.json + behavior-spec.json + 산출물.
 
 ## 4. 검증 도구
 

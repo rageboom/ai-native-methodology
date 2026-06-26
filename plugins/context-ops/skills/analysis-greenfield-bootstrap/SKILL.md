@@ -1,12 +1,12 @@
 ---
 name: analysis-greenfield-bootstrap
-description: Use when scenario=greenfield (신규 프로젝트 / legacy 코드 없음) and user provides PRD / design / contract input (swagger / figma / plan-doc / prompt). Orchestrates the input-adapter analysis pass — generates the 7대 산출물 subset via each analysis skill's greenfield code-optional mode (architecture/domain/business-rules/openapi/schema) + legacy-only 산출물 N/A (antipatterns/migration-cautions) + deterministic openapi.yaml elevation (swagger 채널). greenfield = 처음부터 AX-native (산출물 = 빌드 부산물). Stage = analysis (input). Entry point for greenfield. For legacy code, use analysis-input-collection.
+description: Use when scenario=greenfield (신규 프로젝트 / legacy 코드 없음) and user provides PRD / design / contract input (swagger / figma / plan-doc / prompt). Orchestrates the input-adapter analysis pass — generates the 산출물 subset via each analysis skill's greenfield code-optional mode (architecture/domain/business-rules/openapi/schema) + legacy-only 산출물 N/A (antipatterns/migration-cautions) + deterministic openapi.yaml elevation (swagger 채널). greenfield = 처음부터 AX-native (산출물 = 빌드 부산물). Stage = analysis (input). Entry point for greenfield. For legacy code, use analysis-input-collection.
 allowed-tools: Read, Glob, Grep, Bash, Write, Task
 ---
 
 # analysis-greenfield-bootstrap — greenfield 진입 orchestration
 
-`work-unit-manifest.scenario == "greenfield"` 일 때의 analysis stage 진입점. legacy 코드가 없으므로 **코드-고고학 패스를 생략**하고 **입력어댑터 패스**(PRD·디자인·계약 → 산출물)만 돌려 7대 산출물 subset 을 만든다. 산출물이 나오는 것 자체가 AX 운영 진입 (greenfield = 처음부터 AX-native).
+`work-unit-manifest.scenario == "greenfield"` 일 때의 analysis stage 진입점. legacy 코드가 없으므로 **리버스 엔지니어링 패스를 생략**하고 **입력어댑터 패스**(PRD·디자인·계약 → 산출물)만 돌려 산출물 subset 을 만든다. 산출물이 나오는 것 자체가 AX 운영 진입 (greenfield = 처음부터 AX-native).
 
 > **단일 책임**: greenfield 산출물 생성 흐름 조율. 입력 흡수/merge 는 `analysis-input-orchestrate` (greenfield 분기) 위임. 각 산출물 추출은 해당 analysis skill 의 **greenfield code-optional mode** 위임. 결정적 변환(openapi elevation / N-A)은 `tools/greenfield-bootstrap/src/cli.js` 위임.
 
@@ -17,7 +17,7 @@ allowed-tools: Read, Glob, Grep, Bash, Write, Task
 
 ## 절차
 
-### 1단계 — 입력어댑터 패스 (코드-고고학 skip)
+### 1단계 — 입력어댑터 패스 (리버스 엔지니어링 skip)
 
 `analysis-input-orchestrate` 의 **greenfield 분기**(5단계)를 호출 → BCDE 어댑터(`analysis-from-{prompt,swagger,plan-doc,figma}`)만 dispatch. 산출 = `.ai-context/scopes/<scope>/planning/{swagger,figma,plan-doc,prompt}-extract.json` + `input-summary.json`. legacy 전용 phase(`source-inventory` / DDL `db-schema` / `characterization` / `sql-inventory`)는 미발동.
 
@@ -49,12 +49,12 @@ swagger 채널이 없으면(figma/PRD only) — 위 N/A 산출물만 생성(`--o
 
 ## 산출물
 
-- `<user-project>/.ai-context/base/{architecture,domain,business-rules,schema}.json` + `openapi.yaml` (7대 subset)
+- `<user-project>/.ai-context/base/{architecture,domain,business-rules,schema}.json` + `openapi.yaml` (산출물 subset)
 - `<user-project>/.ai-context/base/antipatterns.json` (N/A 빈) + `migration-cautions.json` (N/A stub / json 단독)
 
 ## When NOT to invoke
 
-- legacy 코드 분석 (S1/S2/S3) → `analysis-input-collection` (코드-고고학 패스 포함).
+- legacy 코드 분석 (S1/S2/S3) → `analysis-input-collection` (리버스 엔지니어링 패스 포함).
 - scenario 미선언 → `chain-driver init --scenario greenfield` 먼저.
 - 정직 한계: 본 skill 의 AI code-optional mode 산출은 **≥2 입력 채널 dogfood 미완** (figma·PRD 2nd 채널 = carry `C-use-scenario-greenfield-dogfood-2nd-channel`). DB schema 합성(entity→table) = carry `C-use-scenario-greenfield-schema-synthesis`.
 

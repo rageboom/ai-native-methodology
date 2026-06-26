@@ -3,7 +3,7 @@
 - 상태: 승인됨 (Accepted)
 - 일자: 2026-05-01
 - 결정자: 윤주스 (TF Lead, Auto Mode 위임)
-- 관련: ADR-001 (사상적 기반), ADR-002 (7대 산출물), ADR-FE-001 (FE 추출기 가정 — 짝), ADR-FE-003 (legacy spectrum + Tier 4), ADR-FE-006 (프레임워크 중립 IR 사상 — 짝), DEC-2026-05-01-v1.4-Stage-2-Gate-결단 (G2-3)
+- 관련: ADR-001 (사상적 기반), ADR-002 (산출물), ADR-FE-001 (FE 추출기 가정 — 짝), ADR-FE-003 (legacy spectrum + Tier 4), ADR-FE-006 (프레임워크 중립 IR 사상 — 짝), DEC-2026-05-01-v1.4-Stage-2-Gate-결단 (G2-3)
 
 > **본 ADR 의 위치** — v1.4 FE 트랙의 **횡단 정책 1**. ADR-FE-001 의 §6 (Tier 4 JSP 예외 Stage 6 carry) + ADR-FE-003 의 §2.4 (Tier 4 ADR-FE-004 예외) 양쪽의 carry-over 종결.
 

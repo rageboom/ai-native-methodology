@@ -10,7 +10,7 @@
 //
 //   인자 누락(--output) → exit 2 (usage). 순수 변환 — 외부 환경 의존 0 (exit 3 무).
 //
-//   범위: 결정적·testable 부분만. domain/business-rules/architecture/schema 등 7대-subset
+//   범위: 결정적·testable 부분만. domain/business-rules/architecture/schema 등 산출물-subset
 //      AI 생성은 greenfield code-optional mode skill (별 axis / unit-test 불가 / 실 dogfood 검증).
 
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
@@ -83,7 +83,7 @@ function main() {
 		);
 	}
 
-	// 2) legacy-only 산출물 N/A (항상 — greenfield 는 코드-고고학 패스 없음).
+	// 2) legacy-only 산출물 N/A (항상 — greenfield 는 리버스 엔지니어링 패스 없음).
 	const scope =
 		opts.scope ||
 		(opts.swaggerExtract ? undefined : 'greenfield') ||

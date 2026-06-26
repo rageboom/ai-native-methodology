@@ -16,7 +16,7 @@
 | Phase              | 산출                                                                                                                            |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
 | 가상 codebase 작성 | examples/poc-14-fsim-corroboration/ — Python FastAPI 0.115 + SQLAlchemy 2.0 + Pydantic v2 + SQLite (~319 LOC / 의도된 결함 3종) |
-| chain 0 analysis   | 7대 산출물 + aspect 5종 (static-security carry-blocked / 4 FE skill non-fire / i18n+legacy stack-signal-absent)                 |
+| chain 0 analysis   | 산출물 + aspect 5종 (static-security carry-blocked / 4 FE skill non-fire / i18n+legacy stack-signal-absent)                 |
 | chain 1 planning   | planning-spec.json — **excluded_antipatterns: [AP-FSIM-SEC-001, AP-FSIM-AUTH-001]** (F-SIM-001 lane carry)                      |
 | chain 2 spec       | behavior-spec + acceptance-criteria — **AC.related_brs + related_aps** (F-SIM-002/004 propagation source)                       |
 | chain 3 test RED   | pytest 7/7 fail (Beck-canonical compile-import RED / ModuleNotFoundError) / result_hash sha256:e0608e                           |

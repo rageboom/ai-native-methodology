@@ -33,7 +33,7 @@
 
 | Stage     | ticket 생성                                       | 산출물                                                          |
 | --------- | ------------------------------------------------- | --------------------------------------------------------------- |
-| analysis  | ❌                                                | 산출물만 (BE 7대 + FE 8)                                        |
+| analysis  | ❌                                                | 산출물만 (BE·FE 산출물)                                        |
 | discovery | ❌                                                | discovery-spec (UC = 사용자 의도 / cross-cut)                   |
 | spec      | ❌                                                | behavior-spec + acceptance-criteria (BHV/AC = cross-cut anchor) |
 | **plan**  | **Epic + Story + Task + Sub-task 모두 본격 생성** | task-plan + Jira ticket cascade                                 |

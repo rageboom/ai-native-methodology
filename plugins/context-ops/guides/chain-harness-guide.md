@@ -91,7 +91,7 @@ node tools/chain-driver/src/cli.js next
 ```mermaid
 stateDiagram-v2
     [*] --> analysis: chain-driver init
-    analysis --> discovery: 7대 산출물 종결
+    analysis --> discovery: 산출물 종결
     discovery --> spec: gate #1 pass<br/>(discovery-extraction-validator<br/>+ v2.5 br-cross-consistency L1+L2)
     spec --> plan: gate #2 pass<br/>(chain-coverage-validator)
     plan --> test: gate #3 pass<br/>(plan-coverage-validator / NFR hard gate + ADR ≥3)

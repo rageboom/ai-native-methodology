@@ -31,7 +31,7 @@ duration: 약 2일 (2026-04-30 ~ 2026-05-01)
 | 4    | Phase 6 (antipatterns final)                    | `de03783`             |
 | 5    | v1.3 격상 데이터 통합 보고                      | `23c937a`             |
 
-**산출**: PoC #03 7대 산출물 6/7 (UI/UX 만 N/A) / 47 AP 누적 / 168 finding / 1 positive (F-161 Bearer 표준).
+**산출**: PoC #03 산출물 6/7 (UI/UX 만 N/A) / 47 AP 누적 / 168 finding / 1 positive (F-161 Bearer 표준).
 
 ### 2.2 본 세션 핵심 결단 — 사용자 방향 재정렬
 
@@ -96,7 +96,7 @@ duration: 약 2일 (2026-04-30 ~ 2026-05-01)
 
 ```
 INPUT:  legacy 코드베이스
-OUTPUT: 7대 산출물 + finding + antipatterns + migration-cautions
+OUTPUT: 산출물 + finding + antipatterns + migration-cautions
 USE:    사람이 신규 시스템 구축 시 → 입력 자료 + 회피 가이드
 ```
 

@@ -51,7 +51,7 @@ output/legacy-spectrum/
 
 | Tier                       | 추출 산출물           | LLM 의존 | bootstrap 패턴                                    |
 | -------------------------- | --------------------- | -------- | ------------------------------------------------- |
-| **1 Modern SPA**           | 7대 7/7               | 낮음     | window.**INITIAL_STATE** / SSR hydration          |
+| **1 Modern SPA**           | 산출물 7/7               | 낮음     | window.**INITIAL_STATE** / SSR hydration          |
 | **2 jQuery legacy**        | 5/7                   | 중       | data-\* attribute / AJAX on $(document).ready     |
 | **3 Vanilla JS**           | 4/7                   | 높음     | DOM 직접 / fetch on load                          |
 | **4 server-side template** | 3/7 + BE/FE 분리 예외 | 높음     | JSP request attribute / Thymeleaf model attribute |

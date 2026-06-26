@@ -30,13 +30,13 @@
 | property_tests stub                              | LLM + framework_status                              | LLM with grounding       | 75%    |
 | acceptance_criteria_refs                         | chain 2 forward link                                | chain-coverage-validator | 100%   |
 
-**입력**: discovery-spec.json + analysis stage 1~16 산출물 ("현 7대 + 신규 추가" 사용자 답변 3 정합 / cross_links.to_analysis_artifacts 의무).
+**입력**: discovery-spec.json + analysis stage 1~16 산출물 ("기존 산출물 + 신규 추가" 사용자 답변 3 정합 / cross_links.to_analysis_artifacts 의무).
 
 ## 4. 검증 도구
 
 | 도구                                      | 검증                                     |
 | ----------------------------------------- | ---------------------------------------- |
-| **chain-coverage-validator** (sub-plan-3) | UC→BHV 1:N + BHV→AC 1:N + 7대 cross-link |
+| **chain-coverage-validator** (sub-plan-3) | UC→BHV 1:N + BHV→AC 1:N + 산출물 cross-link |
 | drift-validator (chain 모드 확장)         | state-machine + sequence drift           |
 | decision-table-validator                  | DMN 5-check                              |
 | formal-spec-link-validator (chain 모드)   | planning ↔ behavior cross-link           |

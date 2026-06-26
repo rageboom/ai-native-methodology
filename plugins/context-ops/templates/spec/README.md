@@ -22,7 +22,7 @@ BE/FE contract 강제 양 axis:
 
 - [`../../skills/spec-compose-behavior-spec/`](../../skills/spec-compose-behavior-spec/) — chain 2 진입 skill
 - [`../../skills/spec-derive-acceptance-criteria/`](../../skills/spec-derive-acceptance-criteria/) — Gherkin AC 추출 skill
-- [`../../skills/spec-integrate-deliverables/`](../../skills/spec-integrate-deliverables/) — 7대 산출물 통합 skill
+- [`../../skills/spec-integrate-deliverables/`](../../skills/spec-integrate-deliverables/) — 산출물 통합 skill
 - [`../../methodology-spec/deliverables/18-behavior-spec.md`](../../methodology-spec/deliverables/18-behavior-spec.md)
 - [`../../methodology-spec/deliverables/19-acceptance-criteria.md`](../../methodology-spec/deliverables/19-acceptance-criteria.md)
 - [`../../schemas/behavior-spec.schema.json`](../../schemas/behavior-spec.schema.json)

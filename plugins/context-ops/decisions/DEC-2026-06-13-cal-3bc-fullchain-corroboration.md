@@ -9,7 +9,7 @@
 
 ## 1. 배경
 
-ep-be-gea 예약(resve) 메뉴그룹 완주 후, **미분석 잔여 그룹 중 cal(총무정산)** 을 새 워크트리(`ep-be-gea-cal` / `feat/cal-domains-analysis` / base=context-ops-test)에서 시행. **resve 와 결정적 차이 = analysis(chain0)가 미존재** → resve 는 chain1 부터였으나 cal 은 **코드-고고학 analysis(7대 산출물 일부 + shared 카탈로그 append) 부터 fresh** 시행 후 chains 1~5. 목적 = (a) AX 운영 컨텍스트 모듈 완성, (b) **analysis-stage 포함 풀파이프라인의 추가 BC 일반화(§8.1)** 검증, (c) 방법론 본체 개선 후보 수집·평가.
+ep-be-gea 예약(resve) 메뉴그룹 완주 후, **미분석 잔여 그룹 중 cal(총무정산)** 을 새 워크트리(`ep-be-gea-cal` / `feat/cal-domains-analysis` / base=context-ops-test)에서 시행. **resve 와 결정적 차이 = analysis(chain0)가 미존재** → resve 는 chain1 부터였으나 cal 은 **리버스 엔지니어링 analysis(산출물 일부 + shared 카탈로그 append) 부터 fresh** 시행 후 chains 1~5. 목적 = (a) AX 운영 컨텍스트 모듈 완성, (b) **analysis-stage 포함 풀파이프라인의 추가 BC 일반화(§8.1)** 검증, (c) 방법론 본체 개선 후보 수집·평가.
 
 BC 분할 = 소스 패키지(정산 메뉴그룹 하위 3 서브도메인) + 캠페인 선례(sub-menu=BC) → 3 BC. taxi 는 own BC(고유 FIP 연동 API 경로 + 유비쿼터스 언어)이나 **corpt 정산 테이블 직접 write + biztrip/wlfr read = cross-cutting 결합**을 caution/AP 로 명시(폴딩 ❌).
 
@@ -35,7 +35,7 @@ BC 분할 = 소스 패키지(정산 메뉴그룹 하위 3 서브도메인) + 캠
 ## 4. 방법론 finding
 
 ### F1 — §8.1 corroboration (PRIMARY / analysis-stage 포함 fresh)
-v0.42.x 본체(append-catalog 다중-BC writer / 결정론 검증기 / chain-driver)가 **cal 3 BC 에서 새 본체 결함 0**으로 견딤. **resve 와 달리 analysis(chain0)부터 fresh** 시행 → 코드-고고학 + 카탈로그 append + analysis exit-gate#0 까지 일반화 확인. 누적 datapoint = event/golf/mtrm/healing/helium/hlum/**cal-salary/corpt/taxi** = **9 BC**. 골프 단일 PoC 과적합 아님 강하게 재입증.
+v0.42.x 본체(append-catalog 다중-BC writer / 결정론 검증기 / chain-driver)가 **cal 3 BC 에서 새 본체 결함 0**으로 견딤. **resve 와 달리 analysis(chain0)부터 fresh** 시행 → 리버스 엔지니어링 + 카탈로그 append + analysis exit-gate#0 까지 일반화 확인. 누적 datapoint = event/golf/mtrm/healing/helium/hlum/**cal-salary/corpt/taxi** = **9 BC**. 골프 단일 PoC 과적합 아님 강하게 재입증.
 
 ### F2 — body-candidate 7건 평가 → **본체 코드 수정 0건 확정** (액면수용 금지 / 실측 검증)
 sub-agent narrative 의 본체 후보를 `feedback_self_recorded_fact_validation` + `feedback_diagnose_before_design_check_existing` 에 따라 실측 검증:

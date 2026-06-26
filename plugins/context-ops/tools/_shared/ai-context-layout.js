@@ -77,7 +77,7 @@ export function baseFileForRead(root, ...parts) {
 	);
 }
 
-// analysis 산출물(7대 deliverable) canonical 파일명 — analysisOutputPresent probe 의 검사 대상.
+// analysis 산출물 canonical 파일명 — analysisOutputPresent probe 의 검사 대상.
 //   chain 산출물(discovery-spec 등)·input.json 은 제외: input.json=analysis "시작"(started≠done) 신호이고
 //   greenfield 는 input.json 부재 / chain 산출물은 analysis 가 아닌 하위 stage.
 export const ANALYSIS_ARTIFACT_FILENAMES = Object.freeze([

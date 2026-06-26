@@ -9,7 +9,7 @@
 
 ## 컨텍스트
 
-v7.1.0 plugin-authoring-spec 감사가 S3 위반 1건 ❌ high 식별 — skill `spec-integrate-7대-deliverables` 의 "7대"(한글)가 공식 charset `[a-z0-9-]` 위반. 당시 결단 = §8-1 backlog 이연 (command-surface rename = MAJOR / 별도 user-gated session). 사용자가 "바꿀게 뭐가 있나" 표 요청 후 **"1 바꾸자"** 결단 → §8-1 본격 시행.
+v7.1.0 plugin-authoring-spec 감사가 S3 위반 1건 ❌ high 식별 — skill `spec-integrate-deliverables` 의 "7대"(한글)가 공식 charset `[a-z0-9-]` 위반. 당시 결단 = §8-1 backlog 이연 (command-surface rename = MAJOR / 별도 user-gated session). 사용자가 "바꿀게 뭐가 있나" 표 요청 후 **"1 바꾸자"** 결단 → §8-1 본격 시행.
 
 ## 결정
 
@@ -24,11 +24,11 @@ v7.1.0 plugin-authoring-spec 감사가 S3 위반 1건 ❌ high 식별 — skill 
 
 ### §2. 시행 (실측 19 occ / 13 files)
 
-- **git mv** `skills/spec-integrate-7대-deliverables` → `skills/spec-integrate-deliverables` (history-preserving / R)
+- **git mv** `skills/spec-integrate-deliverables` → `skills/spec-integrate-deliverables` (history-preserving / R)
 - **활성 코드 5** (literal 치환): SKILL.md `name:`+H1 / `agents/spec-agent.md` ×3(skills[]·table·절차) / `flows/spec.phase-flow.json` skills[] / `flows/spec.phase-flow.mermaid` 라벨 literal
 - **활성 문서 7** (literal 치환): `methodology-spec/skills-axis.md` · `lifecycle-contract.md` · `guides/getting-started.md` · `guides/first-prompt-cookbook.md`(link+path) · `README.md` ×2
 - **content-aware** (Senior 교정): `plugin-authoring-spec.md` §7 row ❌→✅ resolved + §8-1 ~~strike~~ 종결 + 결론 갱신 / ADR-PLUGIN-001 §7 patch v1 append (§2.5 line 57 literal 보존)
-- **보존 무수정** (역사 / LL-i-52): `DEC-2026-05-17-plugin-authoring-spec.md` (audit-time 기록) / CHANGELOG 구 entry / phase-id `cross-link-7-deliverables` + node-id `P_cross_link_7_deliverables` (skill 식별자 아님) + generic "7대 산출물" 도메인 산문 (SKILL.md 본문·templates·spec-compose / LL-i-55 trap 회피)
+- **보존 무수정** (역사 / LL-i-52): `DEC-2026-05-17-plugin-authoring-spec.md` (audit-time 기록) / CHANGELOG 구 entry / phase-id `cross-link-7-deliverables` + node-id `P_cross_link_7_deliverables` (skill 식별자 아님) + generic "산출물" 도메인 산문 (SKILL.md 본문·templates·spec-compose / LL-i-55 trap 회피)
 - **버전 trio** 8.0.0 (plugin.json + package.json + CHANGELOG `[8.0.0]`) + CLAUDE.md sync (현재 release + `plugin.json v8.0.0` check#10 토큰)
 
 ### §3. STOP-3 hard gate ( v7.0.0 LL-i-55·57 paradigm — research 수렴만으로 착수 ❌ / 실측 hard gate)
@@ -59,5 +59,5 @@ v7.1.0 plugin-authoring-spec 감사가 S3 위반 1건 ❌ high 식별 — skill 
 
 - 사용자 결단 (session 26차 후속 / "1 바꾸자" + "spec-integrate-deliverables (Senior 추천)" / 2026-05-17)
 - Senior critique (`_base-senior-engineer`) GO+REVISE conf 0.88 (새 name + 분류 교정 3 + drift-validator ordering + STOP-3 design + v8.0.0 비협상 + cooling-off GO)
-- 실측 — `spec-integrate-7대-deliverables` 19 occ / 13 files grep + git mv R
+- 실측 — `spec-integrate-deliverables` 19 occ / 13 files grep + git mv R
 - 선례 — DEC-2026-05-17-q7-rules-json-rename (v7.0.0 STOP-3 paradigm / LL-i-55·57) / v2.6.0 §8.3 무의미 토큰 제거 (skills-axis.md)

@@ -1,6 +1,6 @@
 # PRD — Money Allocation (통화 분할)
 
-> greenfield 입력(코드 없음 / 기획문서). use-scenario = **greenfield**. 코드-고고학 N/A.
+> greenfield 입력(코드 없음 / 기획문서). use-scenario = **greenfield**. 리버스 엔지니어링 N/A.
 > 본 PRD 가 chain 의 spec source — 여기서 formal-spec.invariants 를 설계하고, 코드는 implement 단계 전까지 **존재하지 않는다**(designed_from_spec).
 
 ## 배경

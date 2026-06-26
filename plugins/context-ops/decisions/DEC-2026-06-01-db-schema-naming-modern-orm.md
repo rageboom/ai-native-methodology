@@ -4,7 +4,7 @@
 
 ## 맥락 (session 64차)
 
-"세션시작 이어서" → STATUS 다음 의제 ②(≥2번째 distinct 도메인) → AskUserQuestion **"② 전체 baseline"**. 대상 = `alvaromrveiga/ecommerce-backend` (NestJS 8 + Prisma 3.14 + PostgreSQL / Type 1.5 operator dogfood). full dogfood (analysis 7대 산출물 + chain 1~5 + dep-graph) 수행 중 **F-ECOM-001** 표면화.
+"세션시작 이어서" → STATUS 다음 의제 ②(≥2번째 distinct 도메인) → AskUserQuestion **"② 전체 baseline"**. 대상 = `alvaromrveiga/ecommerce-backend` (NestJS 8 + Prisma 3.14 + PostgreSQL / Type 1.5 operator dogfood). full dogfood (analysis 산출물 + chain 1~5 + dep-graph) 수행 중 **F-ECOM-001** 표면화.
 
 ## 문제 (F-ECOM-001 / HIGH)
 

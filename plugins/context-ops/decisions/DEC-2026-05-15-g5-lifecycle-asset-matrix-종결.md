@@ -26,9 +26,9 @@ charter §3 G5 (R12 lifecycle stage↔asset 매핑표 부재) 종결.
 | Stage / Cross-cut      | 본질                                                                    |
 | ---------------------- | ----------------------------------------------------------------------- |
 | input (analysis 진입)  | BCDE 입력 흡수 + orchestrator dispatch                                  |
-| analysis (chain 1 sub) | 22 skill (chain 0 sub) — 7대 + 8 FE + aspect + br-cross + html-template |
+| analysis (chain 1 sub) | 22 skill (chain 0 sub) — BE·FE 산출물 + aspect + br-cross + html-template |
 | planning (chain 1)     | UC / BR-INTENT 추출 + planning-spec                                     |
-| spec (chain 2)         | behavior + AC + 7대 통합                                                |
+| spec (chain 2)         | behavior + AC + 산출물 통합                                                |
 | test (chain 3)         | RED test 코드 + 5종 물증                                                |
 | implement (chain 4)    | GREEN impl 코드 + 100% pass                                             |
 | cross-cut traceability | UC→BHV→AC→TC→IMPL forward+backward link                                 |

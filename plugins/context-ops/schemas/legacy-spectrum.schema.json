@@ -178,7 +178,7 @@
         "primary_tier": {"type": "string"},
         "extraction_completeness": {
           "type": "object",
-          "description": "Tier 별 7대 산출물 추출 매트릭스 (ADR-FE-001 §3.1 정합).",
+          "description": "Tier 별 산출물 추출 매트릭스 (ADR-FE-001 §3.1 정합).",
           "properties": {
             "ui_spec": {"type": "boolean"},
             "state_map": {"type": "boolean"},

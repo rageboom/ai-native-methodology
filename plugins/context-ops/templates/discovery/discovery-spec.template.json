@@ -6,7 +6,7 @@
     "methodology_version": "v11.0.0",
     "inputs_used": ["source_code", "planning_docs"],
     "confidence": 0.85,
-    "$comment": "confidence = bare number (schema: number / 0.0~0.98 cap). 근거: analysis stage 7대 산출물 source-grounded coverage + 사용자 검토 1회."
+    "$comment": "confidence = bare number (schema: number / 0.0~0.98 cap). 근거: analysis stage 산출물 source-grounded coverage + 사용자 검토 1회."
   },
   "derivation_source": {
     "type": "legacy-extraction",

@@ -126,7 +126,7 @@ export function validateChainCoverage(
 			kind: 'chain.behavior.cross_links_empty',
 			severity: 'medium',
 			message:
-				'behavior-spec.cross_links.to_analysis_artifacts is empty (사용자 답변 3 정합 위배 — 7대 산출물 reference 의무)',
+				'behavior-spec.cross_links.to_analysis_artifacts is empty (사용자 답변 3 정합 위배 — 산출물 reference 의무)',
 		});
 	}
 

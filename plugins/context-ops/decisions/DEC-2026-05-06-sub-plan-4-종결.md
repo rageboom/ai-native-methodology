@@ -20,7 +20,7 @@ sub-plan-4 종결. 10 항목 모두 통과.
 | ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------------- |
 | `skills/_base/`                                         | build-traceability-matrix / invoke-go-stop-gate ( +2)                                                 | —                                            |
 | `skills/planning/`                                      | extract-from-legacy / decompose-use-cases / identify-business-intent ( +3)                            | README placeholder 보존                      |
-| `skills/spec/`                                          | compose-behavior-spec / derive-acceptance-criteria / integrate-7대-deliverables ( +3 / 신규 디렉토리) | —                                            |
+| `skills/spec/`                                          | compose-behavior-spec / derive-acceptance-criteria / integrate-deliverables ( +3 / 신규 디렉토리) | —                                            |
 | `skills/test/`                                          | generate-test-spec / run-test-evidence / verify-coverage ( +3)                                        | README placeholder 보존                      |
 | `skills/implement/`                                     | generate-impl-spec / verify-test-pass ( +2)                                                           | README placeholder 보존                      |
 | `agents/{planning,spec,test,implement}/README.md`       | —                                                                                                     | placeholder 마커 → "sub-plan-4 채움 ✅" 갱신 |

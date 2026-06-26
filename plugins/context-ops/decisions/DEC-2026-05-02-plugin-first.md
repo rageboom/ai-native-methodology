@@ -18,7 +18,7 @@
 | 4차      | 축 1 (사내 인프라) + 축 2 (현재 프로젝트) 분리 / GHE 풀어쓰기                    | "어떤 것 필요 vs 현재 프로젝트 문제 구분"                                               |
 | 5차      | Phase × Track 분기 (BE/FE/DB) + description 자동 발동                            | "FE/BE/DB 따른 구분 자연스러운가?"                                                      |
 | **6차**  | **본체 = plugin source / adoption/dist = artifact (sync 부담 0)**                | "분리, sync 를 왜 해야 하나?"                                                           |
-| **7차**  | **Track 별 plugin 분리 거절 / 단일 plugin 확정**                                 | "plugin 을 나누는게 좋은건가?" — 7대 산출물 통합 가치 / 풀스택 부자연                   |
+| **7차**  | **Track 별 plugin 분리 거절 / 단일 plugin 확정**                                 | "plugin 을 나누는게 좋은건가?" — 산출물 통합 가치 / 풀스택 부자연                   |
 | **8차**  | **lifecycle stage organize (`_base/` + `analysis/` 채움 + 4 stage placeholder)** | 미래 lifecycle 확장 비전 보존 (기획→분석→설계→테스트→구현)                              |
 | 9차      | Runtime G1~G6 gap 식별                                                           | stage 별 자동 동작 보장 메커니즘                                                        |
 | 10차     | 옵션 4 (G1~G6 v2.0 carry)                                                        | (11차로 부분 수정)                                                                      |

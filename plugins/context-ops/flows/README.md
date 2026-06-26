@@ -11,7 +11,7 @@
 ## Chain stage 5종 (v9.0 6-stage)
 
 - `discovery.phase-flow.json` — chain 1 / discovery-spec 추출 (discovery stage / 입력 어댑터 4종)
-- `spec.phase-flow.json` — chain 2 / behavior + acceptance + 7대 통합
+- `spec.phase-flow.json` — chain 2 / behavior + acceptance + 산출물 통합
 - `plan.phase-flow.json` — chain 3 / task-plan (task 분해 / ADR / NFR / risk — gate #3)
 - `test.phase-flow.json` — chain 4 / test-spec + 실 test code (RED)
 - `implement.phase-flow.json` — chain 5 / impl-spec + 실 impl code (GREEN)
@@ -19,7 +19,7 @@
 ## Cross-cutting (analysis stage / chain 1 진입 전)
 
 - `analysis.phase-flow.json` — analysis stage phase 흐름 (input → discovery → db-schema → architecture → business-logic → formal-spec → characterization → sql-inventory → api → ui → quality)
-  - **chain 1 (discovery) 의 INPUT 으로 사용** — legacy 코드 → 7대 산출물 한 방향 추출
+  - **chain 1 (discovery) 의 INPUT 으로 사용** — legacy 코드 → 산출물 한 방향 추출
   - analysis stage 자산을 chain 1 진입 전 단계로 흡수
 
 ## Canonical artifact registry

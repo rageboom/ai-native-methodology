@@ -7,7 +7,7 @@ chain 1 (discovery / analysis output + swagger/figma/nl-md 어댑터 → discove
 | file                                                             | role                                                                                                                                                               |
 | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | [`discovery-spec.template.json`](./discovery-spec.template.json) | discovery-spec.json placeholder (UC + BR-INTENT + business_intent + cross_links + decisions) — json 단독 SSOT                                                     |
-| [`planning-doc-format.md`](./planning-doc-format.md)             | **기획서 입력 형식 design notes** / 6 component (decision table, entity, use case, flow, NFR, 회피) → 7대 산출물 빈칸 매핑 / 미래 기획서 템플릿 툴 요구사항 source |
+| [`planning-doc-format.md`](./planning-doc-format.md)             | **기획서 입력 형식 design notes** / 6 component (decision table, entity, use case, flow, NFR, 회피) → 산출물 빈칸 매핑 / 미래 기획서 템플릿 툴 요구사항 source |
 
 ## 향후 채움 후보
 

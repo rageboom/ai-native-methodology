@@ -29,7 +29,7 @@ executable behavioral contract 추출 전문. 4 spec skill + 4 base utility = 8 
 | `spec-compose-behavior-spec`      | chain 2 진입 / behavior-spec 본격 작성          | behavior-spec.json (BHV-\* + state machine + sequence + invariant + property test) |
 | `spec-derive-acceptance-criteria` | behavior-spec 채움 후 sub                       | acceptance-criteria.json (AC-\* Gherkin Given/When/Then + MoSCoW)                  |
 | `spec-derive-unit-spec`           | behavior-spec 채움 후 sub (S2 / code-graph∩domain) | unit-spec.json (UNIT-\* / characterized_from_code / mocking-soundness backbone)    |
-| `spec-integrate-deliverables`     | cross_links.to_analysis_artifacts backward link | 7대 + 8 FE 산출물 모두 ref 등재                                                    |
+| `spec-integrate-deliverables`     | cross_links.to_analysis_artifacts backward link | 산출물 모두 ref 등재                                                    |
 | `_base-apply-template`            | 진입 시 behavior-spec.json 골조                 | template 자동 적용                                                                 |
 | `_base-build-traceability-matrix` | UC → BHV → AC forward link 갱신                 | matrix.json (갱신)                                                                 |
 | `_base-log-finding`               | 발견 사항 즉시 기록                             | findings.md                                                                        |
@@ -64,7 +64,7 @@ chain 0 / 1 / 3~5 skill ❌ — 각 stage agent 권한.
    - 격리 순수 단위 0 BC = 파일 미생성 (behavior-only 정상 / busywork ❌)
 
 5. **spec-integrate-deliverables skill 호출** — cross_links 채움:
-   - 7대 BE + 8 FE 산출물 모두 ref 등재
+   - BE + 8 FE 산출물 모두 ref 등재
    - chain-coverage-validator 자동 검증 통과 의무
 
 6. **gate #2 진입 — `_base-invoke-go-stop-gate` skill 호출**:

@@ -1,6 +1,6 @@
 # DEC-2026-05-30-use-scenario-greenfield-bootstrap-slice2
 
-**결단**: `C-use-scenario-taxonomy-impl` carry 의 **Slice 2 시행** — greenfield(신규 / legacy 코드 없음)가 7대 산출물을 실제로 생성해 chain 에 진입하게 만든다 (사용자 1차 want). 옵션 A(DEC-2026-05-30-use-scenario-taxonomy §2.4) = 기존 `analysis-from-*` 재사용 + "analysis 는 코드가 아니라 입력을 요구" 재프레이밍. **결정적 anchor(elevation/N-A 도구 + 29 test) + 5 skill greenfield-mode + 신규 진입 skill + 1 실 swagger dogfood**. v11.10.0 MINOR.
+**결단**: `C-use-scenario-taxonomy-impl` carry 의 **Slice 2 시행** — greenfield(신규 / legacy 코드 없음)가 산출물을 실제로 생성해 chain 에 진입하게 만든다 (사용자 1차 want). 옵션 A(DEC-2026-05-30-use-scenario-taxonomy §2.4) = 기존 `analysis-from-*` 재사용 + "analysis 는 코드가 아니라 입력을 요구" 재프레이밍. **결정적 anchor(elevation/N-A 도구 + 29 test) + 5 skill greenfield-mode + 신규 진입 skill + 1 실 swagger dogfood**. v11.10.0 MINOR.
 
 **작성일**: 2026-05-30 (새 session — `/clear` 후 "greenfield bootstrap Slice 2 이어서 진행").
 
@@ -15,9 +15,9 @@
 
 ## 1. 배경
 
-Slice 1(v11.9.0)은 시나리오 선언 plumbing + scenario-aware gate 로 F-DOGFOOD-007 을 구조 해소했다. 그러나 greenfield 사용자 1차 want — "신규도 산출물이 나와야 chain 으로 개발·운영" — 은 미해결 (gap B: discovery 어댑터는 discovery-spec 만 생성 / 7대 산출물 미생성 / spec stage 가 7대 hard-depend → greenfield 진입 막힘). 본 Slice 2 가 그 산출물 생성 경로를 구현.
+Slice 1(v11.9.0)은 시나리오 선언 plumbing + scenario-aware gate 로 F-DOGFOOD-007 을 구조 해소했다. 그러나 greenfield 사용자 1차 want — "신규도 산출물이 나와야 chain 으로 개발·운영" — 은 미해결 (gap B: discovery 어댑터는 discovery-spec 만 생성 / 산출물 미생성 / spec stage 가 산출물 hard-depend → greenfield 진입 막힘). 본 Slice 2 가 그 산출물 생성 경로를 구현.
 
-** 이 슬라이스의 질적 차이 (정직)**: 7대 중 5종(architecture/domain/business-rules/openapi/schema)은 AI phase skill 이 _코드를 읽어_ 생성 → greenfield(코드 없음)는 이를 **code-optional mode(입력어댑터 extract 를 읽음)** 로 재배선 = **skill-instruction 주도** (unit-test 불가 / 실 dogfood 로만 검증). 결정적·testable 부분은 **openapi elevation + N-A 산출물** 뿐.
+** 이 슬라이스의 질적 차이 (정직)**: 산출물 중 5종(architecture/domain/business-rules/openapi/schema)은 AI phase skill 이 _코드를 읽어_ 생성 → greenfield(코드 없음)는 이를 **code-optional mode(입력어댑터 extract 를 읽음)** 로 재배선 = **skill-instruction 주도** (unit-test 불가 / 실 dogfood 로만 검증). 결정적·testable 부분은 **openapi elevation + N-A 산출물** 뿐.
 
 ## 2. 시행 (additive / breaking 0)
 
@@ -26,9 +26,9 @@ Slice 1(v11.9.0)은 시나리오 선언 plumbing + scenario-aware gate 로 F-DOG
 | `tools/greenfield-bootstrap/` (신규 / 24번째 / zero-dep)   | ① `src/yaml-emit.js` zero-dep block-YAML emitter (12 test) ② `src/elevate.js` swagger-extract→OpenAPI 3.x 결정적 승격 (14 test / AI 추론 0) ③ `src/na-artifacts.js` legacy-only 산출물 N/A (5 test) ④ `src/cli.js` (`--output [--swagger-extract] [--scope] [--channel]`). **29 test** (§8.1 ≥2 swagger fixture = minimal + RealWorld). root `package.json` workspaces 등록. |
 | `schemas` 영향                                             | 없음 (기존 schema 그대로 / N-A 산출물은 `antipatterns.schema.json` strict 정합 — `na_reason` 을 **`meta`(additionalProperties:true) 안 embed** / top-level additionalProperties:false 회피).                                                                                                                                                                                 |
 | 5 analysis skill                                           | `analysis-{architecture,domain-model,business-rules,db-schema-erd,openapi}` 에 " greenfield (code-optional) mode" 절 추가 (scenario=greenfield 시 입력어댑터 extract 에서 산출 / `source_grounded_evidence`=입력 출처 인용 / `code_pointers`=N/A).                                                                                                                           |
-| `analysis-greenfield-bootstrap` (신규 skill / 57번째)      | greenfield 진입점 — 입력어댑터 패스(코드-고고학 skip) → 결정적 산출(elevation/N-A) → AI 5종 code-optional 산출 → 검증 조율. `flows/analysis.phase-flow.json` input phase 등록 (drift-validator orphan 0).                                                                                                                                                                    |
+| `analysis-greenfield-bootstrap` (신규 skill / 57번째)      | greenfield 진입점 — 입력어댑터 패스(리버스 엔지니어링 skip) → 결정적 산출(elevation/N-A) → AI 5종 code-optional 산출 → 검증 조율. `flows/analysis.phase-flow.json` input phase 등록 (drift-validator orphan 0).                                                                                                                                                                    |
 | `analysis-input-orchestrate` / `analysis-input-collection` | greenfield 분기(5단계) + greenfield redirect note.                                                                                                                                                                                                                                                                                                                           |
-| doc                                                        | `lifecycle-contract.md` (analysis = 코드-고고학[legacy] + 입력어댑터[greenfield] 두 패스 / asset matrix input row) + `use-scenario-taxonomy.md` §3.2 + §5 carry 갱신.                                                                                                                                                                                                        |
+| doc                                                        | `lifecycle-contract.md` (analysis = 리버스 엔지니어링[legacy] + 입력어댑터[greenfield] 두 패스 / asset matrix input row) + `use-scenario-taxonomy.md` §3.2 + §5 carry 갱신.                                                                                                                                                                                                        |
 
 ### 2.1 elevation = 왜 결정적인가
 
@@ -79,4 +79,4 @@ plan 의 `{antipatterns:[], code_pointers_na:true}` 는 `antipatterns.schema.jso
 
 ## 7. 한 줄 결론
 
-> greenfield 도 입력어댑터 analysis(옵션 A)로 7대 산출물을 만들어 chain 진입 = 처음부터 AX-native. 결정적 anchor(swagger-extract→openapi.yaml elevation + N-A / 29 test + RealWorld dogfood valid:true) + 5 skill greenfield-mode + 신규 진입 skill. swagger 1채널 입증 / 2nd 채널 carry. v11.10.0 MINOR / 847 test / 22/22.
+> greenfield 도 입력어댑터 analysis(옵션 A)로 산출물을 만들어 chain 진입 = 처음부터 AX-native. 결정적 anchor(swagger-extract→openapi.yaml elevation + N-A / 29 test + RealWorld dogfood valid:true) + 5 skill greenfield-mode + 신규 진입 skill. swagger 1채널 입증 / 2nd 채널 carry. v11.10.0 MINOR / 847 test / 22/22.

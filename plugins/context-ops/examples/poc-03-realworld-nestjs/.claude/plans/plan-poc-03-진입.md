@@ -17,7 +17,7 @@
 
 ```
 INPUT:  legacy 코드베이스 (분석 대상 — 언어/stack 무관)
-OUTPUT: 7대 산출물 + finding + antipatterns + migration-cautions
+OUTPUT: 산출물 + finding + antipatterns + migration-cautions
 USE:    사람이 신규 시스템 구축 시 입력 자료 / 회피 가이드
 ```
 

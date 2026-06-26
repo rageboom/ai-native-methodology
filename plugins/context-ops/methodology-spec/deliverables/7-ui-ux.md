@@ -62,7 +62,7 @@ output/ui/
 
 | Tier                          | enum 값                                                                                | 비고                                   |
 | ----------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------- |
-| Tier 1 (Modern SPA)           | `react`, `vue`, `angular`, `svelte`, `solid`, `qwik`, `astro`, `next`, `nuxt`, `remix` | 7대 산출물 7/7 추출 가능               |
+| Tier 1 (Modern SPA)           | `react`, `vue`, `angular`, `svelte`, `solid`, `qwik`, `astro`, `next`, `nuxt`, `remix` | 산출물 7/7 추출 가능               |
 | Tier 2 (jQuery legacy)        | `jquery_legacy`                                                                        | 5/7 (state-map / visual-manifest 부분) |
 | Tier 3 (Vanilla JS)           | `vanilla_js`                                                                           | 4/7 (LLM 추론 의존도 ↑)                |
 | Tier 4 (server-side template) | `jsp_template`                                                                         | 3/7 + BE/FE 분리 예외                  |

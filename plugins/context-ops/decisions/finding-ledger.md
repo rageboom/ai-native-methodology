@@ -31,15 +31,15 @@
 >
 > scope 확대 사실: F-PA-002 sweep 이 XV 시점(13 skill + formal-spec.md)보다 넓은 **5 workflow SSOT doc**(business-logic/characterization/formal-spec/quality/sql-inventory) 포함 — drift 가 SSOT 근원에 잔존하던 것 동반 해소.
 
-### F-PA-001: spec-compose-behavior-spec 가 v8.0.0 rename 전 skill명 `integrate-7대-deliverables` 호출
+### F-PA-001: spec-compose-behavior-spec 가 v8.0.0 rename 전 skill명 `integrate-deliverables` 호출
 
 - **Phase:** cross-validation
 - **Confidence:** verified (XV 독립 재read)
 - **Type:** anti-pattern
-- **Description:** `skills/spec-compose-behavior-spec/SKILL.md:53` step 5 가 "integrate-7대-deliverables skill 호출"로 지시. v8.0.0 에서 `spec-integrate-deliverables` 로 rename(한글→kebab)되어 pre-rename 디렉토리 부재. chain 2 sub-skill dispatch 가 dead reference.
+- **Description:** `skills/spec-compose-behavior-spec/SKILL.md:53` step 5 가 "integrate-deliverables skill 호출"로 지시. v8.0.0 에서 `spec-integrate-deliverables` 로 rename(한글→kebab)되어 pre-rename 디렉토리 부재. chain 2 sub-skill dispatch 가 dead reference.
 - **Evidence:**
   - `skills/spec-compose-behavior-spec/SKILL.md:53`
-  - `skills/spec-integrate-7대-deliverables/` 부재 / `skills/spec-integrate-deliverables/` 존재 (XV Q3)
+  - `skills/spec-integrate-deliverables/` 부재 / `skills/spec-integrate-deliverables/` 존재 (XV Q3)
 - **Action:** step 5 skill명을 `spec-integrate-deliverables` 로 정정 (corrective / dispatch 깨짐 = 우선)
 - **Status:** resolved (수정 cycle 2026-05-17 — 상단 F-PA 처분표 SSOT)
 

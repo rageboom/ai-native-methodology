@@ -10,6 +10,14 @@
 
 ---
 
+## [0.85.1] — 2026-06-29 — PATCH — 용어 정리 ("7대 산출물"→"산출물" / "코드 고고학"→"리버스 엔지니어링")
+
+**문제**: "7대 산출물"은 산출물이 7개뿐인 듯한 오해를 준다 — 실제 산출물은 inventory/architecture/domain/business-rules/openapi/schema+ERD/antipatterns/migration-cautions + FE(state-map/visual-manifest/a11y/i18n/type-spec/form-validation) + recovered-adr/run-manifest/code-graph/sql-inventory/error-mapping/legacy-spectrum/characterization 등으로 훨씬 많고 스택·영역별로 가변. "코드 고고학"은 비유적 표현 — 분석 시점의 실제 행위는 **리버스 엔지니어링**.
+
+**조치**: `7대 산출물`류(복합형 `현 7대 + 신규 추가`·`7대 통합`·`BE 7대 + FE 8`·`(7대 / …)`·`7대 7/7`·`7대-deliverables` 앵커·`7대-subset` 포함) → `산출물` 계열 **290곳 + 코드(주석/생성문서/finding 메시지) 3파일** / `코드-고고학` → `리버스 엔지니어링` 전부(잔여 0) / `ADR-002-7대-산출물.md` → `ADR-002-산출물.md`(git mv / 제목 "산출물 정의") / 카탈로그 재생성(`marketplace.json` "7대" 0). 용어를 *회고·인용*하는 메타 텍스트 **22곳은 의도적 보존**(치환 시 기록 자가당착 — 용어 폐기 결정 기록 / 존재하지 않는 id `chain.7대.unreferenced` 인용 / `7대 영역`=다른 뜻).
+
+**동작 무변** — prose/주석/메시지 텍스트 only(결정적 gate=schema/validator/coverage/ID 는 "7대" 문구 미사용). 검증: 변경 JSON 전수 파싱 OK / JS `node --check` OK / 테스트 옛 문자열 assert 없음. 근거 = `decisions/DEC-2026-06-26-terminology-deprecate.md`(ADR-002 amend). v0.85.0(analysis-state-aware 라우터) 위로 rebase 재bump(원 0.84.1 / main 선행 충돌 해소). MIS-434 [OP-NAMING-001].
+
 ## [0.85.0] — 2026-06-26 — MINOR — analysis-state-aware 진입 라우터 (분석 미완 시 discovery 전 analysis 먼저)
 
 **문제 (사용자 관측)**: analysis stage 가 한 번도 안 된 프로젝트에서 개발 의도 질의("…기능 추가")를 넣으면 체인이 제대로 안 걸린다. 원인 = 진입 라우터(`routeEntry`, UserPromptSubmit)가 prompt 텍스트만 보는 순수 함수라 **"분석 여부"를 전혀 안 본다** → work-intent 면 무조건 `discovery-from-nl-md` 로 보내고 매 프롬프트마다 "discovery 부터 ground" 안내를 붙인다. discovery 는 analysis baseline grounding 을 전제하는데, SessionStart cold-start 안내("코드 분석 → init → discovery")와 정면 모순 → per-prompt note 가 세션-1회 안내를 덮어 "체인을 잘 안타는" 체감.
@@ -1748,7 +1756,7 @@ BR-split 순차안 STEP 2 — business-rules 로딩(파일위치 resolve + shape
 
 business-rules 산출물을 BC별 파일로 분할하려는 요구에서 출발 — Senior 적대 검토가 **bounded_context 채움률 8 PoC 중 7개 = 0%** 를 실측, "무조건 분할 now" 전제를 반증(분할 시 전부 `_uncategorized` 로 몰려 무의미 + reader silent mis-fire + 경로 3종 불일치). → **순차 4스텝**(STEP 0 subset 폐기 / STEP 1 BC 의무화 / STEP 2 경로통일+loader / STEP 3 분할)으로 전환, **본 릴리스 = STEP 0+1**(토대). 분할(STEP 3)은 STEP 2 후 BC 채움률 실측 재판단.
 
-- **STEP 0 — subset 폐기 (DEC-2026-06-07-subset-retire)**: baseline-delta 의 `*.subset.json`(scope-local 파생 사본) 개념 폐기. 사용자 지적("subset 바뀌어도 원본 반영 안 되면 SSOT 아니다" = 사본↔원본 역동기화 부채) 수용 → scope 슬라이스 = `chain-driver` `subsetAnalysisRefs(canonical, prefixes)` **in-memory 참조 필터**(BR-id/analysis_refs / 사본 파일 ❌)로 canonical 단일 SSOT 유지. 실 `*.subset.json` 0건(미실현)→코드 제거 0 / `subsetAnalysisRefs` 함수 무변경(chain-driver 343/343). doc=`baseline-delta-operating-model.md`(§2·§3·§4)+`lifecycle-contract.md`(scope 디렉토리 다이어그램). greenfield "7대-subset"(산출물 종류 subset / 다른 의미) 무관·보존.
+- **STEP 0 — subset 폐기 (DEC-2026-06-07-subset-retire)**: baseline-delta 의 `*.subset.json`(scope-local 파생 사본) 개념 폐기. 사용자 지적("subset 바뀌어도 원본 반영 안 되면 SSOT 아니다" = 사본↔원본 역동기화 부채) 수용 → scope 슬라이스 = `chain-driver` `subsetAnalysisRefs(canonical, prefixes)` **in-memory 참조 필터**(BR-id/analysis_refs / 사본 파일 ❌)로 canonical 단일 SSOT 유지. 실 `*.subset.json` 0건(미실현)→코드 제거 0 / `subsetAnalysisRefs` 함수 무변경(chain-driver 343/343). doc=`baseline-delta-operating-model.md`(§2·§3·§4)+`lifecycle-contract.md`(scope 디렉토리 다이어그램). greenfield "산출물-subset"(산출물 종류 subset / 다른 의미) 무관·보존.
 - **STEP 1 — bounded_context required (DEC-2026-06-07-bounded-context-mandatory / breaking)**: `business-rules.schema.json` `$defs.businessRule.required` = `["id"]` → `["id","bounded_context"]` + `minLength:1` + description(분할 키 / domain.json 매핑). writer `analysis-business-rules/SKILL.md` = 각 BR 을 domain.json bounded_contexts 에 매핑 의무 채움 지시(단일 도메인이면 그 1개 BC).
 - **예제 백필 (113 rule / 14 파일)**: release-readiness `analysis_validator_violation` 이 예제 business-rules.json 전수 schema 검증 → 0% 14 PoC 백필. BR id `<DOMAIN>` 토큰 → `BC-<DOMAIN>` 결정적 derive(poc-01[BC-AUTH/CONTENT]·poc-16 기존 domain-informed BC 보존 / poc-05 = BC-USER 수동).
 - **test 정합**: schema-validator `chain-schemas`+`rules-cross-consistency` 픽스처에 bounded_context 추가 — VALID 기대 픽스처(BC 추가) + INVALID 기대 픽스처(BC 추가해 의도한 anyOf 이유로 실패 / 테스트 무결성). schema-validator **108/108**.
@@ -2108,7 +2116,7 @@ arch.json有/codegraph無 의존(런타임 DI/decorator/config 와이어링 = co
 
 **committed deliverable/phase-flow `.mermaid` + deliverable `.md` dual-rendering twin 을 전면 폐기하고 산출물을 `.json` 단독 SSOT (완전 AX-native) 로 전환.** P0(AX 운영 / 산출물 = LLM 운영 컨텍스트) 이동 + LLM-무관 실측(2 distinct domain RealWorld·ecommerce: 모든 검증 도구가 json 만 입력으로 read / `.md`·`.mermaid` twin = LLM 운영 컨텍스트 0 기여 + 2차 렌더링 drift 표면만 추가)으로 ADR-008 two-eyes 사상 완전 역전 (honest self-reversal / corrective drift 아님). SSOT = `decisions/DEC-2026-06-01-json-only-ax-native.md`.
 
-- **거버넌스**: ADR-008(이중 렌더링) **Superseded by ADR-011** + ADR-002(7대 산출물 사람용 column 폐기)·ADR-009(retitle "산출물 신뢰 모델" / §2.3·2.4 diagram rung moot / 도구 종류 구분·no-simulation SSOT UNCHANGED)·ADR-FE-002(FE 사람눈 .mermaid retire / visual snapshot-hash UNAFFECTED)·plugin-charter R7(manifest.json 단독) **Amend** + **ADR-011 신설**.
+- **거버넌스**: ADR-008(이중 렌더링) **Superseded by ADR-011** + ADR-002(산출물 사람용 column 폐기)·ADR-009(retitle "산출물 신뢰 모델" / §2.3·2.4 diagram rung moot / 도구 종류 구분·no-simulation SSOT UNCHANGED)·ADR-FE-002(FE 사람눈 .mermaid retire / visual snapshot-hash UNAFFECTED)·plugin-charter R7(manifest.json 단독) **Amend** + **ADR-011 신설**.
 - **C1** schema ADDITIVE — cosmetic 흡수처(relationship_label/note/detail) + `migration-cautions.schema.json` 신설.
 - **C2** skill/agent/builder `.mermaid`+`.md` twin emit 중단 + ADR-011 신설.
 - **DT-json** decision-table grid → formal-spec.json `decision_grids[]` 흡수 (DMN-inspired / 문서용 / hit_policy 만 DMN 어휘 차용).
@@ -2613,15 +2621,15 @@ use-scenario taxonomy(v11.7.0)가 **S2(AX전환)를 주 타깃**으로 선언했
 
 ## [11.10.0] — 2026-05-30 MINOR — greenfield 산출물 bootstrap (C-use-scenario-taxonomy-impl Slice 2 / greenfield-bootstrap 도구 + 5 skill greenfield-mode) (DEC-2026-05-30-use-scenario-greenfield-bootstrap-slice2)
 
-v11.9.0 Slice 1(시나리오 선언 + gate)의 토대 위에서, **greenfield(신규 / legacy 코드 없음)가 7대 산출물을 실제로 생성해 chain 에 진입**하게 만드는 Slice 2. 사용자 1차 want("신규도 산출물이 나와야 chain 으로 개발·운영"). 옵션 A(DEC-2026-05-30-use-scenario-taxonomy §2.4) = 기존 `analysis-from-*` 재사용 / "analysis 는 코드가 아니라 입력을 요구" 재프레이밍.
+v11.9.0 Slice 1(시나리오 선언 + gate)의 토대 위에서, **greenfield(신규 / legacy 코드 없음)가 산출물을 실제로 생성해 chain 에 진입**하게 만드는 Slice 2. 사용자 1차 want("신규도 산출물이 나와야 chain 으로 개발·운영"). 옵션 A(DEC-2026-05-30-use-scenario-taxonomy §2.4) = 기존 `analysis-from-*` 재사용 / "analysis 는 코드가 아니라 입력을 요구" 재프레이밍.
 
 **시행 (additive / breaking 0)**:
 
 - **신규 도구 `tools/greenfield-bootstrap/` (24번째 / zero-dep)** — 결정적·testable anchor: ① `swagger-extract.json → openapi.yaml` elevation (zero-dep block-YAML emitter / 이미 파싱된 OpenAPI 의 결정적 승격 / AI 추론 0) ② legacy-only 산출물 N/A 생성 — `antipatterns.json` 빈 배열 + **`meta.na_reason` embed** (top-level `additionalProperties:false` 회피 / `antipatterns.schema.json` strict 정합) + `migration-cautions.md` stub. CLI `--output [--swagger-extract] [--scope] [--channel]` / 순수 변환(환경 의존 0). **29 test** (yaml-emit 12 + elevate 14 + na-artifacts 5 / §8.1 ≥2 swagger fixture = minimal + RealWorld).
 - **5 analysis skill greenfield code-optional mode** — `analysis-{architecture,domain-model,business-rules,db-schema-erd,openapi}` 에 "scenario=greenfield 시 코드 대신 입력어댑터 extract 에서 산출 / `source_grounded_evidence`=입력 출처 인용 / `code_pointers`=N/A" 절 추가. schema 는 code_pointers hard-require ❌ → greenfield 산출물 schema-valid.
-- **신규 skill `analysis-greenfield-bootstrap`** (57번째 / analysis input phase 등록) — greenfield 진입점. 입력어댑터 패스(코드-고고학 skip) → 결정적 산출(elevation/N-A) → AI 5종 code-optional 산출 → 검증 조율.
+- **신규 skill `analysis-greenfield-bootstrap`** (57번째 / analysis input phase 등록) — greenfield 진입점. 입력어댑터 패스(리버스 엔지니어링 skip) → 결정적 산출(elevation/N-A) → AI 5종 code-optional 산출 → 검증 조율.
 - `analysis-input-orchestrate` greenfield 분기(5단계) + `analysis-input-collection` greenfield redirect note.
-- doc: `lifecycle-contract.md`(analysis = 코드-고고학[legacy] + 입력어댑터[greenfield] 두 패스 / asset matrix input row) + `use-scenario-taxonomy.md` §3.2 bootstrap 구체 절차 + §5 carry 갱신.
+- doc: `lifecycle-contract.md`(analysis = 리버스 엔지니어링[legacy] + 입력어댑터[greenfield] 두 패스 / asset matrix input row) + `use-scenario-taxonomy.md` §3.2 bootstrap 구체 절차 + §5 carry 갱신.
 
 **1 실 dogfood (no-simulation)**: RealWorld(Conduit) swagger-extract → `tools/greenfield-bootstrap` → `openapi.yaml`(3 endpoint/5 schema) = `@readme/openapi-parser` **valid:true / warnings:[]** + `antipatterns.json` = `schema-validator` PASS (antipatterns.schema.json). **정직 표기**: swagger **1채널** 입증 / figma·PRD 2nd 채널 = carry.
 
@@ -2678,7 +2686,7 @@ session 55차 `/clear` 후 사용자 방법론 정체성 재진술 chain (ExitPl
 
 **가장 큰 목적 (P0)**: 산출물 = "시스템 설명 문서"가 아니라 **LLM 의 운영 컨텍스트 그 자체**. 방법론의 가장 큰 목적 중 하나 = 이 컨텍스트를 평생 유지·동기화하여 **프로젝트를 AX 로 운영**(LLM 이 정확한 컨텍스트로 develop·run·modify·evolve)하는 것. (P1 산출물=LLM 컨텍스트 / P2 bootstrap 입력만 다르고 유지 동일 / P3 dep-graph+codegraph 동기화 / P4 산출물=전 stage base+양방향 역동기화)
 
-**use-scenario taxonomy 4종** (**S2 AX전환 = 주 타깃** / S1 재생성 / S3 특성화 / greenfield): bootstrap 입력에서만 갈리고 모두 같은 정상 상태(AX 운영)로 수렴. 시나리오별 RED/GREEN 매트릭스 = F-DOGFOOD-007 교정 (S1 의 test 대상 = legacy 아니라 생성될 코드). **greenfield = 처음부터 AX-native** — 입력어댑터 analysis(`analysis-from-*`) 재사용(옵션 A)으로 산출물 생성 → gap B(discovery 어댑터가 7대 산출물 미생성 / spec hard-dep 막힘) 해소 설계. 시나리오 선언 = `chain-driver init --scenario`→`work-unit-manifest.scenario` (전 stage 일관 참조).
+**use-scenario taxonomy 4종** (**S2 AX전환 = 주 타깃** / S1 재생성 / S3 특성화 / greenfield): bootstrap 입력에서만 갈리고 모두 같은 정상 상태(AX 운영)로 수렴. 시나리오별 RED/GREEN 매트릭스 = F-DOGFOOD-007 교정 (S1 의 test 대상 = legacy 아니라 생성될 코드). **greenfield = 처음부터 AX-native** — 입력어댑터 analysis(`analysis-from-*`) 재사용(옵션 A)으로 산출물 생성 → gap B(discovery 어댑터가 산출물 미생성 / spec hard-dep 막힘) 해소 설계. 시나리오 선언 = `chain-driver init --scenario`→`work-unit-manifest.scenario` (전 stage 일관 참조).
 
 **codegraph 필수화** (DEC-2026-05-30-codegraph-essential): CodeGraph OSS = analysis 단계 필수 도구(Semgrep 동급 / no-simulation 무조건 실행). **DEC-2026-05-27 codegraph scope-out 의 게이트 폐기** (외부 사용자 = 사용자 직접 결정 / maturity = R19 Tier 2 environment-risk 강등 / probe #1~#3 작동 입증). "폐기" 대상 = codegraph ❌ / 막던 게이트 ✅.
 

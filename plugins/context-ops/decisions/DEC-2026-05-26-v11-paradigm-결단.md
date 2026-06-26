@@ -56,7 +56,7 @@ implement stage        → impl-spec.* (stack 별 분리 본격)
 
 | Stage         | 산출물 분리 axis                                        | 근거                                                     |
 | ------------- | ------------------------------------------------------- | -------------------------------------------------------- |
-| analysis      | 본격 분리 (BE 7대 + FE 8 / 이미)                        | 기술 자산 (technology-anchored)                          |
+| analysis      | 본격 분리 (BE·FE 산출물 / 이미)                        | 기술 자산 (technology-anchored)                          |
 | **discovery** | **cross-cut 단일**                                      | UC = 사용자 의도 anchor                                  |
 | **spec**      | **cross-cut 단일**                                      | BHV/AC = 사용자 시나리오 anchor (Gherkin 자연 cross-cut) |
 | plan          | layer 분기 본격 (TASK-\* + layer 필드 또는 산출물 분리) | TASK = 개발 작업 단위 (BE/FE 본격 다름)                  |

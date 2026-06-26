@@ -386,7 +386,7 @@
         "to_analysis_artifacts": {
           "type": "array",
           "items": {"type": "string"},
-          "description": "backward link to analysis 산출물 (business-rules.json / domain.json / 7대 산출물)"
+          "description": "backward link to analysis 산출물 (business-rules.json / domain.json / 산출물)"
         },
         "to_characterization": {
           "type": "array",

@@ -3,7 +3,7 @@
 - 상태: 승인됨 (Accepted)
 - 일자: 2026-06-01
 - 결정자: sangcl (사용자 결단 — "json 단독 / 완전 AX")
-- 관련: ADR-008 ( supersedes — 이중 렌더링 사상), ADR-002 (amends — 7대 산출물), ADR-009 (amends — 산출물 신뢰 모델), ADR-FE-002 (amends — FE 이중 렌더링), ADR-001 (사상적 기반), ADR-CHAIN-011 ( 무관 / non-goal — BR text dual-representation), DEC-2026-06-01-json-only-ax-native (모체), DEC-2026-05-30-use-scenario-taxonomy (P0 AX 운영)
+- 관련: ADR-008 ( supersedes — 이중 렌더링 사상), ADR-002 (amends — 산출물), ADR-009 (amends — 산출물 신뢰 모델), ADR-FE-002 (amends — FE 이중 렌더링), ADR-001 (사상적 기반), ADR-CHAIN-011 ( 무관 / non-goal — BR text dual-representation), DEC-2026-06-01-json-only-ax-native (모체), DEC-2026-05-30-use-scenario-taxonomy (P0 AX 운영)
 
 ## 컨텍스트
 

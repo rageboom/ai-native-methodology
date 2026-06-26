@@ -28,7 +28,7 @@
       "chain": 0,
       "depends_on": [],
       "sub_flow": "analysis.phase-flow.json",
-      "outputs_summary": ["7대 BE 산출물", "8 FE 산출물", "Phase 4.5 형식 명세", "finding-system", "antipatterns", "migration-cautions"],
+      "outputs_summary": ["BE 산출물", "8 FE 산출물", "Phase 4.5 형식 명세", "finding-system", "antipatterns", "migration-cautions"],
       "introduced": "v1.0 (legacy)",
       "gate": null,
       "user_review_pct": "≤ 15"

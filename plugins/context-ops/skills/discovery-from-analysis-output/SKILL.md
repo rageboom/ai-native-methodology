@@ -1,6 +1,6 @@
 ---
 name: discovery-from-analysis-output
-description: v4.1 chain (discovery) 어댑터 skill (analysis-output 채널). analysis stage 7대 + 8 FE 산출물 + finding + antipatterns + migration-cautions 를 입력으로 discovery-spec.{json,md} 추출 (discovery stage 산출물 / 파일명 reuse). 모든 use_case + business_rules_intent 는 source_grounded_evidence (grep_hit_count > 0) 의무. AI 환각 차단이 1차 목적. v4.0 planning-extract-from-legacy 의 rename (DEC-2026-05-21 정합) — 본문 stage 표기 본격 갱신은 carry.
+description: v4.1 chain (discovery) 어댑터 skill (analysis-output 채널). analysis stage 산출물 + finding + antipatterns + migration-cautions 를 입력으로 discovery-spec.{json,md} 추출 (discovery stage 산출물 / 파일명 reuse). 모든 use_case + business_rules_intent 는 source_grounded_evidence (grep_hit_count > 0) 의무. AI 환각 차단이 1차 목적. v4.0 planning-extract-from-legacy 의 rename (DEC-2026-05-21 정합) — 본문 stage 표기 본격 갱신은 carry.
 allowed-tools: Read, Glob, Grep, Bash, Write
 ---
 
@@ -17,7 +17,7 @@ chain 1 (discovery) 의 **진입 skill** (analysis-output 채널). 1차 use case
 
 `<project>/.ai-context/base/` 안:
 
-- 7대 산출물: inventory / domain / rules / architecture / schema / openapi / antipatterns
+- 산출물: inventory / domain / rules / architecture / schema / openapi / antipatterns
 - 8 FE 산출물 (있으면): ui-spec / state-map / visual-manifest / a11y-spec / i18n-spec / static-security-spec / form-validation-spec / type-spec / legacy-spectrum
 - `formal-spec` phase: state-machines / sequences / decision-tables / invariants
 - finding-system: findings.json
@@ -41,7 +41,7 @@ discovery-spec 의 모든 BR-INTENT 와 UC 는 다음 5 필드 중 하나 이상
 
 ## 절차
 
-1. **input 확인** — 7대 산출물 + finding 모두 존재? 누락 시 사용자에게 명시 + analysis stage 재진입 권고.
+1. **input 확인** — 산출물 + finding 모두 존재? 누락 시 사용자에게 명시 + analysis stage 재진입 권고.
 
 2. **business_intent 추출** — domain.json + business-rules.json 에서 도메인 의도 (e.g., "user authentication" / "article lifecycle") 추출. 자연어 prompt + 사용자 검토 후 채움.
 

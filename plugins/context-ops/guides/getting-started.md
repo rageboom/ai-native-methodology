@@ -134,7 +134,7 @@ node tools/chain-driver/src/cli.js init <project>
 
 ```
 # 5-2. analysis stage 종결 (시나리오 A 와 동일)
-"이 코드베이스 분석 시작해줘"  → 7대 산출물 산출
+"이 코드베이스 분석 시작해줘"  → 산출물 산출
 
 # 5-3. chain 1 (discovery) 진입 (1분 / Layer 2 LLM 의무 통과)
 "발견 단계 시작" (또는 "기획 단계 시작")
@@ -148,7 +148,7 @@ node tools/chain-driver/src/cli.js init <project>
 # 5-4. chain 2 (spec) 진입 (1분)
 "behavior spec / acceptance criteria 도출"
 → spec-compose-behavior-spec / spec-derive-acceptance-criteria / spec-integrate-deliverables
-→ behavior-spec + acceptance-criteria + 7대 통합
+→ behavior-spec + acceptance-criteria + 산출물 통합
 → gate #2 (chain-coverage-validator / UC→BHV→AC ≥ 0.85)
 
 # 5-5. chain 3 (plan) 진입 (1분 / v10.0.0 gate #3 본격)

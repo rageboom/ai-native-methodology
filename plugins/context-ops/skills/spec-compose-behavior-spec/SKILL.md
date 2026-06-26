@@ -16,7 +16,7 @@ chain 2 (spec) 의 **진입 skill**. discovery-spec + analysis `formal-spec` pha
 ## 입력
 
 - `<project>/.ai-context/base/discovery-spec.json` (chain 1 산출)
-- `<project>/.ai-context/base/business-rules.json` + `shared/domain.json` + 7대 산출물
+- `<project>/.ai-context/base/business-rules.json` + `shared/domain.json` + 산출물
 - `<project>/.ai-context/base/formal-spec/state-machines/*.json` + `formal-spec/sequences/*.json` + `formal-spec/decision-tables/*.json` + `formal-spec/invariants/*.ts` (`formal-spec` phase 산출 / formal-spec/ prefix = schema·template convention 정합 S8)
 
 ## 산출물

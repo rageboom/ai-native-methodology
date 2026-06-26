@@ -71,7 +71,7 @@
 | #   | 자격                   | 작업                                                               |
 | --- | ---------------------- | ------------------------------------------------------------------ |
 | 1   | Phase A self-iter 누적 | iteration 진행 + 마찰점 finding 수렴                               |
-| 2   | 7대 산출물 안정        | 4 PoC 외 추가 적용 입증                                            |
+| 2   | 산출물 안정        | 4 PoC 외 추가 적용 입증                                            |
 | 3   | release.yml CI         | GitHub Actions (build + sha256 verify + plugin install smoke test) |
 | 4   | LICENSE + InfoSec      | LICENSE 파일 + 사내 InfoSec 검토                                   |
 
@@ -86,7 +86,7 @@
 ### 4.3 우선순위 3 — 잠재적 v1.5+
 
 - 추가 PoC (Vue / Angular / Svelte / Flutter / React Native / Django / Rails / Go)
-- 사내 실 적용 첫 case (100K+ LOC legacy → 7대 산출물 추출)
+- 사내 실 적용 첫 case (100K+ LOC legacy → 산출물 추출)
 
 ---
 

@@ -16,7 +16,7 @@
 
 - **Node ESM + better-sqlite3 (raw SQL / ORM 아님)** — raw SQL 이라 sql-inventory + db-schema(FK) 가 생기는 스택(=data_refs/FK reading-aid 가 legacy 반쪽 메커니즘으로 적용). vitest 러너.
 - `src/` — db.js(스키마 부트스트랩) · users.js · categories.js · notes.js(UC1 createNote) · schema.sql(users·notes·categories / FK 2)
-- `input/` — analysis 6종(코드-고고학 추출): sql-inventory · db-schema(FK) · business-rules(BC-NOTES / BR-001·002·003) · domain · inventory · antipatterns
+- `input/` — analysis 6종(리버스 엔지니어링 추출): sql-inventory · db-schema(FK) · business-rules(BC-NOTES / BR-001·002·003) · domain · inventory · antipatterns
 - `.ai-context/output/` — chain 산출물(discovery·behavior·acceptance·task-plan·test-spec) + **artifact-graph.json** + context-cache.json(FK federation) + findings + intervention-log + state.json
 - `test/` — vitest (5 tests / GREEN)
 

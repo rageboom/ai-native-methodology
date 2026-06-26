@@ -7,7 +7,7 @@
 
 ## 컨텍스트
 
-v1.5.0 까지 본 방법론 = "코드 → 7대 산출물 한 방향 추출기" (DEC-2026-04-29-round-trip-스코프-아웃). round-trip = 영구 scope 외부.
+v1.5.0 까지 본 방법론 = "코드 → 산출물 한 방향 추출기" (DEC-2026-04-29-round-trip-스코프-아웃). round-trip = 영구 scope 외부.
 
 2026-05-06 사용자 결단 ( "A로 하고 싶다") → **(A) i-strict 채택** = 본 방법론 = SDLC chain harness. v10.0.0 (Phase 4-4') 본격 5단계: discovery (chain 1 / 구 planning 개칭 v9.0) → spec (chain 2) → plan (chain 3 / v9.0 신설 / v10.0.0 hard gate 본격) → test (chain 4) → impl (chain 5). 각 단계 AI 자동 생성 + 사용자 검토 (gate #1~#5 / chain N = gate #N 1:1 INTERNAL CONVENTION) + revisit loop (자동 감지 + 사용자 결단).
 

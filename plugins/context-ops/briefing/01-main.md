@@ -181,7 +181,7 @@ npm run build             # 자기완결 dist/ 생성 + CHECKSUMS.txt (오프라
 | S3 — 특성화         | 레거시 코드                   | 동작 보존 위주                |
 | greenfield          | PRD · 디자인 · 계약(swagger/figma) | 처음부터 AX-native (코드 없음) |
 
-레거시 입력은 **analysis stage** 의 "코드-고고학 패스"로, greenfield 는 같은 stage 의 "입력어댑터 패스"로 산출물을 만듭니다. 어느 쪽이든 산출물이 곧 base 가 되고, 기능 추가 시 역방향으로 동기화됩니다(양방향 living-sync, 아래 7장).
+레거시 입력은 **analysis stage** 의 "리버스 엔지니어링 패스"로, greenfield 는 같은 stage 의 "입력어댑터 패스"로 산출물을 만듭니다. 어느 쪽이든 산출물이 곧 base 가 되고, 기능 추가 시 역방향으로 동기화됩니다(양방향 living-sync, 아래 7장).
 
 ---
 

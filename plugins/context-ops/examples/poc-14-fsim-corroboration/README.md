@@ -117,7 +117,7 @@ node /path/to/plugin/tools/chain-driver/src/cli.js init ./poc-14-fsim-corroborat
 # 3. chain 0 — 분석 (자연어 발화)
 "이 코드베이스 분석 시작"
 # → analysis-input-collection / analysis-input-orchestrate / analysis-from-{swagger,plan-doc,prompt} dispatch
-# → 7대 산출물 + aspect 자동 trigger
+# → 산출물 + aspect 자동 trigger
 
 # 4. chain 1 — 기획
 "기획 단계 진입"

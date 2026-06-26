@@ -31,4 +31,4 @@ baseline-delta 모델은 대형 프로젝트 context 부담 완화책으로 `.ai
 ## 4. Non-goal
 
 - `subsetAnalysisRefs` 함수 제거 아님(이게 올바른 슬라이싱 메커니즘).
-- greenfield "7대-subset"(산출물 종류 subset / 다른 의미) 무관·보존.
+- greenfield "산출물-subset"(산출물 종류 subset / 다른 의미) 무관·보존.

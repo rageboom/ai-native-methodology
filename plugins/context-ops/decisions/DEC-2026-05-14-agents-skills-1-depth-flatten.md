@@ -39,7 +39,7 @@ Installed components:
 | \_base    | `_base-`     | 5 (apply-baseline-ratchet / apply-template / build-traceability-matrix / invoke-go-stop-gate / log-finding) |
 | analysis  | `analysis-`  | 22 (aspect 4 + br-cross-consistency-check + phase 17)                                                       |
 | planning  | `planning-`  | 3 (decompose-use-cases / extract-from-legacy / identify-business-intent)                                    |
-| spec      | `spec-`      | 3 (compose-behavior-spec / derive-acceptance-criteria / integrate-7대-deliverables)                         |
+| spec      | `spec-`      | 3 (compose-behavior-spec / derive-acceptance-criteria / integrate-deliverables)                         |
 | test      | `test-`      | 3 (generate-test-spec / run-test-evidence / verify-coverage)                                                |
 | implement | `implement-` | 2 (generate-impl-spec / verify-test-pass)                                                                   |
 

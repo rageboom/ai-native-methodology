@@ -40,7 +40,7 @@ Martin Fowler, "StranglerFigApplication" (2004):
 
 | Tier                              | 추출 가능                     | LLM 의존도 | 본체 산출물                            | legacy 산출물                                                    |
 | --------------------------------- | ----------------------------- | ---------- | -------------------------------------- | ---------------------------------------------------------------- |
-| **Tier 1 (Modern SPA)**           | 7대 7/7                       | 낮음       | 모두                                   | (해당 ❌)                                                        |
+| **Tier 1 (Modern SPA)**           | 산출물 7/7                       | 낮음       | 모두                                   | (해당 ❌)                                                        |
 | **Tier 2 (jQuery legacy)**        | 5/7 (state-map / visual 부분) | 중         | ui-spec (legacy_widget) / antipatterns | legacy-spectrum + bootstrap-data-flow + strangler-migration-plan |
 | **Tier 3 (Vanilla JS)**           | 4/7                           | 높음       | ui-spec / antipatterns                 | legacy-spectrum + bootstrap-data-flow + strangler-migration-plan |
 | **Tier 4 (server-side template)** | 3/7                           | 높음       | ADR-FE-004 BE/FE 통합 산출 (Stage 6)   | legacy-spectrum (분리 detection 만)                              |

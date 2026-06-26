@@ -165,7 +165,7 @@ coverage strategy: ratchet / target: 0.8 / actual: 43.8%
 
 | 시나리오                                                                                | plan §4 추정 | PoC #07 사실                                                                         |
 | --------------------------------------------------------------------------------------- | ------------ | ------------------------------------------------------------------------------------ |
-| A. 전체 51K LOC 분석 → 7대 산출물                                                       | 45~55%       | **53.8%** (capital 다중책임 / +15%p / in range) — 다중책임 모듈에서 추정 정합        |
+| A. 전체 51K LOC 분석 → 산출물                                                       | 45~55%       | **53.8%** (capital 다중책임 / +15%p / in range) — 다중책임 모듈에서 추정 정합        |
 | A'. A + carry 1~3 보강 (Spring 4.x AP seed + Stored Procedure 본문 + iBATIS 2 spectrum) | 65~70%       | corroboration #1+#2 evidence 충족 (양 PoC 동일 spectrum) — v2.2.0 sub-rule 격상 자격 |
 | B. chain 1 단독 (planning-spec)                                                         | 75%          | **0 findings / UC 94.1%** — pass                                                     |
 | C. chain 2~4 본격 진입                                                                  | (carry)      | scope OUT (PoC #07 prelim 정합) — chain 3 영역 C-PoC07-1~3 carry                     |

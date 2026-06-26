@@ -25,7 +25,7 @@ allowed-tools: Read, Glob, Grep, Bash
    - DDL `.sql` / Prisma / JPA entity / TypeORM (DB stack)
 3. **트랙 분기 신호** — 코드베이스가 BE / FE / DB / 풀스택 중 무엇? 신호 기록 (다음 phase 의 skill 자동 발동 trigger)
 4. **분석 가치 명시** — 사용자에게:
-   - 본 방법론은 한 방향 추출기 (legacy → 7대 산출물). round-trip 검증 안 함.
+   - 본 방법론은 한 방향 추출기 (legacy → 산출물). round-trip 검증 안 함.
    - 가치 명세 (CLAUDE.md) 사용자 확인.
 5. **메타 정보 기록** — `<user-project>/.ai-context/input.json`:
    ```json
@@ -52,7 +52,7 @@ allowed-tools: Read, Glob, Grep, Bash
 
 ## When NOT to invoke
 
-- 사용자가 **신규 시스템 구축 (greenfield / legacy 코드 없음)** — 본 skill 부적합. `scenario=greenfield` 선언 후 **`analysis-greenfield-bootstrap`** (입력어댑터 패스만 / 코드-고고학 skip) 호출. 입력어댑터 = `analysis-input-orchestrate` greenfield 분기 (analysis 는 legacy _코드_ 가 아니라 _입력_ 을 요구).
+- 사용자가 **신규 시스템 구축 (greenfield / legacy 코드 없음)** — 본 skill 부적합. `scenario=greenfield` 선언 후 **`analysis-greenfield-bootstrap`** (입력어댑터 패스만 / 리버스 엔지니어링 skip) 호출. 입력어댑터 = `analysis-input-orchestrate` greenfield 분기 (analysis 는 legacy _코드_ 가 아니라 _입력_ 을 요구).
 - baseline+ratchet 미적용 legacy — `_base-apply-baseline-ratchet` 먼저.
 
 ## 인용

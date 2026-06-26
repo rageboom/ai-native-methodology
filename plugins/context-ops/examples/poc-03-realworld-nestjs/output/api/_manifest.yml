@@ -276,7 +276,7 @@ next_actions:
   - 'STATUS.md + INDEX.md 갱신'
   - 'PROGRESS-poc03-phase4.5.md → 본 파일 별 PROGRESS 또는 합산'
   - 'Phase 6 진입 — antipatterns final (8 partial + 4 candidate = 12 → 10 composite)'
-  - 'Phase 6 후 PoC #03 7대 산출물 6/7 (UI/UX 만 N/A)'
+  - 'Phase 6 후 PoC #03 산출물 6/7 (UI/UX 만 N/A)'
 
 # 정직 표기 ( no-simulation 정합)
 honesty_disclosure:

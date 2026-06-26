@@ -270,7 +270,7 @@ FE 분석 시 `migration-cautions-fe.md` 의무 — `methodology-spec/migration-
    - related_table 이 db schema 에 존재
 □ 모든 산출물에 confidence 메타
 □ human_review_required 항목 = 사용자 처리 완료
-□ 7대 산출물 + 보조 산출물 모두 발행됨
+□ 산출물 + 보조 산출물 모두 발행됨
 ```
 
 ---

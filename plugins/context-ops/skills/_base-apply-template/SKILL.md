@@ -57,7 +57,7 @@ User triggers this skill when starting a new deliverable. 매칭 대상:
      - antipatterns: requires `formal-spec` phase cross-validation
      - state-map / visual-manifest / form-validation / type-spec: FE-specific
    - **chain** stage (6 산출물):
-     - discovery-spec: requires analysis 7대 산출물 + (선택) 입력 어댑터 산출물 (swagger / figma / nl-md)
+     - discovery-spec: requires analysis 산출물 + (선택) 입력 어댑터 산출물 (swagger / figma / nl-md)
      - behavior-spec: requires discovery-spec + Phase 4.5 (state-machine / sequence / decision-table)
      - acceptance-criteria: requires behavior-spec (layer 분기 — be → openapi_path/operationId / fe → state_map_ref/dtcg_token_ref/visual_manifest_ref)
      - task-plan: requires behavior-spec + acceptance-criteria (layer 분기 — be → openapi_endpoint_ref / fe → component_ref / ADR alternatives ≥3 / NFR hard gate)

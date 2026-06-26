@@ -30,7 +30,7 @@
 
 ### `analysis-agent.md` (chain 1 sub)
 
-- **책임**: legacy 코드베이스 분석 + 7대 BE 산출물 + 8 FE 산출물 + finding + antipatterns + migration-cautions
+- **책임**: legacy 코드베이스 분석 + BE 산출물 + 8 FE 산출물 + finding + antipatterns + migration-cautions
 - **skill 사전 주입**: 22 analysis skill + 6 input skill + 3 base utility = 31 skill
 - **호출 시기**: main agent 가 "analysis 시작" / "분석 진입" / "legacy 분석" 등 자연어 인지 시 Task tool dispatch
 
@@ -47,7 +47,7 @@
 
 ### `spec-agent.md` (chain 2)
 
-- **책임**: behavior-spec + acceptance-criteria (Gherkin BDD) + cross_links 7대 산출물 통합
+- **책임**: behavior-spec + acceptance-criteria (Gherkin BDD) + cross_links 산출물 통합
 - **skill 사전 주입**: 3 spec skill + 4 base utility = 7 skill
 - **호출 시기**: chain 2 gate 진입 자연어 trigger 시
 
@@ -111,7 +111,7 @@
 # main agent → stage agent dispatch
 main agent → Task(subagent_type="analysis-agent", prompt="""
 target: <target-project-dir>
-goal: 7대 + 8 FE 산출물 추출
+goal: 산출물 추출
 input: legacy code only
 expected: .ai-context/base/{inventory,architecture,domain,rules,schema,openapi,antipatterns}.json + FE 산출 (있으면)
 """)

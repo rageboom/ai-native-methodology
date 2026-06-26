@@ -4,7 +4,7 @@
     "methodology_version": "v0.39.0",
     "inputs_used": ["planning_docs"],
     "confidence": 0.9,
-    "$comment": "greenfield(PRD only) 최소 domain — money allocation. designed_from_spec UNIT 의 의미계층 anchor(domain_path). 코드-고고학 N/A."
+    "$comment": "greenfield(PRD only) 최소 domain — money allocation. designed_from_spec UNIT 의 의미계층 anchor(domain_path). 리버스 엔지니어링 N/A."
   },
   "bounded_contexts": [
     {

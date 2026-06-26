@@ -7,7 +7,7 @@
 
 레거시 전체 full analysis 는 비용이 크다 (대형 코드베이스 context 부담 + 시간). 한 번 분석한 baseline 을 **두 종류의 baseline** 으로 고정하고, 이후 작업은 **변경분(delta)** 만 다룬다:
 
-- **분석 baseline** = canonical global `.ai-context/base/` (7대 BE + 8 FE 산출물). "이 시스템이 무엇인가" 의 단일 진실.
+- **분석 baseline** = canonical global `.ai-context/base/` (BE + 8 FE 산출물). "이 시스템이 무엇인가" 의 단일 진실.
 - **품질 baseline** = `.ai-context/baseline-<date>.json`. 진입 시점 finding 을 grandfather 하고 신규 작업만 ratchet (품질 단조 증가).
 
 두 baseline 은 axis 가 다르다 — 분석 baseline = **사실 스냅샷** / 품질 baseline = **gate 기준선**. (혼동 금지.)

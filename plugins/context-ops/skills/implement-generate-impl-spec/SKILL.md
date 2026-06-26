@@ -18,9 +18,9 @@ chain 5 (impl) 의 **진입 skill / i-strict 정통**. test-spec → impl 코드
 - `<project>/.ai-context/base/test-spec.json` (TC-\* 목록 / source_file path)
 - `<project>/.ai-context/base/behavior-spec.json` (BHV-\* contract / preconditions / postconditions / invariants)
 - `<project>/.ai-context/base/acceptance-criteria.json` (AC-\* / Gherkin reasoning)
-- `<project>/.ai-context/base/shared/architecture.json` (7대 / layered architecture)
-- `<project>/.ai-context/base/shared/schema.json` (7대 / DB schema)
-- `<project>/.ai-context/base/api-extension.json` (7대 / endpoint 정합)
+- `<project>/.ai-context/base/shared/architecture.json` (layered architecture)
+- `<project>/.ai-context/base/shared/schema.json` (DB schema)
+- `<project>/.ai-context/base/api-extension.json` (endpoint 정합)
 - `<project>/.ai-context/base/shared/inventory.json` (stack_signals / framework match)
 - `<project>/.ai-context/runtime/config/test-cmd.json` (test 실행 커맨드 설정)
 

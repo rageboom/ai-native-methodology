@@ -1,6 +1,6 @@
 # ID 표준 (산출물 간 추적성)
 
-> 7대 산출물 + chain 산출물 (6-stage) ID 명명 규칙. ID 를 통해 산출물 간 교차 참조 가능. 단일 source-of-truth.
+> 산출물 + chain 산출물 (6-stage) ID 명명 규칙. ID 를 통해 산출물 간 교차 참조 가능. 단일 source-of-truth.
 
 ### Jira hierarchy 정합 entity matrix
 

@@ -16,7 +16,7 @@ provenance:
 
 > **본 디렉토리 = 사내 표준 운영본 (`internal-v1.3`)** — adoption 워크스페이스의 빌드 산출물.
 > 본 방법론 = "**코드 → 형식 명세 + 위험 기록**" **한 방향 추출기**. 신규 시스템 구축은 사람의 책임.
-> 7대 산출물 + finding + antipatterns + migration-cautions 를 사내 신규 시스템 구축 시 입력 자료/회피 가이드로 활용.
+> 산출물 + finding + antipatterns + migration-cautions 를 사내 신규 시스템 구축 시 입력 자료/회피 가이드로 활용.
 
 **v1.3.0 (2026-05-01)**: 3 PoC platform-agnostic 입증 (Java/Spring + Java/Hexagonal + TypeScript/NestJS) / 11 묶음 본체 갭 closure / spectral 실 실행 (24 warnings, 0 errors) / no-simulation 정책 첫 실현 / 신뢰도 85-92% (ADR-009 단계 4).
 
@@ -45,7 +45,7 @@ provenance:
 
 - 절대 우선순위 (품질 1 > 재작업 최소화 > 속도)
 - 본 방법론 가치 (한 방향 추출기 / round-trip 영구 scope 제외)
-- 의무 정책 (7대 산출물 / 신뢰도 메타 / 이중 렌더링 / no-simulation / 다이어그램 신뢰도 / Baseline+Ratchet / migration_advice)
+- 의무 정책 (산출물 / 신뢰도 메타 / 이중 렌더링 / no-simulation / 다이어그램 신뢰도 / Baseline+Ratchet / migration_advice)
 - 사상 (Schema-First + Contract-First + DDD-Lite B + FSD)
 - 운영 (한국어 1차 / 순환의존성 hybrid)
 - NestJS 전용 4 (적용 프로젝트가 NestJS 일 때만)
@@ -74,7 +74,7 @@ provenance:
 ## 무엇을 하는가
 
 ```
-[레거시 프로젝트]                     [7대 산출물]
+[레거시 프로젝트]                     [산출물]
    소스 코드                       1. 아키텍처/의존성
    ERD (있으면)                    2. 도메인 모델
    ORM (있으면)         ──>        3. API 계약
@@ -92,11 +92,11 @@ provenance:
 
 | PoC         | platform                           | 산출                                             | 신뢰도 |
 | ----------- | ---------------------------------- | ------------------------------------------------ | ------ |
-| **PoC #01** | Java + Spring Boot 2.5 (CRUD)      | 7대 산출물 6/7 / 15 AP / 33 finding              | 0.96   |
-| **PoC #02** | Java + Spring Boot 3.3 + Hexagonal | 7대 산출물 6/7 / 21 AP / 43 finding              | 0.96   |
-| **PoC #03** | TypeScript + NestJS + TypeORM      | 7대 산출물 6/7 / 11 AP / 49 finding / 1 positive | 0.94   |
+| **PoC #01** | Java + Spring Boot 2.5 (CRUD)      | 산출물 6/7 / 15 AP / 33 finding              | 0.96   |
+| **PoC #02** | Java + Spring Boot 3.3 + Hexagonal | 산출물 6/7 / 21 AP / 43 finding              | 0.96   |
+| **PoC #03** | TypeScript + NestJS + TypeORM      | 산출물 6/7 / 11 AP / 49 finding / 1 positive | 0.94   |
 
-→ 3 platform 모두 7대 산출물 6/7 도달 (UI/UX 만 N/A — BE only). 신뢰도 동급 (0.94~0.96).
+→ 3 platform 모두 산출물 6/7 도달 (UI/UX 만 N/A — BE only). 신뢰도 동급 (0.94~0.96).
 
 ### Cross-PoC 학습 효과 (§8.1 정합 — 단일 PoC 과적합 회피)
 
@@ -117,7 +117,7 @@ internal-v1.3/
 ├── CLAUDE.md                  자동 로드 — 정책 23 인라인 (위반 = 빌드 실패)
 ├── README.md                  ← 본 파일 (사내 적용 진입점)
 ├── methodology-spec/          Single Source of Truth
-│   ├── deliverables/          7대 산출물 명세 (1~7 + 4-5)
+│   ├── deliverables/          산출물 명세 (1~7 + 4-5)
 │   ├── workflow/              phase-0~6 + phase-flow 이중 렌더링
 │   ├── finding-system.md
 │   ├── id-conventions.md
@@ -183,7 +183,7 @@ CI 통합 권고 — ADR-010 Baseline + Ratchet 의무 (`CLAUDE.md` 인라인).
 
 | 항목                        | 상태                                                            |
 | --------------------------- | --------------------------------------------------------------- |
-| 7대 산출물 명세 + 형식 명세 | ✅ 완성 (BE 6/7 — UI/UX 만 FE PoC 후속)                         |
+| 산출물 명세 + 형식 명세 | ✅ 완성 (BE 6/7 — UI/UX 만 FE PoC 후속)                         |
 | JSON Schema                 | ✅ 11개 (formal-spec / finding-system / openapi-extension 포함) |
 | 정책 (CLAUDE.md 인라인)     | ✅ 23 (범용 13 + 가치 1 + NestJS 4 + Spring 5)                  |
 | Phase 4.5 정식 도입         | ✅                                                              |

@@ -8,7 +8,7 @@
 
 ## 문제 + 조사 정정 (주장 ≠ 사실 / feedback_senior_fact_check_supplement)
 
-1. **F-ECOM-004 root-cause 불완전**: "discovery/behavior 의 generic `cross_links.to_analysis_artifacts` 가 edge 미합성" 은 사실이나, 실측 결과 5 orphan 중 **3개(domain/error-mapping/form-validation)만** 그 list 에 있음 — **architecture·db-schema 는 어느 to_analysis_artifacts 에도 미참조**(dogfood discovery-spec 이 7대 cross-link coverage 의무 미충족). 즉 Part A(edge 합성)만으론 5→2.
+1. **F-ECOM-004 root-cause 불완전**: "discovery/behavior 의 generic `cross_links.to_analysis_artifacts` 가 edge 미합성" 은 사실이나, 실측 결과 5 orphan 중 **3개(domain/error-mapping/form-validation)만** 그 list 에 있음 — **architecture·db-schema 는 어느 to_analysis_artifacts 에도 미참조**(dogfood discovery-spec 이 산출물 cross-link coverage 의무 미충족). 즉 Part A(edge 합성)만으론 5→2.
 2. **제안 B(chain-coverage filesystem coverage 검사) 폐기**: 코드 실측 — **poc-16 = orphan 0 정상**(db-schema.json 미참조이나 다른 edge 소스로 연결). filesystem coverage 검사 신설 시 poc-16 false-positive. → graph-integrity-validator 가 **이미 orphan=hard-FAIL**(`validator.js:128`) = enforcement 존재. `applyUserDecision` 등 별도 코드 불필요.
 
 ## 결정 (A + C / B = 기존 graph-integrity)

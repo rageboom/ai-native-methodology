@@ -39,12 +39,12 @@
 
 ### §4. 감사 결과 ( 실 F-015 cross-check / false-positive 3건 제거)
 
-- 실 위반 = **S3 1건 ❌ high** (`spec-integrate-7대-deliverables` 한글 → 공식 charset `[a-z0-9-]` 위반 / MAJOR rename / §8-1 이연) + **S3/A1 1군 ⚠️ low** (`_base-*` skill×5+agent×3 leading `_` / 의도적 grouping / §8-2 이연·수용 후보).
+- 실 위반 = **S3 1건 ❌ high** (`spec-integrate-deliverables` 한글 → 공식 charset `[a-z0-9-]` 위반 / MAJOR rename / §8-1 이연) + **S3/A1 1군 ⚠️ low** (`_base-*` skill×5+agent×3 leading `_` / 의도적 grouping / §8-2 이연·수용 후보).
 - false-positive 제거 — S1 retrofit 불요(47/47 ≤500L + out-of-tree ref = progressive disclosure 정합) / marketplace.json 위치 = 공식 정합 / agent `skills:` = 공식 preload 필드(자체확장 ❌). over-claim 교정 = `system_prompt`·`preloaded_skills` 미존재.
 
 ### §5. 이연 (별도 user-gated bundle / 본 DEC scope ❌)
 
-- §8-1 `spec-integrate-7대-deliverables` → kebab rename = **별도 MAJOR** (3 ref: skill dir / `agents/spec-agent.md` skills[] / `flows/spec.phase-flow.json` / cooling-off + Senior + STOP-gate / v7.0.0 선례).
+- §8-1 `spec-integrate-deliverables` → kebab rename = **별도 MAJOR** (3 ref: skill dir / `agents/spec-agent.md` skills[] / `flows/spec.phase-flow.json` / cooling-off + Senior + STOP-gate / v7.0.0 선례).
 - §8-2 `_base-*` charset deviation = 차기 네트워크 재검증서 공식 charset 강제 여부 재평가 후 결단 (rename vs documented-exception).
 
 ---

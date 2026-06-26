@@ -3,7 +3,7 @@
 - 상태: 승인됨 (Accepted)
 - 일자: 2026-05-01 / **갱신 2026-05-01 (Stage 6 — §6 Tier 4 carry → resolved)**
 - 결정자: 윤주스 (TF Lead, Auto Mode 위임)
-- 관련: ADR-001 (사상적 기반), ADR-002 (7대 산출물), ADR-008 (이중 렌더링 사상), ADR-FE-002 (이중 렌더링 FE 적용 — 짝), ADR-FE-004 (BE/FE 분리 — Tier 4 예외 정식), ADR-FE-005 (권위 매개체 12 채택), ADR-FE-006 (framework-neutral IR — 짝), DEC-2026-05-01-v1.4-FE-트랙-진입, DEC-2026-05-01-v1.4-Stage-2-Gate-결단 (G1-1), DEC-2026-05-01-v1.4-Stage-6-종결 (carry 종결)
+- 관련: ADR-001 (사상적 기반), ADR-002 (산출물), ADR-008 (이중 렌더링 사상), ADR-FE-002 (이중 렌더링 FE 적용 — 짝), ADR-FE-004 (BE/FE 분리 — Tier 4 예외 정식), ADR-FE-005 (권위 매개체 12 채택), ADR-FE-006 (framework-neutral IR — 짝), DEC-2026-05-01-v1.4-FE-트랙-진입, DEC-2026-05-01-v1.4-Stage-2-Gate-결단 (G1-1), DEC-2026-05-01-v1.4-Stage-6-종결 (carry 종결)
 
 > **본 ADR 의 위치** — v1.4 FE 트랙의 **사상 기둥 1**. ADR-001 (Schema-First+Contract-First+DDD-Lite+FSD) 의 §FSD 영역을 FE 코드 spectrum 전체로 확장한다. ADR-FE-002/005 와 짝.
 
@@ -59,10 +59,10 @@ Stage 1 research × 3 (공식문서 / 산업사례 / Senior) 의 합의:
   ⏳ Native (React Native / Flutter / Swift UI) → v1.5 이연
 
 명제 3 (Tier 별 추출 가능성 차등):
-  Tier 1 → 7대 산출물 7/7 (full)
-  Tier 2 → 7대 산출물 5/7 (state-map / visual-manifest 부분)
-  Tier 3 → 7대 산출물 4/7 (LLM 추론 의존도 ↑)
-  Tier 4 → 7대 산출물 3/7 + Stage 6 ADR-FE-004 BE/FE 분리 예외 (JSP = BE 통합 산출)
+  Tier 1 → 산출물 7/7 (full)
+  Tier 2 → 산출물 5/7 (state-map / visual-manifest 부분)
+  Tier 3 → 산출물 4/7 (LLM 추론 의존도 ↑)
+  Tier 4 → 산출물 3/7 + Stage 6 ADR-FE-004 BE/FE 분리 예외 (JSP = BE 통합 산출)
 ```
 
 ### 2.2 ADR-001 §FSD 와의 관계
@@ -174,7 +174,7 @@ JSP / Thymeleaf / ERB 의 server-side template 은 **BE 와 FE 가 통합 산출
 - `methodology-spec/be-fe-separation.md` §5 Tier 4 통합 산출 절차 정식
 - `legacy-spectrum.schema.json` `tier_4_be_fe_handling` enum 신설 (`scenario_c_integrated` / `legacy_carry_over_resolved_v14`)
 
-본 ADR §3.1 매트릭스의 "Tier 4 → 7대 산출물 3/7 + Stage 6 ADR-FE-004 BE/FE 분리 예외" = 정식 절차 결정 (Stage 6 종결).
+본 ADR §3.1 매트릭스의 "Tier 4 → 산출물 3/7 + Stage 6 ADR-FE-004 BE/FE 분리 예외" = 정식 절차 결정 (Stage 6 종결).
 
 ---
 
@@ -242,7 +242,7 @@ JSP / Thymeleaf / ERB 의 server-side template 은 **BE 와 FE 가 통합 산출
 ### ADR
 
 - ADR-001 (사상적 기반 §FSD)
-- ADR-002 (7대 산출물)
+- ADR-002 (산출물)
 - ADR-008 (이중 렌더링 사상)
 - ADR-FE-002 (이중 렌더링 FE 적용 — 짝)
 - ADR-FE-005 (권위 매개체 12 채택)

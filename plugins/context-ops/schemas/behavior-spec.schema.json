@@ -130,13 +130,13 @@
     },
     "cross_links": {
       "type": "object",
-      "description": "DO-178C bidirectional + analysis 7대 산출물 통합 (사용자 답변 3 정합)",
+      "description": "DO-178C bidirectional + analysis 산출물 통합 (사용자 답변 3 정합)",
       "additionalProperties": false,
       "properties": {
         "to_analysis_artifacts": {
           "type": "array",
           "items": {"type": "string"},
-          "description": "7대 산출물 reference 의무 — chain-coverage-validator 가 모두 reference 강제 (사용자 답변 3 \"현 7대 + 신규 추가\" 정합)"
+          "description": "산출물 reference 의무 — chain-coverage-validator 가 모두 reference 강제 (사용자 답변 3 \"기존 산출물 + 신규 추가\" 정합)"
         }
       }
     }

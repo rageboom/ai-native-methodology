@@ -129,7 +129,7 @@ approval_gate:
     status: '✅ _positive_findings_logged'
   - check: ' migration-cautions.md 신규 — v1.2.0 묶음 P 의무'
     status: '✅ NestJS 특이 8 함정 + 학습 효과 3건 + 4 ADR 후보'
-  - check: 'PoC #03 7대 산출물 6/7 도달'
+  - check: 'PoC #03 산출물 6/7 도달'
     status: '✅ — UI/UX 만 N/A (BE only)'
 
 # Findings (Phase 6 진행 중 발견 — 0건 / 모두 Phase 1-5 누적)
@@ -154,7 +154,7 @@ findings_cumulative:
   v120_bundles: 16 # A~P
   threshold_status: 'F-021 임계 168건 — §8.1 정합 (PoC #03 종결 후 v1.3 격상 데이터 충분)'
 
-# 7대 산출물 도달 (PoC #03 종결 )
+# 산출물 도달 (PoC #03 종결 )
 seven_deliverables_status:
   1_architecture: '✅ Phase 3 (raw 0.85)'
   2_domain: '✅ Phase 4 (raw 0.83)'
@@ -198,7 +198,7 @@ next_actions:
   - 'git commit ( PoC #03 종결 commit)'
   - ' Sprint 5 (환경 부재) — F-154 transitionFuzzyMatch 보완 + 진짜 static tool'
   - ' v1.3 격상 데이터 정리 — PoC #01+#02+#03 통합 보고 (사내 적용 가능 시점)'
-  - ' memory 갱신 (project_poc03_workflow.md → 7대 산출물 6/7 종결)'
+  - ' memory 갱신 (project_poc03_workflow.md → 산출물 6/7 종결)'
 
 # 정직 표기 ( no-simulation 정합)
 honesty_disclosure:
