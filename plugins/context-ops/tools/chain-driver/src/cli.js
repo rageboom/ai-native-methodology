@@ -60,6 +60,7 @@ import {
 	scopeFileForRead,
 	scopeDirForRead,
 	evidenceDirForRead,
+	analysisOutputPresent,
 } from '../../_shared/ai-context-layout.js';
 import { deriveGateActor } from './gate-provenance.js';
 import { planLayoutMigration, applyLayoutMigration } from './migrate-layout.js';
@@ -1867,6 +1868,21 @@ function cmdHooksBridge(args) {
 			);
 			process.exit(0);
 		}
+		// analysis-state-aware 진입 라우터 (DEC-2026-06-26-analysis-state-aware-router / MIS-433):
+		//   work-intent 자연어(discovery-default)인데 분석 산출물(.ai-context/base|output)이 없으면
+		//   "discovery부터"는 cold-start surface(코드 분석→init→discovery)와 모순 — discovery 는
+		//   analysis baseline grounding 을 전제하기 때문. → 제안 스킬을 analysis 진입으로 교체하고
+		//   analysis-default 안내로 라우팅. 강한 advisory(비차단) — orphan later-stage write 는
+		//   PreToolUse coldStartSkipAheadReason 이 별도 차단(teeth 중복 ❌). 결정론 fs probe(LLM inject ❌)
+		//   는 cli glue 에서만 — routeEntry 는 순수(prompt-only) 유지.
+		if (
+			route.source === 'discovery-default' &&
+			!analysisOutputPresent(payload.cwd || process.cwd())
+		) {
+			route.skillId = 'analysis-input-collection'; // 레거시 기본(주 타깃 S2) — note 가 greenfield/multi 대안 명시
+			route.agentId = 'analysis-agent';
+			route.source = 'analysis-default';
+		}
 		const repoRoot = args.repoRoot || resolveRepoRoot(process.cwd());
 		let meta = null;
 		try {
@@ -1883,6 +1899,7 @@ function cmdHooksBridge(args) {
 		});
 		// 진입 라우터 부가 안내 (DEC-2026-06-18 / living-sync §4 "discovery = 입구·라우터"):
 		//   discovery-default — stage 미지정 변경요청을 discovery 로 ground 하라는 사유 명시.
+		//   analysis-default — 분석 산출물 부재 → discovery 전 analysis 먼저 (analysis-state-aware / MIS-433).
 		//   stage(later-stage) + cold-start(discovery 'pending') — skip-ahead advisory redirect
 		//     (결정론 차단은 PreToolUse coldStartSkipAheadReason hard-block 이 최종 가드).
 		let routeNote = null;
@@ -1890,6 +1907,12 @@ function cmdHooksBridge(args) {
 			routeNote =
 				'진입 라우터: stage 미지정 자연어 변경요청 — 분석 외 모든 작업은 discovery(입구·라우터)부터 ground 후 진행. rule 변경이면 discovery 가 analysis 로 상향 라우팅. ' +
 				'복잡도 tier(DEC-2026-06-24): discovery 에서 닿는 노드를 식별해 `chain-driver triage --graph <artifact-graph.json> --refs <id,...>` 로 결정론 신호를 받고, predicate_satisfied=true 면서 trivial 로 판단되면 fast-path(thin change-record + impact + 경량 단일-OP 티켓)로 경량 진행 — 단 ⑥영향도·⑦Jira·최소검증은 `chain-driver fastpath-gate` 로 강제(면제 ❌). predicate_satisfied=false 거나 standard/deep 이면 기존 풀 체인.';
+		} else if (route.source === 'analysis-default') {
+			routeNote =
+				'진입 라우터(analysis-first): `.ai-context/base/`(또는 output/)에 분석 산출물이 없습니다 — discovery 는 analysis baseline grounding 을 전제하므로 바로 discovery 로 들어가거나 소스를 직접 수정하지 마세요. 먼저 analysis 단계로 진입하세요: ' +
+				'레거시 코드면 analysis-input-collection, 신규(greenfield: PRD/디자인/계약)면 analysis-greenfield-bootstrap, 입력 소스가 여럿이면 analysis-input-orchestrate. ' +
+				'산출물(architecture/domain/business-rules/openapi/schema 등 .ai-context/base/)이 생긴 뒤 같은 변경요청을 다시 주면 discovery 입구로 라우팅됩니다. ' +
+				'(강한 advisory — 강제 차단 아님 / orphan later-stage 산출물 직접 write 는 PreToolUse 가 별도 차단.)';
 		} else if (route.source === 'stage' && isLaterStageSkill(route.skillId)) {
 			try {
 				const st = readState(payload.cwd || process.cwd());

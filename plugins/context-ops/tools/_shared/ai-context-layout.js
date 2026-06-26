@@ -77,6 +77,44 @@ export function baseFileForRead(root, ...parts) {
 	);
 }
 
+// analysis 산출물(7대 deliverable) canonical 파일명 — analysisOutputPresent probe 의 검사 대상.
+//   chain 산출물(discovery-spec 등)·input.json 은 제외: input.json=analysis "시작"(started≠done) 신호이고
+//   greenfield 는 input.json 부재 / chain 산출물은 analysis 가 아닌 하위 stage.
+export const ANALYSIS_ARTIFACT_FILENAMES = Object.freeze([
+	'architecture.json',
+	'domain.json',
+	'business-rules.json',
+	'openapi.yaml',
+	'schema.json',
+	'db-schema.json', // schema.json 의 poc-16/18 호환 별칭
+	'antipatterns.json',
+	'ui-spec.json',
+]);
+
+/**
+ * 분석(analysis stage) 산출물 존재 결정론 probe — `.ai-context/base/`(read-alias: `output/`)에
+ * ANALYSIS_ARTIFACT_FILENAMES 중 하나라도 있으면 true.
+ *
+ * 진입 라우터(UserPromptSubmit)가 "분석 미완 프로젝트는 discovery 전 analysis 먼저"를 안내하는
+ * 근거 신호. state.json 의 `stage_progress.analysis`는 chain 커서(initScopeChainState 가
+ * scope 진입 시 complete 로 flip)일 뿐 "산출물 생산됨" 신호가 아니므로 그것과 별개 축.
+ *
+ * 순수 — fs 존재 + 상수 파일명만(LLM inject ❌ / STRONG-STOP). no-throw / root-guard.
+ * OR-any 인 이유: greenfield·FE-first 는 산출물 subset(예: ui-spec 만)만 생성하므로 특정 1종
+ * (architecture 등) require 시 false-negative 과다. baseFileForRead 가 NEW(base/)→OLD(output/)
+ * alias 를 처리. 알려진 한계: 구형 nested 레이아웃(output/architecture/architecture.json)은
+ * flat lookup 이 놓쳐 false-negative → "analysis 먼저" 안내(과보호 / 비차단이라 무해).
+ *
+ * @param {string} root 프로젝트 루트
+ * @returns {boolean}
+ */
+export function analysisOutputPresent(root) {
+	if (!root || typeof root !== 'string') return false;
+	return ANALYSIS_ARTIFACT_FILENAMES.some((f) =>
+		existsSync(baseFileForRead(root, f)),
+	);
+}
+
 // ── scopes/<scope>/[<stage>/] ───────────────────────────────────────────
 export function scopesRootPath(root) {
 	return join(root, AIMD, SEG.scopes);

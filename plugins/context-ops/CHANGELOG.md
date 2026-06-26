@@ -10,6 +10,18 @@
 
 ---
 
+## [0.85.0] — 2026-06-26 — MINOR — analysis-state-aware 진입 라우터 (분석 미완 시 discovery 전 analysis 먼저)
+
+**문제 (사용자 관측)**: analysis stage 가 한 번도 안 된 프로젝트에서 개발 의도 질의("…기능 추가")를 넣으면 체인이 제대로 안 걸린다. 원인 = 진입 라우터(`routeEntry`, UserPromptSubmit)가 prompt 텍스트만 보는 순수 함수라 **"분석 여부"를 전혀 안 본다** → work-intent 면 무조건 `discovery-from-nl-md` 로 보내고 매 프롬프트마다 "discovery 부터 ground" 안내를 붙인다. discovery 는 analysis baseline grounding 을 전제하는데, SessionStart cold-start 안내("코드 분석 → init → discovery")와 정면 모순 → per-prompt note 가 세션-1회 안내를 덮어 "체인을 잘 안타는" 체감.
+
+**해결 (analysis-state-aware / advisory)**: 결정론 fs probe `analysisOutputPresent(root)`(`tools/_shared/ai-context-layout.js`) 신설 — `.ai-context/base/`(read-alias `output/`)에 분석 산출물(architecture/domain/business-rules/openapi/schema/db-schema/antipatterns/ui-spec 중 하나라도)이 있으면 true. UserPromptSubmit 라우터가 work-intent(`discovery-default`)인데 분석 산출물이 없으면 제안 스킬을 **analysis 진입(`analysis-input-collection`/`analysis-agent`, source=`analysis-default`)으로 교체** + analysis-first 강한 advisory(레거시=input-collection / greenfield=bootstrap / 멀티소스=orchestrate / greenfield dead-end 회피 분기 명시). `discovery-from-nl-md` SKILL.md step 0-a 가드도 동일 정합.
+
+- **강한 advisory(비차단)** — 하드 차단 ❌: 분석 안 된 레포는 `.ai-context/` 자체가 없어(absent) over-block 방지 opt-in 신호가 없고, 진짜 실패모드(모델이 소스 직접 수정)는 임의 레포 파괴 없이 차단 불가. 기존 `coldStartSkipAheadReason` orphan later-stage write deny teeth 는 **불변**(중복 ❌ / 별개 altitude). analysis = soft exit gate #0 사상과 정합.
+- **결정론 axis(STRONG-STOP)**: probe = fs 존재 + 상수 파일명만(LLM inject ❌). probe 는 cli glue 에서만 호출 — `routeEntry` 는 prompt-only 순수 유지(테스트로 pin). state.json `stage_progress.analysis` 는 chain 커서(scope 진입 시 complete flip)일 뿐 "산출물 생산됨" 신호가 아니므로 별개 축.
+- **OR-any 사유**: greenfield·FE-first 는 산출물 subset(예: ui-spec)만 생성 → 특정 1종(architecture) require 시 false-negative 과다. `baseFileForRead` 가 NEW(base/)↔OLD(output/) alias 처리. 알려진 한계: 구형 nested 레이아웃(output/architecture/architecture.json)은 flat lookup 이 놓쳐 false-negative → "analysis 먼저" 과보호(비차단이라 무해).
+- **검증**: 신규 `ai-context-layout.test.js`(9) + `router-analysis-aware.test.js`(7, e2e 2-arm + stage-unaffected + 침묵 + routeEntry 순수성 pin) + chain-driver 762/762(회귀 0, hooks-contract discovery-default 단언을 analysis-present tmpdir 로 정정) + **≥2 PoC corroboration**(poc-18 Modern Express/Prisma + poc-19 Python numpy-financial: output/ present→discovery / rename 후→analysis-first 양 arm) + 3-way 0.85.0.
+- MIS-433 [OP-CHAINROUTE-002] (MIS-371 [OP-CHAINROUTE-001] 진입라우터의 연속). DEC-2026-06-26-analysis-state-aware-router.
+
 ## [0.84.0] — 2026-06-26 — MINOR — codegraph 구조적 질문 우선 nudge (navigation-first / grep authoritative 보존)
 
 **문제 (감사 발화)**: "codegraph 가 실제로 적극 쓰이고 항상 최신화되나" 감사 → 최신화(데몬 watcher)는 정상이나, transcript 1,738개 / tool 호출 45,795건 중 **codegraph 0.17%**(가용 6/17~ 구간도 ~1.3%) / grep·Read·Bash 99.8%. 탐색 자리에서 codegraph 가 사실상 미사용 — nudge 가 Grep 미접촉(valve 보호) + Read nudge=포인터만 + 게이트용 trust 정책이 일상 탐색까지 일반화된 탓.

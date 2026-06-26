@@ -224,20 +224,29 @@ describe('hooks-contract — session-handoff', () => {
 // DEC-2026-06-18 — discovery 보편-라우터 진입점 e2e (living-sync §4 "discovery = 입구·라우터").
 describe('hooks-contract — discovery 보편-라우터 (DEC-2026-06-18)', () => {
 	it('UserPromptSubmit: stage 미지정 변경요청 → discovery 폴백 + 입구·라우터 안내 (① silent 제거)', () => {
-		const r = runHooksBridge(
-			JSON.stringify({
-				hook_event_name: 'UserPromptSubmit',
-				prompt: '예약 취소 기능 추가해줘',
-				session_id: 's1',
-				cwd: process.cwd(),
-			}),
-		);
-		assert.equal(r.status, 0);
-		const out = JSON.parse(r.stdout);
-		assert.equal(out.suppressOutput, true);
-		const ctx = out.hookSpecificOutput.additionalContext;
-		assert.match(ctx, /discovery-from-nl-md/);
-		assert.match(ctx, /입구·라우터/);
+		// analysis-state-aware(MIS-433): discovery 폴백은 분석 산출물 존재를 전제 → tmpdir 에 base/ 산출물 1개.
+		//   (분석 부재 → analysis-first 교체 경로는 router-analysis-aware.test.js 가 커버.)
+		const root = mkdtempSync(join(tmpdir(), 'route-default-'));
+		try {
+			mkdirSync(join(root, '.ai-context', 'base'), { recursive: true });
+			writeFileSync(join(root, '.ai-context', 'base', 'architecture.json'), '{}');
+			const r = runHooksBridge(
+				JSON.stringify({
+					hook_event_name: 'UserPromptSubmit',
+					prompt: '예약 취소 기능 추가해줘',
+					session_id: 's1',
+					cwd: root,
+				}),
+			);
+			assert.equal(r.status, 0);
+			const out = JSON.parse(r.stdout);
+			assert.equal(out.suppressOutput, true);
+			const ctx = out.hookSpecificOutput.additionalContext;
+			assert.match(ctx, /discovery-from-nl-md/);
+			assert.match(ctx, /입구·라우터/);
+		} finally {
+			rmSync(root, { recursive: true, force: true });
+		}
 	});
 
 	it('PreToolUse: cold-start(discovery 미진입)에서 behavior-spec write → exit 2 deny (②)', () => {
