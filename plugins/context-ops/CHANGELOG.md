@@ -10,6 +10,19 @@
 
 ---
 
+## [0.83.0] — 2026-06-26 — MINOR — cold-start 커서 재수화 (manifest SSOT → state.json 자동 복구 / D3b)
+
+**문제 (carry)**: v0.82.0(cold-start 갭) §carry D3b + DEC-2026-06-25-state-model-simplify §carry "manifest 완전유도+reconcile". 핵심 사실 — **`state.json` 은 gitignore(휘발 커서) / scope·stage manifest 는 git-tracked(진행 SSOT)**. 팀원이 repo clone 시 manifest(진행상태)는 받지만 state.json 은 없어 **cold-start 로 떨어지나 실제론 chain 진행 중**. 기존 `init` 은 manifest 무시 DEFAULT(analysis=in_progress) 생성 → 진행상태 오기록.
+
+**해결 (재프레이밍)**: D3b 를 "자동 init(신규 결정)"이 아니라 **"휘발 커서를 SSOT manifest 에서 재수화(rehydrate)"** 로 재정의. state.json 은 gitignore라 외부효과 0 + 완전 가역 = lockfile 재생성·`terraform refresh`·LSP 인덱스 재빌드 동류(결정 ❌ 유도 ⭕). 산업 정합(npm 로컬 자동재생성 / Bazel·IntelliJ 자동+1줄 통지).
+
+- **`rehydrateCursorFromManifests(root)`** (state-store / 순수): `listScopes` → `none`(scope 0 / 자동 ❌) / `ambiguous`(scope 2+ 자동선택 ❌ — 작성자 머신 오복원 위험 / `--scope` 명시) / `not-found` / `corrupt-manifest`(current_stage 무효 / parse 실패 → 자동 ❌) / `single`(유도). scope manifest `current_stage`→`current_chain`(impl→implement), stage manifest status→`stage_progress`, analysis=complete(init parity).
+- **★ lossy 정직 (Senior STRONG-STOP)**: manifest 는 `blocked`/`block_reason`/`last_gate`/`current_task` 미보존(`next` 가 stage status + current_stage 만 동기화). → 재수화 시 기본값(blocked=false 등) + `lossy:true`/`lost_fields` + **surface 에 "직전 block·task 복원 불가" 명시**(BLOCKED clone 의 조용한 unblock = enforcement 구멍 차단).
+- **`chain-driver rehydrate <project> [--scope <slug>]`** 커맨드(명시 복구/CI/멀티scope 선택) + **SessionStart cold-start 자동 재수화**(single-scope 한정 / 투명 surface + lossy 고지 / multi=`--scope` 안내 / corrupt=에러 / none=미초기화 D3a).
+- **결정론 axis 보존(STRONG-STOP)**: manifest read + DEFAULT 합성만 / LLM inject ❌ / write=SSOT-유도(gitignore 휘발 커서 / 완전 가역).
+- **검증**: 신규 `cold-start-rehydrate.test.js` 13 (4-mode + impl매핑 + lossy + SessionStart 자동재수화 + rehydrate 커맨드) + chain-driver 747/747(회귀0). **≥2 PoC live corroboration**: poc-16(Legacy Spring4.1) + poc-18(Modern Express/Prisma/TS) — 실제 `init --scope` 로 scope manifest 생성 → state.json 삭제 → SessionStart 자동재수화 → `mode=live, current_chain=spec, current_scope=auth` (manifest SSOT 일치) 양 paradigm 재현.
+- **resolves**: DEC-2026-06-26-cold-start-enforcement §carry(D3b) + DEC-2026-06-25-state-model-simplify §carry(manifest 완전유도+reconcile). DEC-2026-06-26-cold-start-autoinit.
+
 ## [0.82.0] — 2026-06-26 — MINOR — cold-start 갭 메우기 (state.json 부재/손상 시 enforcement 공백 차단)
 
 **문제 (사용자 발화)**: "analysis 도 안 된 페이지에서 플러그인만 깔고 작업 프롬프트를 넣으면 어떻게 되나?" 추적 결과 — `state.json` 은 `chain-driver init` 수동 실행으로만 생성되는데(자동 init ❌), **그 전까지 PreToolUse 의 모든 결정론 deny 가 `if (state)` 뒤에 있어 통째로 비활성**. init 안 한 상태(=cold-start)에선 orphan 산출물 직접 write 도 안 막혔고, SessionStart 는 침묵해 "방법론이 켜졌는지/초기화됐는지" 신호가 0. 손상된 state.json 은 `catch { state = null }` 로 뭉개져 **live 프로젝트의 enforcement 가 조용히 전부 꺼지는 잠복버그**도 동반.

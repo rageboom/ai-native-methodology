@@ -42,6 +42,8 @@ import {
 	initScopeChainState,
 	getActiveScopeChain,
 	resolveEnforcementContext,
+	rehydrateCursorFromManifests,
+	writeRehydratedState,
 	setCurrentTask,
 	clearCurrentTask,
 } from './state-store.js';
@@ -170,6 +172,7 @@ function usage(code = 3) {
 			'',
 			'commands:',
 			'  init <project> [--scope <slug>] [--scenario <S1|S2|S3|greenfield>]',
+			'  rehydrate <project> [--scope <slug>]   (휘발 커서를 manifest SSOT 에서 재수화 / clone 후 state.json 부재 복구 / lossy: block·task 미복원)',
 			'  state <project> [--json]',
 			'  next <project> [--findings <path>] [--user-decision <go|stop|revisit:STAGE>] [--dry-run]',
 			'  query <project> [--scope <slug>] [--stage <s>] [--ref <id>] [--stale]',
@@ -1755,12 +1758,40 @@ function cmdHooksBridge(args) {
 			);
 		}
 		if (ctx.mode === 'cold-start') {
-			emitSurface(
-				withHandoff(
-					`방법론 설치됨·미초기화 — chain 단계추적/게이트 비활성 (orphan 산출물 쓰기만 차단). ` +
-						`정식 진행: 코드 분석 → 'chain-driver init <project>'로 state 생성 → discovery 진입. analysis 만 할 거면 init 불필요.`,
-				),
-			);
+			// D3b — 휘발 커서를 manifest(SSOT)에서 자동 재수화 (single-scope 한정 / DEC-2026-06-26-cold-start-autoinit).
+			//   결정 ❌ 유도 ⭕ (gitignore 커서 / 완전 가역). 멀티scope·손상·없음은 자동 ❌ + 안내.
+			const rh = rehydrateCursorFromManifests(root);
+			if (rh.mode === 'single') {
+				writeRehydratedState(root, rh.state);
+				emitSurface(
+					withHandoff(
+						`🔄 커서를 manifest 에서 재수화 (scope ${rh.scope} · stage ${rh.stage}). chain enforcement 활성. ` +
+							`⚠️ 직전 block·task 상태는 manifest 미보존 — 복원 안 됨(필요 시 재확인).`,
+					),
+				);
+			} else if (rh.mode === 'ambiguous') {
+				emitSurface(
+					withHandoff(
+						`🔀 scope 다수(${rh.scopes.join(', ')}) — 'chain-driver rehydrate <project> --scope <slug>' 로 커서를 지정하세요. ` +
+							`(현재 미초기화 / orphan 산출물만 차단)`,
+					),
+				);
+			} else if (rh.mode === 'corrupt-manifest') {
+				emitSurface(
+					withHandoff(
+						`⚠️ manifest 손상으로 자동 재수화 불가 (${rh.error}). 'chain-driver rehydrate <project>' 로 확인하세요. ` +
+							`(현재 미초기화 / orphan 산출물만 차단)`,
+					),
+				);
+			} else {
+				// mode 'none' — truly-fresh(scope 0). 자동 init ❌(결정) — 수동 안내(D3a).
+				emitSurface(
+					withHandoff(
+						`방법론 설치됨·미초기화 — chain 단계추적/게이트 비활성 (orphan 산출물 쓰기만 차단). ` +
+							`정식 진행: 코드 분석 → 'chain-driver init <project>'로 state 생성 → discovery 진입. analysis 만 할 거면 init 불필요.`,
+					),
+				);
+			}
 		}
 		// 이하 mode 'live' — 기존 전체 경로.
 		try {
@@ -4055,11 +4086,60 @@ function cmdClearTask(args) {
 	process.exit(0);
 }
 
+// rehydrate — 휘발 커서(state.json)를 git-tracked manifest(SSOT)에서 재수화 (D3b / DEC-2026-06-26-cold-start-autoinit).
+//   명시 경로(수동 복구·CI·멀티scope 선택) — SessionStart cold-start 자동 재수화의 1급 동등물.
+//   결정 ❌ 유도 ⭕ (gitignore 커서 / 완전 가역). lossy(blocked/last_gate/current_task 미복원) 정직 표기.
+function cmdRehydrate(args) {
+	if (!args.project) usage(3);
+	const root = resolve(args.project);
+	const rh = rehydrateCursorFromManifests(
+		root,
+		args.scope ? { scope: args.scope } : {},
+	);
+	if (rh.mode === 'none') {
+		console.error(
+			`[chain-driver rehydrate] scope 없음 — 유도할 SSOT 없음. 신규면 'chain-driver init ${args.project}' 로 시작하세요.`,
+		);
+		process.exit(3);
+	}
+	if (rh.mode === 'ambiguous') {
+		console.error(
+			`[chain-driver rehydrate] scope 다수(${rh.scopes.join(', ')}) — --scope <slug> 로 지정하세요.`,
+		);
+		process.exit(3);
+	}
+	if (rh.mode === 'not-found') {
+		console.error(
+			`[chain-driver rehydrate] scope "${rh.requested}" 없음 (가용: ${rh.scopes.join(', ')}).`,
+		);
+		process.exit(3);
+	}
+	if (rh.mode === 'corrupt-manifest') {
+		console.error(
+			`[chain-driver rehydrate] manifest 손상 — 재수화 불가: ${rh.error}`,
+		);
+		process.exit(4);
+	}
+	writeRehydratedState(root, rh.state);
+	process.stdout.write(
+		[
+			`[chain-driver rehydrate] ✅ 커서 재수화 — scope=${rh.scope} / current_chain=${rh.state.current_chain} (manifest stage=${rh.stage}).`,
+			`  stage_progress: ${Object.entries(rh.state.stage_progress)
+				.map(([k, v]) => `${k}:${v.status}`)
+				.join(' ')}`,
+			`  ⚠️ lossy — manifest 미보존(${rh.lost_fields.join(', ')})는 기본값 복원(직전 block·task 아님 / 필요 시 재확인).`,
+		].join('\n') + '\n',
+	);
+	process.exit(0);
+}
+
 function main() {
 	const args = parseArgs(process.argv);
 	switch (args.command) {
 		case 'init':
 			return cmdInit(args);
+		case 'rehydrate':
+			return cmdRehydrate(args);
 		case 'state':
 			return cmdState(args);
 		case 'next':

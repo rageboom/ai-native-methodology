@@ -355,6 +355,98 @@ export function getActiveScopeChain(state) {
 	};
 }
 
+// manifest stage(impl) → chain stage(implement) 역매핑 (cli.js stageToManifestStage 의 역).
+function manifestStageToChain(mStage) {
+	return mStage === 'impl' ? 'implement' : mStage;
+}
+
+// D3b — 휘발 커서(state.json)를 git-tracked manifest(SSOT)에서 재수화 (DEC-2026-06-26-cold-start-autoinit).
+//   state.json = gitignore(휘발) / scope·stage manifest = git-tracked(진행 SSOT / DEC-2026-06-25).
+//   clone 후 manifest 는 있으나 커서가 없을 때(cold-start) SSOT 에서 커서를 결정론 유도(재수화).
+//   결정 ❌ 유도 ⭕ — gitignore 라 외부효과 0 + 완전 가역(lockfile 재생성·terraform refresh 류).
+//
+//   ★ lossy (Senior STRONG-STOP): manifest 는 blocked/block_reason/last_gate/current_task 미보존
+//     (chain-driver next 가 stage status + scope current_stage 만 동기화 / cli.js next). → 이들은
+//     복원 불가 → 기본값(blocked=false 등) 유지 + lossy:true + lost_fields 로 정직 표기
+//     (BLOCKED clone 의 조용한 unblock = enforcement 구멍 차단). 결정론(manifest read + DEFAULT 합성
+//     / LLM inject ❌ / STRONG-STOP).
+//   analysis=complete = "init parity" (관측 증거 ❌ / scope 존재 시 initScopeChainState 규약 인용).
+//
+// @returns
+//   {mode:'none'}                               scope 0 — 유도원 없음(truly-fresh / 자동 ❌)
+//   {mode:'ambiguous', scopes}                  scope 2+ 且 --scope 미지정 — 자동선택 ❌(작성자 머신 오복원 위험)
+//   {mode:'not-found', requested, scopes}       --scope 가 실제 scope 와 불일치
+//   {mode:'corrupt-manifest', error}            manifest parse 실패 또는 current_stage 무효 — 자동 ❌
+//   {mode:'single', scope, stage, state, lossy, lost_fields}  유도 성공(state=in-memory / write 는 caller)
+export function rehydrateCursorFromManifests(projectRoot, options = {}) {
+	let scopes;
+	try {
+		scopes = listScopes(projectRoot);
+	} catch {
+		scopes = [];
+	}
+	if (!scopes || scopes.length === 0) return { mode: 'none' };
+
+	let scope;
+	if (options.scope) {
+		if (!scopes.includes(options.scope))
+			return { mode: 'not-found', requested: options.scope, scopes };
+		scope = options.scope;
+	} else if (scopes.length > 1) {
+		return { mode: 'ambiguous', scopes };
+	} else {
+		scope = scopes[0];
+	}
+
+	let scopeManifest;
+	const stageManifests = {};
+	try {
+		scopeManifest = readManifest(projectRoot, scope);
+		for (const ms of STAGES_LIST)
+			stageManifests[ms] = readManifest(projectRoot, scope, ms);
+	} catch (e) {
+		return {
+			mode: 'corrupt-manifest',
+			error: e && e.message ? e.message : String(e),
+		};
+	}
+	if (!scopeManifest)
+		return { mode: 'corrupt-manifest', error: `scope manifest 부재: ${scope}` };
+	const curManifestStage = scopeManifest.current_stage;
+	if (!STAGES_LIST.includes(curManifestStage))
+		return {
+			mode: 'corrupt-manifest',
+			error: `invalid current_stage "${curManifestStage}" in scope ${scope}`,
+		};
+
+	const state = DEFAULT_STATE(basename(projectRoot));
+	state.current_scope = scope;
+	state.current_chain = manifestStageToChain(curManifestStage);
+	const sp = DEFAULT_STAGE_PROGRESS();
+	sp.analysis = { status: 'complete' }; // init parity (initScopeChainState 규약)
+	for (const ms of STAGES_LIST) {
+		const st = stageManifests[ms] && stageManifests[ms].status;
+		if (st) sp[manifestStageToChain(ms)] = { status: st };
+	}
+	state.stage_progress = sp;
+	// lossy: manifest 미보존 런타임 필드는 DEFAULT 유지 (blocked=false / last_gate=null / current_task=null).
+	return {
+		mode: 'single',
+		scope,
+		stage: curManifestStage,
+		state,
+		lossy: true,
+		lost_fields: ['blocked', 'block_reason', 'last_gate', 'current_task'],
+	};
+}
+
+// 재수화 산출물 직접 write — CAS 무관(state.json 부재=cold-start 전제 / 휘발 커서 / gitignore).
+export function writeRehydratedState(projectRoot, state) {
+	ensureAimdDir(projectRoot);
+	atomicWrite(statePath(projectRoot), JSON.stringify(state, null, 2) + '\n');
+	return state;
+}
+
 // v2.0 — 전역 단일 current_task 포인터 set/clear (scope_states 제거 / DEC-2026-06-25).
 //   enter-task set / finish-task clear. scope 인자는 caller 시그니처 호환 위해 유지(미사용).
 //   CAS 뮤테이터 안에서 호출 (caller 가 clone 된 state 전달).
