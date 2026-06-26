@@ -302,7 +302,7 @@ test-impl-pass-validator = 진짜 runner 호출 / 100% pass / 5종 물증 7 필�
 │       │   ├── architecture.json
 │       │   ├── schema.json          # DB (단일 물리 스키마 / DB-always-on)
 │       │   ├── scope-carve.json     # reference-lens (도메인 후보 산출 → 도메인으로 못 쪼갬 / gate-inject ❌)
-│       │   ├── code-graph.json      # reference-lens (applies_to:all / gate-inject ❌)
+│       │   ├── code-graph.json      # reference-lens (applies_to:all / gate-inject ❌ / 구조질문 탐색 우선=policies/codegraph-navigation-first.md)
 │       │   ├── recovered-adr.json   # repo-wide arch 결정 (legacy·brownfield / official·opt-in)
 │       │   ├── run-manifest.json    # build/run/env 운영 컨텍스트 (official·opt-in / runnable 한정)
 │       │   ├── error-mapping-spec.json   # app-wide HTTP 에러 계약

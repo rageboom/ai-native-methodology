@@ -13,6 +13,8 @@ import {
 	oneHopNeighbors,
 	buildGraphContext,
 	buildHookOutput,
+	detectStructuralCodeQuestion,
+	buildCodegraphNavContext,
 } from '../graph-context-nudge.js';
 
 const GRAPH = {
@@ -96,4 +98,46 @@ test('graph-context-nudge 는 chain-driver gate 모듈을 import 하지 않는�
 	assert.ok(!/import[^;]*gate-eval/.test(src), 'gate-eval import = gate-inject 위험');
 	assert.ok(!/import[^;]*findings-aggregator/.test(src), 'findings-aggregator import = gate-inject 위험');
 	assert.ok(!/import[^;]*chain-driver\/src/.test(src), 'chain-driver gate 엔진 디렉토리 import = 분리 위반');
+});
+
+// ── codegraph navigation-first (DEC-2026-06-26) ──────────────────────────────
+test('detectStructuralCodeQuestion — intent × code-signal 동시 충족 시 도구 매핑', () => {
+	assert.equal(detectStructuralCodeQuestion('UserService 누가 호출?').intent, 'callers');
+	assert.equal(detectStructuralCodeQuestion('createUser 함수 흐름 추적해줘').intent, 'trace');
+	assert.equal(detectStructuralCodeQuestion('AuthMiddleware 바꾸면 영향 범위는?').intent, 'impact');
+	assert.equal(detectStructuralCodeQuestion('user.service.ts 어디 정의됐어').intent, 'locate');
+	assert.equal(detectStructuralCodeQuestion('로그인 컴포넌트 무엇을 호출하나').intent, 'callees');
+	assert.equal(detectStructuralCodeQuestion('who calls getOrderById').intent, 'callers');
+	// 매핑 도구명
+	assert.equal(detectStructuralCodeQuestion('UserService 누가 호출?').tool, 'codegraph_callers');
+});
+
+test('detectStructuralCodeQuestion — code-signal 부재(비코드 산문) = null (오탐 억제)', () => {
+	assert.equal(detectStructuralCodeQuestion('이 결정이 팀에 미치는 영향은?'), null);
+	assert.equal(detectStructuralCodeQuestion('오늘 날씨 어때'), null);
+	assert.equal(detectStructuralCodeQuestion('릴리스 일정 알려줘'), null);
+	assert.equal(detectStructuralCodeQuestion('그냥 흐름이 좋다'), null);
+	assert.equal(detectStructuralCodeQuestion('인생의 변수가 많다'), null);
+	assert.equal(detectStructuralCodeQuestion(''), null);
+	assert.equal(detectStructuralCodeQuestion(undefined), null);
+});
+
+test('detectStructuralCodeQuestion — intent 부재(코드신호만) = null', () => {
+	// code-signal(UserService) 있으나 구조 intent 없음 → 침묵
+	assert.equal(detectStructuralCodeQuestion('UserService 코드 좋네'), null);
+});
+
+test('buildCodegraphNavContext — codegraph 권유 + reference-lens disclaimer + 차단 필드 부재', () => {
+	const ctx = buildCodegraphNavContext({ intent: 'callers' });
+	assert.match(ctx, /codegraph_callers/);
+	assert.match(ctx, /reference-lens/);
+	assert.match(ctx, /grep authoritative/);
+	assert.match(ctx, /gate-inject ❌/);
+	// 알 수 없는 intent → context 폴백
+	assert.match(buildCodegraphNavContext({ intent: 'zzz' }), /codegraph_context/);
+	assert.match(buildCodegraphNavContext(), /codegraph_context/);
+	// hook output 으로 감싸도 차단 필드 부재 (never blocks)
+	const out = JSON.parse(buildHookOutput(ctx));
+	assert.equal(out.decision, undefined);
+	assert.equal(out.hookSpecificOutput.permissionDecision, undefined);
 });

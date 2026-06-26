@@ -10,6 +10,19 @@
 
 ---
 
+## [0.84.0] — 2026-06-26 — MINOR — codegraph 구조적 질문 우선 nudge (navigation-first / grep authoritative 보존)
+
+**문제 (감사 발화)**: "codegraph 가 실제로 적극 쓰이고 항상 최신화되나" 감사 → 최신화(데몬 watcher)는 정상이나, transcript 1,738개 / tool 호출 45,795건 중 **codegraph 0.17%**(가용 6/17~ 구간도 ~1.3%) / grep·Read·Bash 99.8%. 탐색 자리에서 codegraph 가 사실상 미사용 — nudge 가 Grep 미접촉(valve 보호) + Read nudge=포인터만 + 게이트용 trust 정책이 일상 탐색까지 일반화된 탓.
+
+**해결**: `scripts/graph-context-nudge.js`(UserPromptSubmit) 확장 — artifact-graph 매칭 0(순수 코드 질문) 분기에 구조적 코드 질문 감지(intent 키워드 × code-signal) 시 codegraph MCP 도구(callers/callees/trace/impact/...)를 **비차단** 권유 (DEC-2026-06-26-codegraph-navigation-first / `methodology-spec/policies/codegraph-navigation-first.md`).
+
+- **두 축 분리**: 축1(불변)=codegraph gate 비주입 · grep authoritative · grep deny ❌ (DEC-2026-05-28 §4.2). 축2(신규·범위 한정)=구조 질문(callers/callees/trace/impact/심볼위치)에 한해 codegraph 첫 수 / 일반·리터럴 검색은 grep 이 첫 수 유지.
+- **research 가 framing 정정 (4원칙 §2)**: 1차 "navigation-first 일반 격상"은 과잉주장 — 현장 AI 에이전트 grep-first 지배(yage.ai 실측 LSP 1.1% / Anthropic "grep just worked better") + grep=검증·리터럴 권위는 강지지. → 구조 질문 한정으로 좁힘. 구현(detector)은 이미 구조 질문에만 발동 → 코드 무변경, 정책/DEC 산문만 정직화.
+- **비차단·강제 아님**: additionalContext 한 줄 권유 / grep 절대 차단 안 함 / 독립 opt-out `CONTEXT_OPS_CODEGRAPH_NAV=0` / 신규 스크립트 0개(출하 가드·check #43 무변).
+- 산출: `graph-context-nudge.js`(+`detectStructuralCodeQuestion`/`buildCodegraphNavContext`) + 신규 정책 `codegraph-navigation-first.md` + `DEC-2026-06-26-codegraph-navigation-first` + INDEX + 포인터 2곳(reverse-engineering-methodology·lifecycle-contract).
+- 검증: graph-context-nudge 11/11 + sibling 55/55 + E2E 라이브 훅(구조질문→권유 / 산문→침묵 / opt-out→침묵, 전부 exit 0) + release-readiness 43/43.
+- carry: adoption 실측(soft nudge 효과 비보장 / 현장 grep-first 관성 / 안 오르면 revisit — 강제화는 축1·업계 명제 B 위반이라 안 함) + match>0(심볼=artifact 노드) 사각 확장 후보. MIS-429 [OP-CODEGRAPH-001].
+
 ## [0.83.0] — 2026-06-26 — MINOR — cold-start 커서 재수화 (manifest SSOT → state.json 자동 복구 / D3b)
 
 **문제 (carry)**: v0.82.0(cold-start 갭) §carry D3b + DEC-2026-06-25-state-model-simplify §carry "manifest 완전유도+reconcile". 핵심 사실 — **`state.json` 은 gitignore(휘발 커서) / scope·stage manifest 는 git-tracked(진행 SSOT)**. 팀원이 repo clone 시 manifest(진행상태)는 받지만 state.json 은 없어 **cold-start 로 떨어지나 실제론 chain 진행 중**. 기존 `init` 은 manifest 무시 DEFAULT(analysis=in_progress) 생성 → 진행상태 오기록.
