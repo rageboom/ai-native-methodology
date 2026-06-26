@@ -495,3 +495,26 @@ export function shouldBlockToolUse({ toolName, toolInput, state }) {
 		return null;
 	return state.block_reason || 'state.blocked=true';
 }
+
+// corrupt state.json fail-closed deny (cold-start 갭 / DEC-2026-06-26-cold-start-enforcement).
+//   state.json 이 존재하나 손상(parse/version/IO 실패)이면 enforcement 판정 불가 → 손상 위에
+//   산출물을 더 쌓지 못하도록 fail-closed: .ai-context/ write + MCP ticket-sync 차단.
+//   (shouldBlockToolUse 는 state.blocked 를 요구 — corrupt 엔 state 객체가 없으므로 별도 경로.)
+//   결정론: toolName + path 만 (LLM inject ❌). resolveEnforcementContext mode==='corrupt' 에서만 호출.
+// @returns {string|null} deny reason 또는 null(allow — .ai-context 밖 source write 등).
+export function corruptStateBlockReason({ toolName, toolInput, errorMessage }) {
+	const suffix = errorMessage ? ` (${errorMessage})` : '';
+	if (
+		typeof toolName === 'string' &&
+		(toolName.startsWith('mcp__wiki-jira-assistant__') ||
+			toolName.startsWith('mcp__mcp-server-wiki-jira__'))
+	) {
+		return `state.json 손상 — fail-closed: MCP ticket-sync 차단. 'chain-driver state'로 확인 후 복구하세요.${suffix}`;
+	}
+	if (!['Write', 'Edit', 'NotebookEdit'].includes(toolName)) return null;
+	const path =
+		toolInput?.file_path || toolInput?.path || toolInput?.notebook_path || '';
+	if (!path) return null;
+	if (!isInAiContext(path)) return null; // .ai-context 밖 source 편집은 허용(현 정책과 동일 scope)
+	return `state.json 손상 — fail-closed: .ai-context/ 쓰기 차단. 'chain-driver state'로 손상 확인 후 복구/재init 하세요.${suffix}`;
+}

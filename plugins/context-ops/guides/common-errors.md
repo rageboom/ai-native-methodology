@@ -48,6 +48,23 @@
 - (b) `${CLAUDE_PLUGIN_ROOT}` 환경변수 inject 안 됨 — Claude Code 버전 확인
 - (c) chain-driver hooks-bridge 실행 실패 — stderr 확인 (`tail -f ~/.claude/logs/...`)
 
+### Q2.1 Plugin 깔고 작업하는데 chain 단계추적/게이트가 안 켜진다 (cold-start)
+
+**증상**: 설치 직후 바로 작업했더니 단계 추적·statusline·게이트가 없고, 산출물을 마음대로 쓸 수 있다(또는 일부만 막힌다).
+
+**원인**: chain enforcement 는 `.ai-context/state.json` 이 있어야 켜진다. state.json 은 `chain-driver init` 으로만 생성된다(자동 init ❌). init 전 = **cold-start** 상태.
+
+**4-mode 동작** (state.json 유무 × `.ai-context/` 유무):
+
+| 상태 | 무엇이 켜지나 |
+| --- | --- |
+| `.ai-context/` 없음 (방법론 미사용 레포) | 아무것도 안 막음 (over-block 회피 — 임의 레포 보호) |
+| `.ai-context/` 있음 + state.json 없음 = **cold-start** | SessionStart 가 "미초기화" 안내. later-stage 산출물(behavior-spec 등) 직접 write 만 orphan 차단. source 편집·analysis 는 자유 |
+| state.json 손상 = **corrupt** | fail-closed — `.ai-context/` write 전면 차단 + 복구 안내. `chain-driver state` 로 확인 후 복구 |
+| state.json 정상 = **live** | 전체 enforcement (blocked / skip-ahead / branch / base) |
+
+**해결**: 정식 chain 운영을 원하면 `chain-driver init <project>` (scope 작업이면 `--scope <slug>`) 실행 → state 생성 → discovery 진입. **analysis 만 할 거면 init 불필요**(analysis 는 cold-start 에서도 정상 동작).
+
 ## 2. Version mismatch
 
 ### Q3. README / CLAUDE / plugin.json 의 version 출력이 다를 때

@@ -41,6 +41,7 @@ import {
 	listScopes,
 	initScopeChainState,
 	getActiveScopeChain,
+	resolveEnforcementContext,
 	setCurrentTask,
 	clearCurrentTask,
 } from './state-store.js';
@@ -93,6 +94,7 @@ import {
 	isLaterStageSkill,
 	shouldBlockToolUse,
 	coldStartSkipAheadReason,
+	corruptStateBlockReason,
 	checkCascadeConformance,
 	detectGraphArtifactWrite,
 	detectSourceFileWrite,
@@ -1720,20 +1722,47 @@ function cmdHooksBridge(args) {
 		const handoffNudge = existsSync(join(root, '.ai-context', 'HANDOFF.md'))
 			? '📋 세션 인계 문서 존재 — .ai-context/HANDOFF.md 를 먼저 읽고 §3 "다음 작업"부터 이어서 진행 (§4 휘발성 상태는 실제와 대조 / skill: session-handoff).'
 			: null;
-		if (!existsSync(join(root, '.ai-context', 'state.json'))) {
-			// user project not yet initialized — HANDOFF 만 있으면 그것만 표면화 / 둘 다 없으면 pass-through.
-			const out = handoffNudge
+		// cold-start 갭 (DEC-2026-06-26-cold-start-enforcement) — 4-mode surface.
+		//   absent     = 방법론 미사용 레포 → HANDOFF 만(있으면) / 둘 다 없으면 침묵 (현행 보존 / over-block 회피).
+		//   corrupt    = state.json 손상 → fail-closed 복구 안내 (기존엔 "ready" 거짓 표시되던 잠복버그 정정).
+		//   cold-start = 미초기화(.ai-context 만) → 정직 surface + analysis→init→discovery 안내 (D2+D3a).
+		//   live       = 정상 → 아래 기존 전체 경로(drift/unbaselined/resume/graph).
+		const ctx = resolveEnforcementContext(root);
+		const emitSurface = (additionalContext) => {
+			const out = additionalContext
 				? {
 						suppressOutput: true,
-						hookSpecificOutput: {
-							additionalContext: `[ai-native-methodology] ${handoffNudge}`,
-						},
+						hookSpecificOutput: { hookEventName: event, additionalContext },
 						continue: true,
 					}
 				: { suppressOutput: true, continue: true };
 			process.stdout.write(JSON.stringify(out) + '\n');
 			process.exit(0);
+		};
+		const withHandoff = (msg) =>
+			handoffNudge
+				? `[ai-native-methodology] ${handoffNudge}\n[ai-native-methodology] ${msg}`
+				: `[ai-native-methodology] ${msg}`;
+		if (ctx.mode === 'absent') {
+			emitSurface(handoffNudge ? `[ai-native-methodology] ${handoffNudge}` : null);
 		}
+		if (ctx.mode === 'corrupt') {
+			emitSurface(
+				withHandoff(
+					`⚠️ state.json 손상 감지 — chain enforcement fail-closed (.ai-context/ 쓰기 차단 중). ` +
+						`'chain-driver state'로 확인 후 복구하거나 백업에서 되돌리세요. (오류: ${ctx.error})`,
+				),
+			);
+		}
+		if (ctx.mode === 'cold-start') {
+			emitSurface(
+				withHandoff(
+					`방법론 설치됨·미초기화 — chain 단계추적/게이트 비활성 (orphan 산출물 쓰기만 차단). ` +
+						`정식 진행: 코드 분석 → 'chain-driver init <project>'로 state 생성 → discovery 진입. analysis 만 할 거면 init 불필요.`,
+				),
+			);
+		}
+		// 이하 mode 'live' — 기존 전체 경로.
 		try {
 			recoverTmpFiles(root);
 		} catch {
@@ -1757,7 +1786,7 @@ function cmdHooksBridge(args) {
 		//   "현재 stage"는 statusLine 이 상시 담당 / reference-lens·display-only — 어떤 gate 에도 inject ❌. 활성 chain 없으면 null(침묵).
 		let resumeSummary = null;
 		try {
-			resumeSummary = buildSessionResumeSummary(readState(root));
+			resumeSummary = buildSessionResumeSummary(ctx.state);
 		} catch {
 			/* non-fatal — corrupt/absent state = 요약 생략 */
 		}
@@ -1852,13 +1881,39 @@ function cmdHooksBridge(args) {
 	if (event === 'PreToolUse') {
 		// attempt to resolve project from cwd and check blocked.
 		const root = payload.cwd || process.cwd();
-		let state = null;
-		try {
-			state = readState(root);
-		} catch {
-			state = null;
-		}
-		if (state) {
+		// cold-start 갭 (DEC-2026-06-26-cold-start-enforcement) — 4-mode enforcement.
+		//   corrupt    = state.json 손상 → fail-closed (.ai-context write + MCP ticket-sync 차단).
+		//   cold-start = 미초기화(.ai-context 만) → read-only pseudoChain 으로 orphan 산출물만 차단.
+		//   live       = 정상 → 기존 전체 enforcement (blocked/skip-ahead/branch).
+		//   absent     = .ai-context 부재 → 무차단 (방법론 미사용 레포 / over-block 회피).
+		const ctx = resolveEnforcementContext(root);
+		const denyExit = (reason) => {
+			const out = buildBlockOutput({
+				reason,
+				sessionId: payload.session_id,
+				hookEventName: event,
+			});
+			process.stdout.write(JSON.stringify(out) + '\n');
+			process.stderr.write(`[chain-driver] PreToolUse blocked: ${reason}\n`);
+			process.exit(2);
+		};
+		if (ctx.mode === 'corrupt') {
+			const reason = corruptStateBlockReason({
+				toolName: payload.tool_name,
+				toolInput: payload.tool_input,
+				errorMessage: ctx.error,
+			});
+			if (reason) denyExit(reason);
+		} else if (ctx.mode === 'cold-start') {
+			// init 안 해도 later-stage chain 산출물 직접 write = orphan → deny (discovery='pending' 합성).
+			const skipReason = coldStartSkipAheadReason({
+				toolName: payload.tool_name,
+				toolInput: payload.tool_input,
+				activeChain: ctx.pseudoChain,
+			});
+			if (skipReason) denyExit(skipReason);
+		} else if (ctx.mode === 'live') {
+			const state = ctx.state;
 			const reason = shouldBlockToolUse({
 				toolName: payload.tool_name,
 				toolInput: payload.tool_input,

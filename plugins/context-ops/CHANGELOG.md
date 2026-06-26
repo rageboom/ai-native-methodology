@@ -10,6 +10,23 @@
 
 ---
 
+## [0.82.0] — 2026-06-26 — MINOR — cold-start 갭 메우기 (state.json 부재/손상 시 enforcement 공백 차단)
+
+**문제 (사용자 발화)**: "analysis 도 안 된 페이지에서 플러그인만 깔고 작업 프롬프트를 넣으면 어떻게 되나?" 추적 결과 — `state.json` 은 `chain-driver init` 수동 실행으로만 생성되는데(자동 init ❌), **그 전까지 PreToolUse 의 모든 결정론 deny 가 `if (state)` 뒤에 있어 통째로 비활성**. init 안 한 상태(=cold-start)에선 orphan 산출물 직접 write 도 안 막혔고, SessionStart 는 침묵해 "방법론이 켜졌는지/초기화됐는지" 신호가 0. 손상된 state.json 은 `catch { state = null }` 로 뭉개져 **live 프로젝트의 enforcement 가 조용히 전부 꺼지는 잠복버그**도 동반.
+
+**해결**: 단일 결정론 리졸버 `resolveEnforcementContext(root)` 로 4-mode 판정 후 SessionStart/PreToolUse 가 공유 (DEC-2026-06-26-cold-start-enforcement). `existsSync(state.json)` 을 먼저 봐 "부재(null)"와 "손상(throw)"을 분리 — 손상 silent 강등 차단.
+
+- **opt-in 신호 = `.ai-context/` 존재** (analysis-input-collection 이 `input.json` 생성). 임의 레포 over-block 회피 — pre-commit `--allow-missing-config`·Husky v9 디렉토리 활성화 선례 정합(research).
+- **4-mode**:
+  - `live` (state.json 정상) — 기존 전체 enforcement.
+  - `corrupt` (state.json 손상) — **fail-closed**: `.ai-context/` write + MCP ticket-sync 차단 + 복구 surface. (기존 잠복버그 동시 해소.)
+  - `cold-start` (state.json 부재 + `.ai-context/` 존재) — read-only pseudoChain(`discovery='pending'`) 합성 → `coldStartSkipAheadReason` 만 적용 = **orphan chain 산출물(behavior-spec 등)만 차단** / source 편집·discovery-spec(UC)·analysis 는 허용(init 상태와 parity / 신규 차단 행위 도입 ❌).
+  - `absent` (`.ai-context/` 부재) — 무차단(현행 / 방법론 미사용 레포 보호).
+- **SessionStart surface**(additionalContext / display-only / gate inject ❌): cold-start=미초기화+`chain-driver init` 안내(D3a) / corrupt=fail-closed 복구 안내. (기존엔 손상 state 가 "ready" 거짓 표시되던 것 정정.)
+- **D3a 안내 강화 (자동 init ❌)**: discovery-from-nl-md SKILL.md step 0 cold-start 가드 + common-errors Q2.1(4-mode 표).
+- **결정론 axis 보존(STRONG-STOP)**: 파일 존재 + 파일명만 / pseudoChain=DEFAULT_STAGE_PROGRESS 합성 / LLM inject ❌ / read-only(파일 mutation 0).
+- **검증**: 신규 `cold-start-enforcement.test.js` 19 (resolveEnforcementContext 4-mode + corruptStateBlockReason + SessionStart/PreToolUse E2E) + 기존 fixture 1 정정(숫자 version → 문자열) + chain-driver 734/734 회귀 0. **≥2 PoC live corroboration**: poc-16(Legacy Spring 4.1) + poc-18(Modern Express/Prisma/TS) 양 paradigm 에서 cold-start orphan deny / source allow / corrupt deny E2E 재현(§8.1 단일 PoC 과적합 회피).
+
 ## [0.81.0] — 2026-06-26 — MINOR — spec·plan 게이트 가독성 (discovery 읽기뷰 패턴 확장)
 
 **문제 (사용자 발화)**: discovery 게이트 검토 화면은 v0.79.0 에서 "JSON 인스펙터 → PRD 산문" 으로 읽기 좋게 바꿨으나, 그 다음 단계인 **spec 게이트(#2: behavior-spec / acceptance-criteria / unit-spec)·plan 게이트(#3: task-plan) 는 여전히 raw 필드워커**(`behavior-spec.js` 7줄 등 `Kit.arrange` 위임) = 같은 "JSON 덩어리" 통증 잔존. discovery 와 비슷하게 읽히게 해달라.

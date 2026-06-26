@@ -12,6 +12,7 @@ scope 진입 시 (`chain-driver init --scope <slug>` 직후) NL prompt 또는 ma
 
 ## 사전 조건
 
+- **(step 0) cold-start 가드** — `.ai-context/state.json` 이 없으면 chain enforcement 가 비활성(cold-start)이라 discovery 진입 전 먼저 `chain-driver init <project>` (scope 작업이면 `--scope <slug>`) 로 state 를 생성한다. init 없이 later-stage 산출물(behavior-spec 등)을 직접 write 하면 orphan 으로 PreToolUse 가 차단한다(자동 init ❌ — 명시 실행). analysis 만 할 거면 init 불필요.
 - markdown 기획 문서 파일 경로 (`.md`) 또는 in-conversation NL prompt text.
 - (선택) `.ai-context/base/business-rules.json` baseline (BR cross-check 용).
 

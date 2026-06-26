@@ -51,9 +51,11 @@ function makeFixture(synthesizedAt) {
 	const root = mkdtempSync(join(tmpdir(), 'aimd-fresh-'));
 	mkdirSync(join(root, '.ai-context', 'output'), { recursive: true });
 	mkdirSync(join(root, 'src'), { recursive: true });
+	// 유효 live state — version 은 문자열 의무(readState strict / resolveEnforcementContext mode:'live').
+	//   숫자 version 은 corrupt 로 분류되어 graph surface 가 fail-closed 메시지로 대체됨(cold-start 갭 / DEC-2026-06-26).
 	writeFileSync(
 		join(root, '.ai-context', 'state.json'),
-		JSON.stringify({ version: 1 }) + '\n',
+		JSON.stringify({ version: '2.0', project_id: 'fresh-fixture', current_chain: 'analysis' }) + '\n',
 	);
 	writeFileSync(
 		join(root, '.ai-context', 'output', 'artifact-graph.json'),

@@ -107,6 +107,49 @@ export function readState(projectRoot) {
 	return json;
 }
 
+// 4-mode enforcement context 리졸버 (cold-start 갭 / DEC-2026-06-26-cold-start-enforcement).
+// state.json 부재(null)와 손상(throw)을 명시 분리 — 손상된 live 프로젝트가 약한 cold-start 로
+// silent 강등되는 것을 차단(Senior STRONG-STOP #1 + 기존 잠복버그 동시 해소). 순수 결정론 —
+// 파일 존재 + parse 결과만 (LLM inject ❌ / STRONG-STOP / feedback_chain_driver_deterministic_axis).
+// 절대 throw ❌ — 예기치 못한 IO 오류도 state.json 존재 시 corrupt(fail-closed)로 흡수(hook hot-path 안전).
+//
+//   mode 'live'       state.json 정상            → caller 전체 enforcement (state 반환)
+//   mode 'corrupt'    state.json 존재·읽기 실패  → fail-closed (.ai-context write 차단)
+//   mode 'cold-start' state.json 부재 + .ai-context/ 존재 → orphan 산출물만 차단 (read-only pseudoChain)
+//   mode 'absent'     .ai-context/ 도 부재       → 무차단 (방법론 미사용 레포 / over-block 회피)
+//
+// @param {string} projectRoot
+// @returns {{mode:'live',state:object}|{mode:'corrupt',error:string}|{mode:'cold-start',pseudoChain:object}|{mode:'absent'}}
+export function resolveEnforcementContext(projectRoot) {
+	const sp = statePath(projectRoot);
+	if (existsSync(sp)) {
+		try {
+			const state = readState(projectRoot);
+			if (state) return { mode: 'live', state };
+			// existsSync 후 race-delete → null. .ai-context 체크로 graceful fallthrough.
+		} catch (e) {
+			// state.json 존재하나 parse/version/IO 실패 = 손상 취급 fail-closed (never throw).
+			return { mode: 'corrupt', error: e && e.message ? e.message : String(e) };
+		}
+	}
+	if (existsSync(join(projectRoot, '.ai-context'))) {
+		// read-only 합성 — getActiveScopeChain 와 동일 shape (coldStartSkipAheadReason 소비).
+		// 파일 mutation 0. discovery='pending' 이 cold-start skip-ahead 판정의 핵심.
+		return {
+			mode: 'cold-start',
+			pseudoChain: {
+				current_chain: 'analysis',
+				stage_progress: DEFAULT_STAGE_PROGRESS(),
+				last_gate: null,
+				current_task: null,
+				scoped: false,
+				scope: null,
+			},
+		};
+	}
+	return { mode: 'absent' };
+}
+
 // Atomic write: tmp → fsync → rename (Windows fallback: copyFile + unlink).
 export function atomicWrite(finalPath, contentString) {
 	mkdirSync(dirname(finalPath), { recursive: true });
