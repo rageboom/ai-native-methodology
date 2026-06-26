@@ -142,6 +142,44 @@ test('AC 렌더러 — Gherkin 이 Given/When/Then 시나리오 스텝으로', (
 	assert.ok(kws.includes('Then'), 'Then 키워드');
 });
 
+// ===== spec·plan 게이트 가독성 (읽기뷰 / 필드워커 대치) =====
+
+test('behavior-spec 읽기뷰 — 동작 카드 + 산문 + 추적 칩(필드워커 ❌)', () => {
+	const { byId, descendants } = runApp('behavior-spec'); // poc-14 = behaviors 4
+	const cards = collect(byId['form'], 'bs-b', descendants);
+	assert.equal(cards.length, 4, '동작 4개 = bespoke 카드 (Kit.arrange 필드워커 아님)');
+	assert.ok(collect(byId['form'], 'bs-name', descendants).length === 4, '동작 이름 헤더');
+	assert.ok(collect(byId['form'], 'bs-trace', descendants).length > 0, '추적 칩 줄(← UC / → AC)');
+	assert.ok(collect(byId['form'], 'bs-ref', descendants).length > 0, 'ref 칩 = json 기존 ref 표시');
+	assert.ok(collect(byId['form'], 'bs-blk', descendants).length > 0, '전제/결과 블록');
+});
+
+test('task-plan 읽기뷰 — TL;DR + 실행순 작업 + ADR/위험/NFR 섹션', () => {
+	const { byId, descendants } = runApp('task-plan'); // poc-14 = tasks4 adrs2 risks4 nfr4
+	assert.equal(collect(byId['form'], 'tp-tldr', descendants).length, 1, '한눈 요약(TL;DR) 1개');
+	const heads = collect(byId['form'], 'sec-head', descendants).map((e) => e.textContent).join(' | ');
+	assert.ok(/작업/.test(heads), '작업 섹션');
+	assert.ok(/설계 결정/.test(heads), 'ADR 섹션');
+	assert.ok(/위험/.test(heads), '위험 섹션');
+	assert.ok(/비기능 요구/.test(heads), 'NFR 섹션');
+	// 실행 순서 정렬 — tp-ord 가 비내림차순.
+	const orders = collect(byId['form'], 'tp-ord', descendants).map((e) => Number(e.textContent));
+	const sorted = orders.slice().sort((a, b) => a - b);
+	assert.deepEqual(orders, sorted, '작업이 execution_order 로 정렬');
+});
+
+test('unit-spec 읽기뷰 — 유닛 카드 + 커버리지 통계', () => {
+	const { byId, descendants } = runApp('unit-spec'); // poc-21 fixture
+	assert.ok(collect(byId['form'], 'us-u', descendants).length > 0, '유닛 카드');
+	assert.equal(collect(byId['form'], 'us-cov', descendants).length, 1, '커버리지 통계 블록');
+});
+
+test('acceptance-criteria 읽기뷰 — 기준 카드 + 추적(시나리오는 위 테스트)', () => {
+	const { byId, descendants } = runApp('acceptance-criteria');
+	assert.equal(collect(byId['form'], 'ac-c', descendants).length, 4, '인수기준 4개 카드');
+	assert.ok(collect(byId['form'], 'ac-trace', descendants).length > 0, '추적 칩(← 동작 / → 테스트)');
+});
+
 test('잠금 — provenance/구조는 ro-val(비클릭), 클릭 대상에 잠금 경로 없음', () => {
 	const { byId, descendants } = runApp('task-plan');
 	const roVals = collect(byId['form'], 'ro-val', descendants);

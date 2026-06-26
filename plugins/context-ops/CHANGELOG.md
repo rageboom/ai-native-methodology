@@ -10,6 +10,24 @@
 
 ---
 
+## [0.81.0] — 2026-06-26 — MINOR — spec·plan 게이트 가독성 (discovery 읽기뷰 패턴 확장)
+
+**문제 (사용자 발화)**: discovery 게이트 검토 화면은 v0.79.0 에서 "JSON 인스펙터 → PRD 산문" 으로 읽기 좋게 바꿨으나, 그 다음 단계인 **spec 게이트(#2: behavior-spec / acceptance-criteria / unit-spec)·plan 게이트(#3: task-plan) 는 여전히 raw 필드워커**(`behavior-spec.js` 7줄 등 `Kit.arrange` 위임) = 같은 "JSON 덩어리" 통증 잔존. discovery 와 비슷하게 읽히게 해달라.
+
+**해결**: spec·plan 게이트의 검토 렌더러를 **제자리에서 읽기뷰로 업그레이드** (DEC-2026-06-26-spec-plan-gate-readability). research(공식문서/업계사례/Senior 3-에이전트)가 **Option R(가독성만 / 상태머신 무접촉)** 로 수렴.
+
+- **scope = 가독성만**. discovery 의 draft-first 2-게이트·`/confirm-scope` 구조적 선택은 **명시 scope-out** — spec/plan 은 이미 잠긴 discovery scope 에서 결정론 파생이라 draft 가 좁힐 모집합이 없음(Senior). 기존 `/apply` 자유텍스트 채널 유지.
+- **상태머신·phase-flow·게이트 무접촉** (gate #2/#3 그대로 / STRONG-STOP 보존). renderAs 배선·server.js **무변경** — 기존 산출물별 렌더러를 제자리 업그레이드(별도 phase/renderAs 불요).
+- **behavior-spec 읽기뷰** (`assets/renderers/behavior-spec.js`): 동작별 이름 + 산문 설명(문장 줄바꿈) + 전제/결과/불변 블록 + 추적 칩(← 유스케이스 / → 인수기준 / 규칙).
+- **acceptance-criteria 읽기뷰**: 기준별 산문 + 우선/검증 칩 + Given/When/Then 시나리오(style.css scn- 재사용) + 추적(← 동작 / ← 유스케이스 / → 테스트).
+- **unit-spec 읽기뷰**: 유닛 카드(종류/출처/코드위치/불변·협력 추적) + 커버리지 통계 블록.
+- **task-plan 읽기뷰** (`assets/renderers/task-plan.js`): 한눈 요약(TL;DR) → 작업(실행순 정렬 + 산문 + 의존성/추적) → 설계결정 ADR(완전문 산문 / Nygard) → 위험 → 비기능요구 NFR.
+- **추적 칩 = json 기존 ref 표시만** (계산/검증 ❌ = traceability-builder 책임 / read-only render-time). 본체 **schema 무변경** / 산문 render-time / persist ❌ (json 단독 SSOT / ADR-011).
+- **Kit 로직 헬퍼 승격** (`assets/kit.js`): `Kit.el` + `Kit.proseSentences`(문장 줄바꿈 / wrapCls 호출측 = CSS 누수 차단). spec/plan 읽기뷰 공용. CSS 는 렌더러 로컬(bs-/ac-/us-/tp-).
+- **tests**: `dom-render.test.js` +5(behavior 카드·추적 / task-plan TL;DR·실행순 정렬·ADR/위험/NFR 섹션 / unit 카드·커버리지 / AC 카드·추적). 전 기존 테스트 회귀 0.
+
+> rebase 메모: 작성 당시 v0.80.0 라벨이었으나 main 이 v0.80.0(MIS-428 session-resume)을 먼저 출하 → 충돌 회피 위해 **v0.81.0** 으로 rebump (DEC 날짜·내용 동일).
+
 ## [0.80.0] — 2026-06-25 — MINOR — 세션 시작 시 잔여작업 + 현재 stage 자동 요약 (MIS-428 [OP-SESSION-001])
 
 **요구 (사용자 발화)**: 세션 최초 시작 시 "지금 어느 chain stage 인지, 잔여 작업이 뭔지" 자동 요약을 보고 싶다.
@@ -34,7 +52,6 @@
 ### 결정
 - DEC-2026-06-25-session-resume-summary. §2 적대검토의 stderr 가시성 전제 오류를 재논의가 교정(2번째 self-기록 사실 교정 / `feedback_self_recorded_fact_validation` + `feedback_research_fact_validation`).
 - carry: LLM 첫 응답 richer 렌더형 / 블랭크 화면 즉시 표출 필요 시 `systemMessage` 1줄 재검토(warning 톤·렌더 미명세 trade-off 명시).
-
 ## [0.79.0] — 2026-06-25 — MINOR — discovery 2-게이트 (PRD 산문 + 공유 묶음 뷰 + 범위 선택 / draft-first)
 
 **문제 (사용자 발화)**: discovery 게이트의 브라우저 검토 화면(`plan-review-server`)이 (1) JSON을 그대로 옮겨 압축 언어로 보여줘 "PRD가 아니라 JSON 인스펙터" — 말을 풀어 쓰고 이해를 돕는 도식이 필요, (2) 사용자가 방향/범위를 **선택**할 수 없음, (3) spec을 다 만든 뒤 보여주니 늦음 — 가벼운 draft를 **먼저** 보여주고 확정되면 디테일을 채워야(재작업 최소화).

@@ -639,12 +639,30 @@ var Kit = (function () {
 		{ key: 'cross_links', title: '교차 링크', icon: '🔗' },
 	];
 
+	// 공용 로직 헬퍼 (CSS ❌ — 클래스는 호출측이 넘긴다 / 네임스페이스 누수 차단).
+	//   discovery-draft 가 인라인하던 것을 승격 → spec/plan readable 렌더러가 공유 (중복 최소).
+	function el(tag, cls, text) {
+		var n = document.createElement(tag);
+		if (cls) n.className = cls;
+		if (text != null) n.textContent = text;
+		return n;
+	}
+	// 문장 단위 줄바꿈 — 마침표 뒤에서 끊어 각 문장을 한 줄 prose 로(가독). 각 조각 클릭 시 같은 anchor /apply.
+	//   wrapCls = 호출측 로컬 클래스(CSS 는 렌더러 소유). 단문이면 그대로 한 줄.
+	function proseSentences(text, anchor, ctxLabel, wrapCls) {
+		var wrap = el('div', wrapCls || null);
+		var sents = String(text == null ? '' : text).split(/(?<=\.)\s+/).map(function (s) { return s.trim(); }).filter(Boolean);
+		if (sents.length <= 1) { wrap.appendChild(proseEl(text, anchor, ctxLabel)); return wrap; }
+		sents.forEach(function (s) { wrap.appendChild(proseEl(s, anchor, ctxLabel)); });
+		return wrap;
+	}
+
 	return {
 		init: init, initMulti: initMulti, renderMulti: renderMulti, afterRender: afterRender, arrange: arrange,
 		section: section, card: card, toBlocks: toBlocks, blockify: blockify, renderBlock: renderBlock,
 		chip: chip, roVal: roVal, prose: proseEl, field: fieldRow, tokenizeInto: tokenizeInto,
 		isLocked: isLocked, kindOf: kindOf, label: label, cardTitle: cardTitle, cardSub: cardSub,
-		difficultyBadge: difficultyBadge,
+		difficultyBadge: difficultyBadge, el: el, proseSentences: proseSentences,
 		LABELS: LABELS, COLLAPSED: COLLAPSED,
 	};
 })();
