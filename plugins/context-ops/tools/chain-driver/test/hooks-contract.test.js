@@ -114,7 +114,9 @@ describe('hooks-contract — SessionStart unbaselined surface (② honest)', () 
 		assert.match(out.hookSpecificOutput.additionalContext, /unbaselined/);
 		assert.match(out.hookSpecificOutput.additionalContext, /scope-a/);
 		assert.doesNotMatch(out.hookSpecificOutput.additionalContext, /chain harness ready/, '거짓 ready 억제');
-		assert.match(r.stderr, /unbaselined/); // minor-2 stderr 정합
+		// MIS-428 [OP-SESSION-001] — unbaselined 경고는 additionalContext 전담(위 114-115).
+		//   SessionStart exit 0 의 stderr 는 사용자 트랜스크립트 미표출(공식문서)이라 stderr write 제거 → dead 채널 회귀 방지.
+		assert.doesNotMatch(r.stderr, /unbaselined/);
 		rmSync(root, { recursive: true, force: true });
 	});
 

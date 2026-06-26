@@ -10,6 +10,31 @@
 
 ---
 
+## [0.80.0] — 2026-06-25 — MINOR — 세션 시작 시 잔여작업 + 현재 stage 자동 요약 (MIS-428 [OP-SESSION-001])
+
+**요구 (사용자 발화)**: 세션 최초 시작 시 "지금 어느 chain stage 인지, 잔여 작업이 뭔지" 자동 요약을 보고 싶다.
+
+**해결**: SessionStart 훅이 활성 chain 이 있으면 "🧭 세션 재개 — <stage N/5 · scope> / 남은 단계 / 대기 항목(blocked·revisit·task)" 컴팩트 블록을 합성해 표출. "현재 stage"는 이미 statusLine 이 상시 담당하므로 비어 있던 "잔여 단계 + 대기" 한 조각만 채운다. (DEC-2026-06-25-session-resume-summary)
+
+### Added
+- `tools/chain-driver/src/session-resume.js` — 순수 `buildSessionResumeSummary(state)`. `CHAIN_ORDER`/`renderStatusline` 를 `chain-statusline.js` 에서 import(단일 소스 / 사본 ❌). 남은 단계 = `CHAIN_ORDER.indexOf` 전방 slice(status 필터 아님 / enum `'complete'` 함정 회피). 대기 항목(blocked/pending_revisit/current_task) **있는 것만** 표출(빈 항목 suppress). 활성 chain 없으면 null(전체 침묵 / 비-chain·idle 안전). 단위테스트 12.
+
+### Changed
+- SessionStart 훅(`cli.js`)이 resume 요약을 `additionalContext` **최상단에 prepend** → 어시스턴트가 첫 응답에서 중립 톤 렌더(Anthropic 권장 패턴). reference-lens·display-only — 어떤 gate 에도 inject ❌(deterministic-axis 보존). `state` read = 기존 `readState`(read-only / try-catch 비-fatal).
+
+### Fixed (latent bug)
+- SessionStart 의 drift/unbaselined **stderr write 제거** — exit 0 의 stderr 는 사용자 트랜스크립트에 미표출(공식문서 / exit 2·`--verbose` 한정)이라 죽은 코드였음. drift/unbaselined 정보는 `additionalContext`(parts)로 이미 전달되므로 사용자 가시성 무손실. `hooks-contract.test.js` stderr 단언 → `additionalContext` 단언으로 정정(dead 채널 회귀 방지).
+
+### 채널 설계 (Option B / 사용자 확정)
+- 1차 plan/research 가 "stderr=사용자 가시 채널" 로 전제했으나 공식문서 직접 fetch 결과 **SessionStart exit 0 stderr 미표출** 로 판명 → 재논의에서 교정. `systemMessage` 도 폐기("Warning" 톤 + 시각 렌더 미명세). → `additionalContext` + 첫 응답 렌더로 확정.
+
+### 검증
+- session-resume 12/12 + chain-driver 715/715(회귀 0) + 라이브 SessionStart 스모크(spec 2/5 · 남은 단계 · 대기 렌더). version 3-way 0.80.0.
+
+### 결정
+- DEC-2026-06-25-session-resume-summary. §2 적대검토의 stderr 가시성 전제 오류를 재논의가 교정(2번째 self-기록 사실 교정 / `feedback_self_recorded_fact_validation` + `feedback_research_fact_validation`).
+- carry: LLM 첫 응답 richer 렌더형 / 블랭크 화면 즉시 표출 필요 시 `systemMessage` 1줄 재검토(warning 톤·렌더 미명세 trade-off 명시).
+
 ## [0.79.0] — 2026-06-25 — MINOR — discovery 2-게이트 (PRD 산문 + 공유 묶음 뷰 + 범위 선택 / draft-first)
 
 **문제 (사용자 발화)**: discovery 게이트의 브라우저 검토 화면(`plan-review-server`)이 (1) JSON을 그대로 옮겨 압축 언어로 보여줘 "PRD가 아니라 JSON 인스펙터" — 말을 풀어 쓰고 이해를 돕는 도식이 필요, (2) 사용자가 방향/범위를 **선택**할 수 없음, (3) spec을 다 만든 뒤 보여주니 늦음 — 가벼운 draft를 **먼저** 보여주고 확정되면 디테일을 채워야(재작업 최소화).

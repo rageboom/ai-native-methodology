@@ -45,6 +45,7 @@ import {
 	clearCurrentTask,
 } from './state-store.js';
 import { executeQuery } from './query.js';
+import { buildSessionResumeSummary } from './session-resume.js';
 import { markDrift, cascade, registerCanonicalSources, diffBusinessRulesByRule, listUnbaselinedScopes } from './sync.js';
 import { isBusinessRulesIndex, normalizeBusinessRules, loadBusinessRules } from '../../_shared/load-business-rules.js';
 import {
@@ -1752,6 +1753,14 @@ function cmdHooksBridge(args) {
 		} catch {
 			/* non-fatal */
 		}
+		// MIS-428 [OP-SESSION-001] — 세션 재개 요약(남은 단계 + 대기 항목). additionalContext 채널 → 어시스턴트 첫 응답 렌더.
+		//   "현재 stage"는 statusLine 이 상시 담당 / reference-lens·display-only — 어떤 gate 에도 inject ❌. 활성 chain 없으면 null(침묵).
+		let resumeSummary = null;
+		try {
+			resumeSummary = buildSessionResumeSummary(readState(root));
+		} catch {
+			/* non-fatal — corrupt/absent state = 요약 생략 */
+		}
 		// 메시지 조립: drift + unbaselined 별도 line. ★ unbaselined>0 면 "ready" 주장 금지(거짓 건강 제거).
 		const parts = [];
 		if (driftSummary.marked.length > 0)
@@ -1768,6 +1777,9 @@ function cmdHooksBridge(args) {
 		// session-handoff nudge 는 ready/경고 메시지와 직교 — 별도 line 으로 prepend (ready 신호 보존).
 		if (handoffNudge)
 			additionalContext = `[ai-native-methodology] ${handoffNudge}\n${additionalContext}`;
+		// 세션 재개 요약을 최상단에 prepend — 어시스턴트가 첫 응답에서 위치/잔여작업을 먼저 렌더.
+		if (resumeSummary)
+			additionalContext = `[ai-native-methodology]\n${resumeSummary}\n\n${additionalContext}`;
 		// dep-graph P4 (operation.md 결정 7) — artifact-graph.json 있으면 dirty 노드 수 + top-3 impact root 주입.
 		try {
 			const graphInjection = buildGraphSessionContext(root);
@@ -1781,19 +1793,8 @@ function cmdHooksBridge(args) {
 			continue: true,
 		};
 		process.stdout.write(JSON.stringify(out) + '\n');
-		if (driftSummary.marked.length > 0) {
-			process.stderr.write(
-				`[ai-native-methodology] ⚠️ drift detected: ${driftSummary.marked.join(', ')}\n`,
-			);
-			process.stderr.write(`  → chain-driver sync --scope <slug>\n`);
-		}
-		// minor-2 — additionalContext 와 stderr 조건 정합 (부분 false-health 재발 차단).
-		if (unbaselined.length > 0) {
-			process.stderr.write(
-				`[ai-native-methodology] ⚠️ ${unbaselined.length} scope(s) unbaselined (drift 미감지 사각): ${unbaselined.slice(0, 5).join(', ')}${unbaselined.length > 5 ? ' …' : ''}\n`,
-			);
-			process.stderr.write(`  → chain-driver sync (baseline 등록)\n`);
-		}
+		// drift/unbaselined 는 additionalContext(parts)로 모델에 전달 — 별도 stderr write 제거.
+		//   SessionStart exit 0 의 stderr 는 사용자 트랜스크립트 미표출(공식문서 / exit 2·--verbose 한정)이라 죽은 코드였음 (MIS-428).
 		process.exit(0);
 	}
 	if (event === 'UserPromptSubmit') {

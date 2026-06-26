@@ -40,4 +40,5 @@ argument-hint: "[--setup-statusline] (생략 시 현재 상태 조회)"
 
 - statusLine 스크립트(`${CLAUDE_PLUGIN_ROOT}/scripts/chain-statusline.js`)는 self-contained — stdin 의 cwd 에서 `.ai-context/state.json` 만 읽는다(비-gating display / reference-lens). chain 아닌 프로젝트에선 침묵(빈 출력).
 - 상태/표시는 reference-lens 일 뿐 — gate 판정에 inject 하지 않는다(deterministic-axis).
+- **세션 최초 시작 시** SessionStart 훅이 "🧭 세션 재개 — 현재 stage·남은 단계·대기 항목" 요약을 자동 표출한다(활성 chain 있을 때 / `additionalContext` 채널). 이 커맨드는 그 요약을 **언제든 다시** 조회하는 수동 경로.
 - 단계를 전진/되돌리려면 `/chain-next` · `/chain-stage <name>`.
