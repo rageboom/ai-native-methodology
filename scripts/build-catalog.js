@@ -56,6 +56,7 @@ function buildEntry(name, meta) {
 
 	return {
 		name, // 카탈로그 식별자 = 디렉토리명 (release-readiness check17 lookup 과 일치)
+		version: plugin.version, // /plugin update 체커가 설치 버전과 비교하는 기준값
 		source: {
 			source: 'npm',
 			package: pkg.name,
