@@ -224,12 +224,15 @@ describe('hooks-contract — session-handoff', () => {
 // DEC-2026-06-18 — discovery 보편-라우터 진입점 e2e (living-sync §4 "discovery = 입구·라우터").
 describe('hooks-contract — discovery 보편-라우터 (DEC-2026-06-18)', () => {
 	it('UserPromptSubmit: stage 미지정 변경요청 → discovery 폴백 + 입구·라우터 안내 (① silent 제거)', () => {
-		// analysis-state-aware(MIS-433): discovery 폴백은 분석 산출물 존재를 전제 → tmpdir 에 base/ 산출물 1개.
-		//   (분석 부재 → analysis-first 교체 경로는 router-analysis-aware.test.js 가 커버.)
+		// analysis-state-aware(MIS-433) + draft-first(MIS-435): discovery 폴백은 grounding floor
+		//   완성을 전제 → tmpdir 에 floor 3종(architecture/domain/business-rules) 작성.
+		//   (분석 부재→analysis-first / floor 미완→analysis-floor-incomplete 는 router-analysis-aware.test.js 커버.)
 		const root = mkdtempSync(join(tmpdir(), 'route-default-'));
 		try {
-			mkdirSync(join(root, '.ai-context', 'base'), { recursive: true });
-			writeFileSync(join(root, '.ai-context', 'base', 'architecture.json'), '{}');
+			const base = join(root, '.ai-context', 'base');
+			mkdirSync(base, { recursive: true });
+			for (const f of ['architecture.json', 'domain.json', 'business-rules.json'])
+				writeFileSync(join(base, f), '{}');
 			const r = runHooksBridge(
 				JSON.stringify({
 					hook_event_name: 'UserPromptSubmit',

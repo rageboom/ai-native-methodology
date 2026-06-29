@@ -196,6 +196,8 @@ input (plan stage 가 받음):
 
 plan hard gate = **gate #3 활성** (gate #1~#5 = discovery/spec/plan/test/implement / chain N = gate #N 1:1 / analysis = soft exit gate #0 [opt-in fail-closed / §3-A axis 별개] / `plan-coverage-validator` NFR allocation hard gate).
 
+> **draft-first 점진 analysis** (DEC-2026-06-29 / breadth-only): analysis 산출물 ~21종을 처음에 다 만들 필요 없다. **핵심 grounding floor**({architecture,domain,business-rules}+트랙조건부 / `inventory`=guidance)만 먼저 만들어 discovery 진입 → 나머지는 per-scope 심화(`scope-carve`+`bc-accumulator-rollup` 재활용). 개수만 줄이고(breadth) 산출물은 full-depth 유지(depth-thinning ❌ / coverage 필드 ❌); 미룬 건 honest-absent + 미룬-항목 finding 으로 정직화. 신호 = `minimalSubsetPresent`(advisory / gate-inject ❌). SSOT = `methodology-spec/policies/draft-first-minimal-subset.md`.
+
 ### chain 4 (테스트) — test stage
 
 input (test stage 가 받음):

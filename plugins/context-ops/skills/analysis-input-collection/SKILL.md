@@ -50,6 +50,15 @@ allowed-tools: Read, Glob, Grep, Bash
 
 `<user-project>/.ai-context/input.json` (lifecycle-contract 의 분석 stage 진입 시 다른 phase 들이 참조하는 메타 정보)
 
+## draft-first — 핵심 floor 부터 (전체 ~21종 아님)
+
+analysis 산출물을 처음에 다 만들 필요 없다(부담). **핵심 grounding floor 만 먼저 만들어 discovery 진입** → 나머지는 per-scope 로 심화한다 (breadth-only / SSOT = `methodology-spec/policies/draft-first-minimal-subset.md`).
+
+- **floor** = `architecture.json` + `domain.json` + `business-rules.json` (universal) + 트랙 조건부(BE→openapi / DB→schema / FE→≥1 FE 산출물). `inventory.json` 은 stack 신호로 먼저 만들되 floor 판정에는 미포함.
+- floor 충족 = `minimalSubsetPresent` 신호 → discovery 진입 grounding 충분(advisory). 만든 산출물은 정상 full-depth source-grounded / 미룬 건 honest-absent(빈 stub ❌).
+- **미룬-항목 finding 의무**: floor 만 만들고 멈출 때 `_base-log-finding` 으로 finding 1건 emit — `phase: input` / `severity: low` / description 에 **미룬 산출물 목록** + 정직 노트 *"이 subset 은 시작 baseline (scoped to <X>) — per-scope 작업하며 BR/도메인이 더 surface 됨"*. (`bc-accumulator-rollup` 엔 deferred 개념이 없어 이 finding 이 추적 SSOT.)
+- **심화**: scope 작업 시 `analysis-scope-carve`(경계) + `bc-accumulator-rollup`(멱등 per-BC upsert) 로 닿는 부분만 깊게 — 신규 메커니즘 없음.
+
 ## When NOT to invoke
 
 - 사용자가 **신규 시스템 구축 (greenfield / legacy 코드 없음)** — 본 skill 부적합. `scenario=greenfield` 선언 후 **`analysis-greenfield-bootstrap`** (입력어댑터 패스만 / 리버스 엔지니어링 skip) 호출. 입력어댑터 = `analysis-input-orchestrate` greenfield 분기 (analysis 는 legacy _코드_ 가 아니라 _입력_ 을 요구).
@@ -59,5 +68,6 @@ allowed-tools: Read, Glob, Grep, Bash
 
 - 정책: `methodology-spec/workflow/input.md`
 - 정책: `methodology-spec/lifecycle-contract.md` (단계 간 산출물 인터페이스)
+- 정책: `methodology-spec/policies/draft-first-minimal-subset.md` (핵심 floor 부터 → per-scope 심화)
 - ADR: ADR-010 (baseline+ratchet)
 - 결단: DEC-2026-05-30-use-scenario-taxonomy §2.4

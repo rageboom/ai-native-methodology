@@ -11,6 +11,8 @@ import { join } from 'node:path';
 import {
 	analysisOutputPresent,
 	ANALYSIS_ARTIFACT_FILENAMES,
+	minimalSubsetPresent,
+	MINIMAL_SUBSET_FILENAMES,
 } from '../../_shared/ai-context-layout.js';
 
 function withTmp(fn) {
@@ -85,5 +87,73 @@ describe('analysisOutputPresent — 분석 산출물 결정론 probe', () => {
 		assert.ok(!ANALYSIS_ARTIFACT_FILENAMES.includes('discovery-spec.json'));
 		assert.ok(!ANALYSIS_ARTIFACT_FILENAMES.includes('behavior-spec.json'));
 		assert.ok(!ANALYSIS_ARTIFACT_FILENAMES.includes('input.json'));
+	});
+});
+
+describe('minimalSubsetPresent — draft-first grounding floor (AND)', () => {
+	const FLOOR = ['architecture.json', 'domain.json', 'business-rules.json'];
+
+	it('universal floor 3종 모두 present(base/) → true', () => {
+		withTmp((root) => {
+			FLOOR.forEach((f) => writeArtifact(root, 'base', f));
+			assert.equal(minimalSubsetPresent(root), true);
+		});
+	});
+
+	it('OLD output/ 레이아웃 3종 모두 → true (read-alias)', () => {
+		withTmp((root) => {
+			FLOOR.forEach((f) => writeArtifact(root, 'output', f));
+			assert.equal(minimalSubsetPresent(root), true);
+		});
+	});
+
+	it('business-rules 누락 → false (AND)', () => {
+		withTmp((root) => {
+			writeArtifact(root, 'base', 'architecture.json');
+			writeArtifact(root, 'base', 'domain.json');
+			assert.equal(minimalSubsetPresent(root), false);
+		});
+	});
+
+	it('architecture 누락 → false (AND)', () => {
+		withTmp((root) => {
+			writeArtifact(root, 'base', 'domain.json');
+			writeArtifact(root, 'base', 'business-rules.json');
+			assert.equal(minimalSubsetPresent(root), false);
+		});
+	});
+
+	it('architecture 단독 → analysisOutputPresent=true 이나 minimalSubsetPresent=false (OR↔AND 구분)', () => {
+		withTmp((root) => {
+			writeArtifact(root, 'base', 'architecture.json');
+			assert.equal(analysisOutputPresent(root), true);
+			assert.equal(minimalSubsetPresent(root), false);
+		});
+	});
+
+	it('floor 밖 산출물(ui-spec)만 → false', () => {
+		withTmp((root) => {
+			writeArtifact(root, 'base', 'ui-spec.json');
+			assert.equal(minimalSubsetPresent(root), false);
+		});
+	});
+
+	it('트랙 조건부(openapi/schema)는 floor 에 미포함 — 3종만으로 true', () => {
+		withTmp((root) => {
+			FLOOR.forEach((f) => writeArtifact(root, 'base', f));
+			// openapi/schema 없이도 universal floor 충족 → true (트랙 완전성은 gate#0 책임)
+			assert.equal(minimalSubsetPresent(root), true);
+		});
+	});
+
+	it('inventory 는 floor 에 미포함 (guidance only)', () => {
+		assert.ok(!MINIMAL_SUBSET_FILENAMES.includes('inventory.json'));
+		assert.deepEqual([...MINIMAL_SUBSET_FILENAMES].sort(), [...FLOOR].sort());
+	});
+
+	it('root 가드: null/undefined/비문자열 → false (no-throw)', () => {
+		assert.equal(minimalSubsetPresent(null), false);
+		assert.equal(minimalSubsetPresent(undefined), false);
+		assert.equal(minimalSubsetPresent(42), false);
 	});
 });

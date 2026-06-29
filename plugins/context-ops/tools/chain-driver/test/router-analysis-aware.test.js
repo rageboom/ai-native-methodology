@@ -57,26 +57,43 @@ describe('UserPromptSubmit — analysis-state-aware 라우팅 (e2e)', () => {
 		});
 	});
 
-	it('분석 산출물 PRESENT(base/architecture.json) + work-intent → discovery 정상(교체 ❌)', () => {
+	function writeFloor(root, dir) {
+		const d = join(root, '.ai-context', dir);
+		mkdirSync(d, { recursive: true });
+		for (const f of ['architecture.json', 'domain.json', 'business-rules.json'])
+			writeFileSync(join(d, f), '{}', 'utf-8');
+	}
+
+	it('grounding floor 완성(base/) + work-intent → discovery 정상(교체 ❌)', () => {
 		withTmp((root) => {
-			const base = join(root, '.ai-context', 'base');
-			mkdirSync(base, { recursive: true });
-			writeFileSync(join(base, 'architecture.json'), '{}', 'utf-8');
+			writeFloor(root, 'base');
 			const { ctx } = hook({ prompt: WORK_INTENT, cwd: root });
 			assert.match(ctx, /discovery-from-nl-md/, '제안 스킬 = discovery (불변)');
 			assert.match(ctx, /입구·라우터/, 'discovery-default note');
 			assert.doesNotMatch(ctx, /analysis-first/, 'analysis-first 미발생');
+			assert.doesNotMatch(ctx, /floor 미완/, 'floor-incomplete 미발생');
 		});
 	});
 
-	it('OLD output/ 레이아웃 산출물 present → discovery 정상 (read-alias)', () => {
+	it('OLD output/ 레이아웃 floor 완성 → discovery 정상 (read-alias)', () => {
 		withTmp((root) => {
-			const out = join(root, '.ai-context', 'output');
-			mkdirSync(out, { recursive: true });
-			writeFileSync(join(out, 'business-rules.json'), '{}', 'utf-8');
+			writeFloor(root, 'output');
 			const { ctx } = hook({ prompt: WORK_INTENT, cwd: root });
 			assert.match(ctx, /discovery-from-nl-md/);
 			assert.doesNotMatch(ctx, /analysis-first/);
+			assert.doesNotMatch(ctx, /floor 미완/);
+		});
+	});
+
+	it('분석 일부 present(architecture만) + floor 미완 → analysis-floor-incomplete (draft-first)', () => {
+		withTmp((root) => {
+			const base = join(root, '.ai-context', 'base');
+			mkdirSync(base, { recursive: true });
+			writeFileSync(join(base, 'architecture.json'), '{}', 'utf-8'); // domain/business-rules 부재
+			const { ctx } = hook({ prompt: WORK_INTENT, cwd: root });
+			assert.match(ctx, /analysis-input-collection/, 'floor 마저 → analysis 진입');
+			assert.match(ctx, /floor 미완/, 'floor-incomplete note');
+			assert.doesNotMatch(ctx, /입구·라우터/, 'discovery note 아님');
 		});
 	});
 

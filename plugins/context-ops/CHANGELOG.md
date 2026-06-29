@@ -10,6 +10,20 @@
 
 ---
 
+## [0.86.0] — 2026-06-29 — MINOR — draft-first 점진 analysis (핵심 grounding floor부터 → per-scope 심화)
+
+**문제**: analysis 산출물 ~21종을 처음에 다 만드는 게 부담이라 analysis를 advisory로 뒀으나, 그 결과 "통째로 다 하고 시작" vs "그냥 스킵(grounding 없는 거짓 진행)" 양극단만 1급 경로가 됨. "핵심만 먼저 → 작업하며 per-scope 심화"라는 중간 경로가 명시적으로 없고, v0.85.0 라우터·cold-start surface도 "코드 분석"(전체 암시)이라고만 가리킴.
+
+**해결 (breadth-only / 산출물 *개수*만 줄임, 깊이 ❌)**:
+- **① 최소 grounding floor 정의** — `methodology-spec/policies/draft-first-minimal-subset.md` 신설(canonical SSOT) + lifecycle-contract 포인터. HARD floor = {architecture, domain, business-rules} + 트랙 조건부(BE→openapi / DB→schema / FE→≥1 FE) + spec 진입 시 ≥1 formal-spec. `inventory`=guidance(AND-gate ❌). authority=`gate-eval.js` REQUIRED_VALIDATORS(schema-required 목록 ❌).
+- **② `minimalSubsetPresent(root)` probe** (`ai-context-layout.js`) — universal floor 3종 존재의 AND(`analysisOutputPresent` OR-any 와 별개 축). 순수 fs+상수 파일명(LLM inject ❌ / gate inject ❌ / advisory). + **미룬-항목 finding** 의무(finding-system / phase:input·severity:low) — 미룬 산출물 목록 + "시작 baseline, per-scope에서 더 surface" 정직 노트(within-artifact 불완전성 + deferred-tracking 갭 동시 해소 / coverage 필드 ❌).
+- **③ 라우터 3-상태 + surface reword** — UserPromptSubmit: 분석 0→`analysis-default`(floor부터/draft-first) / 분석 일부 있으나 floor 미완→`analysis-floor-incomplete`(빠진 floor만 마저) / floor 완성→discovery. SessionStart cold-start surface + analysis-input-collection SKILL.md를 "핵심 floor부터(전체 ~21종 아님) → per-scope 심화"로 reword.
+- **점진 심화 = 기존 재활용**(신규 메커니즘 0): `analysis-scope-carve` + `bc-accumulator-rollup`(멱등 per-BC upsert).
+
+- **결정론 axis**: probe=fs+상수(LLM inject ❌)·cli glue 한정(routeEntry 순수). 스키마 변경 0 / 새 state 필드 0 / 새 analysis mode 0(Senior "1 helper + 1 finding + reword" 라인).
+- **검증**: ai-context-layout 유닛 18(minimalSubsetPresent +9) + router-analysis-aware(3-상태) + chain-driver 772/772 회귀 0(v0.85.0 단일-산출물 present→discovery 단언을 full-floor로 정정) + **≥2 PoC 교차 corroboration**(poc-18 Modern TS/BE + poc-19 Python: full→discovery / floor 3종 제거→floor-incomplete / discovery-extraction-validator floor-grounding poc-19 findings 0) + 3-way 0.86.0.
+- MIS-435 [OP-ANALYSIS-001]. DEC-2026-06-29-draft-first-minimal-subset. (DEC-2026-06-26-analysis-state-aware-router v0.85.0 라우터의 정밀화.)
+
 ## [0.85.1] — 2026-06-29 — PATCH — 용어 정리 ("7대 산출물"→"산출물" / "코드 고고학"→"리버스 엔지니어링")
 
 **문제**: "7대 산출물"은 산출물이 7개뿐인 듯한 오해를 준다 — 실제 산출물은 inventory/architecture/domain/business-rules/openapi/schema+ERD/antipatterns/migration-cautions + FE(state-map/visual-manifest/a11y/i18n/type-spec/form-validation) + recovered-adr/run-manifest/code-graph/sql-inventory/error-mapping/legacy-spectrum/characterization 등으로 훨씬 많고 스택·영역별로 가변. "코드 고고학"은 비유적 표현 — 분석 시점의 실제 행위는 **리버스 엔지니어링**.

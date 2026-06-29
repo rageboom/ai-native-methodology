@@ -115,6 +115,41 @@ export function analysisOutputPresent(root) {
 	);
 }
 
+// draft-first 최소 grounding floor — discovery 진입에 universal 하게 필요한 3종 (DEC-2026-06-29).
+//   authority = gate-eval.js REQUIRED_VALIDATORS_PER_STAGE.analysis 가 실제로 필요로 하는 입력:
+//   architecture(br-cross BR↔패턴) + domain(verdict-consistency + business_intent 추출원) +
+//   business-rules(discovery-spec business_rules_intent br_id 1:1 backward link).
+//   inventory 는 제외(stack 신호 guidance — AND 에 넣으면 greenfield·FE-first false-negative).
+//   트랙 조건부 산출물(openapi/schema/FE)은 spec-stage 관심사 → gate#0 검증기 책임 / 본 probe 범위 밖.
+export const MINIMAL_SUBSET_FILENAMES = Object.freeze([
+	'architecture.json',
+	'domain.json',
+	'business-rules.json',
+]);
+
+/**
+ * draft-first 최소 grounding floor 충족 여부 결정론 probe — universal floor 3종이 **모두**
+ * `.ai-context/base/`(read-alias `output/`)에 있으면 true.
+ *
+ * analysisOutputPresent(OR-any = "분석 *시작*됐나")와 별개 축: 이쪽은 AND = "discovery 진입에
+ * 필요한 grounding floor 가 *갖춰졌나*". 진입 라우터/surface 가 "핵심 floor 부터 → per-scope 심화"
+ * 를 안내할 때 "이제 discovery 로 가도 grounding 충분"의 advisory 신호.
+ *
+ * 순수 — fs 존재 + 상수 파일명만(LLM inject ❌ / STRONG-STOP). no-throw / root-guard.
+ * **어떤 결정적 gate 에도 inject ❌** (analysisOutputPresent 와 동일 trust / advisory only).
+ * 트랙 조건부(openapi/schema/FE)는 포함하지 않는다 — 트랙 판정이 fs-순수로 불가 + 그 완전성은
+ * gate#0 검증기(formal-spec-link/DB-always-on/spec-integrate)가 조건부로 본다.
+ *
+ * @param {string} root 프로젝트 루트
+ * @returns {boolean}
+ */
+export function minimalSubsetPresent(root) {
+	if (!root || typeof root !== 'string') return false;
+	return MINIMAL_SUBSET_FILENAMES.every((f) =>
+		existsSync(baseFileForRead(root, f)),
+	);
+}
+
 // ── scopes/<scope>/[<stage>/] ───────────────────────────────────────────
 export function scopesRootPath(root) {
 	return join(root, AIMD, SEG.scopes);

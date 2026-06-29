@@ -61,6 +61,7 @@ import {
 	scopeDirForRead,
 	evidenceDirForRead,
 	analysisOutputPresent,
+	minimalSubsetPresent,
 } from '../../_shared/ai-context-layout.js';
 import { deriveGateActor } from './gate-provenance.js';
 import { planLayoutMigration, applyLayoutMigration } from './migrate-layout.js';
@@ -1789,7 +1790,7 @@ function cmdHooksBridge(args) {
 				emitSurface(
 					withHandoff(
 						`방법론 설치됨·미초기화 — chain 단계추적/게이트 비활성 (orphan 산출물 쓰기만 차단). ` +
-							`정식 진행: 코드 분석 → 'chain-driver init <project>'로 state 생성 → discovery 진입. analysis 만 할 거면 init 불필요.`,
+							`정식 진행: 핵심 grounding floor(architecture·domain·business-rules)부터 분석(전체 ~21종 아님 / draft-first) → 'chain-driver init <project>'로 state 생성 → discovery 진입 → 나머지는 per-scope 심화. analysis 만 할 거면 init 불필요.`,
 					),
 				);
 			}
@@ -1868,20 +1869,25 @@ function cmdHooksBridge(args) {
 			);
 			process.exit(0);
 		}
-		// analysis-state-aware 진입 라우터 (DEC-2026-06-26-analysis-state-aware-router / MIS-433):
-		//   work-intent 자연어(discovery-default)인데 분석 산출물(.ai-context/base|output)이 없으면
-		//   "discovery부터"는 cold-start surface(코드 분석→init→discovery)와 모순 — discovery 는
-		//   analysis baseline grounding 을 전제하기 때문. → 제안 스킬을 analysis 진입으로 교체하고
-		//   analysis-default 안내로 라우팅. 강한 advisory(비차단) — orphan later-stage write 는
-		//   PreToolUse coldStartSkipAheadReason 이 별도 차단(teeth 중복 ❌). 결정론 fs probe(LLM inject ❌)
-		//   는 cli glue 에서만 — routeEntry 는 순수(prompt-only) 유지.
-		if (
-			route.source === 'discovery-default' &&
-			!analysisOutputPresent(payload.cwd || process.cwd())
-		) {
-			route.skillId = 'analysis-input-collection'; // 레거시 기본(주 타깃 S2) — note 가 greenfield/multi 대안 명시
-			route.agentId = 'analysis-agent';
-			route.source = 'analysis-default';
+		// analysis-state-aware 진입 라우터 (DEC-2026-06-26-analysis-state-aware-router / MIS-433
+		//   + draft-first DEC-2026-06-29-draft-first-minimal-subset / MIS-435):
+		//   work-intent 자연어(discovery-default)인데 grounding 이 부족하면 analysis 로 advisory 라우팅.
+		//   discovery 는 analysis baseline grounding 을 전제하기 때문(cold-start surface 와 정합).
+		//   2 상태: (1) 분석 0 → analysis-default(floor 부터 / draft-first) / (2) 분석 일부 있으나
+		//   grounding floor(architecture·domain·business-rules) 미완 → analysis-floor-incomplete(floor 마저).
+		//   강한 advisory(비차단) — orphan later-stage write 는 PreToolUse coldStartSkipAheadReason 이
+		//   별도 차단(teeth 중복 ❌). 결정론 fs probe(LLM inject ❌)는 cli glue 에서만 — routeEntry 는 순수.
+		if (route.source === 'discovery-default') {
+			const aiRoot = payload.cwd || process.cwd();
+			if (!analysisOutputPresent(aiRoot)) {
+				route.skillId = 'analysis-input-collection'; // 레거시 기본(주 타깃 S2) — note 가 greenfield/multi 대안 명시
+				route.agentId = 'analysis-agent';
+				route.source = 'analysis-default';
+			} else if (!minimalSubsetPresent(aiRoot)) {
+				route.skillId = 'analysis-input-collection';
+				route.agentId = 'analysis-agent';
+				route.source = 'analysis-floor-incomplete';
+			}
 		}
 		const repoRoot = args.repoRoot || resolveRepoRoot(process.cwd());
 		let meta = null;
@@ -1909,9 +1915,15 @@ function cmdHooksBridge(args) {
 				'복잡도 tier(DEC-2026-06-24): discovery 에서 닿는 노드를 식별해 `chain-driver triage --graph <artifact-graph.json> --refs <id,...>` 로 결정론 신호를 받고, predicate_satisfied=true 면서 trivial 로 판단되면 fast-path(thin change-record + impact + 경량 단일-OP 티켓)로 경량 진행 — 단 ⑥영향도·⑦Jira·최소검증은 `chain-driver fastpath-gate` 로 강제(면제 ❌). predicate_satisfied=false 거나 standard/deep 이면 기존 풀 체인.';
 		} else if (route.source === 'analysis-default') {
 			routeNote =
-				'진입 라우터(analysis-first): `.ai-context/base/`(또는 output/)에 분석 산출물이 없습니다 — discovery 는 analysis baseline grounding 을 전제하므로 바로 discovery 로 들어가거나 소스를 직접 수정하지 마세요. 먼저 analysis 단계로 진입하세요: ' +
-				'레거시 코드면 analysis-input-collection, 신규(greenfield: PRD/디자인/계약)면 analysis-greenfield-bootstrap, 입력 소스가 여럿이면 analysis-input-orchestrate. ' +
-				'산출물(architecture/domain/business-rules/openapi/schema 등 .ai-context/base/)이 생긴 뒤 같은 변경요청을 다시 주면 discovery 입구로 라우팅됩니다. ' +
+				'진입 라우터(analysis-first / draft-first): `.ai-context/base/`(또는 output/)에 분석 산출물이 없습니다 — discovery 는 analysis baseline grounding 을 전제하므로 바로 discovery 로 들어가거나 소스를 직접 수정하지 마세요. ' +
+				'단 **전체 ~21종을 다 만들 필요는 없습니다** — 핵심 grounding floor(architecture·domain·business-rules + 트랙 조건부)만 먼저 만들면 discovery 진입에 충분하고(`minimalSubsetPresent`), 나머지는 per-scope 로 심화하며 미룬 항목은 finding 으로 남깁니다(draft-first / policies/draft-first-minimal-subset.md). ' +
+				'진입 스킬: 레거시 코드면 analysis-input-collection, 신규(greenfield: PRD/디자인/계약)면 analysis-greenfield-bootstrap, 입력 소스가 여럿이면 analysis-input-orchestrate. ' +
+				'floor 가 생긴 뒤 같은 변경요청을 다시 주면 discovery 입구로 라우팅됩니다. ' +
+				'(강한 advisory — 강제 차단 아님 / orphan later-stage 산출물 직접 write 는 PreToolUse 가 별도 차단.)';
+		} else if (route.source === 'analysis-floor-incomplete') {
+			routeNote =
+				'진입 라우터(draft-first / floor 미완): 분석이 일부 있으나 grounding floor(architecture·domain·business-rules) 가 아직 다 갖춰지지 않았습니다 — discovery 진입 전 **빠진 floor 산출물만** 마저 만드세요(전체 ~21종 아님). ' +
+				'floor 완성 = `minimalSubsetPresent` → 그 위에서 discovery, 나머지는 per-scope 심화(draft-first / policies/draft-first-minimal-subset.md). ' +
 				'(강한 advisory — 강제 차단 아님 / orphan later-stage 산출물 직접 write 는 PreToolUse 가 별도 차단.)';
 		} else if (route.source === 'stage' && isLaterStageSkill(route.skillId)) {
 			try {
