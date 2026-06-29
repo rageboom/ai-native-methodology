@@ -5,7 +5,11 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, mkdtempSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import {
 	isOptedOut,
@@ -140,4 +144,42 @@ test('buildCodegraphNavContext — codegraph 권유 + reference-lens disclaimer 
 	const out = JSON.parse(buildHookOutput(ctx));
 	assert.equal(out.decision, undefined);
 	assert.equal(out.hookSpecificOutput.permissionDecision, undefined);
+});
+
+// ── 통합: main() 제어흐름 (그래프-부재 사각 닫힘 / DEC-2026-06-29) ──────────────
+// 위 단위 테스트는 pure logic 만 검증(main 미호출). "그래프 부재 시 nav-first 도달"은
+// 제어흐름 회귀라 스크립트 직접 실행으로만 잡힌다. spawnSync + 빈 임시 cwd(artifact-graph.json 부재).
+const SCRIPT = fileURLToPath(new URL('../graph-context-nudge.js', import.meta.url));
+
+function runNudge(prompt, { env = {}, cwd } = {}) {
+	const sid = `itest-${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+	const r = spawnSync(process.execPath, [SCRIPT], {
+		input: JSON.stringify({ prompt, cwd: cwd ?? process.cwd(), session_id: sid }),
+		encoding: 'utf8',
+		env: { ...process.env, ...env },
+	});
+	return (r.stdout || '').trim();
+}
+
+test('integration — 그래프 부재 cwd + 구조적 코드 질문 → nav-first 발사 (그래프-부재 사각 닫힘)', () => {
+	const dir = mkdtempSync(join(tmpdir(), 'cgnav-nograph-'));
+	const out = runNudge('ZZZNoSuchSymbol 함수를 누가 호출하나?', { cwd: dir });
+	assert.match(out, /구조적 코드 질문/, '그래프 부재여도 구조질문이면 nav-first 발사해야 함');
+	assert.match(out, /codegraph_callers/);
+	const parsed = JSON.parse(out);
+	assert.equal(parsed.hookSpecificOutput.hookEventName, 'UserPromptSubmit');
+	assert.equal(parsed.decision, undefined, 'never blocks');
+	assert.equal(parsed.hookSpecificOutput.permissionDecision, undefined);
+});
+
+test('integration — 그래프 부재 cwd + 비코드 산문 → 침묵 (오탐 억제 보존)', () => {
+	const dir = mkdtempSync(join(tmpdir(), 'cgnav-prose-'));
+	const out = runNudge('릴리스 일정 알려줘', { cwd: dir });
+	assert.equal(out, '', '비코드 산문은 그래프 부재여도 침묵해야 함');
+});
+
+test('integration — 그래프 부재 + 구조질문 + opt-out(CONTEXT_OPS_CODEGRAPH_NAV=0) → 침묵', () => {
+	const dir = mkdtempSync(join(tmpdir(), 'cgnav-optout-'));
+	const out = runNudge('ZZZNoSuchSymbol 누가 호출하나?', { cwd: dir, env: { CONTEXT_OPS_CODEGRAPH_NAV: '0' } });
+	assert.equal(out, '', 'opt-out 시 nav-first 침묵해야 함');
 });

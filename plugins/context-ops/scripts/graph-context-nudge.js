@@ -4,9 +4,9 @@
 // UserPromptSubmit hook(hooks.json) 이 `node ...graph-context-nudge.js` 로 호출. stdin event JSON 의 prompt 안
 // 식별자(node id / title / code_pointer 심볼·파일)가 artifact-graph.json 노드에 결정론 매칭(matchPromptToNodes)되면,
 // 그 노드들의 진짜 1-hop 이웃(≤8) + code_pointers 를 additionalContext 로 주입한다. NEVER blocks (exit 2 / deny ❌).
-// 매칭 0(한글 산문 등 식별자 부재) = 침묵 no-op. routeEntry(같은 이벤트 sibling) 와 별개.
+// 매칭 0(식별자 부재) = dep-graph 1-hop 주입 no-op (단 구조적 코드 질문이면 아래 nav-first 발동). routeEntry(같은 이벤트 sibling) 와 별개.
 //
-// codegraph navigation-first (DEC-2026-06-26): artifact 매칭 0(순수 코드 질문)이고 구조적 코드 질문이면,
+// codegraph navigation-first (DEC-2026-06-26 / 그래프-부재 확장 DEC-2026-06-29): artifact 매칭 0 또는 그래프 부재(둘 다 순수 코드 질문)이고 구조적 코드 질문이면,
 //   codegraph MCP 도구(callers/callees/trace/impact/...)를 "탐색 첫 수"로 권유(비차단). 실측(transcript 0.17%)
 //   상 탐색 자리서 codegraph 미사용 → grep authoritative·gate 비주입은 불변인 채 탐색 첫 수만 격상.
 //   독립 opt-out CONTEXT_OPS_CODEGRAPH_NAV=0. policies/codegraph-navigation-first.md.
@@ -197,14 +197,13 @@ function main() {
 
 		const projectDir = evt.cwd || process.env.CLAUDE_PROJECT_DIR || process.cwd();
 		const graph = loadGraph(projectDir);
-		if (!graph) return process.exit(0); // 그래프 부재 = no-op (env-graceful)
-
-		const matches = matchPromptToNodes(prompt, selectMatchableNodes(graph), {
-			topN: 5,
-			includeTitle: true,
-		});
+		// 그래프 부재여도 nav-first(순수 코드 질문 권유)는 살아야 한다 — 그래프 부재 = 가장 전형적 순수 코드 질문.
+		// dep-graph 1-hop 주입(아래 매칭>0 분기)만 그래프 필수. graph 부재 시 matches=[] 로 nav-first 분기에 자연 합류.
+		const matches = graph
+			? matchPromptToNodes(prompt, selectMatchableNodes(graph), { topN: 5, includeTitle: true })
+			: [];
 		if (matches.length === 0) {
-			// artifact 노드 매칭 0 = 순수 코드 질문 후보 → 구조적 코드 질문이면 codegraph 첫 수 권유 (비차단).
+			// 순수 코드 질문 후보(그래프 부재 OR 그래프 존재하나 artifact 매칭 0) → 구조적 코드 질문이면 codegraph 첫 수 권유 (비차단).
 			// 독립 opt-out: CONTEXT_OPS_CODEGRAPH_NAV=0 (artifact-graph nudge 는 유지). 전체 off 는 CONTEXT_OPS_GRAPH_NUDGE=0.
 			if (isOptedOut(process.env.CONTEXT_OPS_CODEGRAPH_NAV)) return process.exit(0);
 			const detection = detectStructuralCodeQuestion(prompt);

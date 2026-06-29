@@ -48,7 +48,8 @@ transcript 1,738개 / tool 호출 45,795건 실측 시 **codegraph 점유율 0.1
 
 ## 5. 시행 + 측정
 
-- 배선: `scripts/graph-context-nudge.js` 가 UserPromptSubmit 에서 artifact-graph 매칭 0(순수 코드 질문) + **구조적 코드 질문 감지 시에만** codegraph MCP 도구를 **비차단**으로 권유. 일반 산문·리터럴 검색은 침묵. 강제 라우팅·grep deny ❌. 독립 opt-out `CONTEXT_OPS_CODEGRAPH_NAV=0`.
+- 배선: `scripts/graph-context-nudge.js` 가 UserPromptSubmit 에서 artifact-graph 매칭 0 **또는 그래프 부재**(둘 다 순수 코드 질문) + **구조적 코드 질문 감지 시에만** codegraph MCP 도구를 **비차단**으로 권유. 일반 산문·리터럴 검색은 침묵. 강제 라우팅·grep deny ❌. 독립 opt-out `CONTEXT_OPS_CODEGRAPH_NAV=0`.
+- 그래프-부재 확장 (DEC-2026-06-29 / OP-CODEGRAPH-002): nav-first 는 dep-graph 1-hop 주입과 달리 artifact-graph.json 이 **불필요**하다 — 그래프 없는 순수 코드베이스(analysis 미적용)가 nav-first 의 가장 전형적 타깃이므로 그래프 부재 시에도 발동한다. (adoption 재측정 발견: 구버전은 `if(!graph) return` 이 nav 경로를 선결 차단해 실사용 genuine 발사 0 이었음 / dep-graph 주입만 그래프 필수.)
 - 측정(정직): 현장은 grep-first 관성이 강해 soft nudge 효과 비보장. transcript 점유율을 주기적 재측정해 추이 확인 — 안 오르면 revisit(강제화는 축1·업계 명제 B 위반이라 안 함).
 
 ## 인용

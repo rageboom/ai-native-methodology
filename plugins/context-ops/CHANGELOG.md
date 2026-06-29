@@ -10,6 +10,29 @@
 
 ---
 
+## [0.87.0] — 2026-06-29 — MINOR — codegraph nav-first 그래프-부재 확장 (그래프 없는 순수 코드베이스에서도 구조질문이면 권유)
+
+### 배경 (adoption 재측정)
+
+- codegraph navigation-first(v0.84.0 / DEC-2026-06-26) adoption 재측정(이 repo 128세션 transcript / 하니스 = scratchpad `audit-codegraph-adoption.py`): nav-first nudge genuine 발사 **0**. codegraph 실사용 점유율도 v0.84.0 설치 경계 전후 0.13%(20/15,269)→0.19%(1/522, 설치후 6세션 = 표본 부족 무의미). 격상 신호 없음.
+
+### 변경
+
+- **그래프-부재 사각 수정** (`scripts/graph-context-nudge.js`): `if(!graph) return process.exit(0)` 가 nav-first(artifact 매칭 0 분기)의 선결 게이트였다. nav-first 타깃(analysis 미적용 순수 코드베이스 = artifact-graph.json 부재)에서 영영 미발동 → 의도-구현 갭(정책 위반 아님 / 정책·DEC 원문 대조 완료 = 버그픽스). `const matches = graph ? matchPromptToNodes(...) : []` 로 끌어올려 **그래프 부재여도 구조적 코드 질문이면 nav-first 발동**. dep-graph 1-hop 주입(매칭>0 분기)만 그래프 필수로 남김.
+- 축1(gate 비주입 · grep authoritative · grep deny ❌) 불변. 축2 nudge 범위만 변경. opt-out(`CONTEXT_OPS_CODEGRAPH_NAV=0`) · once-per-prompt marker · 비차단(exit 0) 보존.
+- 문서 동기화: `methodology-spec/policies/codegraph-navigation-first.md` §5 ("매칭 0 또는 그래프 부재" + 그래프-부재 확장 항) + `hooks/hooks.json` UserPromptSubmit $comment 정밀화 + 신규 `decisions/DEC-2026-06-29-codegraph-nav-graph-absent.md`.
+
+### 검증
+
+- `node --test scripts/test/graph-context-nudge.test.js` 14/14 (기존 11 단위 + 신규 통합 3: 그래프 부재+구조질문→발사 / 비코드 산문→침묵 / opt-out→침묵).
+- 라이브: 레포 루트(그래프 부재) + 구조질문 → nav 발사(재측정 때 빈출력이던 케이스 해소).
+- v0.85.0/0.85.1/0.86.0 누적과 묶어 단일 Nexus publish → adoption 전파 갭(merge≠publish≠설치≠실행) 해소.
+
+### 정합
+
+- 신규 스크립트 0 / 새 release-readiness check 0 (카운트·출하 가드 check #43 채널 무변).
+- MIS-366([Tech Debt] mis-plugins) 하위 [OP-CODEGRAPH-002].
+
 ## [0.86.0] — 2026-06-29 — MINOR — draft-first 점진 analysis (핵심 grounding floor부터 → per-scope 심화)
 
 **문제**: analysis 산출물 ~21종을 처음에 다 만드는 게 부담이라 analysis를 advisory로 뒀으나, 그 결과 "통째로 다 하고 시작" vs "그냥 스킵(grounding 없는 거짓 진행)" 양극단만 1급 경로가 됨. "핵심만 먼저 → 작업하며 per-scope 심화"라는 중간 경로가 명시적으로 없고, v0.85.0 라우터·cold-start surface도 "코드 분석"(전체 암시)이라고만 가리킴.

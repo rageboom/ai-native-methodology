@@ -37,7 +37,7 @@
           {
             "type": "command",
             "command": "node ${CLAUDE_PLUGIN_ROOT}/scripts/graph-context-nudge.js",
-            "$comment": "Gap A 자동주입 (plan-living-graph-autowire §3 / DEC-2026-06-19-living-graph-autowire) — UserPromptSubmit sibling. prompt 식별자가 artifact-graph 노드에 결정론 매칭(matchPromptToNodes / includeTitle) 시 진짜 1-hop 이웃(incident edge 만 / transitive·centrality ❌ / ≤8)+code_pointers 를 additionalContext 주입. 매칭 0(한글 산문)=침묵 no-op. NEVER blocks(additionalContext only / exit 2·deny ❌). default-on (opt-out CONTEXT_OPS_GRAPH_NUDGE=0 / 그래프 부재 no-op). 그래프 reference-lens / 결정적 chain gate inject ❌ (chain-driver 분리 / grep authoritative)."
+            "$comment": "Gap A 자동주입 (plan-living-graph-autowire §3 / DEC-2026-06-19-living-graph-autowire) — UserPromptSubmit sibling. prompt 식별자가 artifact-graph 노드에 결정론 매칭(matchPromptToNodes / includeTitle) 시 진짜 1-hop 이웃(incident edge 만 / transitive·centrality ❌ / ≤8)+code_pointers 를 additionalContext 주입. 매칭 0(한글 산문)=dep-graph 주입 no-op. NEVER blocks(additionalContext only / exit 2·deny ❌). default-on (opt-out CONTEXT_OPS_GRAPH_NUDGE=0 / 그래프 부재 시 dep-graph 주입은 no-op, 단 구조적 코드 질문이면 codegraph nav-first 발동 DEC-2026-06-29 / nav opt-out CONTEXT_OPS_CODEGRAPH_NAV=0). 그래프 reference-lens / 결정적 chain gate inject ❌ (chain-driver 분리 / grep authoritative)."
           }
         ]
       }
