@@ -8,6 +8,7 @@
   "plugins": [
     {
       "name": "context-ops",
+      "version": "0.87.0",
       "source": {
         "source": "npm",
         "package": "@mis-plugins/context-ops",
@@ -18,6 +19,7 @@
     },
     {
       "name": "mis-backend-spring",
+      "version": "0.1.0",
       "source": {
         "source": "npm",
         "package": "@mis-plugins/mis-backend-spring",
@@ -28,6 +30,7 @@
     },
     {
       "name": "pm",
+      "version": "0.1.0",
       "source": {
         "source": "npm",
         "package": "@mis-plugins/pm",
@@ -38,6 +41,7 @@
     },
     {
       "name": "ux-plan",
+      "version": "0.1.0",
       "source": {
         "source": "npm",
         "package": "@mis-plugins/ux-plan",
