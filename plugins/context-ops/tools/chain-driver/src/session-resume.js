@@ -2,8 +2,11 @@
 //
 // 목적: 세션 최초 시작 시 "남은 chain 단계 + 대기 항목(blocked/revisit/task)"을 컴팩트 블록으로 합성.
 //   "현재 stage"는 statusLine(chain-statusline.js)이 블랭크 화면부터 상시 담당하므로 여기선 보강만 한다.
-//   채널 = additionalContext(모델 컨텍스트) → 어시스턴트가 첫 응답에서 중립 톤 렌더 (Anthropic 권장 패턴).
-//   stderr/systemMessage 아님 — SessionStart exit 0 stderr 는 사용자 미표출(공식문서) / systemMessage 는 warning 톤.
+//   ★ 출력 채널 정정 (DEC-2026-06-30-sessionstart-systemmessage-visible-channel) — 본 함수 반환 문자열은
+//     cli.js SessionStart 분기에서 systemMessage(SessionStart 의 유일한 결정론 사용자-가시 채널 / 공식문서)로 내보낸다.
+//     동시에 additionalContext(모델 컨텍스트 grounding)에도 동봉한다(하이브리드).
+//     ⚠️ 옛 전제 "additionalContext → 어시스턴트가 첫 응답에서 자발 렌더" 는 폐기 — additionalContext 는 사용자
+//        미표출이라 모델 변덕에 의존해 거의 안 보였다(dead-on-display). 가시성은 systemMessage 가 결정론 보장.
 //
 // ★ reference-lens / display-only — 어떤 결정적 gate(evaluateGate/cmdNext)에도 inject ❌ (deterministic-axis).
 //   순수 함수 (state in → string|null out / 부작용 0 / I/O 0) — cli.js SessionStart 분기에서만 호출.

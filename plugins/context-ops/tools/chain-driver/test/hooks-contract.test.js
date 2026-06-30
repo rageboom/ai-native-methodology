@@ -157,6 +157,104 @@ describe('hooks-contract — SessionStart unbaselined surface (② honest)', () 
 	});
 });
 
+// DEC-2026-06-30-sessionstart-systemmessage-visible-channel — SessionStart 사용자-가시 채널 회귀 가드.
+//   additionalContext = 모델 컨텍스트 전용(사용자 미표출 / 공식문서). systemMessage = SessionStart 의 유일한
+//   결정론 사용자-가시 채널. 과거 additionalContext-only = dead-on-display(모델 자발 렌더 의존 → 거의 안 보임).
+describe('hooks-contract — SessionStart systemMessage 가시 채널 (DEC-2026-06-30)', () => {
+	function writeState(root, state) {
+		mkdirSync(join(root, '.ai-context'), { recursive: true });
+		writeFileSync(join(root, '.ai-context', 'state.json'), JSON.stringify(state));
+	}
+
+	it('live + 활성 chain → systemMessage 에 세션 재개 요약(가시) + additionalContext 병행(grounding)', () => {
+		const root = mkdtempSync(join(tmpdir(), 'sysmsg-live-'));
+		try {
+			writeState(root, {
+				version: '2.0',
+				current_chain: 'spec',
+				current_scope: 'BC-ORDER',
+				blocked: false,
+				stage_progress: {},
+				current_task: { task_id: 'TASK-12', branch: 'MIS-440' },
+			});
+			const r = sessionStart(root);
+			assert.equal(r.status, 0, r.stderr);
+			const out = JSON.parse(r.stdout);
+			assert.match(out.systemMessage, /세션 재개/, 'systemMessage = 결정론 가시 채널');
+			assert.match(out.systemMessage, /spec 2\/5/);
+			assert.match(
+				out.hookSpecificOutput.additionalContext,
+				/세션 재개/,
+				'additionalContext grounding 병행(하이브리드)',
+			);
+		} finally {
+			rmSync(root, { recursive: true, force: true });
+		}
+	});
+
+	it('corrupt state.json → systemMessage 에 손상 fail-closed 경고 (과거 잠복 → 가시화)', () => {
+		const root = mkdtempSync(join(tmpdir(), 'sysmsg-corrupt-'));
+		try {
+			writeState(root, { current_chain: 'spec' }); // version 누락 = corrupt
+			const r = sessionStart(root);
+			assert.equal(r.status, 0, r.stderr);
+			const out = JSON.parse(r.stdout);
+			assert.match(out.systemMessage, /손상/);
+			assert.match(out.systemMessage, /fail-closed/);
+		} finally {
+			rmSync(root, { recursive: true, force: true });
+		}
+	});
+
+	it('unbaselined scope → systemMessage 에 unbaselined 경고 (additionalContext 와 양 채널)', () => {
+		const root = mkdtempSync(join(tmpdir(), 'sysmsg-unbaselined-'));
+		try {
+			runCli(['init', root]);
+			mkdirSync(join(root, '.ai-context', 'output'), { recursive: true });
+			writeFileSync(join(root, '.ai-context', 'output', 'domain.json'), '{}');
+			ensureScopeDir(root, 'scope-a');
+			writeManifest(root, 'scope-a', null, {
+				scope: 'scope-a',
+				status: 'active',
+				sync_state: { sync_sources: [], drift_detected: false },
+			});
+			const out = JSON.parse(sessionStart(root).stdout);
+			assert.match(out.systemMessage, /unbaselined/);
+		} finally {
+			rmSync(root, { recursive: true, force: true });
+		}
+	});
+
+	it('live·idle(current_chain=null) + drift 무 → systemMessage 미발행 (clean-idle 배너 침묵)', () => {
+		const root = mkdtempSync(join(tmpdir(), 'sysmsg-idle-'));
+		try {
+			writeState(root, { version: '2.0', current_chain: null, stage_progress: {} });
+			const r = sessionStart(root);
+			assert.equal(r.status, 0, r.stderr);
+			const out = JSON.parse(r.stdout);
+			assert.equal(out.systemMessage, undefined, 'ready fallback 단독 = 배너 노이즈 없음');
+			assert.match(
+				out.hookSpecificOutput.additionalContext,
+				/chain harness ready/,
+				'grounding 은 ready 유지(모델은 알아야 함)',
+			);
+		} finally {
+			rmSync(root, { recursive: true, force: true });
+		}
+	});
+
+	it('absent(.ai-context 없음) → systemMessage 미발행 + pass-through (방법론 미사용 무회귀)', () => {
+		const root = mkdtempSync(join(tmpdir(), 'sysmsg-absent-'));
+		try {
+			const out = JSON.parse(sessionStart(root).stdout);
+			assert.equal(out.systemMessage, undefined);
+			assert.equal(out.hookSpecificOutput, undefined);
+		} finally {
+			rmSync(root, { recursive: true, force: true });
+		}
+	});
+});
+
 // session-handoff (DEC-2026-06-11-session-handoff-convention) — SessionStart HANDOFF 표면화 + 라우팅 e2e.
 describe('hooks-contract — session-handoff', () => {
 	it('SessionStart: HANDOFF.md 존재 + state.json 부재(pre-init) → handoff nudge 만 표면화', () => {

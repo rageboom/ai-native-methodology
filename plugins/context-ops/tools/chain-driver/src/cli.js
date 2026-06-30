@@ -1734,10 +1734,14 @@ function cmdHooksBridge(args) {
 		//   live       = 정상 → 아래 기존 전체 경로(drift/unbaselined/resume/graph).
 		const ctx = resolveEnforcementContext(root);
 		const emitSurface = (additionalContext) => {
+			// additionalContext = 모델 grounding / systemMessage = 동일 텍스트의 사용자 가시 사본.
+			//   absent·corrupt·cold-start 표면은 모두 사용자 대상(특히 corrupt fail-closed 경고는 과거 additionalContext-only
+			//   라 사용자에게 안 보여 'ready'처럼 잠복했음 — DEC-2026-06-30). text 없으면(absent+handoff 무) 현행대로 완전 침묵.
 			const out = additionalContext
 				? {
 						suppressOutput: true,
 						hookSpecificOutput: { hookEventName: event, additionalContext },
+						systemMessage: additionalContext,
 						continue: true,
 					}
 				: { suppressOutput: true, continue: true };
@@ -1849,14 +1853,28 @@ function cmdHooksBridge(args) {
 		} catch {
 			/* non-fatal — 그래프 없으면 skip */
 		}
+		// dead-on-display 수정 (DEC-2026-06-30-sessionstart-systemmessage-visible-channel) —
+		//   additionalContext 는 모델 컨텍스트 전용 / 사용자 미표출(공식문서). 사용자가 봐야 하는 표면은
+		//   SessionStart 의 유일한 결정론 가시 채널 = systemMessage 로도 내보낸다. additionalContext 는
+		//   모델 grounding 으로 위 full 텍스트(graph reference 포함) 그대로 유지(하이브리드).
+		//   ★ 가시는 "보여줄 것 있을 때만" — clean-idle(resume·drift·handoff 전무 / 'ready' fallback 단독)은
+		//     systemMessage 생략 → 배너 침묵 보존(매 세션 노이즈 회귀 방지).
+		const visibleLines = [];
+		if (resumeSummary) visibleLines.push(resumeSummary);
+		if (handoffNudge) visibleLines.push(handoffNudge);
+		if (parts.length) visibleLines.push(...parts); // drift / unbaselined
+		const systemMessage = visibleLines.length
+			? `[ai-native-methodology]\n${visibleLines.join('\n')}`
+			: undefined;
 		const out = {
 			suppressOutput: true,
 			hookSpecificOutput: { hookEventName: event, additionalContext },
+			...(systemMessage ? { systemMessage } : {}),
 			continue: true,
 		};
 		process.stdout.write(JSON.stringify(out) + '\n');
-		// drift/unbaselined 는 additionalContext(parts)로 모델에 전달 — 별도 stderr write 제거.
-		//   SessionStart exit 0 의 stderr 는 사용자 트랜스크립트 미표출(공식문서 / exit 2·--verbose 한정)이라 죽은 코드였음 (MIS-428).
+		// drift/unbaselined/resume 는 systemMessage(가시) + additionalContext(grounding) 양 채널. stderr write 없음 —
+		//   SessionStart exit 0 의 stderr 는 사용자 트랜스크립트 미표출(공식문서 / exit 2·--verbose 한정)이라 죽은 채널 (MIS-428).
 		process.exit(0);
 	}
 	if (event === 'UserPromptSubmit') {
