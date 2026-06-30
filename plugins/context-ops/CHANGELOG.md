@@ -10,6 +10,26 @@
 
 ---
 
+## [0.89.0] — 2026-06-30 — MINOR — SessionStart 세션 재개 요약 사용자-가시 채널 복구 (dead-on-display)
+
+**문제**: SessionStart hook 의 "사용자가 봐야 하는" 모든 표면(`🧭 세션 재개` 요약 / `⚠️ drift`·`unbaselined` 경고 / `state.json 손상` fail-closed / cold-start 안내 / `HANDOFF.md`)이 `additionalContext` **단일 채널**로만 나갔다. 공식 문서(claude.ai code docs) 기준 `additionalContext` = **모델 컨텍스트 전용 / 사용자 미표출** — 모델이 첫 응답에서 자발적으로 렌더할 때만 보인다(비결정론). 결과: 기능을 구현·테스트·배포(Nexus 0.80.0)했는데도 **실제 설치 후 세션 재개 요약이 사용자에게 거의 보이지 않았다**(dead-on-display). 테스트는 함수 반환 문자열·additionalContext 내용만 검증해 영원히 GREEN.
+
+### 변경
+
+- **`cli.js` SessionStart 분기 — `systemMessage`(SessionStart 의 유일한 결정론 사용자-가시 채널) 신설**:
+  - live 경로: 사용자가 봐야 하는 부분(resume 요약 + handoff + drift/unbaselined)을 `systemMessage` 로도 발행. `additionalContext` 는 모델 grounding 으로 full 유지(graph reference 포함)하는 **하이브리드**.
+  - `emitSurface`(absent/corrupt/cold-start): 표면 텍스트를 `systemMessage` 로도 발행 → 특히 **`state.json 손상` fail-closed 경고가 비로소 사용자에게 보인다**(과거 additionalContext-only 라 'ready' 처럼 잠복).
+  - **노이즈 가드**: `systemMessage` 는 보여줄 내용이 있을 때만 채운다 — clean-idle(`current_chain=null` + drift 무, 'ready' fallback 단독) 세션은 미발행 → 매 세션 배너 노이즈 회귀 방지.
+- **`session-resume.js`** 헤더 주석 정정: "additionalContext → 어시스턴트 자발 렌더(Anthropic 권장)" 전제 폐기 → "systemMessage = 결정론 가시 / additionalContext = grounding 병행".
+- **`hooks-contract.test.js`** 결정론 가시 회귀 가드 +5 (live→systemMessage 에 세션 재개 / corrupt→손상 경고 / unbaselined→경고 / clean-idle→미발행 / absent→미발행·pass-through).
+
+### 검증
+
+- chain-driver 782/782 pass (신규 5 포함) · session-resume 13/13 무회귀 · 3-way 0.89.0.
+- 톤 트레이드오프: `systemMessage` = warning 톤 배너(중립 톤+결정론 동시 만족 채널은 SessionStart 에 부재) — 가시성 > 톤 채택. 과거 톤-기각 결정 명시 역전.
+
+DEC-2026-06-30-sessionstart-systemmessage-visible-channel / MIS-366 하위.
+
 ## [0.88.0] — 2026-06-30 — MINOR — ticket-sync chain3 parent_epic 직접 입력/확인 (cascade 부모를 silent 가정 대신 매번 명시)
 
 **문제**: 기존 ticket-sync 는 config(`parent_initiative`)에 값이 있으면 부모 Epic/Initiative 를 **silent 하게** 사용했다. 사용자가 매 cascade 마다 부모를 명시 지정·확인할 수 없어, 의도와 다른 부모 아래로 티켓이 적재될 여지가 있었다.
