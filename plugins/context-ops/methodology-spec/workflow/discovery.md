@@ -140,6 +140,8 @@ scope_candidates:
 > ⚠️ **패키지 경로 ≠ 경계.** 클린아키텍처를 *지향*했으나 미준수된 코드베이스에서는 명목 BC/레이어 트리와 실제 응집이 어긋난다. `modules_for_priority_analysis` 의 LOC 추정만으로 scope 를 끊지 말고, `analysis-code-graph` 실측 coupling 으로 `scope_candidates` 도출(advisory / 최종 절단 = 사용자 결단). 경계 위반은 antipatterns(ARCH)+migration-cautions+finding 으로 라우팅.
 >
 > **backbone-first (대형)**: scope 를 끊기 전에 ⓐ DB(always-on) + ⓑ shared-kernel(Martin afferent-hub 공통 커널)을 `role=backbone` 으로 먼저 분리 → 1회 분석. hub 를 빼면 feature 간 결합 급감 → feature 가 깨끗한 `role=scope` 로 분리(Martin "hub 쪼개면 파편화" + DDD shared-kernel). scope id = **알아듣기 쉬운 의미 명칭**(패키지 약칭 그대로 ❌).
+>
+> **소형·단일 (cardinality ≥1 불변식 / DEC-2026-06-30)**: 반대로 seam 이 없는 소형 코드베이스(carve 빈 후보 / 단일 도메인)여도 `scope_candidates` 를 **빈 채로 두지 않는다** — 전체 코드베이스를 담는 후보 1개(`source=whole_codebase_fallback` · `role=scope` · `members`=전체)를 항상 emit 한다. soft gate #0 에서 이 단일 후보를 **숨기지 말고** 제시: 사용자는 "전체 1 scope 로 확정"(자명해도 1-클릭) / 이름변경 / 분할 중 택한다. 확정되면 그 슬러그로 `chain-driver init --scope <slug>` 가 scope 컨테이너를 물질화한다(global/no-scope 모드 대신 균일 패러다임 + 나중 scope 확장 seam). carve 가 없는 seam 을 날조하는 게 아니라(carve 빈 후보=정직) inventory 가 확정용 단일 후보를 보장할 뿐 — 절단은 사람.
 
 ---
 
@@ -152,6 +154,7 @@ scope_candidates:
 □ ORM 자동 감지 결과 = 실제와 일치
 □ 분석 우선순위 모듈 = 사용자 의도와 일치
 □ (대형/decayed) scope_candidates = codegraph 실측 도출 + 사용자 절단 동의 (LOC 추정 단독 ❌)
+□ scope_candidates 카디널리티 ≥1 (소형·단일도 빈 배열 ❌ — whole_codebase_fallback 1개 emit + soft gate #0 사용자 확정)
 □ 입력 manifest = `input` phase 정돈과 정합
 ```
 
