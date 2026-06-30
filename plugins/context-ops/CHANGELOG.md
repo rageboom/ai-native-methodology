@@ -10,6 +10,23 @@
 
 ---
 
+## [0.90.0] — 2026-06-30 — MINOR — 슬래시 커맨드 npm 출하 누락 수정 (dead-on-install) + /chain-init 신설 + 자산 디렉토리 출하 가드
+
+**문제**: context-ops 슬래시 커맨드 4개(`/chain-next` `/chain-stage` `/chain-status` `/roi`)가 source:npm 설치 시 **dead-on-install** 이었다. `commands/` 가 `package.json` `files` 배열에서 누락 → npm tarball 미포함(`npm pack --dry-run` 실측: 793 항목 중 commands/ = 0) → 설치 캐시(`~/.claude/plugins/cache`) 미복사 → 발견 불가. dist 채널(`build-plugin.js` INCLUDE)엔 있으나 source:npm 설치엔 미사용. 기존 출하 가드(check43 / DEC-2026-06-24)는 자산이 *참조하는* `${CLAUDE_PLUGIN_ROOT}/scripts/*` 만 검증, **디렉토리 자체 출하는 미검증**이라 못 잡았다. 공식 확정(Claude Code plugins-reference.md): 커맨드는 디렉토리 컨벤션 자동 스캔 / tarball 미포함 = dead-on-install.
+
+### 변경
+
+- **출하 복구 (P0)**: `package.json` `files` 배열에 `commands` 추가 → 기존 4개 슬래시 커맨드 npm 채널 부활(`npm pack --dry-run` 5개 `.md` 포함 실측). plugin.json 명시 등록 불필요(디렉토리 컨벤션 / 공식 확인).
+- **`/chain-init` 신설** (`commands/chain-init.md`): chain harness 초기화 entry. grounding floor(architecture·domain·business-rules / `minimalSubsetPresent` 정의) 점검 후 `chain-driver init <project> --scope <slug> [--scenario]` → discovery 진입 안내. floor 미충족 시 analysis 먼저 안내 후 **중단**(chain-stage 동형). init = 1회성 부트스트랩(LLM auto-invoke ❌ / 사용자 명시 결단 entry / ADR-CHAIN-005 D21').
+- **출하 가드 보강 (release-readiness check44)**: 자산 디렉토리(commands/skills/agents/hooks/flows/tools/templates/methodology-spec/schemas/guides)가 **npm `files` ∩ dist build-plugin INCLUDE 양 채널** 등재됐는지 디렉토리-단위 결정론 검증. check43(참조 scripts) 직교 보강 — 디렉토리 자체 누락 클래스(본 결함) 회귀 차단.
+
+### 검증
+
+- `npm pack --dry-run` → `commands/` 5개(`.md`) 포함. release-readiness **44/44**(criteria_total 43→44 / check44 신규 pass) + test count 결합(`criteria_total`·`criteria_passed` 동시 갱신 / check44 test 추가). check43·check44 ✔.
+- 3-way 0.90.0 정합.
+
+MIS-538 (MIS-366 하위 OP Task). plan: `.claude/plans/plan-chain-init-command.md`.
+
 ## [0.89.0] — 2026-06-30 — MINOR — SessionStart 세션 재개 요약 사용자-가시 채널 복구 (dead-on-display)
 
 **문제**: SessionStart hook 의 "사용자가 봐야 하는" 모든 표면(`🧭 세션 재개` 요약 / `⚠️ drift`·`unbaselined` 경고 / `state.json 손상` fail-closed / cold-start 안내 / `HANDOFF.md`)이 `additionalContext` **단일 채널**로만 나갔다. 공식 문서(claude.ai code docs) 기준 `additionalContext` = **모델 컨텍스트 전용 / 사용자 미표출** — 모델이 첫 응답에서 자발적으로 렌더할 때만 보인다(비결정론). 결과: 기능을 구현·테스트·배포(Nexus 0.80.0)했는데도 **실제 설치 후 세션 재개 요약이 사용자에게 거의 보이지 않았다**(dead-on-display). 테스트는 함수 반환 문자열·additionalContext 내용만 검증해 영원히 GREEN.

@@ -3297,6 +3297,69 @@ function check43_hookScriptShipped() {
 	}
 }
 
+// check44 (v0.90.0 / 자산 디렉토리 출하정합 / MIS-538) — Claude Code 가 디렉토리 컨벤션으로
+//   자동 발견하는 컴포넌트 디렉토리(commands/skills/agents/hooks)+핵심 의존 자산이 **양 출하 채널**에
+//   등재됐는지 결정론 대조. check43 은 자산이 *참조하는 scripts/*만 봄 — 디렉토리 자체 출하 누락
+//   (commands 가 npm files 에서 빠져 슬래시 커맨드 4개가 dead-on-install 이던 MIS-538)은 못 잡았다.
+//   본 check 는 디렉토리 자체 멤버십을 검증(직교 보강). source:npm 설치 시 files 에서 빠진 디렉토리는
+//   tarball 미포함 → 캐시 미복사 → 컴포넌트 발견 불가 = dead-on-install.
+function check44_assetDirsShipped() {
+	try {
+		// 존재하는 것만 검증(없는 디렉토리는 N/A — 플러그인마다 다름).
+		const ASSET_DIRS = [
+			'commands', 'skills', 'agents', 'hooks', // Claude Code 자동발견 컴포넌트 (dead-on-install 직결)
+			'flows', 'tools', 'templates', 'methodology-spec', 'schemas', 'guides', // 런타임 의존 자산
+		];
+		const present = ASSET_DIRS.filter((d) => existsSync(join(ROOT, d)));
+
+		// 채널 ① npm (AUTHORITATIVE / source:npm 설치) = package.json files 의 양성 엔트리.
+		const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf-8'));
+		const npmFiles = new Set(
+			(pkg.files ?? []).filter((f) => typeof f === 'string' && !f.startsWith('!')),
+		);
+
+		// 채널 ② dist (build-plugin.js INCLUDE).
+		const buildPluginPath = join(REPO_ROOT, 'scripts', 'build-plugin.js');
+		const included = new Set();
+		if (existsSync(buildPluginPath)) {
+			const bpText = readFileSync(buildPluginPath, 'utf-8');
+			const incMatch = bpText.match(/const INCLUDE\s*=\s*\[([\s\S]*?)\];/);
+			if (incMatch)
+				for (const m of incMatch[1].matchAll(/['"]([^'"]+)['"]/g)) included.add(m[1]);
+		}
+
+		const memberOf = (dir, set) => set.has(dir) || set.has(dir + '/');
+		const gaps = [];
+		for (const d of present) {
+			const inNpm = memberOf(d, npmFiles);
+			const inDist = memberOf(d, included);
+			if (!inNpm || !inDist) {
+				const ch = [!inNpm && 'npm:files', !inDist && 'dist:INCLUDE']
+					.filter(Boolean)
+					.join('+');
+				gaps.push(`${d}/(누락채널:${ch})`);
+			}
+		}
+		return {
+			id: 'asset_dirs_shipped',
+			pass: gaps.length === 0,
+			detail:
+				gaps.length === 0
+					? `자산 디렉토리 ${present.length}개(${present.join(', ')}) 전부 양 채널(npm package.json files + dist build-plugin INCLUDE) 등재 — 디렉토리-단위 dead-on-install 차단 (MIS-538 / check43 직교 보강)`
+					: `디렉토리 dead-on-install ${gaps.length}건 (자동발견 대상이나 미출하): ${gaps.join(', ')} — package.json files / build-plugin.js INCLUDE 에 추가`,
+			delegated_to:
+				'commands/skills/agents/hooks/flows/tools/templates/… ⊆ package.json files ∩ build-plugin.js INCLUDE (MIS-538 / 디렉토리-단위 출하 가드)',
+		};
+	} catch (e) {
+		return {
+			id: 'asset_dirs_shipped',
+			pass: false,
+			detail: `error: ${e.message}`,
+			delegated_to: 'asset dirs → npm files ∩ build-plugin INCLUDE',
+		};
+	}
+}
+
 function main() {
 	const args = parseArgs(process.argv);
 	if (!args.target) usage(2);
@@ -3345,6 +3408,7 @@ function main() {
 		check41_catalogRangeCoversVersion(),
 		check42_artifactSecretLeak(),
 		check43_hookScriptShipped(),
+		check44_assetDirsShipped(),
 	];
 	const passCount = results.filter((r) => r.pass).length;
 	const total = results.length;

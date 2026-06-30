@@ -38,12 +38,12 @@ function runScript(args, env = {}, timeout = 60000) {
 const SKIP_WS = ['--skip-workspace-test'];
 
 describe('release-readiness — Senior F3 흡수 (content-aware criterion / file presence ❌) + v3.6.7 11/11 + v7.1.0 12/12 + v8.1.0 13/13 격상', () => {
-	it('happy path — 42/43 pass for v2.5.0 (A1 skip via --skip-workspace-test / check12 staleness + check13 citation pass / 본격 spawn 회피 cadence)', () => {
-		// skip 시 check11(workspace_test) = pass=false / total 42/43 (나머지 전부 pass). release 본격 시행 시 본 flag ❌ 의무.
+	it('happy path — 43/44 pass for v2.5.0 (A1 skip via --skip-workspace-test / check12 staleness + check13 citation pass / 본격 spawn 회피 cadence)', () => {
+		// skip 시 check11(workspace_test) = pass=false / total 43/44 (나머지 전부 pass). release 본격 시행 시 본 flag ❌ 의무.
 		const r = runScript(['--target', 'v2.5.0', '--json', ...SKIP_WS]);
 		const out = JSON.parse(r.stdout);
-		assert.equal(out.criteria_total, 43);
-		assert.equal(out.criteria_passed, 42);
+		assert.equal(out.criteria_total, 44);
+		assert.equal(out.criteria_passed, 43);
 		const ws = out.results.find((x) => x.id === 'workspace_test_pass');
 		assert.ok(
 			ws.detail.includes('skipped via --skip-workspace-test'),
@@ -61,7 +61,7 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 		);
 	});
 
-	it('all 43 criterion ids are present in output (no skipped)', () => {
+	it('all 44 criterion ids are present in output (no skipped)', () => {
 		const r = runScript(['--target', 'v2.5.0', '--json', ...SKIP_WS]);
 		const out = JSON.parse(r.stdout);
 		const ids = out.results.map((x) => x.id).sort();
@@ -72,6 +72,7 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 			'agent_skills_phaseflow_sync',
 			'analysis_validator_violation',
 			'artifact_secret_leak',
+			'asset_dirs_shipped',
 			'authoring_spec_staleness',
 			'be_task_openapi_ref_ratchet',
 			'catalog_range_covers_version',
@@ -310,7 +311,7 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 		const r = runScript(['--target', 'v99.99.99', '--json', ...SKIP_WS]);
 		// even with bogus target, should still evaluate all checks against current artifacts.
 		const out = JSON.parse(r.stdout);
-		assert.equal(out.criteria_total, 43);
+		assert.equal(out.criteria_total, 44);
 	});
 
 	// check41 discrimination — 카탈로그 범위 ⊇ plugin.json 버전 (install ETARGET 회귀 가드).
@@ -695,6 +696,21 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 		assert.ok(c.delegated_to.includes('INCLUDE'), 'build-plugin INCLUDE allow-list 대조');
 	});
 
+	it('asset_dirs_shipped (check44) — 자산 디렉토리(commands/skills/agents/hooks/…)가 npm files ∩ build-plugin INCLUDE 양 채널 등재 (디렉토리-단위 dead-on-install 회귀 가드 / MIS-538)', () => {
+		const r = runScript(['--target', 'v0.90.0', '--json', ...SKIP_WS]);
+		const out = JSON.parse(r.stdout);
+		const c = out.results.find((x) => x.id === 'asset_dirs_shipped');
+		assert.ok(c, 'check44 asset_dirs_shipped criterion must exist');
+		assert.ok(
+			c.pass,
+			`check44 must pass (자산 디렉토리 전부 양 채널 등재) — detail: ${c.detail}`,
+		);
+		// 본 가드가 잡는 버그 클래스 = commands 가 npm files 누락 → 슬래시 커맨드 4개 dead-on-install (MIS-538).
+		// check43(참조 scripts) 직교 보강 — 디렉토리 자체 멤버십 검증.
+		assert.match(c.detail, /commands/);
+		assert.ok(c.delegated_to.includes('INCLUDE'), 'build-plugin INCLUDE 대조');
+	});
+
 	it('scanSecrets — TP(실 secret) hit / FP(test-data·타입설명·placeholder) clean (release-block low-FP 의무)', async () => {
 		const { scanSecrets } = await import('../../tools/_shared/pii-patterns.js');
 		// TP — 진짜 secret 은 hit
@@ -742,8 +758,8 @@ describe('release-readiness — Senior F3 흡수 (content-aware criterion / file
 			`workspace_test_pass must pass — full detail: ${ws.detail} | r.status=${r.status} | stderr=${r.stderr.slice(0, 300)}`,
 		);
 		assert.match(ws.detail, /\d+\/\d+ pass \/ 0 fail/);
-		assert.equal(out.criteria_total, 43);
-		assert.equal(out.criteria_passed, 43);
+		assert.equal(out.criteria_total, 44);
+		assert.equal(out.criteria_passed, 44);
 		assert.equal(out.ready, true);
 		assert.equal(r.status, 0);
 	});
