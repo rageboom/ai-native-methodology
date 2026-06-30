@@ -144,7 +144,8 @@
     },
     "scope_candidates": {
       "type": "array",
-      "description": "ADR-CHAIN-016 — 대형/decayed 코드베이스의 analysis scope 후보 (분석가 확정 출력 컨테이너). **역할 분담**: scope-carve.json(신호 엔진 / Tarjan SCC·Martin·co-change·hotspot = WHERE/WHICH 결정론 신호)이 carve_candidates 를 제시 → 사용자가 soft gate #0 에서 확정 → 본 `scope_candidates` 가 일원화된 출력 (scope-carve = 신호, scope_candidates = 확정 결과 / 두 산출물 평행 ❌). scope-carve 부재 시 codegraph 실측 coupling 또는 LOC 추정 fallback. **advisory(reference-lens) — 어떤 gate 에도 inject ❌ / 최종 scope 절단은 사용자 결단** (codegraph trust 모델 DEC-2026-05-28 §4.2 + dependency-cruiser severity=warn 선례 정합). 미측정 시 빈 배열 + meta.warnings 정직 표기. CodeScene temporal-coupling + Vertical Slice(Bogard) 원칙.",
+      "minItems": 1,
+      "description": "ADR-CHAIN-016 — 대형/decayed 코드베이스의 analysis scope 후보 (분석가 확정 출력 컨테이너). **역할 분담**: scope-carve.json(신호 엔진 / Tarjan SCC·Martin·co-change·hotspot = WHERE/WHICH 결정론 신호)이 carve_candidates 를 제시 → 사용자가 soft gate #0 에서 확정 → 본 `scope_candidates` 가 일원화된 출력 (scope-carve = 신호, scope_candidates = 확정 결과 / 두 산출물 평행 ❌). scope-carve 부재 시 codegraph 실측 coupling 또는 LOC 추정 fallback. **advisory(reference-lens) — 어떤 gate 에도 inject ❌ / 최종 scope 절단은 사용자 결단** (codegraph trust 모델 DEC-2026-05-28 §4.2 + dependency-cruiser severity=warn 선례 정합). **cardinality ≥1 불변식 (DEC-2026-06-30 / minItems:1)**: 측정 신호(carve/codegraph/loc)가 모두 0 후보여도 빈 배열 ❌ — 전체 코드베이스를 담는 `whole_codebase_fallback` 후보 1개를 항상 emit(members=전체 모듈 / role=scope). 단일 full-codebase 도 scope 컨테이너를 항상 물질화해 나중 scope 확장 seam 을 확보(global/no-scope 모드 대신 균일한 scope 패러다임). fallback 도 **여전히 advisory** — 사용자가 soft gate #0 에서 확정(자명해도 1-클릭)·이름변경·분할. 측정 부재는 source=whole_codebase_fallback + meta.warnings 로 정직 표기(추정으로 위장 ❌). CodeScene temporal-coupling + Vertical Slice(Bogard) 원칙.",
       "items": {
         "type": "object",
         "required": ["id", "members", "source"],
@@ -193,8 +194,8 @@
           },
           "source": {
             "type": "string",
-            "enum": ["scope_carve", "codegraph_measured", "loc_estimate", "manual"],
-            "description": "trust provenance. scope_carve = scope-carve.json 신호(SCC/Martin/co-change/hotspot)에서 확정(권장 / 가장 풍부) / codegraph_measured = codegraph coupling 집계(scope-carve 부재 시 corroborating) / loc_estimate = 환경부재 fallback 추정 / manual = 사용자 지정. no-simulation 정합 — 안 돌린 신호로 표기 ❌."
+            "enum": ["scope_carve", "codegraph_measured", "loc_estimate", "whole_codebase_fallback", "manual"],
+            "description": "trust provenance. scope_carve = scope-carve.json 신호(SCC/Martin/co-change/hotspot)에서 확정(권장 / 가장 풍부) / codegraph_measured = codegraph coupling 집계(scope-carve 부재 시 corroborating) / loc_estimate = 환경부재 LOC fallback 추정 / whole_codebase_fallback = 측정 신호가 0 후보일 때 전체 코드베이스를 단일 scope 로 담는 cardinality ≥1 보장 fallback (members=전체 / 측정 부재를 정직 표기 — 추정으로 위장 ❌ / advisory 유지 — soft gate #0 사람 확정) / manual = 사용자 지정. no-simulation 정합 — 안 돌린 신호로 표기 ❌."
           },
           "carve_signals": {
             "type": "array",

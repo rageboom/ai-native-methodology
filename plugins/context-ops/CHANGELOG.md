@@ -10,6 +10,26 @@
 
 ---
 
+## [0.90.0] — 2026-06-30 — MINOR — analysis scope 분해 cardinality ≥1 불변식 (단일 full-codebase 도 whole-codebase fallback scope 항상 물질화)
+
+**문제**: 단일/소형 full-codebase 를 analysis 하면 carve 가 seam 을 못 찾아(정직) `inventory.json#scope_candidates` 가 빈 배열로 통과 → scope 컨테이너가 안 생기고 global(no-scope) 모드로 끝났다(v0.78.0 의도된 설계). 결과: 단일 코드베이스는 멀티-scope 와 다른 패러다임(global)으로 운영되고, 나중에 scope 가 생겨도 확장할 seam(컨테이너)이 없었다.
+
+### 변경
+
+- **inventory `scope_candidates` cardinality ≥1 불변식**: 측정 신호(carve/codegraph/loc)가 모두 0 후보여도 빈 배열 ❌ — 전체 코드베이스를 담는 `whole_codebase_fallback` 후보 1개를 항상 emit. 단일 full-codebase 도 균일 scope 패러다임으로 물질화 + 나중 scope 확장 seam 확보.
+- `schemas/inventory.schema.json`: `source` enum 에 `whole_codebase_fallback` 추가 · `scope_candidates` `minItems:1` · description 교체("미측정 시 빈 배열" → cardinality ≥1 불변식).
+- `skills/analysis-source-inventory/SKILL.md`: 신호 사다리 4번(whole-codebase fallback 바닥) + env-부재에도 ≥1 유지.
+- `methodology-spec/workflow/discovery.md`: 소형·단일 전이 산문(fallback 제시 → soft gate #0 사람 1-클릭 확정 → `init --scope`) + 승인 게이트 체크 ≥1.
+- **신뢰모델 보존**: fallback 도 advisory(reference-lens) — "항상 ≥1"은 *제시* 보장이지 자동확정 ❌(절단·이름·분할 = 사람). carve(reference-lens / 빈 후보 정직)·chain-driver 결정론 코어·`/confirm-scope` 무수정. state.schema `current_scope` null 유지(global 모드 backward-compat) → **MINOR·additive**.
+
+### 검증
+
+- schema-validator 113/113 · chain-driver 777/777 · version 3-way 정합 · ajv 40 스키마 컴파일.
+- **§8.1 ≥2 도메인 corroboration (풀 E2E)**: **ep-be-gea**(legacy Java/iBATIS/SQL Server) + **poc-19**(modern Python) 둘 다 — 멀티모듈 carve→1 후보(fallback 불발 / 스푸리어스 발사 ❌) / atomic carve→0 후보→fallback inventory VALID→`init --scope` scope 컨테이너 물질화.
+- 독립 적대적 리뷰 6/6 CLEAR(신뢰모델 inject·over-block·backward-compat·no-simulation·carve 무수정·스키마 정합) = GO.
+
+DEC-2026-06-30-scope-cardinality-min-1 / MIS-537 [OP-ANALYSIS-002] / MIS-366 하위.
+
 ## [0.89.0] — 2026-06-30 — MINOR — SessionStart 세션 재개 요약 사용자-가시 채널 복구 (dead-on-display)
 
 **문제**: SessionStart hook 의 "사용자가 봐야 하는" 모든 표면(`🧭 세션 재개` 요약 / `⚠️ drift`·`unbaselined` 경고 / `state.json 손상` fail-closed / cold-start 안내 / `HANDOFF.md`)이 `additionalContext` **단일 채널**로만 나갔다. 공식 문서(claude.ai code docs) 기준 `additionalContext` = **모델 컨텍스트 전용 / 사용자 미표출** — 모델이 첫 응답에서 자발적으로 렌더할 때만 보인다(비결정론). 결과: 기능을 구현·테스트·배포(Nexus 0.80.0)했는데도 **실제 설치 후 세션 재개 요약이 사용자에게 거의 보이지 않았다**(dead-on-display). 테스트는 함수 반환 문자열·additionalContext 내용만 검증해 영원히 GREEN.

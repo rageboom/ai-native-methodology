@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "context-ops",
-      "version": "0.89.0",
+      "version": "0.90.0",
       "source": {
         "source": "npm",
         "package": "@mis-plugins/context-ops",
