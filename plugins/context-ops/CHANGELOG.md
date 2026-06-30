@@ -10,6 +10,28 @@
 
 ---
 
+## [0.88.0] — 2026-06-30 — MINOR — ticket-sync chain3 parent_epic 직접 입력/확인 (cascade 부모를 silent 가정 대신 매번 명시)
+
+**문제**: 기존 ticket-sync 는 config(`parent_initiative`)에 값이 있으면 부모 Epic/Initiative 를 **silent 하게** 사용했다. 사용자가 매 cascade 마다 부모를 명시 지정·확인할 수 없어, 의도와 다른 부모 아래로 티켓이 적재될 여지가 있었다.
+
+### 변경
+
+- **chain3 plan-exit pre-flight 에 step 5 "parent_epic 직접 입력/확인" 신설** (`skills/ticket-sync/SKILL.md`): cascade 생성 전 **항상** 사용자에게 부모 키를 입력/확인받는다.
+  - 후보 우선순위 = `args.parent_epic` > `config.parent_initiative` > 없음.
+  - 3지선다(기본값 사용 / 직접 입력 / `jira_search` 로 선택) → 선택 키를 `parent_epic` 으로 고정.
+  - 빈 값이면 기존 `initiative_required` 폴백 보존(동작 호환).
+  - 기존 step 5/6 → 6/7 renumber.
+- `F-TICKETSYNC-020` (`parent_explicit_input`) finding 추가.
+
+### 검증
+
+- prose/skill 텍스트 변경 only — 결정론 gate(schema/validator/coverage/ID) 무변. 3-way 0.88.0 정합 + release-readiness 회귀 0.
+
+### 정합
+
+- 신규 스크립트 0 / 새 release-readiness check 0. 변경 = `skills/ticket-sync/SKILL.md` 단일.
+- MIS-366([Tech Debt] mis-plugins) 하위 (PR #39 `feat/ticket-sync-chain3-parent-epic-input` / merge `8a1951ce`). v0.87.0 이후 미릴리스분 단일 패키징.
+
 ## [0.87.0] — 2026-06-29 — MINOR — codegraph nav-first 그래프-부재 확장 (그래프 없는 순수 코드베이스에서도 구조질문이면 권유)
 
 ### 배경 (adoption 재측정)
