@@ -380,6 +380,11 @@ function buildAnalysisArgs(validatorName, projectDir, artifacts) {
 			const dir = abs(artifacts['analysis-output-dir']);
 			return ok(dir) ? [dir, '--json'] : null;
 		}
+		case 'state-map-integrity-validator': {
+			// state-map.json transition target/initial/final/child/parallel/history ∈ states 참조 무결성 (FE 조건부).
+			const f = abs(artifacts['state-map']);
+			return ok(f) ? [f, '--json'] : null;
+		}
 		default:
 			return null;
 	}
@@ -430,6 +435,9 @@ function main() {
 		// DEC-2026-06-22 — count-bearing 산출물 자기정합(summary↔배열). dir 존재 시 추가(self-gating: 비-count 산출물은 N/A).
 		if (artifacts['analysis-output-dir'])
 			extraValidators.push('analysis-self-consistency-validator');
+		// state-map 참조 무결성(FE) — FE state-map 산출물 존재 시 조건부(sql-inventory 패턴 / gates[#0].conditional_validators).
+		if (artifacts['state-map'])
+			extraValidators.push('state-map-integrity-validator');
 		const runAnalysisValidator = (name, projectDir) =>
 			runValidatorAnalysis(name, projectDir, artifacts);
 		findings = aggregateForStage(

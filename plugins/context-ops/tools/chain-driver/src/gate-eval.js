@@ -17,7 +17,7 @@
 const REQUIRED_VALIDATORS_PER_STAGE = {
 	// analysis exit gate #0 (DEC-2026-06-06-analysis-exit-gate) — analysis 산출물(사용자 프로젝트) 결정론 validator base set.
 	//   drift-validator 제외: 그건 플러그인 자체 구조(flows↔skills↔manifest) 검사지 사용자 analysis 산출물 검사가 아님 (CI drift-check + spec gate chain-mode 가 owner).
-	//   조건부(characterization-coverage[S2/S3] · sql-inventory[RDB] · analysis-self-consistency[DEC-2026-06-22 count↔배열 / count-bearing 산출물])는 caller(findings-aggregator)가 배열 밖에서 추가 (sdlc gates[#0].conditional_validators allowlist 정합).
+	//   조건부(characterization-coverage[S2/S3] · sql-inventory[RDB] · analysis-self-consistency[DEC-2026-06-22 count↔배열 / count-bearing 산출물] · state-map-integrity[FE state-map 존재 시 / 참조 무결성])는 caller(findings-aggregator)가 배열 밖에서 추가 (sdlc gates[#0].conditional_validators allowlist 정합).
 	analysis: [
 		'schema-validator',
 		'br-cross-consistency-validator',

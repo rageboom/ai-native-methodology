@@ -886,3 +886,17 @@
 - **Severity:** low–medium — 격리 worktree 안에선 무해(컴파일·실행 정상) / 통합 시점에만 표면화 / 통합자 수동 rename 으로 완전 해소(커버리지 손실 0). 단 BC 스코프 중첩이 흔한 대형 레포 캠페인에선 통합 마찰 누적.
 - **Proposed fix:** char-test 생성 경로(chain-4 test stage + 캠페인 엔진)에 **BC-scope-aware test-class 네임스페이싱** 도입 — 공유 서비스 충돌 위험 감지 시 클래스명에 BC suffix(또는 관심사 한정자) 자동 부여, 또는 생성 후 cross-BC FQN 충돌 검사 게이트로 통합 전 선차단. `templates/test/test-spec.template.json` 명명 규칙 보강 + `analysis-characterization-test`/test-stage SKILL 에 충돌 회피 규칙 명시.
 - **Status:** **promoted** (백로그 등재 / 미수정 — 통합 rename 우회로 현 캠페인은 해소 / 엔진 개선 = v 후보)
+
+### F-DOGFOOD-018: state-map 참조 무결성 미검증 — 미정의 state 전이가 schema+evidence 게이트 GREEN 통과 (검증 갭 A)
+
+> ※ 출처 = mis-fe-admin FE dogfood **live-probe**(93 state-map / 279 machine 배치 참조 무결성 최초 실측 / 2026-07-01). F-DOGFOOD 네임스페이스(외부 사내 프로젝트 dogfood) 귀속.
+
+- **Phase:** analysis (FE 산출물 8 state-map / gate #0).
+- **Confidence:** verified (실 dangling 참조 재현 — mis-fe-admin 실파일 1건 + 합성 fixture RED).
+- **Type:** gap (analysis FE 구조 산출물에 참조 무결성 검증 계층 부재).
+- **Description:** state-map.json 은 schema(구조) + evidence({file,line})만 검사되고 전이 그래프의 *참조 무결성*(전이 타깃이 정의된 state 를 가리키는가)은 어떤 게이트도 검증 안 함. `SUBMIT → "validatingX"`(미정의 state)로 전이하는 schema-valid state-map 이 schema-validator(exit0) + evidence-scan(exit0)을 모두 GREEN 통과.
+- **Evidence:** mis-fe-admin `apps/gea/.ai-context/base/domains/BC-GEA-IN-HOUSE-LOAN-DEDUCTION/state-map.json` `FSM-FE-GEA-INLD-001`: `loaded --CLOSE_TOGGLE--> "closing"`(states=[init,ready,fetching,aggregating,loaded,editing,saving]에 없음 / source_ref `InHouseLoanDeductionBottom.tsx:144`). DEC-2026-06-24 가 "참조 무결성 잔여 0" 이라 기록했으나 그 주장은 *참조를 검증하지 않는* schema-validator 로 한 것 → 93파일 중 1건 실 dangling 이 사람 검토+게이트 모두 통과.
+- **Spec gap:** `schemas/state-map.schema.json:183` `target:{type:"string"}` — 전이 타깃/initial/final_states/child_states/parallel regions/history default_target 가 모두 free string(JSON Schema 는 "값 ∈ states 키" 참조 제약을 구조적 검증 불가). br-cross-consistency-validator(BR 두 표현 정합)의 FE 등가물 부재.
+- **Decision made:** 신규 결정론 tool `state-map-integrity-validator` 신설 + analysis gate #0 조건부(FE state-map 존재 시) 배선 — dangling reference=high(gating) / 도달불가=medium(advisory). severity 비대칭은 W3C SCXML 1.0 REC §3.11(target MUST=legal state spec) + XState v5(undefined target machine 생성 시 throw) 1차 출처 정합. mis-fe-admin 실 결함은 `closing` state 추가(deadlineApply mutation lifecycle grounding)로 교정 → 93/93 PASS.
+- **Severity:** medium — 격리 산출물론 무해하나 chain 하류(spec→test→impl)가 state-map 을 기계 소비할 때 미정의 state 전이 = 잘못된 컨텍스트 전파. 결정론 검증 부재 자체가 "false GREEN" 클래스.
+- **Status:** **resolved** (v0.92.0 / state-map-integrity-validator + gate#0 배선 / DEC-2026-07-01-state-map-integrity-validator / mis-fe-admin live-probe 93/93 PASS).

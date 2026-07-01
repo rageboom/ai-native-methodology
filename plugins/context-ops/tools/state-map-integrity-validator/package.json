@@ -1,0 +1,10 @@
+{
+  "name": "@mis-plugins/state-map-integrity-validator",
+  "version": "0.1.0",
+  "description": "FE state-map.json 참조 무결성 검증 — transition target/initial/final/child/parallel/history ∈ states (high, gating) + 도달성(medium, advisory). analysis gate #0 조건부 validator (FE state-map 존재 시). br-cross-consistency-validator 의 FE 판.",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "bin": { "state-map-integrity-validator": "./src/cli.js" },
+  "scripts": { "test": "node --test test/validator.test.js" },
+  "license": "UNLICENSED"
+}

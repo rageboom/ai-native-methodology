@@ -10,6 +10,26 @@
 
 ---
 
+## [0.92.0] — 2026-07-01 — MINOR — state-map 참조 무결성 validator 신설 + analysis gate#0 배선 (검증 갭 A 해소)
+
+**문제 (검증 갭 A)**: analysis FE 구조 산출물 `state-map.json` 은 schema(구조) + evidence({file,line})만 검사되고 전이 그래프의 *참조 무결성*(전이 타깃이 정의된 state 를 가리키는가)을 검증하는 계층이 없었다. `SUBMIT → "validatingX"`(정의 안 된 state)로 전이하는 **schema-valid** state-map 이 schema-validator(exit 0) + evidence-scan(exit 0)을 **모두 GREEN 통과**. 근본 원인 = `schemas/state-map.schema.json:183` `target:{type:"string"}` — 전이 타깃/`initial`/`final_states`/`child_states`/parallel `regions`/history `default_target` 가 모두 free string(JSON Schema 는 "값 ∈ states 키" 참조 제약을 구조적 검증 불가).
+
+### 변경
+
+- **신규 결정론 tool `state-map-integrity-validator`** (br-cross-consistency-validator 의 FE 판): 머신별 transition `target`/`initial`/`final_states`/`child_states`/`parallel_regions.regions`/`history.default_target` ∈ states = **high(gating)** / 도달 불가 state = **medium(advisory / non-gating)**. `machines` 부재·`[]`(BE/N-A) → passed=true. canonical 포맷만(old `state_machines[]` = schema-validator 소관).
+- **severity 비대칭 1차 출처 검증**: W3C SCXML 1.0 REC §3.11(전이 target = "legal state specification" MUST → 미존재 = 비적합 문서) + XState v5 `stateUtils.ts`(undefined target/initial = machine 생성 시점 throw) → dangling=gating. XState graph/YAKINDU severity 미부여 + guarded transition false-positive 내재 → reachability=advisory.
+- **analysis gate#0 조건부 배선** (FE state-map 존재 시 / `sql-inventory-validator` 패턴): findings-aggregator(`cli.js` buildAnalysisArgs case + `main` extraValidators 트리거 `artifacts['state-map']` / `aggregator.js` dispatchValidator → `transformGeneric` → gate-eval `validator_high` HARD_BLOCK) + `flows/sdlc-4stage-flow.json` gates[#0].conditional_validators + `flows/analysis.phase-flow.json` cross_cutting.validators(check26 4중 정합) + gate-eval 주석.
+- **신뢰모델**: 100% 결정론 구조 검사(`target ∈ states` 확정 판정) → 결정론 gate 적법(graph-integrity·code-pointer 동급 / LLM inject ❌ / STRONG-STOP 정합). `schemas/state-map.schema.json` 무변경(참조 제약은 validator 로 보완).
+
+### 검증
+
+- validator 단위 **9/9** (clean/broken-target/missing-initial/unreachable/refs-bad + N-A + 입력방어 + internal-transition).
+- gate 통합 실측: broken state-map → aggregate high=1 → gate-eval `validator_high` block(user 'go' override 거부=HARD) / clean → 0.
+- **dogfood (live-probe)**: 사내 mis-fe-admin 실제 93 state-map(279 machine) 참조 무결성 최초 실측 → 실 dangling 참조 **1건 검출**(`FSM-FE-GEA-INLD-001`: `loaded --CLOSE_TOGGLE--> "closing"` 미정의 / schema-validator+evidence-scan+사람검토 모두 놓침 / DEC-2026-06-24 "참조 무결성 잔여 0" 반증) → `closing` state 추가 교정 → **93/93 PASS**.
+- release-readiness **44/44** (workspace test 신규 tool 9 자동 발견·pass / check26 PASS). 3-way 0.92.0.
+
+MIS-539 [OP-VALIDATION-001] (MIS-366 하위). DEC-2026-07-01-state-map-integrity-validator. Resolves F-DOGFOOD-018.
+
 ## [0.91.0] — 2026-06-30 — MINOR — 슬래시 커맨드 npm 출하 누락 수정 (dead-on-install) + /chain-init 신설 + 자산 디렉토리 출하 가드
 
 **문제**: context-ops 슬래시 커맨드 4개(`/chain-next` `/chain-stage` `/chain-status` `/roi`)가 source:npm 설치 시 **dead-on-install** 이었다. `commands/` 가 `package.json` `files` 배열에서 누락 → npm tarball 미포함(`npm pack --dry-run` 실측: 793 항목 중 commands/ = 0) → 설치 캐시(`~/.claude/plugins/cache`) 미복사 → 발견 불가. dist 채널(`build-plugin.js` INCLUDE)엔 있으나 source:npm 설치엔 미사용. 기존 출하 가드(check43 / DEC-2026-06-24)는 자산이 *참조하는* `${CLAUDE_PLUGIN_ROOT}/scripts/*` 만 검증, **디렉토리 자체 출하는 미검증**이라 못 잡았다. 공식 확정(Claude Code plugins-reference.md): 커맨드는 디렉토리 컨벤션 자동 스캔 / tarball 미포함 = dead-on-install.

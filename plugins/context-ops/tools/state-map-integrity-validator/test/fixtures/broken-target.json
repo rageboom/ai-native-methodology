@@ -1,0 +1,13 @@
+{
+  "$schema_origin": "ai-native-methodology/schemas/state-map.schema.json",
+  "machines": [
+    {
+      "id": "FSM-FE-LOGIN-001",
+      "initial": "idle",
+      "states": {
+        "idle": { "on": { "SUBMIT": "validatingX", "CANCEL": "closed" } },
+        "closed": {}
+      }
+    }
+  ]
+}
