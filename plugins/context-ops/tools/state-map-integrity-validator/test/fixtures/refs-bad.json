@@ -1,0 +1,22 @@
+{
+  "$schema_origin": "ai-native-methodology/schemas/state-map.schema.json",
+  "machines": [
+    {
+      "id": "FSM-FE-Z-001",
+      "initial": "root",
+      "final_states": ["ghostFinal"],
+      "parallel_regions": [{ "id": "par1", "regions": ["regionA", "ghostRegion"] }],
+      "history": [
+        { "state_id": "h1", "type": "shallow", "default_target": "ghostHistory" }
+      ],
+      "states": {
+        "root": {
+          "type": "compound",
+          "child_states": ["regionA", "ghostChild"],
+          "on": { "E": "regionA" }
+        },
+        "regionA": {}
+      }
+    }
+  ]
+}

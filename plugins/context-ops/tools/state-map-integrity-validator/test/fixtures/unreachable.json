@@ -1,0 +1,14 @@
+{
+  "$schema_origin": "ai-native-methodology/schemas/state-map.schema.json",
+  "machines": [
+    {
+      "id": "FSM-FE-Y-001",
+      "initial": "idle",
+      "states": {
+        "idle": { "on": { "GO": "active" } },
+        "active": { "on": { "STOP": "idle" } },
+        "orphanState": { "on": { "X": "idle" } }
+      }
+    }
+  ]
+}

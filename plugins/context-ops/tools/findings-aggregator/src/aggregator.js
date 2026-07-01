@@ -344,6 +344,9 @@ export function dispatchValidator(validatorName, output) {
 		case 'unit-spec-oracle-validator':
 			// { applicable, summary:{total_findings,high,medium}, findings } — required UNIT oracle 누락 = medium(soft / 게이트 미차단) → gate-eval validator_high 미진입 (DEC-2026-06-22-unit-spec-oracle-symmetry)
 			return transformGeneric(JSON.parse(output));
+		case 'state-map-integrity-validator':
+			// { passed, findings, summary:{critical,high,medium,low,info} } — 미정의 state 참조(target/initial/final/child/parallel/history) = high → HARD / 도달불가 = medium(advisory / 비차단)
+			return transformGeneric(JSON.parse(output));
 		default:
 			// generic JSON fallback (drift / spec-test-link / static-runner)
 			try {

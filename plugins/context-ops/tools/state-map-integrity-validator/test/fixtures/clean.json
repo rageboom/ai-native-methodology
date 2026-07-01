@@ -1,0 +1,21 @@
+{
+  "$schema_origin": "ai-native-methodology/schemas/state-map.schema.json",
+  "machines": [
+    {
+      "id": "FSM-FE-LOGIN-001",
+      "initial": "idle",
+      "final_states": ["done"],
+      "states": {
+        "idle": { "on": { "SUBMIT": "validating" } },
+        "validating": {
+          "on": {
+            "OK": { "target": "submitting", "guard": "isValid" },
+            "FAIL": "idle"
+          }
+        },
+        "submitting": { "on": { "SUCCESS": "done", "ERROR": "idle" } },
+        "done": { "type": "final" }
+      }
+    }
+  ]
+}
