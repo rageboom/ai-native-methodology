@@ -173,14 +173,14 @@
                 },
                 "on": {
                   "type": "object",
-                  "description": "이벤트 핸들러. 키=이벤트명. 값=transition target 또는 객체.",
+                  "description": "이벤트 핸들러. 키=이벤트명. 값=transition target(문자열) 또는 객체. target(문자열형·객체 .target 형 모두)은 본 머신 states 에 정의된 키여야 한다 — state-map-integrity-validator 가 결정론 검증(dangling reference = high / gating). target 없는 전이(actions-only)는 internal transition 으로 허용.",
                   "additionalProperties": {
                     "oneOf": [
                       {"type": "string"},
                       {
                         "type": "object",
                         "properties": {
-                          "target": {"type": "string"},
+                          "target": {"type": "string", "description": "전이 목표 state — 반드시 본 머신 states 에 정의된 키여야 한다(SCXML 1.0 §3.11 target=legal state specification MUST). 정의 없는 target(dangling reference)=비적합 문서 → state-map-integrity-validator 가 high(gating)로 검출(JSON Schema 로는 참조 제약 미표현). transient 상태(closing·saving 등)를 target 으로 쓰면 states 에 정의하라. 크로스머신 발동은 target 아닌 actions + cross_links(link_type=triggers)."},
                           "guard": {"type": "string"},
                           "actions": {"type": "array", "items": {"type": "string"}},
                           "source_ref": {
@@ -320,7 +320,12 @@
           "type": "boolean",
           "description": "XState v5+ SCXML import 시도 통과 여부 (단계 5 진짜 도구 검증)."
         },
-        "scxml_export_artifact_path": {"type": "string"}
+        "scxml_export_artifact_path": {"type": "string"},
+        "reference_integrity_validated": {
+          "type": "boolean",
+          "description": "state-map-integrity-validator 실행으로 전이 target/initial/final_states/child_states/parallel regions/history default_target ∈ states 참조 무결성 GREEN(dangling reference 0) 확인 여부. 러너 부재 시 false + meta.warnings 정직 기록."
+        },
+        "reference_integrity_dangling_count": {"type": "integer", "minimum": 0, "description": "state-map-integrity-validator 가 검출한 dangling reference(high) 수. 산출 종료 시 0 의무(생성 시점 self-check)."}
       }
     }
   }
