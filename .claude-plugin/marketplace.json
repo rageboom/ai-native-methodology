@@ -7,8 +7,19 @@
   "description": "MIS 사내 Claude Code 플러그인 마켓플레이스 — 각 플러그인 독립 semver + Nexus npm 배포.",
   "plugins": [
     {
+      "name": "aiops",
+      "version": "0.1.0",
+      "source": {
+        "source": "npm",
+        "package": "@mis-plugins/aiops",
+        "version": ">=0.1.0 <1.0.0",
+        "registry": "https://repo.smiledev.net/repository/npm-public/"
+      },
+      "description": "MIS AI 자동화(AIOps). 사내 워크플로우 자동화 설계 agent(automation-architect, n8n 등), MCP 서버 개발 agent(mcp-developer, Go/Python), AI 코딩 도구 표준·정책 큐레이션 skill(ai-tooling-curator). 설치 후 workspace_root 설정 필요."
+    },
+    {
       "name": "context-ops",
-      "version": "0.91.0",
+      "version": "0.92.0",
       "source": {
         "source": "npm",
         "package": "@mis-plugins/context-ops",
@@ -16,6 +27,39 @@
         "registry": "https://repo.smiledev.net/repository/npm-public/"
       },
       "description": "SDLC 6단계 chain harness (legacy 분석 → discovery → spec → plan → test → implement / v9.0 6-stage). Analysis stage = 한 방향 추출 (산출물 + finding + antipatterns + migration-cautions / Phase 0~6 + BE/FE/DB 분기 + 횡단 a11y/i18n/security/legacy). 위 chain 1~5 gate (#1~#5 / chain N = gate #N / plan = #3 본격) + revisit loop + 70~80% 한계 명시."
+    },
+    {
+      "name": "devops",
+      "version": "0.1.0",
+      "source": {
+        "source": "npm",
+        "package": "@mis-plugins/devops",
+        "version": ">=0.1.0 <1.0.0",
+        "registry": "https://repo.smiledev.net/repository/npm-public/"
+      },
+      "description": "MIS 빌드/배포 자동화 + Kubernetes 생태계 구축. GHE PR 5-lens 리뷰(infra-reviewer)·기술조사 agent, 신규 K8s chart 스캐폴딩·Compose→K8s 전환·설계 skill, 빌드/배포/상태조회 command 12종, MIS 공통 워크플로우 rule-skill 7종, 자동포맷·kubeconform hook, illuminati MCP(운영 조회/쓰기 53-tool — 토큰 export만으로 동작). 설치 후 workspace_root 설정 필요 — 폴더 구조가 달라도 동일하게 동작한다."
+    },
+    {
+      "name": "devsecops",
+      "version": "0.1.0",
+      "source": {
+        "source": "npm",
+        "package": "@mis-plugins/devsecops",
+        "version": ">=0.1.0 <1.0.0",
+        "registry": "https://repo.smiledev.net/repository/npm-public/"
+      },
+      "description": "MIS 보안(DevSecOps). Kyverno/Trivy/Falco 정책 현황 분석 agent(security-policy-analyst), CIS/NSA/PSS 기준 K8s·Compose 보안 리뷰 체크리스트 skill(devsecops-review), 보호파일(.env/.key/.pem) 편집 차단·위험명령 차단 hook."
+    },
+    {
+      "name": "finops",
+      "version": "0.1.0",
+      "source": {
+        "source": "npm",
+        "package": "@mis-plugins/finops",
+        "version": ">=0.1.0 <1.0.0",
+        "registry": "https://repo.smiledev.net/repository/npm-public/"
+      },
+      "description": "MIS 리소스 효율(FinOps). request/limit right-sizing, resourcequota 산정 근거, overcommit·환경별 자원 비대칭 점검 체크리스트 skill(finops-review). Grafana PromQL로 request 대비 실사용률을 실측하는 패턴 포함."
     },
     {
       "name": "mis-backend-spring",
@@ -38,6 +82,17 @@
         "registry": "https://repo.smiledev.net/repository/npm-public/"
       },
       "description": "PM팀/개발팀이 현업 요구사항을 표준 요구사항 정의서(PRD)로 정리하고, Confluence 위키 업로드 → Jira 이슈(에픽/스토리/작업/버그) 변환·등록까지 하나의 흐름으로 처리하도록 돕는 플러그인. 요구사항 정의서 템플릿 + 단계별 사람 확인 게이트 포함."
+    },
+    {
+      "name": "sre",
+      "version": "0.1.0",
+      "source": {
+        "source": "npm",
+        "package": "@mis-plugins/sre",
+        "version": ">=0.1.0 <1.0.0",
+        "registry": "https://repo.smiledev.net/repository/npm-public/"
+      },
+      "description": "MIS 관측성·트러블슈팅. Linux/K8s/네트워크/미들웨어 진단 agent 4종(read-only, 경계 비중첩), LGTM 텔레메트리 교차조사·로그 타임라인 추출, SLO/alert/OTel 파이프라인 설계, 장애 포스트모템 작성 agent, cross-layer 장애 분류 /triage command."
     },
     {
       "name": "ux-plan",

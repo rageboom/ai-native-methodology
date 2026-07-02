@@ -7,6 +7,12 @@ npm-debug.log*
 #   (워크스페이스 lock = repo-root pnpm-lock.yaml 만 SSOT / plugin-local 은 커밋 안 함)
 plugins/*/pnpm-lock.yaml
 
+# 개인 전용 자산 (다른 사용자에게 이식 불가 — 개인 KPI 마스터플랜/블로그/학습·경력 결합).
+# git에 안 올림 — package.json files allowlist에도 없어 npm/Nexus 배포에서도 자동 제외됨.
+# ~/.claude 개인 스코프의 SSOT 편집 지점이지만 회사 org 레포에는 push하지 않는다 (personal/README.md 참조).
+/personal/
+plugins/*/personal/
+
 # Build artifacts (build-plugin.js → repo-root dist/<plugin>-v<ver>/)
 dist/
 

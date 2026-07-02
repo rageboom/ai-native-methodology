@@ -15,6 +15,11 @@
 | `context-ops` | `@mis-plugins/context-ops` | flagship — AI-Native 개발 방법론 (SDLC 6단계 chain harness). 모바일 확장팩 = `plugins/context-ops/extensions/mobile-native/`. | [`plugins/context-ops/CLAUDE.md`](plugins/context-ops/CLAUDE.md) |
 | `pm` | `@mis-plugins/pm` | PM팀/개발팀 요구사항 정의서(PRD) 작성 + 위키 업로드 + Jira 변환·등록. | [`plugins/pm/CLAUDE.md`](plugins/pm/CLAUDE.md) |
 | `ux-plan` | `@mis-plugins/ux-plan` | Smilegate UX/UI팀 Confluence 위키 기획서 작성. | [`plugins/ux-plan/CLAUDE.md`](plugins/ux-plan/CLAUDE.md) |
+| `devops` | `@mis-plugins/devops` | MIS 인프라 role 플러그인의 base — 빌드/배포·K8s 생태계. infra-reviewer(5-lens PR 리뷰)·devops-researcher agent, chart 스캐폴딩·전환 skill, command 12종, 공통 rule-skill 7종, hook 6종. | [`plugins/devops/CLAUDE.md`](plugins/devops/CLAUDE.md) |
+| `sre` | `@mis-plugins/sre` | 관측성·트러블슈팅 — 진단 agent 4종(비중첩) + LGTM 조사·로그 분석·SLO 설계·포스트모템 agent + `/triage`. | [`plugins/sre/README.md`](plugins/sre/README.md) |
+| `devsecops` | `@mis-plugins/devsecops` | 보안 — security-policy-analyst agent + CIS/NSA/PSS 보안 리뷰 skill + 보호파일·위험명령 가드 hook 2종. | [`plugins/devsecops/README.md`](plugins/devsecops/README.md) |
+| `finops` | `@mis-plugins/finops` | 리소스 효율 — right-sizing/quota/overcommit 비용 리뷰 skill (PromQL 실측 패턴). | [`plugins/finops/README.md`](plugins/finops/README.md) |
+| `aiops` | `@mis-plugins/aiops` | AI 자동화 — automation-architect(n8n)·mcp-developer agent + ai-tooling-curator skill. | [`plugins/aiops/README.md`](plugins/aiops/README.md) |
 
 - **새 플러그인 추가** → [`docs/add-a-plugin.md`](docs/add-a-plugin.md) (`pnpm plugin:new <name>`).
 - **마켓플레이스-레벨 결정** → [`docs/decisions/INDEX.md`](docs/decisions/INDEX.md) (정체성 = [`DEC-2026-06-23-marketplace-monorepo-identity`](docs/decisions/DEC-2026-06-23-marketplace-monorepo-identity.md)).

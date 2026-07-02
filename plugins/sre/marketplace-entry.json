@@ -1,0 +1,3 @@
+{
+  "description": "MIS 관측성·트러블슈팅. Linux/K8s/네트워크/미들웨어 진단 agent 4종(read-only, 경계 비중첩), LGTM 텔레메트리 교차조사·로그 타임라인 추출, SLO/alert/OTel 파이프라인 설계, 장애 포스트모템 작성 agent, cross-layer 장애 분류 /triage command."
+}

@@ -1,0 +1,25 @@
+{
+  "name": "devops",
+  "version": "0.1.0",
+  "description": "MIS 빌드/배포 자동화 + Kubernetes 생태계 구축. GHE PR 5-lens 리뷰(infra-reviewer)·기술조사 agent, 신규 K8s chart 스캐폴딩·Compose→K8s 전환·설계 skill, 빌드/배포/상태조회 command 12종, MIS 공통 워크플로우 rule-skill 7종, 자동포맷·kubeconform hook, illuminati MCP(운영 조회/쓰기 53-tool — 토큰 export만으로 동작). 설치 후 workspace_root 설정 필요 — 폴더 구조가 달라도 동일하게 동작한다.",
+  "author": {
+    "name": "MIS",
+    "email": "sangcl@smilegate.com"
+  },
+  "homepage": "https://github.smilegate.net/SGH-ISD/ai-native-methodology",
+  "license": "UNLICENSED",
+  "keywords": [
+    "claude-code",
+    "devops",
+    "infra",
+    "mis-plugins"
+  ],
+  "userConfig": {
+    "workspace_root": {
+      "type": "directory",
+      "title": "회사 레포 workspace 루트",
+      "description": "MIS-DevOps, MIS-GitOps, eam, tlm, gea, sgh-mis-observer 등 회사 GHE 레포들을 클론해 둔 최상위 디렉토리. agent/skill/command 안의 경로가 전부 이 값 기준으로 치환된다.",
+      "required": true
+    }
+  }
+}

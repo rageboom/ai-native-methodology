@@ -1,0 +1,40 @@
+{
+  "name": "@mis-plugins/finops",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "description": "MIS 리소스 효율(FinOps). request/limit right-sizing, resourcequota 산정 근거, overcommit·환경별 자원 비대칭 점검 체크리스트 skill(finops-review). Grafana PromQL로 request 대비 실사용률을 실측하는 패턴 포함.",
+  "license": "UNLICENSED",
+  "homepage": "https://github.smilegate.net/SGH-ISD/ai-native-methodology",
+  "author": {
+    "name": "MIS",
+    "email": "sangcl@smilegate.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.smilegate.net/SGH-ISD/ai-native-methodology.git",
+    "directory": "plugins/finops"
+  },
+  "files": [
+    ".claude-plugin",
+    "agents",
+    "skills",
+    "hooks",
+    "commands",
+    "flows",
+    "templates",
+    "CHANGELOG.md",
+    "README.md",
+    "!**/test",
+    "!**/tests",
+    "!**/__tests__",
+    "!**/*.test.js",
+    "!**/node_modules"
+  ],
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "publishConfig": {
+    "registry": "https://repo.smiledev.net/repository/npm-hosted/"
+  }
+}
