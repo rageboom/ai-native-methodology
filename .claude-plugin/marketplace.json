@@ -19,7 +19,7 @@
     },
     {
       "name": "context-ops",
-      "version": "0.92.0",
+      "version": "0.94.0",
       "source": {
         "source": "npm",
         "package": "@mis-plugins/context-ops",

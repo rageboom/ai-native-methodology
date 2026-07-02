@@ -278,19 +278,29 @@ describe('F-AUDIT-SOFTGATE-001 fail-closed (=C-13 / findings 미제출)', () => 
 		);
 	});
 
-	it('`next --user-decision go` (--findings 없이) → exit 0 + advanced (명시 ack escape / intervention-log actor:user)', () => {
+	// DEC-2026-07-02 + gate-deterministic-surfacing(Q3) — gate 는 표면화 강제도 받으므로 findings soft-block ack(go) 위에
+	//   --auto-mode(표면화 위임)를 동봉해야 전진한다. 단 --auto-mode 는 위조불가 위임 토큰(UserPromptSubmit)이 있어야 유효.
+	//   --auto-mode 없는 순수 go, 또는 위임 토큰 없는 --auto-mode 는 gate_not_surfaced hold (별도 검증).
+	it('`next --user-decision go --auto-mode` (위임 토큰 발급 후 / --findings 없이) → exit 0 + advanced', () => {
 		const root = join(tmp, 'softgate-ack');
 		mkdirSync(root, { recursive: true });
 		initState(root, 'softgate-ack');
+		// Q3: --auto-mode 는 위조불가 위임 토큰 필요 → UserPromptSubmit 로 발급.
+		spawnSync('node', [CLI_PATH, 'hooks-bridge'], {
+			cwd: root,
+			input: JSON.stringify({ hook_event_name: 'UserPromptSubmit', prompt: '전부 자동 진행' }),
+			encoding: 'utf-8',
+			timeout: 20000,
+		});
 		const result = spawnSync(
 			'node',
-			[CLI_PATH, 'next', root, '--user-decision', 'go'],
+			[CLI_PATH, 'next', root, '--user-decision', 'go', '--auto-mode'],
 			{ encoding: 'utf-8', timeout: 20000 },
 		);
 		assert.equal(
 			result.status,
 			0,
-			`명시 go ack 시 전진 exit 0 의무 (got ${result.status}) / stderr: ${result.stderr}`,
+			`명시 go ack + auto-mode 시 전진 exit 0 의무 (got ${result.status}) / stderr: ${result.stderr}`,
 		);
 		const state = readState(root);
 		assert.equal(
@@ -329,9 +339,17 @@ describe('F-AUDIT-SOFTGATE-001 fail-closed (=C-13 / findings 미제출)', () => 
 		assert.equal(r2.status, 2, `anti-bypass: plain next 재호출 exit 2 (got ${r2.status})`);
 		assert.equal(readState(root).blocked, true, '②후에도 blocked 유지');
 
-		// ③ 명시 --user-decision go → 재평가 → soft go-with-warnings 해소 + 전진
-		const r3 = run(['--user-decision', 'go']);
-		assert.equal(r3.status, 0, `명시 go ack 해소 exit 0 (got ${r3.status}) / ${r3.stderr}`);
+		// ③ 명시 --user-decision go + --auto-mode → 재평가 soft go-with-warnings 해소 + 표면화 위임 → 전진
+		//    (표면화: findings 해소 위에 표면화(토큰/auto)도 요구. 순수 go 는 gate_not_surfaced hold.)
+		//    Q3: --auto-mode 는 위조불가 위임 토큰 필요 → UserPromptSubmit 로 발급.
+		spawnSync('node', [CLI_PATH, 'hooks-bridge'], {
+			cwd: root,
+			input: JSON.stringify({ hook_event_name: 'UserPromptSubmit', prompt: '전부 자동 진행' }),
+			encoding: 'utf-8',
+			timeout: 20000,
+		});
+		const r3 = run(['--user-decision', 'go', '--auto-mode']);
+		assert.equal(r3.status, 0, `명시 go ack + auto 해소 exit 0 (got ${r3.status}) / ${r3.stderr}`);
 		assert.equal(readState(root).blocked, false, '③후 blocked=false (해소)');
 		assert.equal(readState(root).current_chain, 'discovery', '전진 = discovery');
 	});

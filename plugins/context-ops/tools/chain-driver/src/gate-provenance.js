@@ -44,19 +44,44 @@ export function reviewPassageFresh(projectRoot, stage, activeChain, reader) {
 	}
 }
 
+// gate #0 표면화 강제 (DEC-2026-07-02-analysis-exit-gate-surfacing-hard-deny) — 위조불가
+//   사용자 결정 토큰 fresh 판정 (순수 / fs·시간 read 없음 — token 객체만 평가).
+//   fresh = 미소비(consumed=false) && stage 일치 && (presentedAt 있으면 issued_at >= presentedAt).
+//   token 은 UserPromptSubmit 훅만 발급 = LLM 이 UserPromptSubmit 이벤트를 유발 불가 = 위조불가
+//   (plan-review-server spawn 마커 동급 신호 / DEC-2026-06-25 의 "text=advisory 한계" 를 이 신호 클래스로 초과).
+export function userGateTokenFresh(token, stage, presentedAt) {
+	if (!token || token.consumed) return false;
+	if (token.stage !== stage) return false;
+	if (presentedAt && token.issued_at) {
+		return Date.parse(token.issued_at) >= Date.parse(presentedAt);
+	}
+	return true;
+}
+
+// Auto Mode 위조불가 위임 토큰 fresh 판정 (Q3 / gate-deterministic-surfacing).
+//   --auto-mode 플래그(LLM-passable = 위조가능)는 이 위조불가 토큰(UserPromptSubmit 발급)이 있어야만 유효.
+//   세션/체인 위임이라 per-gate 소비 ❌ (존재 + 미회수 = fresh). 체인 terminal 도달 시 cli.js 가 clear.
+export function autoDelegationTokenFresh(token) {
+	return !!token && !token.consumed;
+}
+
 // intervention-log actor provenance 결정론 도출.
-//   args = { userDecision, autoMode } / projectRoot / stage / activeChain / (reader 테스트 주입).
+//   args = { userDecision, autoMode } / projectRoot / stage / activeChain / (reader 테스트 주입) /
+//   userTokenFresh = gate #0 위조불가 토큰 fresh 여부 (DEC-2026-07-02 / 없으면 undefined=미해당).
 export function deriveGateActor(
 	{ userDecision, autoMode },
 	projectRoot,
 	stage,
 	activeChain,
 	reader,
+	userTokenFresh,
 ) {
 	if (!userDecision) return 'driver';
 	if (userDecision === 'stop' || userDecision.startsWith('revisit:')) return 'user';
 	// go-family — go 가 어떻게 얻어졌나
 	if (autoMode) return 'user_auto';
+	// gate #0 위조불가 사용자 토큰 (DEC-2026-07-02) — 서버 마커 부재 텍스트 게이트의 정당 user 증거.
+	if (userTokenFresh) return 'user';
 	if (reviewPassageFresh(projectRoot, stage, activeChain, reader)) return 'user';
 	return 'llm_assumed';
 }

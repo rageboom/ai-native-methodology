@@ -22,7 +22,7 @@
 
 import { existsSync, readFileSync, readdirSync, appendFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve, isAbsolute, relative } from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import {
 	initState,
@@ -63,7 +63,11 @@ import {
 	analysisOutputPresent,
 	minimalSubsetPresent,
 } from '../../_shared/ai-context-layout.js';
-import { deriveGateActor } from './gate-provenance.js';
+import {
+	deriveGateActor,
+	userGateTokenFresh,
+	autoDelegationTokenFresh,
+} from './gate-provenance.js';
 import { planLayoutMigration, applyLayoutMigration } from './migrate-layout.js';
 import { computeTriageSignals } from './triage.js';
 import { evaluateFastPathRecord } from './fastpath-gate.js';
@@ -77,6 +81,8 @@ import {
 	nextStage,
 	validateStateAgainstFlow,
 	getGateForStage,
+	SURFACING_ENFORCED_STAGES,
+	stageHasReviewServer,
 } from './stage-graph.js';
 import {
 	evaluateGate,
@@ -106,7 +112,10 @@ import {
 	evaluatePolicyForEdges,
 	revisitCandidateNote,
 	branchGuardReason,
+	deriveGateDecisionToken,
+	deriveAutoDelegation,
 } from './hooks-bridge.js';
+import { randomUUID } from 'node:crypto';
 import { gitDiffNumstat, detectRevisit } from './revisit-detect.js';
 import { enrichRevisitImpact, renderRevisitPrompt } from './revisit-impact.js';
 import { analyzeImpact, EDGE_TYPE_CATALOG } from './impact-analyzer.js';
@@ -493,6 +502,28 @@ function drainLiftCandidates(root, scope, { clear = true } = {}) {
 	return buildLiftAdvisory(lift, pending);
 }
 
+// Q2: chain-driver 가 gate hold 시 plan-review-server 를 결정론 spawn (discovery/spec/plan).
+//   스킬(LLM) 대신 도구가 리뷰 서버를 띄워 "HTML 리뷰가 뜬다"를 결정론화 — 서버는 reference-lens(판정 무생성 / gate-eval 무오염).
+//   detached + inherit → 서버가 PLAN_REVIEW_URL 을 사용자 터미널에 직접 출력 + 브라우저 자동 open. spawn 실패는 게이트 무손상(try/catch).
+//   비-TTY(CI/test) 에서는 호출측이 skip.
+function spawnReviewServer(projectRoot, stage) {
+	try {
+		const here = dirname(fileURLToPath(import.meta.url));
+		const serverCli = join(here, '..', '..', 'plan-review-server', 'src', 'cli.js');
+		if (!existsSync(serverCli)) return false;
+		const child = spawn(
+			process.execPath,
+			[serverCli, '--phase', stage, '--project', projectRoot],
+			{ detached: true, stdio: ['ignore', 'inherit', 'inherit'] },
+		);
+		child.on('error', () => {});
+		child.unref();
+		return true;
+	} catch {
+		return false;
+	}
+}
+
 function cmdNext(args) {
 	if (!args.project) usage(3);
 	const root = resolve(args.project);
@@ -621,6 +652,84 @@ function cmdNext(args) {
 		process.exit(1);
 	}
 
+	// gate 표면화 강제 (#0~#5 / DEC-2026-07-02 + gate-deterministic-surfacing 확장).
+	//   판정·차단은 이미 결정론(gate-eval + state.blocked). 여기서 layer 3(표면화)을 결정론 전제조건으로 승격:
+	//   게이트가 통과하더라도, 위조불가 사용자 결정 토큰(user_gate_token) 또는 --auto-mode 위임이 없으면 전진 ❌ →
+	//   hold: pending_gate set + 리뷰 렌더 + blocked(gate_not_surfaced). 토큰은 UserPromptSubmit 훅만 발급
+	//   (LLM 은 UserPromptSubmit 이벤트를 유발 불가 = 위조불가 / plan-review-server spawn 마커 동급 신호).
+	//   DEC-2026-06-25 의 "Phase 2 hard-deny" 실행 — 단 위조불가 신호 위에서만 정당(text 마커 '벽 사칭' 회피 / doctrine 정합).
+	//   #0(analysis)=DEC-2026-07-02 선행 / #1~#5=본 확장. discovery/spec/plan 은 리뷰 서버 결정론 spawn(아래).
+	const gid = getGateForStage(stage);
+	const surfacingEnforced = SURFACING_ENFORCED_STAGES.has(stage);
+	const gateTokenFresh =
+		surfacingEnforced &&
+		userGateTokenFresh(state.user_gate_token, stage, state.pending_gate?.presented_at) &&
+		// 결단 일치 의무 — 사용자가 'stop' 로 만든 토큰으로 LLM 이 'go' 를 밀어넣어 전진하는 것 차단.
+		state.user_gate_token?.decision === args.userDecision;
+	// Q3: --auto-mode 는 위조불가 위임 토큰(UserPromptSubmit 발급)이 있어야만 유효 — 플래그 단독(LLM-passable)으로는 표면화 우회 ❌.
+	const autoModeAuthorized =
+		args.autoMode && autoDelegationTokenFresh(state.user_auto_delegation_token);
+	if (surfacingEnforced && !autoModeAuthorized && !gateTokenFresh) {
+		const presentedAt = new Date().toISOString();
+		writeStateCAS(root, (s) => {
+			s.pending_gate = {
+				stage,
+				gate_id: gid,
+				presented_at: presentedAt,
+				findings_snapshot: {
+					critical: findings.critical || 0,
+					high: findings.high || 0,
+					medium: findings.medium || 0,
+					low: findings.low || 0,
+					info: findings.info || 0,
+				},
+			};
+			s.blocked = true;
+			s.block_reason = 'gate_not_surfaced';
+			s.block_scope = s.current_scope ?? null;
+			return s;
+		});
+		// Q2: discovery/spec/plan 은 chain-driver 가 리뷰 서버를 결정론 spawn (LLM 재량 제거). 비-TTY(CI/test) 는 skip.
+		const reviewSpawned =
+			stageHasReviewServer(stage) && process.stdout.isTTY
+				? spawnReviewServer(root, stage)
+				: false;
+		logIntervention(state, root, {
+			event_type: 'gate_decision',
+			actor: 'driver',
+			stage,
+			decision: 'block',
+			exit_code: 1,
+			message:
+				'게이트 표면화 hold (gate_not_surfaced) — 위조불가 사용자 결정 토큰 부재. 사용자가 리뷰를 보고 go/stop 을 결단(프롬프트 제출)해야 전진.',
+		});
+		console.error(renderGateSummaryText(gateSummary));
+		console.error(
+			'[chain-driver] ⛔ 게이트 표면화 강제: 위 리뷰를 사용자에게 제시하세요. ' +
+				'사용자가 직접 go/stop 을 결단(프롬프트 제출)해야 전진합니다 — LLM 이 임의로 --user-decision go 를 넣어도 ' +
+				'전진하지 않습니다(위조불가 토큰 요구). Auto Mode 명시 위임이면 --auto-mode. (blocked=gate_not_surfaced / advisory 아님 / 결정론 hold)',
+		);
+		process.stdout.write(
+			JSON.stringify(
+				{
+					stage,
+					awaiting_decision: true,
+					gate: finalDecision,
+					summary: gateSummary,
+					pending_gate: {
+						stage,
+						gate_id: gid,
+						presented_at: presentedAt,
+					},
+					review_server_spawned: reviewSpawned,
+				},
+				null,
+				2,
+			) + '\n',
+		);
+		process.exit(1);
+	}
+
 	// unblocked — advance
 	const next = nextStage(stage);
 	const nowIso = new Date().toISOString();
@@ -668,6 +777,15 @@ function cmdNext(args) {
 			s.block_reason = null;
 			s.block_scope = null;
 		}
+		// gate 표면화 강제 (#0~#5) — 전진 성사 → pending_gate clear + 위조불가 결정 토큰 단일 소비.
+		s.pending_gate = null;
+		if (s.user_gate_token && s.user_gate_token.stage === stage) {
+			s.user_gate_token = null;
+		}
+		// Q3: 체인 terminal(implement 완료 / next=null) 도달 시 auto 위임 토큰도 clear — 위임 범위 = 1 체인 run.
+		if (!next && s.user_auto_delegation_token) {
+			s.user_auto_delegation_token = null;
+		}
 		return s;
 	});
 	// G3 manifest sync — only when current_scope is set.
@@ -705,7 +823,8 @@ function cmdNext(args) {
 	}
 	// Phase 1 (DEC-2026-06-25-gate-review-bypass-guard) — actor provenance 정직 도출.
 	// go 가 사람 검토 경유(user) / Auto Mode 위임(user_auto) / 증거 부재(llm_assumed) 중 무엇인지 기록.
-	const gateActor = deriveGateActor(args, root, stage, activeChain);
+	// gate #0 위조불가 토큰이 fresh 면 actor='user' (DEC-2026-07-02) — #1~#5 는 gateTokenFresh=false → 기존 서버 마커 경로.
+	const gateActor = deriveGateActor(args, root, stage, activeChain, undefined, gateTokenFresh);
 	if (gateActor === 'llm_assumed') {
 		// advisory / 비차단 (Phase 1) — soft go 가 검토 UX 경유 증거 없이 통과. 우회를 loud 화.
 		process.stderr.write(
@@ -1878,6 +1997,72 @@ function cmdHooksBridge(args) {
 		process.exit(0);
 	}
 	if (event === 'UserPromptSubmit') {
+		// gate #0 (analysis exit) 표면화 강제 (DEC-2026-07-02-analysis-exit-gate-surfacing-hard-deny).
+		//   pending_gate 가 걸린 동안 사용자의 go/stop/revisit 결단 프롬프트 → 위조불가 토큰(user_gate_token) 발급.
+		//   UserPromptSubmit 은 사람의 프롬프트 제출로만 발생 = LLM 위조 불가. routeEntry 보다 먼저 처리
+		//   (go 가 침묵 폴백에 삼켜지지 않도록). state 부재/corrupt 는 흡수하고 정상 routeEntry 로 폴백.
+		try {
+			const gRoot = payload.cwd || process.cwd();
+			const gState = readState(gRoot);
+			// Q3: Auto Mode 위조불가 위임 토큰 발급 — "전부 자동 진행" 류 프롬프트 (pending_gate 무관 / 사전 위임 가능).
+			//   --auto-mode 플래그는 LLM-passable(위조가능)이므로, 이 토큰(사람 프롬프트 제출로만 발생 = 위조불가)이 있어야만
+			//   cmdNext 가 auto-mode 전진을 허용. go 패턴은 시작앵커라 여기와 비충돌.
+			if (gState && deriveAutoDelegation(payload.prompt)) {
+				const issuedAt = new Date().toISOString();
+				const nonce = randomUUID();
+				writeStateCAS(gRoot, (s) => {
+					s.user_auto_delegation_token = { issued_at: issuedAt, nonce, consumed: false };
+					return s;
+				});
+				process.stdout.write(
+					JSON.stringify({
+						suppressOutput: true,
+						continue: true,
+						hookSpecificOutput: {
+							hookEventName: 'UserPromptSubmit',
+							additionalContext:
+								'사용자가 Auto Mode 를 위임했습니다 — 위조불가 위임 토큰 발급. 이제 chain-driver next --auto-mode 가 게이트를 ' +
+								'일괄 통과합니다 (게이트별 검토 생략 / 사용자 명시 위임 기록). 개별 게이트에서 stop 을 제출하면 그 지점에서 중단됩니다.',
+						},
+					}) + '\n',
+				);
+				process.exit(0);
+			}
+			if (gState && gState.pending_gate && gState.pending_gate.stage) {
+				const tok = deriveGateDecisionToken(payload.prompt, gState.pending_gate);
+				if (tok) {
+					const issuedAt = new Date().toISOString();
+					const nonce = randomUUID();
+					writeStateCAS(gRoot, (s) => {
+						s.user_gate_token = {
+							stage: (s.pending_gate && s.pending_gate.stage) || gState.pending_gate.stage,
+							decision: tok.decision,
+							issued_at: issuedAt,
+							nonce,
+							consumed: false,
+						};
+						return s;
+					});
+					const gid = gState.pending_gate.gate_id || '#0';
+					process.stdout.write(
+						JSON.stringify({
+							suppressOutput: true,
+							continue: true,
+							hookSpecificOutput: {
+								hookEventName: 'UserPromptSubmit',
+								additionalContext:
+									`사용자가 gate ${gid} 결단 '${tok.decision}' 을 제출했습니다 — 위조불가 토큰 발급 완료 (DEC-2026-07-02). ` +
+									`이제 chain-driver next <project> --user-decision ${tok.decision} --json (사용자 향: /chain-next) 를 실행해 전이하세요. ` +
+									`gate ${gid} 은 이 위조불가 토큰이 있어야만 전진합니다 (LLM 이 임의로 넣은 --user-decision 만으로는 전진 ❌).`,
+							},
+						}) + '\n',
+					);
+					process.exit(0);
+				}
+			}
+		} catch {
+			/* state 부재/corrupt = 토큰 발급 skip → 정상 routeEntry 폴백 */
+		}
 		// DEC-2026-06-18 — routeEntry 진입 라우터 (suggestSkillForPrompt 대체).
 		// stage 명시 트리거 또는 변경-의도 자연어 → discovery 폴백. 비-작업 prompt = null(침묵 보존).
 		const route = routeEntry(payload.prompt);

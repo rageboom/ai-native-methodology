@@ -22,7 +22,9 @@ UX 결정 영역:
 
 **5 gate UX 정책** 명문화 ( v10.0.0):
 
-> analysis exit gate #0 (DEC-2026-06-06-analysis-exit-gate) 도 동일 go/stop 결단 메커니즘(applyUserDecision / trio) 재사용 — 단 **soft** (critical/high 만 hard-block / 나머지 evidence_missing·findings_unverified 는 `--user-decision go` 로 ack). 본 §의 #1~#5 = chain hard gate.
+> analysis exit gate #0 (DEC-2026-06-06-analysis-exit-gate) 도 동일 go/stop 결단 메커니즘(applyUserDecision / trio) 재사용 — 단 **판정(validator)은 soft** (critical/high 만 hard-block / 나머지 evidence_missing·findings_unverified 는 `--user-decision go` 로 ack). 본 §의 #1~#5 = chain hard gate.
+>
+> **표면화(layer 3)는 hard (DEC-2026-07-02-analysis-exit-gate-surfacing-hard-deny)**: gate 는 판정·차단·표면화 3계층인데, #0 의 표면화(go/stop 리뷰가 실제로 사용자에게 뜨는 것)는 종전 신호가 0 이라 통과 #0 이 검토 통째 스킵 auto-advance 가능했다. 이제 #0 은 **위조불가 UserPromptSubmit 결정 토큰**(`user_gate_token`) 또는 `--auto-mode` 위임이 없으면 전진하지 않는다(hold / `blocked=gate_not_surfaced`). LLM 은 UserPromptSubmit 이벤트를 유발 불가 = 토큰 위조 불가(plan-review-server spawn 마커 동급 / text 마커 아님). 이는 DEC-2026-06-25 가 "text-gate = 영구 advisory"로 규정한 한계를 새 신호 클래스로 초과한 것 — test#4/implement#5 도 동일 신호로 후속 승격 가능(현재는 advisory carry).
 
 ### 1. gate #1~#5 prompt 형식
 

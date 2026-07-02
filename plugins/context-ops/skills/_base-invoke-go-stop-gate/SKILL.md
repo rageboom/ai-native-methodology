@@ -18,6 +18,8 @@ chain harness 의 **gate UX skill**. 매 chain stage (discovery1 / spec2 / plan3
      - test·implement gate = 텍스트 prompt(렌더러 carry).
   4. (go) 다음 stage skill 호출 / (stop) sprint 중단 / (revisit) 임의 stage jump
 
+> **gate #0 (analysis exit) 표면화 강제**: #0 은 이 스킬의 chain stage 목록(discovery1~) 밖 pre-chain gate 이지만, 표면화(layer 3)가 이제 결정론 hard 다. `chain-driver next <proj> --user-decision go` 를 토큰·auto 없이 실행하면 **전진하지 않고 hold** — chain-driver 가 평이 리뷰를 렌더하고 `blocked=gate_not_surfaced` + exit 1 을 반환한다. 이때 (1) 렌더된 리뷰를 **사용자에게 그대로 제시**하고, (2) 사용자가 직접 `go`/`stop`/`revisit:<stage>`(또는 `/chain-next go`)를 **프롬프트로 제출**하게 하라. 그 제출 시 UserPromptSubmit 훅이 **위조불가 토큰**(`user_gate_token`)을 발급하고(LLM 은 이 이벤트를 유발 불가), 그 다음 `chain-driver next --user-decision <결단>` 이 토큰을 소비하며 전진한다. **LLM 이 임의로 `--user-decision go` 를 넣는 것만으로는 전진하지 않는다.** Auto Mode 명시 위임이면 `--auto-mode`(토큰 면제 / `user_auto`).
+
 ## 절차
 
 1. **gate 입력 수집**:

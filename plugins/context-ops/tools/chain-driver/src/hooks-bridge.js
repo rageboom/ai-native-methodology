@@ -96,6 +96,61 @@ export function parseHookInput(jsonString) {
 	return parsed;
 }
 
+// gate #0 (analysis exit) 표면화 강제 — UserPromptSubmit 발급 위조불가 결정 토큰 (DEC-2026-07-02-analysis-exit-gate-surfacing-hard-deny).
+//   pending_gate 가 설정된 동안에만 발동: 사용자의 go/stop/revisit 결정-의도 프롬프트를 매칭해 {decision} 반환.
+//   그 외(비-결정 프롬프트 / pending_gate 부재) 엔 null → 정상 routeEntry 흐름 (기존 동작 무영향).
+//   위조불가 근거: UserPromptSubmit 은 사람의 프롬프트 제출로만 발생 (LLM assistant 출력은 유발 ❌) →
+//   토큰은 "사람이 실제로 결단했다" 의 증거 (plan-review-server spawn 마커 동급 / DEC-2026-06-25 text-gate advisory 한계 초과).
+//   순수: prompt 문자열 + pendingGate 객체만 평가 (fs/state/시간 read ❌).
+// 주의: \b(ASCII word-boundary)는 한글 뒤에서 성립하지 않으므로(예: '진행할게') ASCII 키워드에만 \b 를 건다.
+//   한글 키워드는 접두 매칭('중단해줘'→중단) — pending_gate 중에만 발동하므로 접두 매칭 위험 낮음.
+//   ASCII 는 \b 로 substring 오탐 방지('gopher'→'go' ❌).
+const GATE_DECISION_PATTERNS = [
+	{
+		regex: /^\s*(?:\/chain-next\s+)?(?:(?:go|approve|ok|okay)\b|진행|승인|계속|가자|좋아)/i,
+		decision: 'go',
+	},
+	{
+		regex: /^\s*(?:\/chain-next\s+)?(?:(?:stop|abort)\b|중단|멈춰|중지|취소|정지)/i,
+		decision: 'stop',
+	},
+	{
+		regex:
+			/^\s*(?:\/chain-(?:next|stage)\s+)?revisit:(analysis|discovery|spec|plan|test|implement)\b/i,
+		decision: 'revisit',
+	},
+];
+
+export function deriveGateDecisionToken(prompt, pendingGate) {
+	if (!pendingGate || !pendingGate.stage) return null;
+	if (typeof prompt !== 'string') return null;
+	for (const p of GATE_DECISION_PATTERNS) {
+		const m = prompt.match(p.regex);
+		if (m) {
+			if (p.decision === 'revisit') return { decision: `revisit:${m[1]}` };
+			return { decision: p.decision };
+		}
+	}
+	return null;
+}
+
+// Auto Mode 위임 패턴 (Q3 / gate-deterministic-surfacing) — 사용자가 "전부 자동/알아서 진행" 류로 세션 위임 시
+//   위조불가 delegation 토큰 발급 근거. --auto-mode 플래그는 LLM-passable(위조가능)이라, 이 위조불가 토큰
+//   (UserPromptSubmit 발급)이 있어야만 auto-mode 전진이 유효. go 패턴은 ^\s* 시작앵커라 "전부 자동 진행"과 비충돌.
+const AUTO_DELEGATION_PATTERNS = [
+	/전부\s*자동/,
+	/자동(?:으?로)?\s*(?:진행|처리)/,
+	/알아서\s*(?:진행|처리|해|해줘|가)/,
+	/모두\s*자동/,
+	/일괄\s*(?:승인|진행)/,
+	/auto[- ]?mode\b/i,
+];
+
+export function deriveAutoDelegation(prompt) {
+	if (typeof prompt !== 'string') return false;
+	return AUTO_DELEGATION_PATTERNS.some((re) => re.test(prompt));
+}
+
 // Inspect a UserPromptSubmit prompt for chain stage trigger keywords.
 // v4.0: TRIGGER_PATTERNS 의 entry 마다 agentId 추가 (stage 별 sub-agent dispatch / DEC-2026-05-17).
 // analysis stage entry 추가 (B1 보강 통합 / hooks-bridge TRIGGER_PATTERNS 가 chain 1~4 만 커버 → 5 stage 모두).

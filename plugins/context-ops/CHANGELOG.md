@@ -10,6 +10,40 @@
 
 ---
 
+## [0.94.0] — 2026-07-02 — MINOR — gate 표면화 결정론 hard-deny #1~#5 확장 + Auto Mode 위조불가 위임 토큰 (DEC-2026-06-25 Phase 2 완료)
+
+- **surfacing hard-deny #1~#5 확장**: `SURFACING_ENFORCED_STAGES = {analysis,discovery,spec,plan,test,implement}` — cmdNext 전이 guard 가 위조불가 `user_gate_token`(UserPromptSubmit 훅만 발급 / LLM 이벤트 유발 불가) 없으면 전진 거부(hold: pending_gate + blocked=gate_not_surfaced + exit 1). gate #0(DEC-2026-07-02) 패턴을 #1~#5 로 일반화 — **FSM 전이 함수 내부 guard**(신규 상태·전이 도입 ❌ / 기존 stage-generic 배선 재사용). go/stop/revisit 이 어떤 오케스트레이션(Workflow 자동주행 포함)에서도 무조건 표출.
+- **HTML 리뷰 결정론 spawn (Q2)**: discovery/spec/plan hold 시 chain-driver 가 plan-review-server 를 결정론 spawn(스킬 LLM 대신). 서버 = reference-lens(판정 무생성 / gate-eval 무오염 / spawn = 결정론 side-effect ≠ LLM inject). 비-TTY(CI/test) skip. 스킬 spawn 과 상보(정상 흐름=스킬 spawn→토큰→hold 없음 / 우회 시=chain-driver backstop / 이중 spawn 없음).
+- **Auto Mode 위조불가 위임 토큰 (Q3)**: `--auto-mode` 플래그 단독(LLM-passable) 우회 봉인 — `user_auto_delegation_token`(UserPromptSubmit "전부 자동/알아서 진행" 발급)이 fresh 할 때만 auto-mode 전진 유효. 세션 위임(per-gate 소비 ❌ / 체인 terminal clear). state.schema 추가.
+- 테스트: chain-driver 791/791 + gate-provenance 신규 헬퍼 단위(userGateTokenFresh/autoDelegationTokenFresh 8) + f-cha·gate-surfacing 갱신(위임 토큰 발급 스텝 + no-token hold) + 워크스페이스 2346 pass.
+- DEC-2026-07-02-gate-surfacing-hard-deny-chain-stages / Resolves F-DOGFOOD-019 후속.
+
+---
+
+## [0.93.0] — 2026-07-02 — MINOR — gate #0 표면화(layer 3) 결정론 강제 — 위조불가 UserPromptSubmit 토큰 (DEC-2026-06-25 Phase 2 실행 / additive)
+
+**문제 (ep-fe-mis dogfood 발견 / 코드 검증)**: gate 는 3계층 — 판정(evaluate) · 차단(block) · 표면화(surface). 판정·차단은 이미 결정론(gate-eval + `state.blocked` → PreToolUse deny)이지만 **표면화(go/stop/revisit 리뷰가 실제로 사용자에게 뜨는 것)** 는 LLM 이 `_base-invoke-go-stop-gate` 스킬을 호출해야만 발생 = 강제 아님(nudge). 특히 **gate #0(analysis exit)** 은 plan-review-server 미지원 + 스킬 stage 목록 부재로 표면화 신호가 **0** — 통과하는 #0 이 검토 UX 를 통째 건너뛰고 조용히 auto-advance (DEC-2026-06-25 §문제 leak 의 #0 판). DEC-2026-06-25 는 hard-deny 를 "Phase 2 carry"(≥2 PoC + 위조불가 신호 전제)로 연기했고, "LLM-writable text 마커 hard-deny = 벽 사칭 금지" 원칙을 명시했다.
+
+### 변경
+
+- **위조불가 신호 클래스 신설 — UserPromptSubmit 발급 결정 토큰(`user_gate_token`)**: LLM 은 UserPromptSubmit 이벤트를 유발 불가(사람의 프롬프트 제출로만 발생) → `pending_gate` 중 사용자의 go/stop/revisit 결단 프롬프트를 훅이 매칭해 단일 사용 토큰 발급. plan-review-server spawn 마커 동급 위조불가 = **DEC-2026-06-25 의 "text-gate = 영구 advisory" 한계를 이 신호 클래스로 초과**(text 마커 아님).
+- **cmdNext present→decide (gate #0 한정)**: #0 이 통과하더라도 fresh·unconsumed·stage 일치 토큰 또는 `--auto-mode` 위임이 없으면 전진 ❌ → **hold**: `pending_gate` set + 평이 리뷰 렌더(stdout `awaiting_decision:true`) + `blocked(gate_not_surfaced)`. 유효 토큰이면 소비 후 전진. `deriveGateActor` #0 `llm_assumed` advisory → hard hold 로 승격.
+- **차단 재사용**: hold 가 `blocked=true` 를 세팅 → 기존 `shouldBlockToolUse`(PreToolUse) 가 `.ai-context/` write deny + 기존 anti-bypass(`next` no-decision → exit 2) 그대로 작동. 신규 exit code ❌(DEC-2026-06-25 준수) / 신규 PreToolUse matcher ❌.
+- **범위**: gate #0 만 (§8.1 no-overfit). #1~#3 = 서버 마커 advisory 유지 / test#4·implement#5 = 텍스트 advisory carry 유지(동일 토큰 신호로 후속 무개조 승격 가능).
+- **스키마**: `state.schema.json` `pending_gate`·`user_gate_token`(둘 다 optional / 하위호환 / version bump 불필요) + `block_reason` enum `gate_not_surfaced`.
+
+### 검증
+
+- chain-driver **789/789**(777 기존 무회귀 + 신규 `gate-surfacing-hard-deny.test.js` 12: deriveGateDecisionToken/userGateTokenFresh 순수 + hold/auto/토큰소비/write-deny E2E).
+- 기존 F-AUDIT-SOFTGATE-001(C-13) ack 테스트 2건 = findings soft-block 위에 표면화 게이트가 얹혔으므로 `--auto-mode` 동봉으로 갱신(의도 보존).
+- E2E 실측(no-simulation): `init` → `next --user-decision go`(토큰 없음) → exit 1 + `gate_not_surfaced` + `pending_gate`(#0) + 리뷰 렌더 + 미전진 / UserPromptSubmit `go` → 토큰 발급 / `next --user-decision go` → 전진(discovery) + 토큰 소비.
+
+### §8.1 정직 기록
+
+DEC-2026-06-25 는 hard-deny 를 ≥2 PoC corroboration 뒤로 연기했다. 본 승격의 근거: ① 원 caution 의 전제("신호가 LLM-writable = 벽 사칭")를 **위조불가 신호(UserPromptSubmit)** 도입으로 제거 — 새 신호 클래스는 그 caution 의 사정권 밖. ② ep-fe-mis dogfood 를 1차 corroboration 으로 계상. 잔여 한계(사람이 리뷰를 실제로 *읽었는지* 는 여전히 self-attested — 토큰은 "사람이 결단을 제출했다"까지만 증명)는 방법론 speedbump 철학의 기존 ceiling 과 동일. 상세 = `decisions/DEC-2026-07-02-analysis-exit-gate-surfacing-hard-deny.md`.
+
+---
+
 ## [0.92.0] — 2026-07-01 — MINOR — state-map 참조 무결성 validator 신설 + analysis gate#0 배선 (검증 갭 A 해소)
 
 **문제 (검증 갭 A)**: analysis FE 구조 산출물 `state-map.json` 은 schema(구조) + evidence({file,line})만 검사되고 전이 그래프의 *참조 무결성*(전이 타깃이 정의된 state 를 가리키는가)을 검증하는 계층이 없었다. `SUBMIT → "validatingX"`(정의 안 된 state)로 전이하는 **schema-valid** state-map 이 schema-validator(exit 0) + evidence-scan(exit 0)을 **모두 GREEN 통과**. 근본 원인 = `schemas/state-map.schema.json:183` `target:{type:"string"}` — 전이 타깃/`initial`/`final_states`/`child_states`/parallel `regions`/history `default_target` 가 모두 free string(JSON Schema 는 "값 ∈ states 키" 참조 제약을 구조적 검증 불가).
