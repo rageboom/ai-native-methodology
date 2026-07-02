@@ -38,6 +38,35 @@
 - **Agents: 3** (`_base-senior-engineer` / `_base-industry-case-researcher` / `_base-official-docs-checker`)
 - **Skills: N** (1-depth + category prefix paradigm / `skills/<category>-<name>/SKILL.md`)
 
+### Q1.2 `/plugin update` 후 Installed 탭에 구 버전이 그대로 표시될 때
+
+**증상**: `/plugin update context-ops` 실행 후 `/plugin` Installed 탭에서 버전이 업데이트되지 않고 구 버전(예: 0.20.0)이 그대로 표시됨.
+
+**원인**: Claude Code plugin 캐시에 구 버전 아티팩트가 남아있어 업데이트가 반영되지 않음.
+
+**해결**:
+
+```bash
+# 1. 구 버전 캐시 삭제 (버전 번호는 실제 설치된 버전으로 교체)
+# macOS: trash 사용 권장 (brew install trash)
+trash ~/.claude/plugins/cache/mis-plugins/context-ops/<구버전>
+
+# trash 미설치 시
+mv ~/.claude/plugins/cache/mis-plugins/context-ops/<구버전> ~/.Trash/
+```
+
+```
+# 2. Claude Code 에서 재시도
+/plugin update context-ops
+/reload-plugins
+```
+
+캐시 디렉터리 위치를 모를 경우:
+
+```bash
+ls ~/.claude/plugins/cache/mis-plugins/context-ops/
+```
+
 ### Q2. UserPromptSubmit hook 발동 안 함 (chain-driver 권고 stderr 안 뜸)
 
 **증상**: "기획 단계 시작" 같은 prompt 입력했는데 chain-driver 가 권고 안 함.
