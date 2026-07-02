@@ -278,19 +278,21 @@ describe('F-AUDIT-SOFTGATE-001 fail-closed (=C-13 / findings 미제출)', () => 
 		);
 	});
 
-	it('`next --user-decision go` (--findings 없이) → exit 0 + advanced (명시 ack escape / intervention-log actor:user)', () => {
+	// DEC-2026-07-02 — gate #0 은 표면화 강제도 받으므로 findings soft-block ack(go) 위에 --auto-mode(표면화 위임)를
+	//   동봉해야 전진한다. --auto-mode 없는 순수 go 는 gate_not_surfaced hold (아래 별도 describe 에서 검증).
+	it('`next --user-decision go --auto-mode` (--findings 없이) → exit 0 + advanced (findings ack + 표면화 위임)', () => {
 		const root = join(tmp, 'softgate-ack');
 		mkdirSync(root, { recursive: true });
 		initState(root, 'softgate-ack');
 		const result = spawnSync(
 			'node',
-			[CLI_PATH, 'next', root, '--user-decision', 'go'],
+			[CLI_PATH, 'next', root, '--user-decision', 'go', '--auto-mode'],
 			{ encoding: 'utf-8', timeout: 20000 },
 		);
 		assert.equal(
 			result.status,
 			0,
-			`명시 go ack 시 전진 exit 0 의무 (got ${result.status}) / stderr: ${result.stderr}`,
+			`명시 go ack + auto-mode 시 전진 exit 0 의무 (got ${result.status}) / stderr: ${result.stderr}`,
 		);
 		const state = readState(root);
 		assert.equal(
@@ -329,9 +331,10 @@ describe('F-AUDIT-SOFTGATE-001 fail-closed (=C-13 / findings 미제출)', () => 
 		assert.equal(r2.status, 2, `anti-bypass: plain next 재호출 exit 2 (got ${r2.status})`);
 		assert.equal(readState(root).blocked, true, '②후에도 blocked 유지');
 
-		// ③ 명시 --user-decision go → 재평가 → soft go-with-warnings 해소 + 전진
-		const r3 = run(['--user-decision', 'go']);
-		assert.equal(r3.status, 0, `명시 go ack 해소 exit 0 (got ${r3.status}) / ${r3.stderr}`);
+		// ③ 명시 --user-decision go + --auto-mode → 재평가 soft go-with-warnings 해소 + 표면화 위임 → 전진
+		//    (DEC-2026-07-02: gate #0 은 findings 해소 위에 표면화(토큰/auto)도 요구. 순수 go 는 gate_not_surfaced hold.)
+		const r3 = run(['--user-decision', 'go', '--auto-mode']);
+		assert.equal(r3.status, 0, `명시 go ack + auto 해소 exit 0 (got ${r3.status}) / ${r3.stderr}`);
 		assert.equal(readState(root).blocked, false, '③후 blocked=false (해소)');
 		assert.equal(readState(root).current_chain, 'discovery', '전진 = discovery');
 	});

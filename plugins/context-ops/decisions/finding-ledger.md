@@ -900,3 +900,17 @@
 - **Decision made:** 신규 결정론 tool `state-map-integrity-validator` 신설 + analysis gate #0 조건부(FE state-map 존재 시) 배선 — dangling reference=high(gating) / 도달불가=medium(advisory). severity 비대칭은 W3C SCXML 1.0 REC §3.11(target MUST=legal state spec) + XState v5(undefined target machine 생성 시 throw) 1차 출처 정합. mis-fe-admin 실 결함은 `closing` state 추가(deadlineApply mutation lifecycle grounding)로 교정 → 93/93 PASS.
 - **Severity:** medium — 격리 산출물론 무해하나 chain 하류(spec→test→impl)가 state-map 을 기계 소비할 때 미정의 state 전이 = 잘못된 컨텍스트 전파. 결정론 검증 부재 자체가 "false GREEN" 클래스.
 - **Status:** **resolved** (v0.92.0 / state-map-integrity-validator + gate#0 배선 / DEC-2026-07-01-state-map-integrity-validator / mis-fe-admin live-probe 93/93 PASS).
+
+### F-DOGFOOD-019: gate 표면화(layer 3)가 결정론 아님 — 특히 gate #0 은 표면화 신호가 0 (통과 시 검토 통째 스킵 auto-advance)
+
+> ※ 출처 = ep-fe-mis FE dogfood ([[project-methodology-dogfood]]) / 코드 검증 (2026-07-02). F-DOGFOOD 네임스페이스(외부 사내 프로젝트 dogfood) 귀속.
+
+- **Phase:** chain harness (gate 메커니즘 / go-stop-gate).
+- **Confidence:** verified (코드 trace + E2E 실측 재현 — 통과 #0 이 `next` 로 조용히 auto-advance).
+- **Type:** gap (게이트 3계층 중 표면화 계층의 결정론 강제 부재 / #0 은 신호 자체가 부재).
+- **Description:** 게이트는 판정(evaluate)·차단(block)·표면화(surface) 3계층인데, 판정·차단은 결정론(gate-eval + `state.blocked` → PreToolUse deny)이나 **표면화**(go/stop/revisit 리뷰가 실제로 사용자에게 뜨는 것)는 LLM 이 `_base-invoke-go-stop-gate` 스킬을 호출해야만 발생 = 강제 아님(nudge). 특히 **gate #0(analysis exit)** 은 plan-review-server 미지원 + 스킬 stage 목록 부재 + `gate-review-passage.json` 마커 미생산으로 표면화 신호가 **0** — 통과하는 #0 이 검토 UX 를 통째 건너뛰고 `chain-driver next` 로 조용히 auto-advance 해도 아무 흔적이 없다.
+- **Evidence:** `cli.js cmdNext` unblocked-advance 경로가 `--user-decision go` 유무와 무관히 통과 게이트를 전진(구). `_base-invoke-go-stop-gate/SKILL.md` stage 목록 discovery1~ (#0 부재). `plan-review-server/src/artifact-registry.js` phases = discovery-draft/discovery/spec/plan (analysis 부재). `gate-provenance.js` 의 `llm_assumed` 는 비차단 stderr advisory 였음.
+- **Spec gap:** DEC-2026-06-25 가 hard-deny 를 "Phase 2 carry"로 연기하며 "위조불가 신호(plan-review-server spawn 토큰)뿐 / text 마커 hard-deny = 벽 사칭 금지"를 명시 → #0(텍스트 게이트)은 그 원칙상 정당한 hard-deny 신호가 없었다.
+- **Decision made:** 새 위조불가 신호 클래스 = **UserPromptSubmit 발급 결정 토큰**(`user_gate_token`). LLM 은 UserPromptSubmit 이벤트를 유발 불가 → 사람이 실제 결단을 제출한 증거(plan-review-server spawn 마커 동급 / text 마커 아님 → DEC-2026-06-25 "text=영구 advisory" 한계 초과). cmdNext #0 present→decide(토큰/auto 없으면 hold=gate_not_surfaced) + blocked 재사용(write-deny/anti-bypass) + `llm_assumed`→hard hold 승격. 범위=#0만(§8.1).
+- **Severity:** medium — 통과 #0 의 조용한 auto-advance 는 사람 검토 없이 하류(discovery~)로 진행 = 잘못된 grounding 전파 위험. 표면화 신호 0 자체가 "게이트를 통째 스킵해도 흔적 없음" 클래스.
+- **Status:** **resolved** (v0.93.0 / DEC-2026-07-02-analysis-exit-gate-surfacing-hard-deny / chain-driver 789/789 + 신규 12 + E2E no-sim). test#4/implement#5 동일 신호 후속 승격 = carry.

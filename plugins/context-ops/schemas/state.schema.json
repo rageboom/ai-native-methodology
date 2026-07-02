@@ -148,7 +148,8 @@
             "evidence_missing",
             "schema_migration_required",
             "state_corrupt",
-            "user_stop"
+            "user_stop",
+            "gate_not_surfaced"
           ]
         }
       ]
@@ -190,6 +191,63 @@
         { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,63}$" }
       ],
       "description": "어느 scope 가 현재 block 을 설정했는지 추적. null = global/no-scope block. 다른 scope 의 next 성공이 이 block 을 지우지 않도록 cross-scope clear 방지에 사용."
+    },
+    "pending_gate": {
+      "anyOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "required": ["stage", "gate_id", "presented_at"],
+          "additionalProperties": false,
+          "properties": {
+            "stage": {
+              "type": "string",
+              "enum": ["analysis", "discovery", "spec", "plan", "test", "implement"]
+            },
+            "gate_id": {
+              "type": "string",
+              "enum": ["#0", "#1", "#2", "#3", "#4", "#5"]
+            },
+            "presented_at": { "type": "string", "format": "date-time" },
+            "findings_snapshot": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "critical": { "type": "integer", "minimum": 0 },
+                "high": { "type": "integer", "minimum": 0 },
+                "medium": { "type": "integer", "minimum": 0 },
+                "low": { "type": "integer", "minimum": 0 },
+                "info": { "type": "integer", "minimum": 0 }
+              }
+            }
+          }
+        }
+      ],
+      "description": "DEC-2026-07-02-analysis-exit-gate-surfacing-hard-deny — gate #0(analysis exit) 표면화 강제. gate 가 사용자에게 present 됐고 결정 대기 중임을 표시. cmdNext 가 hold 시 set, 전진 시 clear. UserPromptSubmit 훅이 이 필드가 있을 때만 위조불가 결정 토큰(user_gate_token)을 발급한다."
+    },
+    "user_gate_token": {
+      "anyOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "required": ["stage", "decision", "issued_at", "nonce", "consumed"],
+          "additionalProperties": false,
+          "properties": {
+            "stage": {
+              "type": "string",
+              "enum": ["analysis", "discovery", "spec", "plan", "test", "implement"]
+            },
+            "decision": {
+              "type": "string",
+              "pattern": "^(go|stop|revisit:(analysis|discovery|spec|plan|test|implement))$"
+            },
+            "issued_at": { "type": "string", "format": "date-time" },
+            "nonce": { "type": "string", "minLength": 1 },
+            "consumed": { "type": "boolean" }
+          }
+        }
+      ],
+      "description": "DEC-2026-07-02-analysis-exit-gate-surfacing-hard-deny — 위조불가 gate 결정 토큰. UserPromptSubmit 훅이 pending_gate 중 사용자의 결정 프롬프트를 받았을 때만 발급(LLM 은 UserPromptSubmit 이벤트를 유발 불가 = 위조불가 / plan-review-server spawn 마커 동급 신호). cmdNext 가 gate #0 전진 시 fresh·unconsumed·stage 일치 토큰을 요구하고 소비한다. 없으면 hold(block_reason=gate_not_surfaced)."
     }
   },
   "$defs": {
