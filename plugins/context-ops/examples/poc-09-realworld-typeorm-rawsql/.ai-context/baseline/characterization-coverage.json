@@ -1,7 +1,0 @@
-{
-  "generated_at": "2026-05-08",
-  "source_commit_sha": "unknown",
-  "project_id": "poc-09-realworld-typeorm-rawsql",
-  "coverage_strategy": "ratchet",
-  "coverage_ratio": 0.3
-}
