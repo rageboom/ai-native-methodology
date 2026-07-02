@@ -101,7 +101,7 @@ flow 확정 전:
 
 ## 핸드오프 기준
 
-- MCP 서버 신규 작성·infra-ops-mcp 도구 추가 → `mcp-developer`
+- MCP 서버 신규 작성·illuminati-mcp 도구 추가 → `mcp-developer`
 - Alert/SLO/대시보드 설계(자동화의 Grafana 알림 부분 이상) → `observability-architect`
 - JIRA 티켓 발행 절차 자체 → `/jira-ticket-exec`
 - 자동화로 해결할 장애의 근본원인 진단 → `k8s-diagnostician` 등 troubleshooter 계열

@@ -34,5 +34,5 @@ code/.claude/commands/*.md   →  (symlink, 개인 3종)  →  <repo>/personal/c
 ## 알려진 후속 (carry)
 
 - MIS-GitOps/MIS-DevOps 등 project-scope `.claude/` 자산은 각 레포가 정본, 이 플러그인 범위 밖.
-- illuminati MCP는 `.mcp.json` + launcher(`scripts/illuminati-mcp-launch.sh`)로 동봉 — 서버 소스 정본은 여전히 `MIS-DevOps/platform-automation/mcp/infra-ops`(.venv 로컬 설치 전제). launcher는 미설치/user-scope 중복/`ILLUMINATI_DISABLE=1`이면 조용히 no-op. codegraph MCP는 미동봉(머신별 인덱스).
+- illuminati MCP는 **서버 소스까지 이 플러그인이 정본**(`server/` — 2026-07-02 MIS-DevOps에서 이관, 구명 infra-ops). launcher(`scripts/illuminati-mcp-launch.sh`)가 CLAUDE_PLUGIN_DATA에 venv를 자동 부트스트랩하고 `server/pyproject.toml` version이 바뀌면 재설치한다 — **서버 코드 수정 시 그 version을 반드시 bump**. user-scope 중복/`ILLUMINATI_DISABLE=1`/python3 부재 시 조용히 no-op. 서버 테스트: `python -m pytest server/tests/`. codegraph MCP는 미동봉(머신별 인덱스).
 - 버전 3-way 정합: `node scripts/version-check.js --plugin devops`. 배포: `node scripts/publish.js --plugin devops` (Node 22 필요).

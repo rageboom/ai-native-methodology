@@ -10,6 +10,13 @@
             "timeout": 5000,
             "statusMessage": "Checking environment...",
             "once": true
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/illuminati-env-check.sh\" \"${user_config.workspace_root}\"",
+            "timeout": 5000,
+            "statusMessage": "Checking illuminati credentials...",
+            "once": true
           }
         ]
       }

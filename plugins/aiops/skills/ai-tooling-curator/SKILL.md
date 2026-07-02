@@ -63,7 +63,7 @@ AI 코딩 도구를 회사 환경(HIWARE 제약·DEV/STG/LIVE·Infisical·Harbor
 
 - 시크릿: env block 평문 OK (`~/.claude/.mcp.json`) — 회사 결정. git 추적 차단 필수
 - per-repo 선택: `code/.mcp.json` 은 시크릿 없는 버전, 글로벌이 실값
-- 사내 MCP (infra-ops): Grafana/Jenkins/JIRA/Confluence 통합
+- 사내 MCP (illuminati): Grafana/Jenkins/JIRA/Confluence 통합
 
 ## Onboarding 체크리스트 (신규 직원)
 

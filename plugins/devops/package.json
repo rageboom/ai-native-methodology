@@ -1,6 +1,6 @@
 {
   "name": "@mis-plugins/devops",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": false,
   "type": "module",
   "description": "MIS 빌드/배포 자동화 + Kubernetes 생태계 구축. GHE PR 5-lens 리뷰(infra-reviewer)·기술조사 agent, 신규 K8s chart 스캐폴딩·Compose→K8s 전환·설계 skill, 빌드/배포/상태조회 command 12종, MIS 공통 워크플로우 rule-skill 7종, 자동포맷·kubeconform hook, illuminati MCP(운영 조회/쓰기 53-tool — 토큰 export만으로 동작). 설치 후 workspace_root 설정 필요 — 폴더 구조가 달라도 동일하게 동작한다.",
@@ -23,6 +23,7 @@
     "hooks",
     "commands",
     "scripts",
+    "server",
     "flows",
     "templates",
     "CHANGELOG.md",
@@ -31,7 +32,10 @@
     "!**/tests",
     "!**/__tests__",
     "!**/*.test.js",
-    "!**/node_modules"
+    "!**/node_modules",
+    "!**/__pycache__",
+    "!**/.pytest_cache",
+    "!**/.venv"
   ],
   "engines": {
     "node": ">=22.0.0"

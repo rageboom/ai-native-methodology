@@ -1,15 +1,69 @@
 # devops
 
-MIS 빌드/배포 자동화 + Kubernetes 생태계 구축. 역할별 5개 플러그인(devops/sre/devsecops/finops/aiops)의 base — MIS 공통 워크플로우 rule-skill을 이 플러그인이 보유한다.
+MIS 빌드/배포 자동화 + Kubernetes 생태계 구축. 역할별 5개 플러그인(devops/sre/devsecops/finops/aiops)의 base — MIS 공통 워크플로우 rule-skill과 illuminati MCP(운영 조회/쓰기 53-tool)를 이 플러그인이 보유한다.
 
-## 설치
+## 설치 (4단계)
+
+### 1단계 — 플러그인 설치
+
+Claude Code에서:
 
 ```
 /plugin marketplace add SGH-ISD/ai-native-methodology
 /plugin install devops@mis-plugins
 ```
 
-설치 후 `workspace_root`(회사 GHE 레포들을 클론해 둔 최상위 디렉토리, 예: `MIS-DevOps`/`MIS-GitOps`/`eam`이 나란히 있는 폴더)를 설정해야 한다 — 활성화 시 Claude Code가 자동으로 물어본다. 각자 폴더 구조가 달라도 이 값 하나만 설정하면 동일하게 동작한다.
+### 2단계 — workspace_root 입력
+
+활성화 시 Claude Code가 자동으로 물어본다. 회사 GHE 레포들을 클론해 둔 최상위 디렉토리를 입력한다 (예: `MIS-DevOps`/`MIS-GitOps`/`eam`이 나란히 있는 폴더). 각자 폴더 구조가 달라도 이 값 하나만 맞추면 동일하게 동작한다.
+
+### 3단계 — 환경변수 입력 (개인 토큰/계정)
+
+`~/.zshrc`에 아래 블록을 복붙하고 본인 값을 채운 뒤 `source ~/.zshrc`. **쓰는 도메인 것만 채워도 된다** — 비워둔 도메인의 tool만 동작하지 않고 나머지는 전부 정상이다.
+
+```bash
+# ── illuminati MCP 자격증명 (빈 값 = 본인 토큰/계정만 채우면 됨) ──────
+# Grafana API Key — 각 Grafana UI > Administration > Service accounts 에서 발급
+export GRAFANA_URL=http://mis-manage.smilegate.net:3000
+export GRAFANA_API_KEY=
+export GRAFANA_STG_URL=https://stg-mis-grafana.smiledev.net
+export GRAFANA_STG_API_KEY=
+export GRAFANA_DEV_URL=https://dev-mis-grafana.smiledev.net
+export GRAFANA_DEV_API_KEY=
+# JIRA — Personal Access Token (프로필 > 개인 액세스 토큰)
+export JIRA_URL=https://jira.smilegate.net
+export JIRA_TOKEN=
+export JIRA_USER=
+# Confluence — Bearer PAT
+export CONFLUENCE_URL=https://wiki.smilegate.net
+export WIKI_TOKEN=
+# Jenkins — API 토큰은 인스턴스별 발급 (각 Jenkins > 내 계정 > API Token)
+export JENKINS_USER=
+export JENKINS_DEV_URL=https://dev-mis-jenkins.smiledev.net
+export JENKINS_DEV_TOKEN=
+export JENKINS_STG_URL=https://stg-mis-jenkins.smiledev.net
+export JENKINS_STG_TOKEN=
+export JENKINS_LIVE_URL=https://mis-jenkins.smilegate.net
+export JENKINS_LIVE_TOKEN=
+# Harbor — robot account (harbor tool 사용 시에만)
+export HARBOR_DEV_URL=https://dev-mis-registry.smiledev.net
+export HARBOR_DEV_USER=
+export HARBOR_DEV_PASS=
+export HARBOR_STG_URL=https://stg-mis-registry.smiledev.net
+export HARBOR_STG_USER=
+export HARBOR_STG_PASS=
+export HARBOR_LIVE_URL=https://mis-registry.smilegate.net
+export HARBOR_LIVE_USER=
+export HARBOR_LIVE_PASS=
+```
+
+- URL은 회사 고정값으로 미리 채워져 있다(launcher 기본값과 동일) — **빈 값인 본인 토큰/계정만 채우면 된다**.
+- github tool(6종)은 env 대신 gh CLI 인증: `gh auth login --hostname github.smilegate.net`
+- 뭘 빠뜨렸는지 몰라도 된다 — **새 세션을 열면 SessionStart hook이 미설정 키 목록을 바로 알려준다** (키 이름만, 값 미노출).
+
+### 4단계 — 동작 확인
+
+새 세션을 열면 첫 실행에서 서버 venv가 자동 구성된다(수십 초, 타임아웃 시 `/mcp`에서 재연결). `/mcp`에서 `illuminati`가 connected면 끝. 다른 레포 clone·수동 설치는 필요 없다 — 서버 소스(Python)가 플러그인에 동봉되어 있고(`server/`) python3만 있으면 된다.
 
 ## Agents (2)
 
@@ -53,11 +107,12 @@ MIS 빌드/배포 자동화 + Kubernetes 생태계 구축. 역할별 5개 플러
 | `/start-infra` | 인프라 컴포넌트 시작 가이드 |
 | `/test` | 테스트 실행 가이드 |
 
-## Hooks (6)
+## Hooks (7)
 
 | Hook | 이벤트 | 기능 |
 |---|---|---|
 | env-check | SessionStart | 브랜치/미커밋/Docker 상태 + workspace_root 실값 출력 |
+| illuminati-env-check | SessionStart | 미설정 자격증명 키 안내 (값 미노출) — 설치 직후 설정 가이드 |
 | auto-formatter | PostToolUse (Edit\|Write) | java/kt/ts 파일 저장 시 포맷터 자동 실행 |
 | kubeconform-validator | PostToolUse (Edit\|Write) | MIS-GitOps yaml 저장 시 kubeconform 검증 |
 | compaction-reminder | PostCompact | 배포 원칙/포맷 순서/승인 규칙 재주입 |
@@ -70,21 +125,43 @@ MIS 빌드/배포 자동화 + Kubernetes 생태계 구축. 역할별 5개 플러
 |---|---|
 | `illuminati` | MIS 운영 조회/쓰기 53-tool ("모든 것을 보는 눈") — grafana LGTM(metric/logs/trace/alert) 8, jira 11, confluence 6, jenkins 5, GHE PR 6, harbor 3, gitops 6, backend/frontend 정적분석 7, inventory 1. 쓰기 도구는 전부 `confirm` 게이트 |
 
-sre 진단 agent의 라이브 텔레메트리 조회, infra-reviewer의 FinOps 실사용률·Harbor CVE 실측, finops-review의 PromQL 실측이 전부 이 서버를 쓴다. 서버 소스 정본은 `MIS-DevOps/platform-automation/mcp/infra-ops` — 플러그인은 launcher만 동봉한다.
+sre 진단 agent의 라이브 텔레메트리 조회, infra-reviewer의 FinOps 실사용률·Harbor CVE 실측, finops-review의 PromQL 실측이 전부 이 서버를 쓴다. 서버 소스(Python)는 이 플러그인이 통째로 동봉하며(`server/`), venv는 첫 실행 시 플러그인 데이터 디렉토리에 자동 구성되고 서버 버전이 바뀌면 자동 재설치된다. 설정 절차는 위 "설치 (4단계)".
 
-**설정은 개인 토큰/계정 export가 전부다.** venv는 첫 실행 시 launcher가 자동 부트스트랩하고(수십 초, 타임아웃 시 `/mcp` 재연결), 회사 공통 URL은 launcher가 기본값으로 제공한다. `~/.zshrc`에:
+grafana tool은 `env='prod'|'stg'|'dev'`, jenkins tool은 `env='dev'|'stg'|'live'` 파라미터로 대상 환경을 고른다 — 환경마다 인스턴스가 분리되어 있다(공용 가정 금지).
 
-```bash
-export GRAFANA_API_KEY=...        # LIVE Grafana
-export GRAFANA_DEV_API_KEY=...    # DEV Grafana
-export JIRA_TOKEN=... JIRA_USER=<계정>
-export WIKI_TOKEN=...             # Confluence Bearer
-export JENKINS_USER=<계정> JENKINS_TOKEN=...
-# harbor tool 사용 시: HARBOR_{DEV,STG,LIVE}_{URL,USER,PASS}
-# github tool 사용 시: gh auth login --hostname github.smilegate.net
-```
+### 전체 환경변수 레퍼런스
 
-전제조건은 `workspace_root`에 `MIS-DevOps`가 clone 되어 있는 것 하나다(서버 소스). 기존처럼 `platform-automation/.env` 파일을 쓰는 머신도 그대로 동작한다 — 서버가 `os.environ.setdefault`로 읽어 **export된 env가 항상 .env보다 우선**한다. `claude mcp add -s user`로 이미 등록해 둔 머신에서는 launcher가 중복을 감지해 no-op 한다 (강제 비활성화: `ILLUMINATI_DISABLE=1`).
+| 변수 | 용도 | launcher 기본값 | 언제 필요 |
+|---|---|---|---|
+| `GRAFANA_URL` | prod(LIVE) Grafana 주소 | `http://mis-manage.smilegate.net:3000` | grafana tool `env='prod'` |
+| `GRAFANA_API_KEY` | prod API Key | — (**export 필수**) | 〃 |
+| `GRAFANA_STG_URL` | STG Grafana 주소 | `https://stg-mis-grafana.smiledev.net` | grafana tool `env='stg'` |
+| `GRAFANA_STG_API_KEY` | STG API Key | — (**export 필수**) | 〃 |
+| `GRAFANA_DEV_URL` | DEV Grafana 주소 | `https://dev-mis-grafana.smiledev.net` | grafana tool `env='dev'` |
+| `GRAFANA_DEV_API_KEY` | DEV API Key | — (**export 필수**) | 〃 |
+| `JIRA_URL` | JIRA 주소 | `https://jira.smilegate.net` | jira tool 전부 |
+| `JIRA_TOKEN` | JIRA PAT (Bearer) | — (**export 필수**) | 〃 |
+| `JIRA_USER` | JIRA 계정명 | — (권장) | silence 작성자·담당자 기본값 |
+| `CONFLUENCE_URL` | Confluence 주소 | `https://wiki.smilegate.net` | confluence tool 전부 |
+| `WIKI_TOKEN` | Confluence Bearer PAT | — (**export 필수**) | 〃 |
+| `JENKINS_DEV_URL` | DEV Jenkins 주소 | `https://dev-mis-jenkins.smiledev.net` | jenkins tool `env='dev'` |
+| `JENKINS_STG_URL` | STG Jenkins 주소 | `https://stg-mis-jenkins.smiledev.net` | jenkins tool `env='stg'` |
+| `JENKINS_LIVE_URL` | LIVE Jenkins 주소 | `https://mis-jenkins.smilegate.net` | jenkins tool `env='live'` |
+| `JENKINS_{DEV,STG,LIVE}_USER` | 환경별 계정 | — (`JENKINS_USER` 폴백) | 계정이 환경별로 다를 때만 |
+| `JENKINS_{DEV,STG,LIVE}_TOKEN` | 환경별 API 토큰 | — (**export 필수**, `JENKINS_TOKEN` 폴백) | 토큰은 인스턴스별 발급 |
+| `HARBOR_DEV_URL`/`HARBOR_STG_URL`/`HARBOR_LIVE_URL` | 환경별 Harbor 주소 | `dev-mis-registry.smiledev.net` / `stg-mis-registry.smiledev.net` / `mis-registry.smilegate.net` | harbor tool |
+| `HARBOR_{DEV,STG,LIVE}_USER`/`_PASS` | Harbor robot 계정 | — (**export 필수**) | harbor tool 사용 시 |
+| `ILLUMINATI_DISABLE` | `1`이면 플러그인 동봉 서버 비활성 | — | 수동 등록과 충돌 시 |
+| `ILLUMINATI_CODE_ROOT` | 레포 워크스페이스 루트 재지정 | `workspace_root` 값 | 정적분석 tool 경로가 어긋날 때 |
+| `ILLUMINATI_ENV_FILE` | 자격증명 .env 파일 경로 재지정 | — | .env 파일 방식을 쓸 때 |
+| `ILLUMINATI_INSECURE` | `1`이면 TLS 검증 skip | — | 사설 인증서 문제 시에만 |
+
+### 세부 동작 (참고)
+
+- 로컬 파일 정적분석 tool은 대상 레포가 `workspace_root`에 clone 되어 있어야 한다 — gitops_*(MIS-GitOps), inventory_query(MIS-DevOps), backend_*/frontend_*(각 앱 레포). HTTP API tool(grafana/jira/confluence/jenkins/GHE/harbor)은 레포 불필요.
+- 자격증명은 쉘 export가 기본. `.env` 파일 방식도 지원 — `<workspace_root>/MIS-DevOps/platform-automation/.env`가 있으면 자동 폴백으로 읽는다(export env가 항상 우선, `ILLUMINATI_ENV_FILE`로 경로 재지정 가능).
+- `claude mcp add -s user`로 직접 등록해 둔 머신에서는 launcher가 중복을 감지해 no-op 한다.
+- 서버 코드를 고칠 땐 `server/pyproject.toml`의 version을 올려야 사용자 venv가 재설치된다.
 
 ## 형제 플러그인 (역할 분리)
 
