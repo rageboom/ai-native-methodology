@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "_comment": "illuminati = MIS 운영 조회/쓰기 53-tool MCP (grafana LGTM/jira/confluence/jenkins/GHE/harbor/gitops/backend/frontend/inventory) — '모든 것을 보는 눈'. 서버 소스는 이 플러그인이 동봉(server/) — 다른 레포 clone 불필요. launcher 가 CLAUDE_PLUGIN_DATA 에 venv 를 첫 실행 시 자동 부트스트랩하고 서버 버전 변경 시 재설치. 사용자는 개인 토큰/계정 env 만 export 하면 동작(URL 기본값은 launcher 제공). 중복/opt-out/실패 시 조용히 no-op.",
+    "illuminati": {
+      "command": "bash",
+      "args": [
+        "${CLAUDE_PLUGIN_ROOT}/scripts/illuminati-mcp-launch.sh",
+        "${user_config.workspace_root}",
+        "${CLAUDE_PLUGIN_DATA}"
+      ]
+    }
+  }
+}

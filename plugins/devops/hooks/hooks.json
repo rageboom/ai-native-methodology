@@ -1,0 +1,84 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'BRANCH=$(git branch --show-current 2>/dev/null || echo \"N/A\"); CHANGED=$(git diff --stat HEAD 2>/dev/null | tail -1 || echo \"N/A\"); DOCKER=$(docker ps --format \"{{.Names}}\" 2>/dev/null | wc -l | tr -d \" \" || echo \"N/A\"); echo \"Branch: $BRANCH | Uncommitted: $CHANGED | Docker containers: $DOCKER | Workspace root: ${user_config.workspace_root}\"'",
+            "timeout": 5000,
+            "statusMessage": "Checking environment...",
+            "once": true
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/illuminati-env-check.sh\" \"${user_config.workspace_root}\"",
+            "timeout": 5000,
+            "statusMessage": "Checking illuminati credentials...",
+            "once": true
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "INPUT=$(cat); filepath=$(echo \"$INPUT\" | jq -r '.tool_input.file_path // empty' 2>/dev/null); if [ -n \"$filepath\" ]; then case \"$filepath\" in *.java) cd \"$(git -C \"$(dirname \"$filepath\")\" rev-parse --show-toplevel 2>/dev/null || dirname \"$filepath\")\" && ./gradlew spotlessApply -q 2>/dev/null ;; *.kt|*.kts) cd \"$(git -C \"$(dirname \"$filepath\")\" rev-parse --show-toplevel 2>/dev/null || dirname \"$filepath\")\" && ./gradlew ktlintFormat -q 2>/dev/null ;; *.ts|*.tsx|*.js|*.jsx) cd \"$(git -C \"$(dirname \"$filepath\")\" rev-parse --show-toplevel 2>/dev/null || dirname \"$filepath\")\" && pnpm format --silent 2>/dev/null ;; esac; fi; exit 0",
+            "timeout": 30000,
+            "statusMessage": "Formatting code..."
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "INPUT=$(cat); filepath=$(echo \"$INPUT\" | jq -r '.tool_input.file_path // empty' 2>/dev/null); if [ -n \"$filepath\" ] && command -v kubeconform >/dev/null 2>&1; then case \"$filepath\" in *MIS-GitOps/*.yaml|*MIS-GitOps/*.yml) case \"$filepath\" in */templates/*|*/Chart.yaml|*/values*.yaml|*/values*.yml) : ;; *) kubeconform -strict -ignore-missing-schemas \"$filepath\" 2>&1 | head -20 ;; esac ;; esac; fi; exit 0",
+            "timeout": 15000,
+            "statusMessage": "kubeconform validating..."
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '## Compaction Context Reload\n- 배포 순서: dev → stg → live. live 직접 작업 금지\n- 코드 수정 후: Format → Compile → Lint 순서 실행\n- Git 커밋/푸시: 반드시 사용자 확인 후 실행\n- JIRA 티켓/댓글: 반드시 사용자 확인 후 실행\n- 프로젝트 경로: rule-project-paths skill 참조\n- 수정된 파일 목록과 현재 작업 중인 JIRA 티켓 번호를 반드시 기억'"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \"Claude Code 알림\" with title \"Claude Code\" sound name \"Glass\"' 2>/dev/null || true",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "osascript -e 'display notification \"Claude Code 작업이 완료되었습니다\" with title \"Claude Code\" sound name \"Glass\"' 2>/dev/null || true",
+            "async": true
+          }
+        ]
+      }
+    ]
+  }
+}

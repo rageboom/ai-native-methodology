@@ -1,0 +1,40 @@
+{
+  "name": "@mis-plugins/sre",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "description": "MIS 관측성·트러블슈팅. Linux/K8s/네트워크/미들웨어 진단 agent 4종(read-only, 경계 비중첩), LGTM 텔레메트리 교차조사·로그 타임라인 추출, SLO/alert/OTel 파이프라인 설계, 장애 포스트모템 작성 agent, cross-layer 장애 분류 /triage command.",
+  "license": "UNLICENSED",
+  "homepage": "https://github.smilegate.net/SGH-ISD/ai-native-methodology",
+  "author": {
+    "name": "MIS",
+    "email": "sangcl@smilegate.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.smilegate.net/SGH-ISD/ai-native-methodology.git",
+    "directory": "plugins/sre"
+  },
+  "files": [
+    ".claude-plugin",
+    "agents",
+    "skills",
+    "hooks",
+    "commands",
+    "flows",
+    "templates",
+    "CHANGELOG.md",
+    "README.md",
+    "!**/test",
+    "!**/tests",
+    "!**/__tests__",
+    "!**/*.test.js",
+    "!**/node_modules"
+  ],
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "publishConfig": {
+    "registry": "https://repo.smiledev.net/repository/npm-hosted/"
+  }
+}

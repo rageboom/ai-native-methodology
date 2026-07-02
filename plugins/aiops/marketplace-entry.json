@@ -1,0 +1,3 @@
+{
+  "description": "MIS AI 자동화(AIOps). 사내 워크플로우 자동화 설계 agent(automation-architect, n8n 등), MCP 서버 개발 agent(mcp-developer, Go/Python), AI 코딩 도구 표준·정책 큐레이션 skill(ai-tooling-curator). 설치 후 workspace_root 설정 필요."
+}

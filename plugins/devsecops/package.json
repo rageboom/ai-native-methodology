@@ -1,0 +1,40 @@
+{
+  "name": "@mis-plugins/devsecops",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "description": "MIS 보안(DevSecOps). Kyverno/Trivy/Falco 정책 현황 분석 agent(security-policy-analyst), CIS/NSA/PSS 기준 K8s·Compose 보안 리뷰 체크리스트 skill(devsecops-review), 보호파일(.env/.key/.pem) 편집 차단·위험명령 차단 hook.",
+  "license": "UNLICENSED",
+  "homepage": "https://github.smilegate.net/SGH-ISD/ai-native-methodology",
+  "author": {
+    "name": "MIS",
+    "email": "sangcl@smilegate.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.smilegate.net/SGH-ISD/ai-native-methodology.git",
+    "directory": "plugins/devsecops"
+  },
+  "files": [
+    ".claude-plugin",
+    "agents",
+    "skills",
+    "hooks",
+    "commands",
+    "flows",
+    "templates",
+    "CHANGELOG.md",
+    "README.md",
+    "!**/test",
+    "!**/tests",
+    "!**/__tests__",
+    "!**/*.test.js",
+    "!**/node_modules"
+  ],
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "publishConfig": {
+    "registry": "https://repo.smiledev.net/repository/npm-hosted/"
+  }
+}

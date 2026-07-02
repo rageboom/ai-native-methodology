@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "INPUT=$(cat); FILE_PATH=$(echo \"$INPUT\" | jq -r '.tool_input.file_path // empty' 2>/dev/null); if [ -n \"$FILE_PATH\" ]; then case \"$(basename \"$FILE_PATH\")\" in .env|.env.*|*.key|*.pem) echo \"BLOCKED: $FILE_PATH is a protected file\" >&2; exit 2 ;; esac; fi; exit 0",
+            "timeout": 1000
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "INPUT=$(cat); CMD=$(echo \"$INPUT\" | jq -r '.tool_input.command // empty' 2>/dev/null); if [ -n \"$CMD\" ]; then case \"$CMD\" in *'rm -rf /'*|*'rm -rf /*'*) echo \"BLOCKED: Destructive rm -rf on root is not allowed\" >&2; exit 2 ;; *'git push'*'--force'*|*'git push'*'-f '*) echo \"BLOCKED: Force push detected. Use regular push or get explicit approval.\" >&2; exit 2 ;; *'git reset --hard'*) echo \"WARNING: git reset --hard detected. Uncommitted changes will be lost.\" >&2; exit 2 ;; *'git clean -f'*) echo \"WARNING: git clean -f will delete untracked files permanently.\" >&2; exit 2 ;; *'kubectl delete'*'--all'*) echo \"BLOCKED: kubectl delete --all is too dangerous. Specify resources explicitly.\" >&2; exit 2 ;; *'kubectl apply'*'--force'*) echo \"BLOCKED: kubectl apply --force is not recommended. Use regular apply.\" >&2; exit 2 ;; *'helm delete'*|*'helm uninstall'*) echo \"WARNING: Helm release deletion detected. Confirm this is intentional.\" >&2; exit 2 ;; *'docker system prune'*) echo \"WARNING: docker system prune will remove all unused data.\" >&2; exit 2 ;; esac; fi; exit 0",
+            "timeout": 1000
+          }
+        ]
+      }
+    ]
+  }
+}

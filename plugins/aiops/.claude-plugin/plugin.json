@@ -1,0 +1,26 @@
+{
+  "name": "aiops",
+  "version": "0.1.0",
+  "description": "MIS AI 자동화(AIOps). 사내 워크플로우 자동화 설계 agent(automation-architect, n8n 등), MCP 서버 개발 agent(mcp-developer, Go/Python), AI 코딩 도구 표준·정책 큐레이션 skill(ai-tooling-curator). 설치 후 workspace_root 설정 필요.",
+  "author": {
+    "name": "MIS",
+    "email": "sangcl@smilegate.com"
+  },
+  "homepage": "https://github.smilegate.net/SGH-ISD/ai-native-methodology",
+  "license": "UNLICENSED",
+  "keywords": [
+    "aiops",
+    "claude-code",
+    "devops",
+    "infra",
+    "mis-plugins"
+  ],
+  "userConfig": {
+    "workspace_root": {
+      "type": "directory",
+      "title": "회사 레포 workspace 루트",
+      "description": "MIS-DevOps, MIS-GitOps, eam, tlm, gea, sgh-mis-observer 등 회사 GHE 레포들을 클론해 둔 최상위 디렉토리. agent/skill/command 안의 경로가 전부 이 값 기준으로 치환된다.",
+      "required": true
+    }
+  }
+}
