@@ -22,7 +22,7 @@
 
 import { existsSync, readFileSync, readdirSync, appendFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { basename, dirname, join, resolve, isAbsolute, relative } from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import {
 	initState,
@@ -63,7 +63,11 @@ import {
 	analysisOutputPresent,
 	minimalSubsetPresent,
 } from '../../_shared/ai-context-layout.js';
-import { deriveGateActor, userGateTokenFresh } from './gate-provenance.js';
+import {
+	deriveGateActor,
+	userGateTokenFresh,
+	autoDelegationTokenFresh,
+} from './gate-provenance.js';
 import { planLayoutMigration, applyLayoutMigration } from './migrate-layout.js';
 import { computeTriageSignals } from './triage.js';
 import { evaluateFastPathRecord } from './fastpath-gate.js';
@@ -77,6 +81,8 @@ import {
 	nextStage,
 	validateStateAgainstFlow,
 	getGateForStage,
+	SURFACING_ENFORCED_STAGES,
+	stageHasReviewServer,
 } from './stage-graph.js';
 import {
 	evaluateGate,
@@ -107,6 +113,7 @@ import {
 	revisitCandidateNote,
 	branchGuardReason,
 	deriveGateDecisionToken,
+	deriveAutoDelegation,
 } from './hooks-bridge.js';
 import { randomUUID } from 'node:crypto';
 import { gitDiffNumstat, detectRevisit } from './revisit-detect.js';
@@ -495,6 +502,28 @@ function drainLiftCandidates(root, scope, { clear = true } = {}) {
 	return buildLiftAdvisory(lift, pending);
 }
 
+// Q2: chain-driver 가 gate hold 시 plan-review-server 를 결정론 spawn (discovery/spec/plan).
+//   스킬(LLM) 대신 도구가 리뷰 서버를 띄워 "HTML 리뷰가 뜬다"를 결정론화 — 서버는 reference-lens(판정 무생성 / gate-eval 무오염).
+//   detached + inherit → 서버가 PLAN_REVIEW_URL 을 사용자 터미널에 직접 출력 + 브라우저 자동 open. spawn 실패는 게이트 무손상(try/catch).
+//   비-TTY(CI/test) 에서는 호출측이 skip.
+function spawnReviewServer(projectRoot, stage) {
+	try {
+		const here = dirname(fileURLToPath(import.meta.url));
+		const serverCli = join(here, '..', '..', 'plan-review-server', 'src', 'cli.js');
+		if (!existsSync(serverCli)) return false;
+		const child = spawn(
+			process.execPath,
+			[serverCli, '--phase', stage, '--project', projectRoot],
+			{ detached: true, stdio: ['ignore', 'inherit', 'inherit'] },
+		);
+		child.on('error', () => {});
+		child.unref();
+		return true;
+	} catch {
+		return false;
+	}
+}
+
 function cmdNext(args) {
 	if (!args.project) usage(3);
 	const root = resolve(args.project);
@@ -623,25 +652,29 @@ function cmdNext(args) {
 		process.exit(1);
 	}
 
-	// gate #0 (analysis exit) 표면화 강제 (DEC-2026-07-02-analysis-exit-gate-surfacing-hard-deny).
+	// gate 표면화 강제 (#0~#5 / DEC-2026-07-02 + gate-deterministic-surfacing 확장).
 	//   판정·차단은 이미 결정론(gate-eval + state.blocked). 여기서 layer 3(표면화)을 결정론 전제조건으로 승격:
-	//   #0 이 통과하더라도, 위조불가 사용자 결정 토큰(user_gate_token) 또는 --auto-mode 위임이 없으면 전진 ❌ →
+	//   게이트가 통과하더라도, 위조불가 사용자 결정 토큰(user_gate_token) 또는 --auto-mode 위임이 없으면 전진 ❌ →
 	//   hold: pending_gate set + 리뷰 렌더 + blocked(gate_not_surfaced). 토큰은 UserPromptSubmit 훅만 발급
 	//   (LLM 은 UserPromptSubmit 이벤트를 유발 불가 = 위조불가 / plan-review-server spawn 마커 동급 신호).
-	//   DEC-2026-06-25 의 "Phase 2 hard-deny carry" 실행 — 단 위조불가 신호 위에서만 정당(text 마커 '벽 사칭' 회피 / doctrine 정합).
-	//   #1~#5 는 무영향 (서버 마커 advisory 유지 — 별개 신호 클래스).
-	const isAnalysisExitGate = stage === 'analysis';
+	//   DEC-2026-06-25 의 "Phase 2 hard-deny" 실행 — 단 위조불가 신호 위에서만 정당(text 마커 '벽 사칭' 회피 / doctrine 정합).
+	//   #0(analysis)=DEC-2026-07-02 선행 / #1~#5=본 확장. discovery/spec/plan 은 리뷰 서버 결정론 spawn(아래).
+	const gid = getGateForStage(stage);
+	const surfacingEnforced = SURFACING_ENFORCED_STAGES.has(stage);
 	const gateTokenFresh =
-		isAnalysisExitGate &&
+		surfacingEnforced &&
 		userGateTokenFresh(state.user_gate_token, stage, state.pending_gate?.presented_at) &&
 		// 결단 일치 의무 — 사용자가 'stop' 로 만든 토큰으로 LLM 이 'go' 를 밀어넣어 전진하는 것 차단.
 		state.user_gate_token?.decision === args.userDecision;
-	if (isAnalysisExitGate && !args.autoMode && !gateTokenFresh) {
+	// Q3: --auto-mode 는 위조불가 위임 토큰(UserPromptSubmit 발급)이 있어야만 유효 — 플래그 단독(LLM-passable)으로는 표면화 우회 ❌.
+	const autoModeAuthorized =
+		args.autoMode && autoDelegationTokenFresh(state.user_auto_delegation_token);
+	if (surfacingEnforced && !autoModeAuthorized && !gateTokenFresh) {
 		const presentedAt = new Date().toISOString();
 		writeStateCAS(root, (s) => {
 			s.pending_gate = {
-				stage: 'analysis',
-				gate_id: getGateForStage(stage),
+				stage,
+				gate_id: gid,
 				presented_at: presentedAt,
 				findings_snapshot: {
 					critical: findings.critical || 0,
@@ -656,6 +689,11 @@ function cmdNext(args) {
 			s.block_scope = s.current_scope ?? null;
 			return s;
 		});
+		// Q2: discovery/spec/plan 은 chain-driver 가 리뷰 서버를 결정론 spawn (LLM 재량 제거). 비-TTY(CI/test) 는 skip.
+		const reviewSpawned =
+			stageHasReviewServer(stage) && process.stdout.isTTY
+				? spawnReviewServer(root, stage)
+				: false;
 		logIntervention(state, root, {
 			event_type: 'gate_decision',
 			actor: 'driver',
@@ -663,11 +701,11 @@ function cmdNext(args) {
 			decision: 'block',
 			exit_code: 1,
 			message:
-				'gate #0 표면화 hold (gate_not_surfaced) — 위조불가 사용자 결정 토큰 부재. 사용자가 리뷰를 보고 go/stop 을 결단(프롬프트 제출)해야 전진.',
+				'게이트 표면화 hold (gate_not_surfaced) — 위조불가 사용자 결정 토큰 부재. 사용자가 리뷰를 보고 go/stop 을 결단(프롬프트 제출)해야 전진.',
 		});
 		console.error(renderGateSummaryText(gateSummary));
 		console.error(
-			'[chain-driver] ⛔ gate #0 (analysis exit) 표면화 강제 (DEC-2026-07-02): 위 리뷰를 사용자에게 제시하세요. ' +
+			'[chain-driver] ⛔ 게이트 표면화 강제: 위 리뷰를 사용자에게 제시하세요. ' +
 				'사용자가 직접 go/stop 을 결단(프롬프트 제출)해야 전진합니다 — LLM 이 임의로 --user-decision go 를 넣어도 ' +
 				'전진하지 않습니다(위조불가 토큰 요구). Auto Mode 명시 위임이면 --auto-mode. (blocked=gate_not_surfaced / advisory 아님 / 결정론 hold)',
 		);
@@ -679,10 +717,11 @@ function cmdNext(args) {
 					gate: finalDecision,
 					summary: gateSummary,
 					pending_gate: {
-						stage: 'analysis',
-						gate_id: getGateForStage(stage),
+						stage,
+						gate_id: gid,
 						presented_at: presentedAt,
 					},
+					review_server_spawned: reviewSpawned,
 				},
 				null,
 				2,
@@ -738,10 +777,14 @@ function cmdNext(args) {
 			s.block_reason = null;
 			s.block_scope = null;
 		}
-		// gate #0 표면화 강제 (DEC-2026-07-02) — 전진 성사 → pending_gate clear + 위조불가 토큰 단일 소비.
+		// gate 표면화 강제 (#0~#5) — 전진 성사 → pending_gate clear + 위조불가 결정 토큰 단일 소비.
 		s.pending_gate = null;
 		if (s.user_gate_token && s.user_gate_token.stage === stage) {
 			s.user_gate_token = null;
+		}
+		// Q3: 체인 terminal(implement 완료 / next=null) 도달 시 auto 위임 토큰도 clear — 위임 범위 = 1 체인 run.
+		if (!next && s.user_auto_delegation_token) {
+			s.user_auto_delegation_token = null;
 		}
 		return s;
 	});
@@ -1961,6 +2004,30 @@ function cmdHooksBridge(args) {
 		try {
 			const gRoot = payload.cwd || process.cwd();
 			const gState = readState(gRoot);
+			// Q3: Auto Mode 위조불가 위임 토큰 발급 — "전부 자동 진행" 류 프롬프트 (pending_gate 무관 / 사전 위임 가능).
+			//   --auto-mode 플래그는 LLM-passable(위조가능)이므로, 이 토큰(사람 프롬프트 제출로만 발생 = 위조불가)이 있어야만
+			//   cmdNext 가 auto-mode 전진을 허용. go 패턴은 시작앵커라 여기와 비충돌.
+			if (gState && deriveAutoDelegation(payload.prompt)) {
+				const issuedAt = new Date().toISOString();
+				const nonce = randomUUID();
+				writeStateCAS(gRoot, (s) => {
+					s.user_auto_delegation_token = { issued_at: issuedAt, nonce, consumed: false };
+					return s;
+				});
+				process.stdout.write(
+					JSON.stringify({
+						suppressOutput: true,
+						continue: true,
+						hookSpecificOutput: {
+							hookEventName: 'UserPromptSubmit',
+							additionalContext:
+								'사용자가 Auto Mode 를 위임했습니다 — 위조불가 위임 토큰 발급. 이제 chain-driver next --auto-mode 가 게이트를 ' +
+								'일괄 통과합니다 (게이트별 검토 생략 / 사용자 명시 위임 기록). 개별 게이트에서 stop 을 제출하면 그 지점에서 중단됩니다.',
+						},
+					}) + '\n',
+				);
+				process.exit(0);
+			}
 			if (gState && gState.pending_gate && gState.pending_gate.stage) {
 				const tok = deriveGateDecisionToken(payload.prompt, gState.pending_gate);
 				if (tok) {
@@ -1986,7 +2053,7 @@ function cmdHooksBridge(args) {
 								additionalContext:
 									`사용자가 gate ${gid} 결단 '${tok.decision}' 을 제출했습니다 — 위조불가 토큰 발급 완료 (DEC-2026-07-02). ` +
 									`이제 chain-driver next <project> --user-decision ${tok.decision} --json (사용자 향: /chain-next) 를 실행해 전이하세요. ` +
-									`gate #0 은 이 위조불가 토큰이 있어야만 전진합니다 (LLM 이 임의로 넣은 --user-decision 만으로는 전진 ❌).`,
+									`gate ${gid} 은 이 위조불가 토큰이 있어야만 전진합니다 (LLM 이 임의로 넣은 --user-decision 만으로는 전진 ❌).`,
 							},
 						}) + '\n',
 					);

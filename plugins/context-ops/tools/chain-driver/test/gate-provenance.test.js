@@ -4,7 +4,12 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { deriveGateActor, reviewPassageFresh } from '../src/gate-provenance.js';
+import {
+	deriveGateActor,
+	reviewPassageFresh,
+	userGateTokenFresh,
+	autoDelegationTokenFresh,
+} from '../src/gate-provenance.js';
 import { gateReviewPassagePath } from '../../_shared/ai-context-layout.js';
 
 // DEC-2026-06-25-gate-review-bypass-guard (Phase 1) — actor provenance 정직 도출.
@@ -104,5 +109,38 @@ describe('reviewPassageFresh — 디스크 read (plan-review-server 마커 실�
 		} finally {
 			rmSync(root, { recursive: true, force: true });
 		}
+	});
+});
+
+// gate-deterministic-surfacing (#1~#5 확장 + Q3) — 위조불가 토큰 fresh 판정 헬퍼.
+describe('위조불가 토큰 fresh 판정 (userGateTokenFresh / autoDelegationTokenFresh)', () => {
+	const P = '2026-07-02T09:00:00Z';
+	it('userGateTokenFresh: stage 일치 + unconsumed + issued_at>=presented → true', () => {
+		const t = { stage: 'discovery', decision: 'go', issued_at: '2026-07-02T10:00:00Z', consumed: false };
+		assert.equal(userGateTokenFresh(t, 'discovery', P), true);
+	});
+	it('userGateTokenFresh: stage 불일치 → false', () => {
+		const t = { stage: 'spec', issued_at: '2026-07-02T10:00:00Z', consumed: false };
+		assert.equal(userGateTokenFresh(t, 'discovery', P), false);
+	});
+	it('userGateTokenFresh: consumed → false', () => {
+		const t = { stage: 'discovery', issued_at: '2026-07-02T10:00:00Z', consumed: true };
+		assert.equal(userGateTokenFresh(t, 'discovery', P), false);
+	});
+	it('userGateTokenFresh: stale(issued<presented) → false', () => {
+		const t = { stage: 'discovery', issued_at: '2026-07-02T08:00:00Z', consumed: false };
+		assert.equal(userGateTokenFresh(t, 'discovery', P), false);
+	});
+	it('userGateTokenFresh: null → false', () => {
+		assert.equal(userGateTokenFresh(null, 'discovery', P), false);
+	});
+	it('autoDelegationTokenFresh: 존재 + unconsumed → true', () => {
+		assert.equal(autoDelegationTokenFresh({ issued_at: 'x', nonce: 'n', consumed: false }), true);
+	});
+	it('autoDelegationTokenFresh: consumed → false', () => {
+		assert.equal(autoDelegationTokenFresh({ consumed: true }), false);
+	});
+	it('autoDelegationTokenFresh: null → false', () => {
+		assert.equal(autoDelegationTokenFresh(null), false);
 	});
 });

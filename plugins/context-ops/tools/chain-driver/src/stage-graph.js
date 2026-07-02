@@ -61,6 +61,26 @@ export function getGateForStage(stage) {
 	return map[stage] ?? null;
 }
 
+// 표면화 강제 대상 stage — go/stop/revisit 게이트가 무조건 표출되어야 하는(위조불가 토큰 없이 전진 ❌) stage 집합.
+//   #0(analysis)=DEC-2026-07-02 / #1~#5=확장(gate-deterministic-surfacing). 판정은 이미 결정론(gate-eval);
+//   여기서 표면화(사람 결단 provenance)를 결정론 전제조건으로 승격 — 위조불가 신호(user_gate_token) 위에서만 정당.
+export const SURFACING_ENFORCED_STAGES = new Set([
+	'analysis',
+	'discovery',
+	'spec',
+	'plan',
+	'test',
+	'implement',
+]);
+
+// plan-review-server phase 모드가 존재하는 stage — chain-driver 가 hold 시 리뷰 서버를 결정론 spawn(Q2).
+//   analysis/test/implement 는 브라우저 리뷰 서버 없음(텍스트 게이트) → spawn 없이 텍스트 hold.
+export const REVIEW_SERVER_STAGES = new Set(['discovery', 'spec', 'plan']);
+
+export function stageHasReviewServer(stage) {
+	return REVIEW_SERVER_STAGES.has(stage);
+}
+
 // upstream(target) = stages that come before target — used by revisit-detect.
 export function isUpstream(target, current) {
 	const ti = STAGES.indexOf(target);

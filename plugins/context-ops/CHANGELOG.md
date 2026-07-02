@@ -10,6 +10,16 @@
 
 ---
 
+## [0.94.0] — 2026-07-02 — MINOR — gate 표면화 결정론 hard-deny #1~#5 확장 + Auto Mode 위조불가 위임 토큰 (DEC-2026-06-25 Phase 2 완료)
+
+- **surfacing hard-deny #1~#5 확장**: `SURFACING_ENFORCED_STAGES = {analysis,discovery,spec,plan,test,implement}` — cmdNext 전이 guard 가 위조불가 `user_gate_token`(UserPromptSubmit 훅만 발급 / LLM 이벤트 유발 불가) 없으면 전진 거부(hold: pending_gate + blocked=gate_not_surfaced + exit 1). gate #0(DEC-2026-07-02) 패턴을 #1~#5 로 일반화 — **FSM 전이 함수 내부 guard**(신규 상태·전이 도입 ❌ / 기존 stage-generic 배선 재사용). go/stop/revisit 이 어떤 오케스트레이션(Workflow 자동주행 포함)에서도 무조건 표출.
+- **HTML 리뷰 결정론 spawn (Q2)**: discovery/spec/plan hold 시 chain-driver 가 plan-review-server 를 결정론 spawn(스킬 LLM 대신). 서버 = reference-lens(판정 무생성 / gate-eval 무오염 / spawn = 결정론 side-effect ≠ LLM inject). 비-TTY(CI/test) skip. 스킬 spawn 과 상보(정상 흐름=스킬 spawn→토큰→hold 없음 / 우회 시=chain-driver backstop / 이중 spawn 없음).
+- **Auto Mode 위조불가 위임 토큰 (Q3)**: `--auto-mode` 플래그 단독(LLM-passable) 우회 봉인 — `user_auto_delegation_token`(UserPromptSubmit "전부 자동/알아서 진행" 발급)이 fresh 할 때만 auto-mode 전진 유효. 세션 위임(per-gate 소비 ❌ / 체인 terminal clear). state.schema 추가.
+- 테스트: chain-driver 791/791 + gate-provenance 신규 헬퍼 단위(userGateTokenFresh/autoDelegationTokenFresh 8) + f-cha·gate-surfacing 갱신(위임 토큰 발급 스텝 + no-token hold) + 워크스페이스 2346 pass.
+- DEC-2026-07-02-gate-surfacing-hard-deny-chain-stages / Resolves F-DOGFOOD-019 후속.
+
+---
+
 ## [0.93.0] — 2026-07-02 — MINOR — gate #0 표면화(layer 3) 결정론 강제 — 위조불가 UserPromptSubmit 토큰 (DEC-2026-06-25 Phase 2 실행 / additive)
 
 **문제 (ep-fe-mis dogfood 발견 / 코드 검증)**: gate 는 3계층 — 판정(evaluate) · 차단(block) · 표면화(surface). 판정·차단은 이미 결정론(gate-eval + `state.blocked` → PreToolUse deny)이지만 **표면화(go/stop/revisit 리뷰가 실제로 사용자에게 뜨는 것)** 는 LLM 이 `_base-invoke-go-stop-gate` 스킬을 호출해야만 발생 = 강제 아님(nudge). 특히 **gate #0(analysis exit)** 은 plan-review-server 미지원 + 스킬 stage 목록 부재로 표면화 신호가 **0** — 통과하는 #0 이 검토 UX 를 통째 건너뛰고 조용히 auto-advance (DEC-2026-06-25 §문제 leak 의 #0 판). DEC-2026-06-25 는 hard-deny 를 "Phase 2 carry"(≥2 PoC + 위조불가 신호 전제)로 연기했고, "LLM-writable text 마커 hard-deny = 벽 사칭 금지" 원칙을 명시했다.

@@ -134,6 +134,23 @@ export function deriveGateDecisionToken(prompt, pendingGate) {
 	return null;
 }
 
+// Auto Mode 위임 패턴 (Q3 / gate-deterministic-surfacing) — 사용자가 "전부 자동/알아서 진행" 류로 세션 위임 시
+//   위조불가 delegation 토큰 발급 근거. --auto-mode 플래그는 LLM-passable(위조가능)이라, 이 위조불가 토큰
+//   (UserPromptSubmit 발급)이 있어야만 auto-mode 전진이 유효. go 패턴은 ^\s* 시작앵커라 "전부 자동 진행"과 비충돌.
+const AUTO_DELEGATION_PATTERNS = [
+	/전부\s*자동/,
+	/자동(?:으?로)?\s*(?:진행|처리)/,
+	/알아서\s*(?:진행|처리|해|해줘|가)/,
+	/모두\s*자동/,
+	/일괄\s*(?:승인|진행)/,
+	/auto[- ]?mode\b/i,
+];
+
+export function deriveAutoDelegation(prompt) {
+	if (typeof prompt !== 'string') return false;
+	return AUTO_DELEGATION_PATTERNS.some((re) => re.test(prompt));
+}
+
 // Inspect a UserPromptSubmit prompt for chain stage trigger keywords.
 // v4.0: TRIGGER_PATTERNS 의 entry 마다 agentId 추가 (stage 별 sub-agent dispatch / DEC-2026-05-17).
 // analysis stage entry 추가 (B1 보강 통합 / hooks-bridge TRIGGER_PATTERNS 가 chain 1~4 만 커버 → 5 stage 모두).

@@ -58,6 +58,13 @@ export function userGateTokenFresh(token, stage, presentedAt) {
 	return true;
 }
 
+// Auto Mode 위조불가 위임 토큰 fresh 판정 (Q3 / gate-deterministic-surfacing).
+//   --auto-mode 플래그(LLM-passable = 위조가능)는 이 위조불가 토큰(UserPromptSubmit 발급)이 있어야만 유효.
+//   세션/체인 위임이라 per-gate 소비 ❌ (존재 + 미회수 = fresh). 체인 terminal 도달 시 cli.js 가 clear.
+export function autoDelegationTokenFresh(token) {
+	return !!token && !token.consumed;
+}
+
 // intervention-log actor provenance 결정론 도출.
 //   args = { userDecision, autoMode } / projectRoot / stage / activeChain / (reader 테스트 주입) /
 //   userTokenFresh = gate #0 위조불가 토큰 fresh 여부 (DEC-2026-07-02 / 없으면 undefined=미해당).

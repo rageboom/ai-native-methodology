@@ -148,14 +148,46 @@ describe('gate #0 표면화 강제 E2E (CLI)', () => {
 		assert.equal(s.current_chain, 'analysis', '미전진 (analysis 유지)');
 	});
 
-	it('`--user-decision go --auto-mode` → 전진 (exit0 / discovery / actor=user_auto)', () => {
+	it('`--auto-mode` 단독(위임 토큰 없음) → hold (Q3: 플래그만으론 우회 ❌)', () => {
+		const root = freshRoot('auto-notoken');
+		const r = next(root, ['--user-decision', 'go', '--auto-mode']);
+		assert.equal(r.status, 1, `위임 토큰 없는 auto-mode 는 hold exit1 (got ${r.status}) / ${r.stderr}`);
+		const s = readState(root);
+		assert.equal(s.blocked, true, 'hold → blocked');
+		assert.equal(s.current_chain, 'analysis', '미전진');
+	});
+
+	it('위조불가 위임 토큰 발급 후 `--auto-mode` → 전진 (exit0 / discovery / actor=user_auto)', () => {
 		const root = freshRoot('auto');
+		// Q3: Auto Mode 는 위조불가 위임 토큰(UserPromptSubmit)이 있어야만 유효.
+		const hd = hook(root, { hook_event_name: 'UserPromptSubmit', prompt: '전부 자동 진행' });
+		assert.equal(hd.status, 0, `위임 훅 exit0 (got ${hd.status}) / ${hd.stderr}`);
+		assert.ok(readState(root).user_auto_delegation_token, '위임 토큰 발급됨');
 		const r = next(root, ['--user-decision', 'go', '--auto-mode']);
 		assert.equal(r.status, 0, `auto 위임 전진 exit 0 (got ${r.status}) / ${r.stderr}`);
 		const s = readState(root);
 		assert.equal(s.blocked, false);
 		assert.equal(s.current_chain, 'discovery', '전진 = discovery');
 		assert.equal(s.pending_gate ?? null, null, 'pending_gate clear');
+	});
+
+	// #1~#5 확장 실증 — mid-chain 도 토큰 없이 hold → 토큰 후 advance (gate #0 뿐 아니라 확장 증거).
+	//   순서: next(hold)→hook(토큰)→next(advance) — pending_gate 는 hold 가 set 하므로 hook 은 hold 뒤라야 발급됨.
+	it('#1~#5 확장: analysis(#0)→discovery(#1)→spec 각 stage 토큰 없이 hold → 토큰 후 advance', () => {
+		const root = freshRoot('walk');
+		const walk = (gid, toStage) => {
+			let r = next(root, ['--user-decision', 'go']);
+			assert.equal(r.status, 1, `${gid} 토큰 없이 hold exit1 (got ${r.status}) / ${r.stderr}`);
+			const held = readState(root);
+			assert.equal(held.block_reason, 'gate_not_surfaced', `${gid} block_reason=gate_not_surfaced`);
+			assert.equal(held.pending_gate?.gate_id, gid, `${gid} pending_gate.gate_id`);
+			hook(root, { hook_event_name: 'UserPromptSubmit', prompt: 'go' });
+			r = next(root, ['--user-decision', 'go']);
+			assert.equal(r.status, 0, `${gid} 전진 exit0 (got ${r.status}) / ${r.stderr}`);
+			assert.equal(readState(root).current_chain, toStage, `${gid} → ${toStage}`);
+		};
+		walk('#0', 'discovery'); // analysis(#0) → discovery
+		walk('#1', 'spec'); // discovery(#1) → spec  ← 확장 핵심 (mid-chain #1 도 hold)
 	});
 
 	it('위조불가 토큰 발급(UserPromptSubmit) 후 go → 전진 + 토큰 소비', () => {
